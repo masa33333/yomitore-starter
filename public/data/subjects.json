@@ -1,0 +1,18 @@
+[
+  {
+    "id": "english",
+    "name": "English Vocabulary",
+    "questions": [
+      {
+        "question": "What is the synonym of 'happy'?",
+        "options": ["Sad", "Angry", "Joyful", "Tired"],
+        "answer": "Joyful"
+      },
+      {
+        "question": "What does 'run' mean?",
+        "options": ["Walk", "Sleep", "Jog", "Eat"],
+        "answer": "Jog"
+      }
+    ]
+  }
+]
