@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getNextUnreachedCity } from '@/lib/getNextCity';
 import MailNotification from '@/components/MailNotification';
+import { getLetterFromStorage } from '@/lib/letterStorage';
 
 // 構造見出しを除去する関数
 const filterStructuralHeadings = (paragraphs: string[]): string[] => {
@@ -2406,6 +2407,26 @@ function ReadingPageContent() {
     }
   }, [english, japanese, isStoryMode]);
 
+  // 📮 手紙・メール確認関数
+  const checkForAvailableLetter = (): { hasLetter: boolean; letterType: 'letter' | 'mail' | null; catName: string } => {
+    const letter = getLetterFromStorage();
+    const catName = localStorage.getItem('catName') || 'あなたのネコ';
+    
+    if (letter) {
+      return {
+        hasLetter: true,
+        letterType: letter.type as 'letter' | 'mail',
+        catName
+      };
+    }
+    
+    return {
+      hasLetter: false,
+      letterType: null,
+      catName
+    };
+  };
+
   // 新しい難易度を選択（読了後の再読み用）
   const handleNewDifficultySelect = async (difficulty: string) => {
     // ③ 「読み直す」「レベル変更」などのイベントでは以下を実行：
@@ -2640,14 +2661,11 @@ function ReadingPageContent() {
       setShowTranslationButton(true);
       setHasError(false);
       
-      // 語数をlocalStorageに保存（読了時の累積）
-      const currentTotalWords = parseInt(localStorage.getItem('wordCount') || '0', 10);
-      const newTotalWords = currentTotalWords + wordCount;
-      localStorage.setItem('wordCount', newTotalWords.toString());
-      console.log('✅ 語数保存完了:', { 
-        wordsRead: wordCount, 
-        previousTotal: currentTotalWords, 
-        newTotal: newTotalWords 
+      // 🔧 修正: 語数の重複更新を防止
+      // saveReadingHistory() → saveToHistory() で既に wordCount が更新されるため
+      // ここでの手動更新は削除（重複を防ぐ）
+      console.log('📊 Word count will be updated by saveToHistory() through saveReadingHistory()', { 
+        wordsRead: wordCount
       });
       
     } else {
@@ -3989,6 +4007,22 @@ function ReadingPageContent() {
               {/* アクションボタン */}
               <div className="bg-white border border-gray-300 rounded p-4">
                 <div className="flex gap-2 flex-wrap">
+                  {/* 📮 手紙・メール確認ボタン */}
+                  {(() => {
+                    const letterInfo = checkForAvailableLetter();
+                    return letterInfo.hasLetter ? (
+                      <button
+                        onClick={() => router.push('/letter')}
+                        className="bg-[#FFE1B5] text-[#1E1E1E] px-3 py-1 rounded text-sm hover:bg-[#e5a561] flex items-center gap-1"
+                      >
+                        {letterInfo.letterType === 'mail' ? '✉️' : '📮'} 
+                        {letterInfo.letterType === 'mail' 
+                          ? `${letterInfo.catName}からのメールを見る` 
+                          : `${letterInfo.catName}からの手紙を見る`}
+                      </button>
+                    ) : null;
+                  })()}
+                  
                   <button
                     onClick={handleLevelChange}
                     className="bg-[#FFB86C] text-[#1E1E1E] px-3 py-1 rounded text-sm hover:bg-[#e5a561]"
