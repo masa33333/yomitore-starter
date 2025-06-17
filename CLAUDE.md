@@ -72,12 +72,13 @@ npm run lint && npm run test
 
 ---
 
-## 🔨 Live TODO (2025‑06‑15)
+## 🔨 Live TODO (2025‑06‑17)
 
 * [ ] Adjust cat/flag positions on map so Tokyo & Seoul markers do not overlap popup.
 * [ ] Replace static map with react‑leaflet + dynamic zoom.
 * [ ] Ensure `vocabLevel` propagates to generateReading().
 * [ ] Remove legacy cat emoji overlay.
+* [x] **Mail notification system implementation (2025-06-17 COMPLETED)**
 
 ---
 
@@ -164,6 +165,92 @@ npm run lint && npm run test
 
 ---
 
+
+---
+
+## 📋 Work Session Summary (2025-06-17)
+
+### ✅ Completed Today
+
+**Mail Notification System Implementation** - Full automated mail/letter delivery system based on reading progress.
+
+#### Task 1: Arrival Mail Flags
+- **File**: `src/lib/arrivalMailUtils.ts`
+- **localStorage key**: `arrivalMail:<city>` = `"true"`
+- **Functions**: `setArrivalMailFlag()`, `hasArrivalMail()`, `clearArrivalMailFlag()`
+
+#### Task 2: In-Flight Mail Flags
+- **File**: `src/lib/inFlightMailUtils.ts` 
+- **localStorage key**: `inFlightSent:<leg>` = `[30,60,90]` (JSON array)
+- **Functions**: `addInFlightMail()`, `getInFlightMailMinutes()`, `hasInFlightMail()`
+
+#### Task 3: Send Arrival Mail
+- **File**: `src/lib/sendArrivalMail.ts`
+- **Function**: `sendArrivalMail(city)` - AI-generated arrival letters
+- **Dependencies**: `buildArrivalPrompt()`, `showNotification()`, `saveLetterToStorage()`
+
+#### Task 4: Send In-Flight Mail  
+- **File**: `src/lib/sendInFlightMail.ts`
+- **Function**: `sendInFlightMail(leg, minute)` - AI-generated journey emails
+- **Features**: Word count, WPM calculation, metrics tracking
+- **Dependencies**: `buildInFlightPrompt()`, `countWords()`, `calculateWPM()`
+
+#### Task 5: Progress Watcher Hook
+- **File**: `src/hooks/useProgressWatcher.ts`
+- **Function**: `useProgressWatcher()` - monitors reading progress every 1 minute
+- **Logic**: 
+  - Arrival check: `words >= ARRIVAL_WORDS[city]` → `sendArrivalMail()`
+  - In-flight check: `minutes >= milestone && !sent.includes(milestone)` → `sendInFlightMail()`
+- **Constants**: `src/constants/progress.ts` - city thresholds & flight milestones
+
+#### Task 6: Notification Text Switching
+- **File**: `src/components/MailNotification.tsx`
+- **Update**: Mail vs Letter icon differentiation
+  - Mail: `✉️ ${catName} から未読メールが届いています`
+  - Letter: `📮 ${catName} から手紙が届いています`
+
+#### Task 7: Progress Summary Data
+- **File**: `src/app/history/page.tsx`
+- **Update**: Removed default values `= 0` for `wordCount` and `wpm` since `saveToHistory()` guarantees these values
+
+### 📁 New Files Created
+
+```
+src/lib/arrivalMailUtils.ts          - Arrival mail flag management
+src/lib/inFlightMailUtils.ts         - In-flight mail flag management  
+src/lib/sendArrivalMail.ts           - Arrival mail generation & sending
+src/lib/sendInFlightMail.ts          - In-flight mail generation & sending
+src/lib/promptTemplates/arrivalPrompt.ts    - Arrival mail AI prompts
+src/lib/promptTemplates/inFlightPrompt.ts   - In-flight mail AI prompts
+src/lib/notificationUtils.ts         - Notification display utilities
+src/lib/wordCountUtils.ts            - Word counting & WPM calculation
+src/lib/progressUtils.ts             - Progress tracking utilities
+src/hooks/useProgressWatcher.ts      - Progress monitoring hook
+src/constants/progress.ts            - Progress thresholds & milestones
+```
+
+### 🔄 Integration Points
+
+1. **Progress Monitoring**: `useProgressWatcher()` should be called from main app layout
+2. **API Integration**: Mail generation uses `/api/generate-reading` with `isMailGeneration: true`
+3. **Storage Integration**: Uses existing `letterStorage.ts` for mail persistence
+4. **Notification Integration**: Uses existing notification system with type-based messages
+
+### 🛠 Next Steps / Future Work
+
+1. **UI Integration**: Add `useProgressWatcher()` to main app layout
+2. **Testing**: Test complete flow from reading → notifications → mail generation
+3. **Refinement**: Fine-tune AI prompts for better mail content quality
+4. **Performance**: Optimize progress checking frequency if needed
+5. **Analytics**: Add metrics tracking for mail engagement
+6. **Localization**: Ensure all new text supports i18n
+
+### 🐛 Known Issues to Monitor
+
+- API rate limiting for mail generation
+- localStorage size with accumulated mail data
+- Progress watcher performance with frequent checks
+- Mail generation fallback reliability
 
 ---
 
