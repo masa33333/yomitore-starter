@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
 
 【制約】
 - 単なる事実説明で終わらず、読者の心に残るような結びの一文を文末に入れてください。
+`;
 
     const jpResponse = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',

@@ -1,92 +1,130 @@
-# Quiz App
+# 多読トレーニングアプリ
 
-This **Quiz App** is built with **Next.js** and **Tailwind CSS**, providing a dynamic and engaging quiz experience. The app features a variety of interactive elements such as real-time scoring, a timer for each question, answer validation, and detailed results upon completion. The user interface is fully responsive and the quiz data is loaded from JSON files.
+このアプリは**Next.js**と**Tailwind CSS**で構築された英語多読練習アプリです。語彙レベル判定テストと個人のレベルに合わせた読み物生成機能を提供し、読書速度（WPM）の測定と履歴管理が可能です。
 
-## Live Demo
-[Click Here to Try the Quiz App](https://quiz-app-aman-kumar-sinha.vercel.app/)
+## 主要機能
 
-## Features
+### 1. **語彙レベル判定テスト**
+- 英語の語彙レベルを判定するクイズ機能
+- 正答数に基づいてレベル（1-10）を算出
+- テスト結果に基づいて適切なレベルの読み物を生成
 
-### 1. **Subject Selection**
-- Choose a subject from the home page.
-- Questions are dynamically loaded from JSON files located in the `/public/data` folder for each subject.
+### 2. **読み物生成機能**
+- OpenAI APIを使用した英語読み物の自動生成
+- テーマ、サブトピック、文体、語彙レベルを指定可能
+- 英文と日本語訳を同時生成
 
-### 2. **Timed Quiz**
-- Each question has a countdown timer of **10 seconds**.
-- If the timer runs out, the question is marked as unattempted.
+### 3. **読書速度（WPM）測定**
+- 読み始めから読了までの時間を自動計測
+- 語数と時間からWPM（Words Per Minute）を算出
+- リアルタイムで読書統計を表示
 
-### 3. **Answer Validation**
-- Selected answers turn **green** if correct, **red** if incorrect, and the correct answer is highlighted in green for immediate feedback.
+### 4. **読書履歴管理**
+- ローカルストレージで読書履歴を自動保存
+- 読書日時、テーマ、語数、WPM、読書時間を記録
+- 平均WPMや総読書時間などの統計情報を表示
 
-### 4. **Scoring System**
-- Earn **4 points** for each correct answer, with the score displayed at the top throughout the quiz.
+### 5. **直感的なユーザーインターフェース**
+- 日本語訳の表示/非表示切り替え機能
+- 読み直し、レベル変更、次の読み物への移動ボタン
+- レスポンシブデザインでモバイル・デスクトップ対応
 
-### 5. **Post-Quiz Results**
-- **Detailed Results Page**: After completing the quiz, users receive a comprehensive performance breakdown:
-  - Total Points
-  - Points Earned
-  - Correct Answers
-  - Wrong Answers
-  - Unattempted Questions
-  - Percentage
-  - Total Time Spent
-  - Average Time Per Question
-- The results page features icons and colors for improved readability, along with a celebratory **confetti** effect.
+## 使用技術
 
-### 6. **Responsive Design**
-- Fully responsive, ensuring seamless functionality across all devices, including mobile and desktop.
+- **Next.js 15**: React フレームワーク（App Router使用）
+- **TypeScript**: 型安全性とコード品質の向上
+- **Tailwind CSS**: ユーティリティファーストのCSSフレームワーク
+- **OpenAI API**: GPT-4を使用した英語読み物の生成
+- **React Hooks**: useState, useEffect等を使用した状態管理
 
-## Technologies Used
+## セットアップ方法
 
-- **Next.js**: For server-side rendering and static site generation.
-- **Tailwind CSS**: A utility-first CSS framework for styling.
-- **React Icons**: For scalable icons.
-- **Confetti**: For celebratory effects on the results page.
-- **react-use**: For handling window sizes, particularly for the confetti effect.
-- **JavaScript/ES6**: For component building and quiz logic.
-
-## How to Run the Project
-
-### 1. Clone the Repository
+### 1. リポジトリのクローン
 ```bash
-git clone https://github.com/AmanKumarSinhaGitHub/Quiz-App-in-NextJS.git
+git clone <repository-url>
+cd Quiz-App-in-NextJS-main
 ```
 
-### 2. Navigate to the Project Folder
-```bash
-cd quiz-app
-```
-
-### 3. Install Dependencies
+### 2. 依存関係のインストール
 ```bash
 npm install
 ```
 
-### 4. Run the Development Server
+### 3. 環境変数の設定
+`.env.local`ファイルを作成し、OpenAI APIキーを設定：
+```
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### 4. 開発サーバーの起動
 ```bash
 npm run dev
 ```
-Open your browser and go to `http://localhost:3000` to see the app in action.
+ブラウザで `http://localhost:3000` にアクセス
 
-## Project Structure
+## プロジェクト構成
 
-- `public/data/`: Contains JSON files for questions.
-- `components/Results.jsx`: Displays the quiz results.
-- `components/QuestionTimer.jsx`: Manages the countdown timer for questions.
-- `components/SubjectCard.jsx`: Displays the subjects available for selection.
-- `pages/index.js`: Home page listing available subjects.
-- `pages/quiz/[subject].js`: Quiz page for each subject.
-- `public/images`: Contains static assets like images.
-- `context/PointsContext.js`: Context for managing points state.
-- `layout.js`: Includes header and footer components.
+### APIルート
+- `src/app/api/generate-reading/route.ts`: 読み物生成API
+- `src/app/api/test-openai/route.ts`: OpenAI接続テスト用API
 
-## Future Improvements
+### ページ
+- `src/app/page.js`: ホームページ（語彙テスト選択）
+- `src/app/choose/page.tsx`: 語彙レベル判定テスト
+- `src/app/story-form/page.tsx`: 読み物生成条件入力フォーム
+- `src/app/reading/page.tsx`: 読み物表示・WPM測定ページ
+- `src/app/history/page.tsx`: 読書履歴表示ページ
 
-- **Backend Integration**: To allow dynamic question loading, user authentication, and real-time leaderboard updates.
-- **User Authentication**: Implement login and signup features to track user progress and performance.
-- **Difficulty Levels**: Add multiple difficulty levels for each subject to enhance the quiz experience.
-- **Question Bank Expansion**: Expand the quiz by adding more subjects and questions.
+### コンポーネント
+- `src/components/VocabularyQuiz.tsx`: 語彙テストクイズ機能
+- `src/components/Results.jsx`: テスト結果表示
+- `src/components/Header.js`: ヘッダーナビゲーション
+- `src/components/Footer.js`: フッター
 
-## Contributions
+### データ・型定義
+- `src/data/vocabularyData.ts`: 語彙テスト用問題データ
+- `src/types/reading.ts`: TypeScript型定義
+- `src/context/PointsContext.js`: スコア管理用Context
 
-Feel free to fork the repository and submit pull requests for any improvements or features you'd like to add. Contributions are welcome!
+## 使用方法
+
+### 1. 語彙レベル判定
+1. ホームページで「語彙テスト」を選択
+2. 20問の語彙テストを回答
+3. 正答数に基づいてレベル（1-10）が算出される
+
+### 2. 読み物生成・読書
+1. テスト完了後、または直接「読み物生成」から条件を入力
+2. テーマ、サブトピック、文体を指定
+3. 生成された英文を読み、「読了」ボタンでWPMを測定
+4. 日本語訳は必要に応じて表示切り替え可能
+
+### 3. 履歴確認
+- ヘッダーの「履歴」から過去の読書記録を確認
+- 平均WPM、総読書時間などの統計も表示
+
+## ビルドとデプロイ
+
+### プロダクションビルド
+```bash
+npm run build
+npm start
+```
+
+### 型チェック
+```bash
+npx tsc --noEmit
+```
+
+### Lint実行
+```bash
+npm run lint
+```
+
+## 今後の改善点
+
+- **ユーザー認証**: アカウント機能の追加
+- **クラウド履歴保存**: サーバーサイドでの履歴管理
+- **より詳細な統計**: 読書傾向の分析機能
+- **SNS共有**: 読書成果の共有機能
+- **オフライン対応**: PWA化による利用性向上

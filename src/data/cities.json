@@ -1,0 +1,38 @@
+[
+  {
+    "cityName": "q¬",
+    "englishName": "Tokyo",
+    "requiredWords": 0,
+    "image": "/letters/tokyo.png"
+  },
+  {
+    "cityName": "íóÉó",
+    "englishName": "London",
+    "requiredWords": 10000,
+    "image": "/letters/london.png"
+  },
+  {
+    "cityName": "Ëåüèü¯",
+    "englishName": "New York",
+    "requiredWords": 20000,
+    "image": "/letters/newyork.png"
+  },
+  {
+    "cityName": "Ê¤íÓ",
+    "englishName": "Nairobi",
+    "requiredWords": 30000,
+    "image": "/letters/nairobi.png"
+  },
+  {
+    "cityName": "·ÉËü",
+    "englishName": "Sydney",
+    "requiredWords": 40000,
+    "image": "/letters/sydney.png"
+  },
+  {
+    "cityName": "½¦ë",
+    "englishName": "Seoul",
+    "requiredWords": 50000,
+    "image": "/letters/seoul.png"
+  }
+]

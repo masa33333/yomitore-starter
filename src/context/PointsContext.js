@@ -1,22 +1,17 @@
-"use client"; 
-import { createContext, useContext, useState } from 'react';
+"use client";
 
-// Create context
-const PointsContext = createContext();
+import { createContext, useContext } from "react";
 
-// Provider component
-export const PointsProvider = ({ children }) => {
-  const [points, setPoints] = useState(0);
+const PointsContext = createContext({});
 
+function PointsProvider({ children }) {
   return (
-    <PointsContext.Provider value={{ points, setPoints }}>
+    <PointsContext.Provider value={{}}>
       {children}
     </PointsContext.Provider>
   );
-};
+}
 
-// Hook to use the context
-export const usePoints = () => {
-  const context = useContext(PointsContext);
-  return context;
-};
+export { PointsProvider };
+export default PointsProvider;
+export const usePoints = () => useContext(PointsContext);

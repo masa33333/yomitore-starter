@@ -1,0 +1,7 @@
+POST http://localhost:3000/api/claude
+Content-Type: application/json
+
+{
+  "city": "Istanbul",
+  "level": "B1"
+}

@@ -17,3 +17,56 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Story content styling */
+.story-content h3 {
+  display: none;
+}
+
+.story-content h3:first-child {
+  display: none;
+}
+
+.story-content strong {
+  @apply font-semibold text-gray-900;
+}
+
+.story-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+/* Make words in story content clickable */
+.story-content p:hover {
+  cursor: pointer;
+}
+
+/* Animation classes */
+@keyframes wiggle {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(2deg); }
+  75% { transform: translateX(-50%) rotate(-2deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 1.5s infinite;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}

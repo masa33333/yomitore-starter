@@ -1,39 +1,117 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import SubjectCard from '@/components/SubjectCard';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Home() {
-  const [subjects, setSubjects] = useState([]);
+  const [hasVocabLevel, setHasVocabLevel] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { displayLang } = useLanguage();
+
+  // 表示テキストの定義
+  const text = {
+    title: {
+      ja: '多読トレーニング',
+      en: 'Tadoku Training',
+    },
+    subtitle: {
+      ja: '何を読みますか？',
+      en: 'What would you like to read?',
+    },
+    choose: {
+      ja: '読み物を選ぶ',
+      en: 'Choose Reading',
+    },
+    retest: {
+      ja: '語彙レベルを再測定',
+      en: 'Retake Vocabulary Test',
+    },
+    firstTime: {
+      ja: 'まずはあなたの語彙レベルをチェックしましょう！',
+      en: 'Let\'s check your vocabulary level first!',
+    },
+    checkLevel: {
+      ja: '語彙レベルをチェックする',
+      en: 'Check Vocabulary Level',
+    },
+    loading: {
+      ja: '読み込み中...',
+      en: 'Loading...',
+    },
+  };
+
+  // 表示言語に応じたテキスト取得関数
+  const getText = (key) => {
+    return text[key][displayLang];
+  };
 
   useEffect(() => {
-    const fetchSubjects = async () => {
-      const response = await fetch('/data/questions.json');
-      if (response.ok) {
-        const data = await response.json();
-        setSubjects(data.subjects);
-        console.log(data);
-      } else {
-        console.error("Failed to fetch subjects");
-      }
+    // localStorageから語彙レベルをチェック
+    const checkVocabLevel = () => {
+      const vocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
+      setHasVocabLevel(!!vocabLevel);
+      setIsLoading(false);
     };
-    fetchSubjects();
+
+    checkVocabLevel();
   }, []);
 
-  return (
-    <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-blue-600 mb-6">Welcome to the Quiz App</h1>
-      <p className="text-lg text-gray-700 mb-8">Select a subject to get started and test your knowledge!</p>
+  const handleQuizStart = () => {
+    window.location.href = '/quiz';
+  };
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full max-w-screen-lg">
-        {subjects.length > 0 ? (
-          subjects.map((subject) => (
-            <SubjectCard key={subject.name} subject={subject} />
-          ))
-        ) : (
-          <p className="text-lg text-center text-gray-500 animate-pulse">Loading subjects...</p>
-        )}
+  const handleChooseReading = () => {
+    window.location.href = '/choose';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-6 min-h-screen flex items-center justify-center">
+        <p className="text-lg text-text-primary animate-pulse">{getText('loading')}</p>
       </div>
+    );
+  }
+
+  return (
+    <div className="p-6 min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-2xl font-bold text-text-primary mb-6 text-center">{getText('title')}</h1>
+      
+      {!hasVocabLevel ? (
+        // 初回ユーザー向け - 語彙レベルチェックのみ
+        <div className="text-center max-w-md">
+          <p className="text-lg text-text-primary mb-8">
+            {getText('firstTime')}
+          </p>
+          <button
+            onClick={handleQuizStart}
+            className="bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"
+          >
+            {getText('checkLevel')}
+          </button>
+        </div>
+      ) : (
+        // 既存ユーザー向け - 読み物選択 + 再測定オプション
+        <div className="text-center max-w-md">
+          <p className="text-lg text-text-primary mb-8">
+            {getText('subtitle')}
+          </p>
+          <button
+            onClick={handleChooseReading}
+            className="bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"
+          >
+            {getText('choose')}
+          </button>
+          
+          <div className="mt-6">
+            <button
+              onClick={handleQuizStart}
+              className="bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-sm hover:opacity-80 transition-colors"
+            >
+              {getText('retest')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
