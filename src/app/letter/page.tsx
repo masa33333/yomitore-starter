@@ -5,8 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getNextCity, getNextUnreachedCity } from '@/lib/getNextCity';
 import { letters } from '@/app/data/letterData';
 import { getEnglishText } from '@/utils/getEnglishText';
-import { getLetterFromStorage } from '@/lib/letterStorage';
+import { getCurrentRouteLetter, getInFlightMail, saveLetterToStorage } from '@/lib/letterStorage';
 import { saveToHistory } from '@/lib/saveToHistory';
+import { processNextInQueue, checkForPendingMailAfterLetterCompletion } from '@/lib/letterPriorityUtils';
+import '@/lib/testMailGeneration'; // テスト用ユーティリティを読み込み
+import '@/lib/forceMailDisplay'; // 緊急メール表示テスト
 
 function LetterPageContent() {
   const router = useRouter();
@@ -34,6 +37,190 @@ function LetterPageContent() {
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [showDictionaryModal, setShowDictionaryModal] = useState(false);
   const [clickedWords, setClickedWords] = useState<any[]>([]);
+  const [contentDecision, setContentDecision] = useState<any>(null);
+
+  // 📮 到着手紙専用のレンダリング関数
+  const renderArrivalLetter = () => {
+    console.log('📮 Rendering arrival letter content');
+    
+    // letter type content header
+    const letterHeader = (
+      <div className="border-l-4 border-blue-500 pl-4 mb-4">
+        <div className="flex items-center mb-2">
+          <span className="text-blue-600 text-lg">📮</span>
+          <span className="ml-2 text-blue-600 font-semibold">到着手紙</span>
+        </div>
+      </div>
+    );
+
+    // letter content validation
+    if (!letter?.en?.[userLevel]) {
+      return (
+        <>
+          {letterHeader}
+          <p className="text-red-600 text-center py-4">
+            手紙の読み込みに失敗しました。
+          </p>
+        </>
+      );
+    }
+
+    // letter content rendering
+    return (
+      <>
+        {letterHeader}
+        {pairedParagraphs.length > 0 ? (
+          pairedParagraphs.map((pair, index) => (
+            <div key={index}>
+              <p className="text-gray-700 leading-relaxed mb-1 text-lg">
+                {renderClickableText(pair.en)}
+              </p>
+              {showTranslation && (
+                <p className="text-gray-600 leading-relaxed text-sm">{pair.jp}</p>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-700 leading-relaxed">
+            手紙の内容を読み込めませんでした。
+          </p>
+        )}
+      </>
+    );
+  };
+
+  // 📧 機内メール専用のレンダリング関数
+  const renderInFlightMail = () => {
+    console.log('📧 Rendering in-flight mail content');
+    
+    // mail type content header
+    const mailHeader = (
+      <div className="border-l-4 border-orange-500 pl-4 mb-4">
+        <div className="flex items-center mb-2">
+          <span className="text-orange-600 text-lg">✉️</span>
+          <span className="ml-2 text-orange-600 font-semibold">機内メール</span>
+        </div>
+      </div>
+    );
+
+    // 📧 保存されたメールの構造に合わせて取得
+    // 構造: { en: string, jp: string } (レベル別ではない)
+    const mailContent = diary?.en || '';
+    const mailJpContent = diary?.jp || '';
+    
+    console.log('📧 Mail content structure:', { 
+      hasEn: !!mailContent, 
+      hasJp: !!mailJpContent,
+      enType: typeof mailContent,
+      enLength: mailContent?.length || 0
+    });
+    
+    if (!mailContent) {
+      return (
+        <>
+          {mailHeader}
+          <p className="text-red-600 text-center py-4">
+            メールの読み込みに失敗しました。
+          </p>
+        </>
+      );
+    }
+
+    // mail content paragraph splitting
+    const mailParagraphs = mailContent.split(/\n+/).filter(p => p.trim() !== '');
+    const mailJpParagraphs = mailJpContent.split(/\n+/).filter(p => p.trim() !== '');
+    
+    const pairedMailParagraphs = mailParagraphs.map((en, idx) => ({
+      en,
+      jp: mailJpParagraphs[idx] || '',
+    }));
+
+    // mail content rendering
+    return (
+      <>
+        {mailHeader}
+        {pairedMailParagraphs.length > 0 ? (
+          pairedMailParagraphs.map((pair, index) => (
+            <div key={index}>
+              <p className="text-gray-700 leading-relaxed mb-1 text-lg">
+                {renderClickableText(pair.en)}
+              </p>
+              {showTranslation && (
+                <p className="text-gray-600 leading-relaxed text-sm">{pair.jp}</p>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-700 leading-relaxed">
+            メールの内容を読み込めませんでした。
+          </p>
+        )}
+      </>
+    );
+  };
+
+  // メール生成用のヘルパー関数
+  const generateTestMail = async (fromCity: string, toCity: string) => {
+    try {
+      const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+      const catName = localStorage.getItem('catName') || 'Your cat';
+      
+      // テスト用のメールコンテンツ
+      const testMailContent = {
+        en: `Hello from high above the clouds!
+
+I'm writing to you during my flight from ${fromCity} to ${toCity}. The view from up here is absolutely breathtaking! I can see the vast landscape stretching endlessly below us.
+
+The flight attendant just served some delicious fish - exactly what a traveling cat like me needs. I've been thinking about all the reading you've been doing, and it fills my heart with joy.
+
+Your dedication to reading is what makes this incredible journey possible. Every word you read gives me the strength to fly further and discover new places.
+
+I can't wait to share more adventures with you from ${toCity}. Keep reading, my dear friend!
+
+Love,
+${catName}`,
+        jp: `雲の上からこんにちは！
+
+${fromCity}から${toCity}への飛行中に手紙を書いています。ここからの景色は本当に息をのむほど美しいです！眼下には果てしなく続く大地が見えます。
+
+客室乗務員さんがおいしいお魚を出してくれました。旅するネコの私にはぴったりです。あなたがずっと読書を続けてくれていることを思うと、心が喜びでいっぱいになります。
+
+あなたの読書への献身が、この素晴らしい旅を可能にしているのです。あなたが読む一つ一つの言葉が、私がより遠くまで飛び、新しい場所を発見する力を与えてくれます。
+
+${toCity}からもっと多くの冒険をあなたと分かち合えるのが楽しみです。読書を続けてくださいね、親愛なる友よ！
+
+愛を込めて、
+${catName}`
+      };
+
+      const wordCount = testMailContent.en.trim().split(/\s+/).filter(word => word.length > 0).length;
+      const estimatedDuration = Math.max(1800000, wordCount * 60000 / 200); // 最低30分、または200WPMでの推定時間
+      const estimatedWPM = Math.round(wordCount / (estimatedDuration / 60000));
+
+      const mailData = {
+        type: "mail" as const,
+        jp: testMailContent.jp,
+        en: {
+          [userLevel]: testMailContent.en
+        },
+        fromCity,
+        toCity,
+        level: userLevel,
+        wordCount: wordCount,
+        duration: estimatedDuration,
+        wpm: estimatedWPM,
+        catName: catName,
+      };
+
+      console.log('📧 Saving test mail to storage:', mailData);
+      saveLetterToStorage(mailData);
+      
+      return mailData;
+    } catch (error) {
+      console.error('❌ Failed to generate test mail:', error);
+      return null;
+    }
+  };
 
   // 品詞の日本語マッピング
   const posMap: Record<string, string> = {
@@ -352,9 +539,10 @@ function LetterPageContent() {
       return () => clearTimeout(timer);
     }
     
-    // 📧 /letter ページに遷移したら通知フラグをクリア
-    localStorage.setItem('notified', 'false');
-    console.log('📧 Letter page visited, cleared notified flag');
+    // 📧 /letter ページに遷移したら全ての通知フラグをクリア（同期）
+    const { clearNotification } = require('@/lib/notificationUtils');
+    clearNotification();
+    console.log('📧 Letter page visited, all notification flags cleared synchronously');
   }, [searchParams]);
 
   useEffect(() => {
@@ -363,54 +551,144 @@ function LetterPageContent() {
       const id = searchParams.get('id');
       console.log('🔍 diary.id:', id);
 
-      // 📧 PRIORITY 1: Check for stored letter/mail content first
-      const storedLetter = getLetterFromStorage();
-      console.log('📧 Checking stored letter first:', storedLetter);
+      // 📧 PRIORITY SYSTEM: Determine what content to show based on conditions
+      console.log('📧 Loading letter page, checking content availability...');
       
-      if (storedLetter) {
-        // Use stored letter/mail content
+      const { determineContentToShow, debugContentState } = await import('@/lib/letterDisplayHelpers');
+      debugContentState(); // デバッグ情報を表示
+      const decision = determineContentToShow();
+      setContentDecision(decision);
+      console.log('📧 Content decision:', decision);
+      
+      let storedLetter = null;
+      let inFlightMail = null;
+      
+      if (decision.type === 'letter') {
+        storedLetter = getCurrentRouteLetter();
+        console.log('📮 Priority 1 - Letter content:', storedLetter);
+      } else if (decision.type === 'mail') {
+        inFlightMail = getInFlightMail();
+        console.log('📧 Priority 2 - Mail content (stored only):', inFlightMail);
+        
+        // 📧 mailは保存されているもののみ表示（新規生成はしない）
+        if (!inFlightMail) {
+          console.log('📧 No stored mail found for display');
+        }
+      } else {
+        console.log('❌ No content available to show:', decision.reason);
+      }
+      
+      // 📮 Special handling for Seoul letter loading
+      const totalWords = parseInt(localStorage.getItem('wordCountTotal') || '0', 10);
+      console.log('📧 Current total words:', totalWords);
+      
+      if (totalWords >= 5000 && !storedLetter) {
+        console.log('📮 Seoul threshold reached but no letter found, ensuring Seoul letter exists...');
+        const { ensureSeoulLetterSaved } = await import('@/lib/ensureSeoulLetter');
+        ensureSeoulLetterSaved();
+        
+        // Re-check after ensuring Seoul letter
+        storedLetter = getCurrentRouteLetter();
+        console.log('📮 Re-checked letter after ensuring Seoul letter:', storedLetter);
+      }
+      
+      // 📮 Handle letter content (priority 1)
+      if (storedLetter && decision.type === 'letter') {
         const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
         let contentToShow = '';
         
         if (storedLetter.en && storedLetter.en[userLevel]) {
           contentToShow = storedLetter.en[userLevel];
         } else if (storedLetter.en) {
-          // Use first available level if exact level not found
           const availableLevels = Object.keys(storedLetter.en).map(Number);
           if (availableLevels.length > 0) {
             contentToShow = storedLetter.en[availableLevels[0]];
           }
         }
         
-        console.log('📧 Using stored letter/mail content:', { 
+        console.log('📮 Using stored letter content:', { 
           type: storedLetter.type, 
           hasContent: !!contentToShow,
           contentLength: contentToShow.length 
         });
         
         setLetterText(contentToShow);
-        setCityName(storedLetter.fromCity || storedLetter.city || 'Tokyo');
-        setCityImage(storedLetter.cityImage || '/letters/tokyo.png');
+        setCityName(storedLetter.toCity || 'Tokyo');
+        
+        const cityImageMap: { [key: string]: string } = {
+          'Tokyo': '/letters/tokyo.png',
+          'Seoul': '/letters/seoul.png',
+          'Beijing': '/letters/beijing.png'
+        };
+        const fallbackImage = cityImageMap[storedLetter.toCity] || '/letters/tokyo.png';
+        setCityImage(storedLetter.cityImage || fallbackImage);
         setDiaryNotFound(false);
         
-        // Create diary structure from stored letter
         const letterDiary = {
           id: 1,
           en: contentToShow,
           jp: storedLetter.jp,
-          location: storedLetter.fromCity || storedLetter.city || 'Tokyo',
-          cityName: storedLetter.fromCity || storedLetter.city || '東京',
+          location: storedLetter.toCity || 'Tokyo',
+          cityName: storedLetter.toCity || '東京',
           cityImage: storedLetter.cityImage || '/letters/tokyo.png',
           type: storedLetter.type
         };
         setDiary(letterDiary);
         
-        // Calculate word count
         const words = contentToShow.trim().split(/\s+/).filter((word: string) => word.length > 0);
         setWordCount(words.length);
         
-        // Skip the rest if we have stored content
-        console.log('📧 Successfully loaded stored letter/mail content');
+        console.log('📮 Successfully loaded stored letter content');
+        return;
+      }
+      
+      // 📧 Handle in-flight mail content (priority 2)
+      if (inFlightMail && decision.type === 'mail') {
+        console.log('📧 Processing stored in-flight mail structure:', inFlightMail);
+        
+        // 📧 保存されたメールの構造に合わせて処理
+        // 構造: { en: string, jp: string } (レベル別ではない)
+        const contentToShow = inFlightMail.en || '';
+        
+        console.log('📧 Using stored in-flight mail content:', { 
+          type: inFlightMail.type, 
+          hasContent: !!contentToShow,
+          contentLength: contentToShow.length,
+          fromCity: inFlightMail.fromCity,
+          toCity: inFlightMail.toCity
+        });
+        
+        setLetterText(contentToShow);
+        setCityName(`${inFlightMail.fromCity}-${inFlightMail.toCity}`);
+        
+        const cityImageMap: { [key: string]: string } = {
+          'Tokyo': '/letters/tokyo.png',
+          'Seoul': '/letters/seoul.png',
+          'Beijing': '/letters/beijing.png'
+        };
+        const fallbackImage = cityImageMap[inFlightMail.toCity] || '/letters/tokyo.png';
+        setCityImage(fallbackImage);
+        setDiaryNotFound(false);
+        
+        // 📧 保存されたメール構造に合わせたmailDiary作成
+        const mailDiary = {
+          id: 1,
+          en: contentToShow, // 直接string
+          jp: inFlightMail.jp || '',
+          location: `${inFlightMail.fromCity}-${inFlightMail.toCity}`,
+          cityName: `${inFlightMail.fromCity}-${inFlightMail.toCity}`,
+          cityImage: fallbackImage,
+          type: inFlightMail.type,
+          fromCity: inFlightMail.fromCity,
+          toCity: inFlightMail.toCity,
+          milestone: inFlightMail.milestone
+        };
+        setDiary(mailDiary);
+        
+        const words = contentToShow.trim().split(/\s+/).filter((word: string) => word.length > 0);
+        setWordCount(words.length);
+        
+        console.log('📧 Successfully loaded stored in-flight mail content');
         return;
       }
       
@@ -532,7 +810,7 @@ function LetterPageContent() {
     // ID がない場合の処理
     const handleNoIdCase = () => {
       // Use safe letter storage function instead of direct localStorage access
-      const storedLetter = getLetterFromStorage();
+      const storedLetter = getCurrentRouteLetter();
       const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
       
       const savedCityImage = localStorage.getItem('cityImage') || '';
@@ -610,9 +888,9 @@ Your Cat`;
     }
     
     // 語数更新
-    const currentTotal = parseInt(localStorage.getItem('wordCount') || '0', 10);
+    const currentTotal = parseInt(localStorage.getItem('wordCountTotal') || '0', 10);
     const newTotal = currentTotal + wordCount;
-    localStorage.setItem('wordCount', newTotal.toString());
+    localStorage.setItem('wordCountTotal', newTotal.toString());
     
     // 新都市を取得して保存
     const nextCity = getNextCity(newTotal);
@@ -620,7 +898,7 @@ Your Cat`;
     console.log('🗺️ 次に訪れる都市:', nextCity.cityName);
 
     // 📧 Save mail/letter to history with proper metrics
-    const storedLetter = getLetterFromStorage();
+    const storedLetter = getCurrentRouteLetter();
     if (storedLetter) {
       const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
       const catName = localStorage.getItem('catName') || 'Your cat';
@@ -666,14 +944,14 @@ Your Cat`;
         // Save letter to history
         saveToHistory({
           type: "letter",
-          title: `A letter from ${storedLetter.city || cityName}`,
+          title: `A letter from ${storedLetter.toCity || cityName}`,
           contentJP: storedLetter.jp,
           contentEN: actualContent,
           level: userLevel,
           wordCount: actualWordCount,
           duration: duration,
           wpm: actualWPM,
-          city: storedLetter.city || cityName,
+          city: storedLetter.toCity || cityName,
         });
         console.log('📧 Letter saved to history with metrics:', { wordCount: actualWordCount, duration, wpm: actualWPM });
       }
@@ -687,6 +965,52 @@ Your Cat`;
         saveWPMHistory(actualWPM);
         console.log('📧 WPM saved to history:', actualWPM);
       }
+      
+      // ✅ 手紙読了後：ペンディングメールがあるかチェック
+      console.log('📧 Letter completion - checking for pending mail...');
+      const hasPendingMail = checkForPendingMailAfterLetterCompletion();
+      
+      if (hasPendingMail) {
+        console.log('📧 Found pending mail after letter completion, processing...');
+        
+        // ペンディングキューから次のメールを処理
+        setTimeout(() => {
+          const nextItem = processNextInQueue();
+          if (nextItem) {
+            console.log(`📧 ✅ Processed pending ${nextItem.type} after letter completion`);
+            
+            // 通知表示（ページ遷移なしで通知のみ）
+            const event = new CustomEvent('pendingMailProcessed', {
+              detail: { type: nextItem.type, reason: nextItem.reason }
+            });
+            window.dispatchEvent(event);
+          }
+        }, 1000); // 1秒後に処理（手紙読了のフィードバック後）
+      } else {
+        console.log('📧 No pending mail found after letter completion');
+      }
+    }
+    
+    // ペンディングInFlightメールもチェック
+    const pendingInFlightMails = JSON.parse(localStorage.getItem('pendingInFlightMails') || '[]');
+    if (pendingInFlightMails.length > 0) {
+      console.log('📧 Found pending in-flight mails, processing after letter completion...');
+      
+      setTimeout(async () => {
+        for (const mailInfo of pendingInFlightMails) {
+          try {
+            const { sendInFlightMail } = await import('@/lib/sendInFlightMail');
+            await sendInFlightMail(mailInfo.leg, mailInfo.minute);
+            console.log(`📧 ✅ Processed pending in-flight mail: ${mailInfo.leg} at ${mailInfo.minute} minutes`);
+          } catch (error) {
+            console.error('📧 Failed to process pending in-flight mail:', error);
+          }
+        }
+        
+        // ペンディングリストをクリア
+        localStorage.removeItem('pendingInFlightMails');
+        console.log('📧 Cleared pending in-flight mails list');
+      }, 1500); // 1.5秒後に処理
     }
   };
 
@@ -704,58 +1028,69 @@ Your Cat`;
     router.push('/choose');
   };
 
-  // 📧 Part 3: Safe letter storage usage for display
+  // 📧 Safe content rendering preparation
   const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
   
-  // Try to get letter from storage first, then fallback to letterData
-  const storedLetter = getLetterFromStorage();
-  const fallbackLetter = letters[0]; // Narita Airport letter as fallback
+  // 📧 安全なコンテンツ取得 - diary.type に基づいて処理を分岐
+  let letter, englishText, pairedParagraphs = [];
   
-  let letter, englishText;
-  
-  if (storedLetter && storedLetter.en && storedLetter.en[userLevel]) {
-    letter = storedLetter;
-    englishText = storedLetter.en[userLevel];
-    console.log('📧 Using stored letter with safe parsing');
-  } else if (fallbackLetter) {
-    letter = fallbackLetter;
-    englishText = getEnglishText(fallbackLetter.en, userLevel);
-    console.log('📧 Fallback to letterData');
-  } else {
-    console.error('📧 No letter available');
-    letter = null;
-    englishText = '手紙の読み込みに失敗しました。';
-  }
-  
-  console.log('📧 Safe letter usage:', { userLevel, letterExists: !!letter, englishLength: englishText.length });
-  
-  // Split letterText into paragraphs (段落分割)
-  console.log('📄 Letter page - diary:', diary);
-  console.log('📄 Letter page - letterText:', letterText);
-  console.log('📄 Letter page - diary?.en:', diary?.en);
-  
-  // Use safe letter content for display
-  let contentToDisplay = englishText;
-  console.log('📄 Using safe letter content');
-  
-  const enParagraphs = contentToDisplay
-    ? contentToDisplay.split(/\n+/).filter(p => p.trim() !== '')
-    : [];
-
-  const jpParagraphs = letter && letter.jp
-    ? letter.jp.split(/\n+/).filter(p => p.trim() !== '')
-    : [];
-
-  // max length に合わせてループ
-  const pairedParagraphs = enParagraphs.map((en, idx) => ({
-    en,
-    jp: jpParagraphs[idx] || '', // 対応する日本語訳（なければ空）
-  }));
+  try {
+    if (diary?.type === 'letter') {
+      // 📮 Letter content handling
+      const storedLetter = getCurrentRouteLetter();
+      const fallbackLetter = letters[0]; // Narita Airport letter as fallback
+      
+      if (storedLetter && storedLetter.en && storedLetter.en[userLevel]) {
+        letter = storedLetter;
+        englishText = storedLetter.en[userLevel];
+        console.log('📮 Using stored letter with safe parsing');
+      } else if (fallbackLetter) {
+        letter = fallbackLetter;
+        englishText = getEnglishText(fallbackLetter.en, userLevel);
+        console.log('📮 Fallback to letterData');
+      } else {
+        console.error('📮 No letter available');
+        letter = null;
+        englishText = '手紙の読み込みに失敗しました。';
+      }
+      
+      // Letter paragraph splitting
+      const enParagraphs = englishText ? englishText.split(/\\n+/).filter(p => p.trim() !== '') : [];
+      const jpParagraphs = letter && letter.jp ? letter.jp.split(/\\n+/).filter(p => p.trim() !== '') : [];
+      pairedParagraphs = enParagraphs.map((en, idx) => ({ en, jp: jpParagraphs[idx] || '' }));
+      
+    } else if (diary?.type === 'mail') {
+      // 📧 Mail content handling - diary構造から直接取得
+      letter = null; // mail では letter 構造を使わない
+      englishText = diary?.en || '';
+      
+      console.log('📧 Using mail content from diary structure');
+      
+      // Mail では paragraph splitting は renderInFlightMail() で行う
+      pairedParagraphs = [];
+      
+    } else {
+      // 🚫 Unknown or missing type
+      console.warn('⚠️ Unknown content type or missing diary:', diary?.type);
+      letter = null;
+      englishText = 'コンテンツタイプが不明です。';
+      pairedParagraphs = [];
+    }
     
-  console.log('📄 Letter page - contentToDisplay:', contentToDisplay);
-  console.log('📄 Letter page - enParagraphs:', enParagraphs);
-  console.log('📄 Letter page - jpParagraphs:', jpParagraphs);
-  console.log('📄 Letter page - pairedParagraphs:', pairedParagraphs);
+    console.log('📧 Safe content preparation:', { 
+      diaryType: diary?.type, 
+      userLevel, 
+      letterExists: !!letter, 
+      englishLength: englishText?.length || 0,
+      paragraphCount: pairedParagraphs.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Error in content preparation:', error);
+    letter = null;
+    englishText = 'コンテンツの準備中にエラーが発生しました。';
+    pairedParagraphs = [];
+  }
 
   return (
     <main className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-center p-4">
@@ -763,24 +1098,33 @@ Your Cat`;
         {showNotice && (
           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-800 rounded shadow animate-fade-in">
             {(() => {
-              const storedLetter = getLetterFromStorage();
-              const isMailType = storedLetter?.type === 'mail';
-              return isMailType ? '✉️ 新しいメールが届きました！' : '✨ 新しい手紙が届きました！';
+              const contentType = diary?.type || 'letter';
+              return contentType === 'mail' ? '✉️ 新しいメールが届きました！' : '✨ 新しい手紙が届きました！';
             })()}
+          </div>
+        )}
+        
+        {/* 🛠️ Debug info (dev mode only) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+            Debug: type={diary?.type}, hasEn={!!diary?.en}, hasJp={!!diary?.jp}, 
+            enLength={diary?.en?.length || 0}, contentDecision={JSON.stringify(contentDecision)}
           </div>
         )}
         {/* ① 動的タイトル：手紙・メール type に応じて分岐 */}
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
           {(() => {
-            const letter = getLetterFromStorage();
+            // 📧 安全なタイトル表示 - diaryオブジェクトからtypeを取得
+            const contentType = diary?.type || 'letter';
             const catName = localStorage.getItem("catName") || "Your cat";
             
-            if (letter?.type === "letter" && letter?.city) {
-              return `📮 A letter from ${letter.city}`;
-            } else if (letter?.type === "mail" && letter?.fromCity) {
-              return `✉️ ${catName} からの未読メール`;
+            if (contentType === "mail") {
+              const fromCity = diary?.fromCity || cityName.split('-')[0] || 'Tokyo';
+              const toCity = diary?.toCity || cityName.split('-')[1] || 'Seoul';
+              return `✉️ In-flight Mail from ${fromCity} to ${toCity}`;
             } else {
-              return `📮 A Letter from ${cityName}`;
+              const destination = diary?.toCity || diary?.location || cityName || 'Unknown';
+              return `📮 A Letter from ${destination}`;
             }
           })()}
         </h1>
@@ -819,26 +1163,22 @@ Your Cat`;
           <>
             {/* 手紙本文（段落分け + クリック可能な語） */}
             <div className="letter-content mb-8 space-y-6">
-              {!letter?.en?.[userLevel] ? (
-                <p className="text-red-600 text-center py-4">
-                  手紙の読み込みに失敗しました。
-                </p>
-              ) : pairedParagraphs.length > 0 ? (
-                pairedParagraphs.map((pair, index) => (
-                  <div key={index}>
-                    <p className="text-gray-700 leading-relaxed mb-1 text-lg">
-                      {renderClickableText(pair.en)}
+              {(() => {
+                // 📧 安全なmailtype判定とコンテンツ表示の分離
+                const contentType = diary?.type || 'letter';
+                
+                if (contentType === 'mail') {
+                  return renderInFlightMail();
+                } else if (contentType === 'letter') {
+                  return renderArrivalLetter();
+                } else {
+                  return (
+                    <p className="text-red-600 text-center py-4">
+                      コンテンツタイプが不明です: {contentType}
                     </p>
-                    {showTranslation && (
-                      <p className="text-gray-600 leading-relaxed text-sm">{pair.jp}</p>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-700 leading-relaxed">
-                  No letter content available. Please check localStorage.
-                </p>
-              )}
+                  );
+                }
+              })()}
             </div>
 
             {/* ✅ 読了ボタン（手紙と画像の間） */}
@@ -861,9 +1201,9 @@ Your Cat`;
                   <p className="text-sm">今回の語数：<span className="font-semibold">{wordCount}語</span></p>
                   <p className="text-sm">今回のWPM：<span className="font-semibold">{calculatedWPM}</span></p>
                   <p className="text-sm">平均WPM（直近5回）：<span className="font-semibold">{getAverageWPM()}</span></p>
-                  <p className="text-sm">これまでの合計語数：<span className="font-semibold">{(parseInt(localStorage.getItem('wordCount') || '0', 10)).toLocaleString()}語</span></p>
+                  <p className="text-sm">これまでの合計語数：<span className="font-semibold">{(parseInt(localStorage.getItem('wordCountTotal') || '0', 10)).toLocaleString()}語</span></p>
                   {(() => {
-                    const totalWords = parseInt(localStorage.getItem('wordCount') || '0', 10);
+                    const totalWords = parseInt(localStorage.getItem('wordCountTotal') || '0', 10);
                     const nextCity = getNextUnreachedCity(totalWords);
                     return nextCity ? (
                       <p className="text-sm">次の目的地：<span className="font-semibold">{nextCity.cityName}</span>（あと <span className="font-semibold text-orange-600">{(nextCity.requiredWords - totalWords).toLocaleString()}語</span>）</p>
