@@ -19,13 +19,19 @@ function getDifficultyFromLevel(level: number, lang: 'ja' | 'en' = 'ja'): string
 
 // 難易度ラベルから語彙レベルを取得する関数
 function getLevelFromDifficulty(difficulty: string): number {
-  if (difficulty.includes('簡単') || difficulty.includes('A1') || difficulty.includes('A2')) {
-    return 2; // 簡単レベルの代表値
+  if (difficulty.includes('簡単') || difficulty.includes('A1')) {
+    return 1; // 🟢 初級 (A1): 基本的な単語と現在形のみ
   }
-  if (difficulty.includes('中') || difficulty.includes('B1') || difficulty.includes('B2')) {
-    return 5; // 中レベルの代表値
+  if (difficulty.includes('A2')) {
+    return 2; // 🟡 初中級 (A2): 過去形・未来形を含む基本的な表現
   }
-  return 8; // 難しいレベルの代表値
+  if (difficulty.includes('中') || difficulty.includes('B1')) {
+    return 3; // 🟠 中級 (B1): 日常会話に必要な語彙と関係代名詞
+  }
+  if (difficulty.includes('B2')) {
+    return 4; // 🔵 中上級 (B2): 幅広い語彙と複雑な従属節
+  }
+  return 5; // 🟣 上級 (C1+): 学術的・専門的語彙と高度な構文
 }
 
 
@@ -34,7 +40,7 @@ export default function ChoosePage() {
   const { displayLang } = useLanguage();
   
   // 語彙テスト結果のレベル（固定値）
-  const [fixedLevel, setFixedLevel] = useState<number>(7);
+  const [fixedLevel, setFixedLevel] = useState<number>(3);
 
   // 表示テキストの定義
   const text = {

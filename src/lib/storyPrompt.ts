@@ -44,7 +44,7 @@ export const STORY_OPTIONS = {
 /**
  * ストーリー生成のプロンプトテンプレートを生成
  */
-export function generateStoryPrompt({ genre, tone, feeling, level = 7 }: StoryParameters): string {
+export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryParameters): string {
   // ランダムに主人公の性別を選択
   const genders = ['男性', '女性'];
   const randomGender = genders[Math.floor(Math.random() * genders.length)];
@@ -59,13 +59,13 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 7 }: StoryPa
 この条件に基づいて英語の読み物を1つ作成し、以下のstrict JSON形式で出力してください：
 
 {
-  "title": "The Shadow in the Forest",
+  "title": "[Your Story Title Here]",
   "content": [
-    "David always loved the forest behind his house. It was a place of peace and quiet, where he could escape from the busy world and think clearly. Every afternoon after school, he would walk along the familiar paths, listening to the birds singing and feeling the cool breeze through the trees. The forest had been his sanctuary for years, and he knew every rock, every stream, and every tall oak tree by heart.",
-    "But one evening, as the sun began to set and painted the sky orange and pink, he noticed something strange. There was a shadow moving between the trees that did not belong to any branch or trunk. It seemed to glide silently across the forest floor, independent and mysterious. David stopped walking and felt his heartbeat quicken as he watched this unusual sight.",
-    "He decided to follow the shadow, curious but also nervous about what he might discover. The shadow led him deeper into the forest, to places he had never explored before. As he walked further, the familiar sounds of the forest grew quieter, and an eerie silence filled the air. David felt a mix of excitement and fear as he continued to pursue this mysterious presence.",
-    "Suddenly, the shadow stopped in a small clearing he had never seen before. As David approached carefully, he realized that the shadow belonged to an old woman sitting quietly on a fallen log. She looked up at him with kind, twinkling eyes and smiled warmly. 'I've been waiting for someone brave enough to follow me,' she said softly.",
-    "The old woman explained that she was the guardian of the forest and had been watching over it for many decades. She told David that she had chosen him to help protect this special place because of his deep love for nature. David felt honored and excited about this new responsibility. From that day forward, he became the forest's youngest protector, learning its secrets and helping to keep it safe for future generations."
+    "[First paragraph: Setup - introduce character and setting]",
+    "[Second paragraph: Inciting incident - something changes]", 
+    "[Third paragraph: Rising action - conflict develops]",
+    "[Fourth paragraph: Climax - main conflict peaks]",
+    "[Fifth paragraph: Resolution - conclusion and outcome]"
   ]
 }
 
@@ -285,8 +285,8 @@ export function validateStoryParameters({ genre, tone, feeling, level }: StoryPa
   if (!feeling || !validFeelings.includes(feeling)) {
     return `Invalid feeling. Must be one of: ${validFeelings.join(', ')}`;
   }
-  if (level && (level < 1 || level > 10)) {
-    return `Invalid level. Must be between 1 and 10`;
+  if (level && (level < 1 || level > 5)) {
+    return `Invalid level. Must be between 1 and 5`;
   }
 
   return null; // バリデーション成功

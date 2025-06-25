@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -41,11 +42,28 @@ const posMap: Record<string, string> = {
 };
 
 export default function NotebookPage() {
+  const router = useRouter();
   const { displayLang } = useLanguage();
   const { t } = useTranslation();
   const [words, setWords] = useState<WordInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortType, setSortType] = useState<SortType>('recent');
+
+  // ブラウザ戻るボタンでURLパラメータを確実に付与
+  useEffect(() => {
+    const handlePopState = () => {
+      // ブラウザ戻る操作時にURLにfromNotebookパラメータを追加
+      const currentUrl = new URL(window.location.href);
+      if (currentUrl.pathname === '/reading') {
+        currentUrl.searchParams.set('fromNotebook', 'true');
+        window.history.replaceState(null, '', currentUrl.toString());
+        console.log('📚 notebook→reading戻り検知、URLパラメータ設定');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // ローカルストレージから単語リストを取得
   useEffect(() => {

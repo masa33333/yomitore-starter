@@ -129,18 +129,24 @@ const getDifficultyFromLevel = (level: number): string => {
 
 // ✅ 難易度ラベルから語彙レベルを取得する関数
 const getLevelFromDifficulty = (difficulty: string): number => {
-  if (difficulty.includes('簡単') || difficulty.includes('A1') || difficulty.includes('A2')) {
-    return 2; // 簡単レベルの代表値
+  if (difficulty.includes('初級') || difficulty.includes('A1')) {
+    return 1; // 🟢 初級 (A1): 基本的な単語と現在形のみ
   }
-  if (difficulty.includes('中') || difficulty.includes('B1') || difficulty.includes('B2')) {
-    return 5; // 中レベルの代表値
+  if (difficulty.includes('初中級') || difficulty.includes('A2')) {
+    return 2; // 🟡 初中級 (A2): 過去形・未来形を含む基本的な表現
   }
-  return 8; // 難しいレベルの代表値
+  if (difficulty.includes('中級') || difficulty.includes('B1')) {
+    return 3; // 🟠 中級 (B1): 日常会話に必要な語彙と関係代名詞
+  }
+  if (difficulty.includes('中上級') || difficulty.includes('B2')) {
+    return 4; // 🔵 中上級 (B2): 幅広い語彙と複雑な従属節
+  }
+  return 5; // 🟣 上級 (C1+): 学術的・専門的語彙と高度な構文
 };
 
 // ✅ 効果的な語彙レベルを取得する関数
 const getEffectiveLevel = (): number => {
-  if (typeof window === 'undefined') return 7;
+  if (typeof window === 'undefined') return 3;
   
   const selectedDifficulty = localStorage.getItem('selectedDifficulty');
   if (selectedDifficulty) {
@@ -150,7 +156,7 @@ const getEffectiveLevel = (): number => {
   // selectedDifficultyがない場合は固定レベルを使用
   const fixedLevel = Number(localStorage.getItem('fixedLevel')) || 
                     Number(localStorage.getItem('vocabularyLevel')) || 
-                    Number(localStorage.getItem('level')) || 7;
+                    Number(localStorage.getItem('level')) || 3;
   return fixedLevel;
 };
 
@@ -307,15 +313,147 @@ function ReadingPageContent() {
   const emotion = searchParams.get('emotion');
   const style = searchParams.get('style');
   const historyId = searchParams.get('id'); // 履歴からの再読用ID
+  const fromNotebook = searchParams.get('fromNotebook'); // notebookからの戻り判定
   const previousParams = useRef<string | null>(null);
   
-  // 履歴復元時はローディングをスキップ、新規生成時のみローディング表示
-  const [loading, setLoading] = useState<boolean>(!historyId);
+  // 📍 シンプルな初期状態判定
+  const isFromNotebook = fromNotebook === 'true';
+  const shouldSkipGeneration = historyId || isFromNotebook;
+  
+  // 📖 初期データ復元
+  const getInitialData = () => {
+    if (typeof window === 'undefined') return null;
+    
+    const lastReading = localStorage.getItem('lastReading');
+    const lastStory = localStorage.getItem('lastStory');
+    
+    if (lastReading || lastStory) {
+      try {
+        const sourceData = isStoryMode && lastStory ? lastStory : lastReading || lastStory;
+        const savedData = JSON.parse(sourceData);
+        console.log('📖 初期データ復元:', savedData.title);
+        return savedData;
+      } catch (error) {
+        console.error('❌ 初期データ復元エラー:', error);
+      }
+    }
+    return null;
+  };
+
+  const initialData = getInitialData();
+  
+  const [loading, setLoading] = useState<boolean>(shouldSkipGeneration ? false : true);
+  const [storyData, setStoryData] = useState<any>(initialData);
+  const [english, setEnglish] = useState<string>(
+    initialData?.story || initialData?.english || ''
+  );
+  const [storyTitle, setStoryTitle] = useState<string>(
+    initialData?.title || ''
+  );
+  const [englishParagraphs, setEnglishParagraphs] = useState<string[]>(
+    initialData?.story ? initialData.story.split('\n\n').filter(p => p.trim()) : 
+    initialData?.englishParagraphs || []
+  );
+  
+  // 📍 シンプルな統合useEffect
+  useEffect(() => {
+    console.log('🔄 統合useEffect開始:', { 
+      isFromNotebook, 
+      shouldSkipGeneration, 
+      hasData: !!(storyData || english) 
+    });
+    
+    // notebook戻りの場合は何もしない
+    if (isFromNotebook) {
+      console.log('🚫 notebook戻りのため処理スキップ');
+      setLoading(false);
+      return;
+    }
+    
+    // 履歴からの復元の場合も何もしない
+    if (historyId) {
+      console.log('📚 履歴復元のため処理スキップ');
+      return;
+    }
+    
+    // データがない場合のみ新規生成
+    if (!storyData && !english && !hasLoadedOnce.current) {
+      console.log('🔄 新規生成開始');
+      // loadingは初期状態でtrueに設定済み
+      hasLoadedOnce.current = true;
+      
+      // 生成ロジックの実行
+      const generateContent = async () => {
+        try {
+          // パラメータ取得
+          const genre = searchParams.get('genre');
+          const tone = searchParams.get('tone');
+          const feeling = searchParams.get('feeling');
+          const topic = searchParams.get('topic');
+          const emotion = searchParams.get('emotion');
+          const style = searchParams.get('style');
+          
+          console.log('🎯 生成パラメータ:', { genre, tone, feeling, topic, emotion, style, isStoryMode });
+          
+          if (isStoryMode && genre && tone && feeling) {
+            // ストーリー生成
+            const response = await fetch('/api/create-story', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ genre, tone, feeling, level: 3 })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              setStoryData(data);
+              setStoryTitle(data.title || '');
+              setEnglish(data.story || '');
+              if (data.story) {
+                const paragraphs = data.story.split('\n\n').filter(p => p.trim());
+                setEnglishParagraphs(paragraphs);
+              }
+              console.log('✅ ストーリー生成完了');
+            }
+          } else if (!isStoryMode && topic && emotion && style) {
+            // 読み物生成
+            const response = await fetch('/api/generate-reading', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                contentType: 'reading',
+                theme: topic,
+                emotion,
+                style,
+                level: 3
+              })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              setEnglish(data.story || '');
+              setStoryTitle(data.title || '');
+              if (data.story) {
+                const paragraphs = data.story.split('\n\n').filter(p => p.trim());
+                setEnglishParagraphs(paragraphs);
+              }
+              console.log('✅ 読み物生成完了');
+            }
+          }
+        } catch (error) {
+          console.error('❌ 生成エラー:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      generateContent();
+    }
+  }, []); // 1回のみ実行
   const [japanese, setJapanese] = useState('');
-  const [english, setEnglish] = useState('');
+  // english state（上で初期化済み）
   const [showJapanese, setShowJapanese] = useState(false);
   const [showTranslationButton, setShowTranslationButton] = useState(false);
-  const [englishParagraphs, setEnglishParagraphs] = useState<string[]>([]);
+  // englishParagraphs state（上で初期化済み）
   const [japaneseParagraphs, setJapaneseParagraphs] = useState<string[]>([]);
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
@@ -331,25 +469,18 @@ function ReadingPageContent() {
   const [wpm, setWpm] = useState<number | null>(null);
   const [wordCount, setWordCount] = useState<number>(0);
   const [isReadingStarted, setIsReadingStarted] = useState(false);
-  const [storyTitle, setStoryTitle] = useState<string>(''); // ストーリータイトル用state
+  // storyTitle state（上で初期化済み）
   
   // 読み物生成パラメータの監視用
-  const [currentLevel, setCurrentLevel] = useState<number>(7);
+  const [currentLevel, setCurrentLevel] = useState<number>(3);
   const [currentTheme, setCurrentTheme] = useState<string>('');
   const [currentEmotion, setCurrentEmotion] = useState<string>('');
   const [currentStyle, setCurrentStyle] = useState<string>('');
-  const [effectiveLevel, setEffectiveLevel] = useState<number>(7);
+  const [effectiveLevel, setEffectiveLevel] = useState<number>(3);
   const [hasError, setHasError] = useState(false);
   const [showLevelSelection, setShowLevelSelection] = useState(false);
   
-  // ストーリーモード用state
-  const [storyData, setStoryData] = useState<{
-    story: string;
-    themes: string[];
-    genre?: string;
-    tone?: string;
-    feeling?: string;
-  } | null>(null);
+  // ストーリーモード用state（上で初期化済み）
   
   // 前回のストーリーを記録して重複検知用
   const [previousStory, setPreviousStory] = useState<string>('');
@@ -493,7 +624,7 @@ function ReadingPageContent() {
     try {
       // レベル取得：語彙テスト結果 > 選択された難易度 > 固定レベル の優先順
       const vocabLevel = Number(localStorage.getItem('vocabLevel'));
-      const fixedLevel = Number(localStorage.getItem('fixedLevel')) || 7;
+      const fixedLevel = Number(localStorage.getItem('fixedLevel')) || 3;
       const selectedDifficulty = localStorage.getItem('selectedDifficulty');
       
       let level;
@@ -740,7 +871,7 @@ function ReadingPageContent() {
           theme: topic,
           emotion: emotion,
           style: style,
-          level: Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 7,
+          level: Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 3,
           timestamp: lastReadingData.timestamp
         };
         
@@ -1006,7 +1137,7 @@ function ReadingPageContent() {
       console.log('  - feeling param:', feelingParam);
       
       // 初期パラメータを設定
-      const level = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 7;
+      const level = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 3;
       const theme = urlParams.get('topic') || localStorage.getItem('theme') || '';
       const emotion = urlParams.get('emotion') || '';
       const style = urlParams.get('style') || localStorage.getItem('style') || '';
@@ -1031,7 +1162,7 @@ function ReadingPageContent() {
           if (savedStoryData) {
             const parsedStoryData = JSON.parse(savedStoryData);
             const currentEffectiveLevel = getEffectiveLevel();
-            const storedLevel = parsedStoryData.level || 7;
+            const storedLevel = parsedStoryData.level || 3;
             
             // ストーリーのレベルが現在的レベルと一致しない場合は再生成が必要
             if (storedLevel !== currentEffectiveLevel && parsedStoryData.genre) {
@@ -1168,7 +1299,7 @@ function ReadingPageContent() {
         
         console.log('🔍 コンテンツタイプ判定:', { queryType, contentType });
         // レベル取得：初回は固定レベル、再読時は選択された難易度から取得
-        const fixedLevel = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 7;
+        const fixedLevel = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 3;
         const selectedDifficulty = localStorage.getItem('selectedDifficulty');
         const level = selectedDifficulty ? getLevelFromDifficulty(selectedDifficulty) : fixedLevel;
 
@@ -1332,7 +1463,7 @@ function ReadingPageContent() {
       // 読み物モードの場合のみ監視
       if (queryType !== 'story') {
         // レベル取得：初回は固定レベル、再読時は選択された難易度から取得
-        const fixedLevel = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 7;
+        const fixedLevel = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('vocabularyLevel')) || Number(localStorage.getItem('level')) || 3;
         const selectedDifficulty = localStorage.getItem('selectedDifficulty');
         const level = selectedDifficulty ? getLevelFromDifficulty(selectedDifficulty) : fixedLevel;
         const theme = urlParams.get('topic') || localStorage.getItem('theme') || '';
@@ -1567,6 +1698,55 @@ function ReadingPageContent() {
 
   // メインuseEffect: パラメータ変化に応じた処理
   useEffect(() => {
+    console.log('🔄 useEffect実行開始 - 各種判定を実行');
+    
+    // 🚫 最優先: 既にロード済みの場合は処理スキップ
+    if (hasLoadedOnce.current) {
+      console.log('🚫 既にロード済みのため処理をスキップ');
+      return;
+    }
+    
+    // 🚫 最優先: notebook戻り判定（すべての処理より先に実行）
+    if (typeof window !== 'undefined') {
+      const isBackFromNotebook = document.referrer.includes('/notebook');
+      const hasNotebookFlag = window.sessionStorage.getItem('fromNotebook') === 'true';
+      const isUrlFromNotebook = searchParams.get('fromNotebook') === 'true';
+      const hasLastReading = localStorage.getItem('lastReading');
+      const hasLastStory = localStorage.getItem('lastStory');
+      
+      console.log('🔍 notebook戻り判定:', {
+        referrer: document.referrer,
+        isBackFromNotebook,
+        hasNotebookFlag,
+        isUrlFromNotebook,
+        hasCache: !!(hasLastReading || hasLastStory)
+      });
+      
+      // notebook戻りまたはキャッシュがある場合
+      if (isBackFromNotebook || hasNotebookFlag || isUrlFromNotebook || (hasLastReading || hasLastStory)) {
+        console.log('🚫 【最優先】notebook戻りまたはキャッシュ検知 - 生成処理を完全スキップ');
+        
+        setLoading(false);
+        hasLoadedOnce.current = true;
+        
+        // フラグクリア
+        if (hasNotebookFlag) {
+          setTimeout(() => {
+            window.sessionStorage.removeItem('fromNotebook');
+            console.log('🚫 notebook戻りフラグをクリア');
+          }, 1000);
+        }
+        
+        return;
+      }
+    }
+    
+    console.log('🔄 通常処理を継続 - 新規生成を開始');
+    // 通常処理の場合のみローディング表示
+    if (!historyId && !hasLoadedOnce.current) {
+      setLoading(true);
+    }
+    
     // 履歴からの再読: URLにidパラメータが存在する場合
     if (historyId) {
       console.log('📚 履歴から再読要求:', historyId);
@@ -1691,8 +1871,8 @@ function ReadingPageContent() {
     );
     
     // 🔧 修正②: fromNotebook識別の追加（最優先処理）
-    const fromNotebook = document.referrer.includes('/notebook');
-    if (fromNotebook) {
+    const isFromNotebookReferrer = document.referrer.includes('/notebook');
+    if (isFromNotebookReferrer) {
       console.log('📚 【修正②】notebookから戻り検知 - generateReading()完全ブロック');
       window.sessionStorage.setItem('fromNotebook', 'true');
       
@@ -2168,7 +2348,7 @@ function ReadingPageContent() {
       
       // ストーリーデータが存在し、レベルが変更された場合に再生成
       if (existingStoryData.genre && existingStoryData.tone && existingStoryData.feeling) {
-        const currentStoredLevel = existingStoryData.level || 7;
+        const currentStoredLevel = existingStoryData.level || 3;
         
         if (currentStoredLevel !== effectiveLevel) {
           console.log('🔄 ストーリー effectiveLevel 変更検知:', { 
@@ -2468,12 +2648,12 @@ function ReadingPageContent() {
         // ストーリーモードの場合：既存のストーリー内容も送信
         const storyData = JSON.parse(localStorage.getItem('storyData') || '{}');
         originalParams = {
-          genre: storyData.genre,
-          tone: storyData.tone,
-          feeling: storyData.feeling,
+          genre: storyData?.genre,
+          tone: storyData?.tone,
+          feeling: storyData?.feeling,
           // 🔑 重要：既存のストーリー内容を含める
-          existingStory: storyData.story || english, // 既存のストーリー本文
-          existingThemes: storyData.themes || []
+          existingStory: storyData?.story || english, // 既存のストーリー本文
+          existingThemes: storyData?.themes || []
         };
       } else {
         // 読み物モードの場合：現在のURLパラメータまたはlocalStorageから読み物情報を取得
@@ -2618,9 +2798,26 @@ function ReadingPageContent() {
 
   // 読了処理とWPM計算
   const handleFinishReading = () => {
-    console.log('🔄 Finish button clicked', { startTime, wordCount, hasError, isStoryMode });
+    console.log('🔄 Finish button clicked - START', { 
+      startTime, 
+      wordCount, 
+      hasError, 
+      isStoryMode,
+      english: english ? english.substring(0, 100) + '...' : 'NO ENGLISH',
+      englishLength: english?.length || 0,
+      storyData: storyData ? 'EXISTS' : 'NO STORY DATA'
+    });
+    
+    // wordCountが0の場合、英語テキストから再計算
+    if (wordCount === 0 && english && english.trim().length > 0) {
+      const words = english.trim().split(/\s+/).filter(word => word.length > 0);
+      const calculatedWordCount = words.length;
+      setWordCount(calculatedWordCount);
+      console.log('🔢 wordCount was 0, recalculated from english text:', calculatedWordCount);
+    }
     
     if (wordCount > 0) {
+      console.log('✅ wordCount > 0 条件を通過');
       let effectiveStartTime = startTime;
       
       // ストーリーモードで開始時間が設定されていない場合は、仮の開始時間を使用
@@ -2631,14 +2828,20 @@ function ReadingPageContent() {
       }
       
       if (effectiveStartTime) {
+        console.log('🕐 effectiveStartTime exists, calculating WPM');
+        
         const currentTime = Date.now();
         setEndTime(currentTime);
         const timeInMinutes = (currentTime - effectiveStartTime) / (1000 * 60);
         const calculatedWPM = Math.round(wordCount / timeInMinutes);
         setWpm(calculatedWPM);
         
+        console.log('📊 WPM calculated', { calculatedWPM, timeInMinutes });
+        
         // WPM履歴を保存
+        console.log('💾 Saving WPM history');
         saveWPMHistory(calculatedWPM);
+        console.log('💾 WPM history saved');
         
         console.log('✅ Finish reading completed with WPM', { 
           wpm: calculatedWPM, 
@@ -2647,7 +2850,9 @@ function ReadingPageContent() {
         });
         
         // 読書履歴をローカルストレージに保存（ストーリーモードも含む）
+        console.log('📝 About to call saveReadingHistory', { calculatedWPM, currentTime });
         saveReadingHistory(calculatedWPM, currentTime);
+        console.log('📝 saveReadingHistory call completed');
       } else {
         // 時間測定なしの場合
         setWpm(0);
@@ -3369,7 +3574,17 @@ function ReadingPageContent() {
   const handleClick = (e: React.MouseEvent) => {
     const selection = window.getSelection()
     if (!selection) return
-    const word = selection.toString().trim().match(/^\b\w+\b$/)?.[0]
+    
+    let selectedText;
+    try {
+      selectedText = selection.toString();
+    } catch (error) {
+      console.error('Selection toString error:', error);
+      return;
+    }
+    
+    if (!selectedText) return;
+    const word = selectedText.trim().match(/^\b\w+\b$/)?.[0]
     if (word) showDefinition(word)
   }
 
@@ -3637,8 +3852,12 @@ function ReadingPageContent() {
       try {
         console.log('🌸 ストーリーの日本語訳を生成中...');
         
-        // 各段落を翻訳
-        const translationPromises = englishParagraphs.map(async (paragraph, index) => {
+        // 各段落を順次翻訳（API制限回避のため）
+        const translatedParagraphs: string[] = [];
+        
+        for (let index = 0; index < englishParagraphs.length; index++) {
+          const paragraph = englishParagraphs[index];
+          
           // HTMLタグと構造タグを除去してクリーンアップ
           let cleanText = paragraph
             .replace(/<[^>]*>/g, '') // HTMLタグ除去
@@ -3649,14 +3868,26 @@ function ReadingPageContent() {
             .replace(/^### .*/g, '') // 見出し行の除去
             .trim();
           
-          if (cleanText.length < 20) return ''; // 短すぎるテキストはスキップ
+          if (cleanText.length < 20) {
+            translatedParagraphs.push(''); // 短すぎるテキストはスキップ
+            continue;
+          }
           
-          console.log(`🌸 段落${index + 1}を翻訳中:`, cleanText.substring(0, 50) + '...');
+          console.log(`🌸 段落${index + 1}/${englishParagraphs.length}を翻訳中:`, cleanText.substring(0, 50) + '...');
           
-          return await translateToJapanese(cleanText);
-        });
-
-        const translatedParagraphs = await Promise.all(translationPromises);
+          try {
+            const translation = await translateToJapanese(cleanText);
+            translatedParagraphs.push(translation);
+            
+            // API制限回避のため少し待機
+            if (index < englishParagraphs.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+          } catch (error) {
+            console.error(`❌ 段落${index + 1}の翻訳エラー:`, error);
+            translatedParagraphs.push(cleanText); // 失敗時は元のテキストを使用
+          }
+        }
         
         // 空の翻訳を除去し、英語段落と同じ数になるように調整
         const filteredTranslations = translatedParagraphs.filter(t => t && t.trim().length > 0);
@@ -3685,18 +3916,34 @@ function ReadingPageContent() {
 
   // 読書履歴保存関数（改良版）
   const saveReadingHistory = (wpmValue: number, completedTime: number) => {
+    console.log('📝 saveReadingHistory START', { wpmValue, completedTime, english: english?.substring(0, 50) + '...' });
+    
     // contentが存在しない場合は保存しない
     if (!english || english.trim() === '') {
       console.log('🚫 英語コンテンツが存在しないため履歴保存をスキップ');
       return;
     }
+    
+    console.log('✅ 英語コンテンツ存在確認OK');
 
     // 一意IDを生成（Date.now + ランダム値で衝突回避）
-    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const randomValue = Math.random();
+    console.log('🎲 Random value:', randomValue);
+    
+    if (randomValue === null || randomValue === undefined) {
+      console.error('❌ Math.random() returned null/undefined');
+      return;
+    }
+    
+    const uniqueId = `${Date.now()}-${randomValue.toString(36).substr(2, 9)}`;
+    console.log('🆔 uniqueId generated:', uniqueId);
     
     // タイトルの確実な取得（改善版）
     let title = '';
+    console.log('📝 Title generation starting, isStoryMode:', isStoryMode);
+    
     if (isStoryMode) {
+      console.log('📚 Story mode title generation');
       // ストーリーモードの場合
       if (storyTitle && storyTitle.trim() !== '') {
         title = storyTitle; // stateから直接取得（最新の状態）
@@ -3719,14 +3966,20 @@ function ReadingPageContent() {
       }
     } else {
       // 読み物モードの場合
+      console.log('📖 Reading mode title generation');
       title = searchParams.get('topic') || localStorage.getItem('theme') || '読み物';
+      console.log('📖 Reading mode title:', title);
     }
 
     // タイトルの最終検証
+    console.log('🏷️ Title validation, title:', title);
+    
     if (!title || title.trim() === '') {
       console.log('🚫 タイトルが空のため履歴保存をスキップ');
       return;
     }
+    
+    console.log('✅ タイトル検証OK');
     
     // ストーリーモード用の追加情報を取得
     let storyModeExtras = {};
@@ -3749,7 +4002,7 @@ function ReadingPageContent() {
       title: title, // Claudeが生成したストーリータイトル
       content: english, // 英文全体
       translation: japanese, // 日本語訳
-      level: Number(localStorage.getItem('level')) || effectiveLevel || 7,
+      level: Number(localStorage.getItem('level')) || effectiveLevel || 3,
       wordCount: wordCount,
       wpm: wpmValue,
       timestamp: new Date(completedTime).toISOString(),
@@ -3783,17 +4036,22 @@ function ReadingPageContent() {
     console.log('✅ 履歴保存完了:', { title, mode: historyItem.mode, contentLength: english.length });
   };
 
-  // loading状態による表示切り替え（Lottieアニメーション使用）
-  if (loading) {
+
+  // 📺 シンプルなローダー表示判定
+  if (loading && !isFromNotebook) {
+    console.log('📺 CatLoader表示');
     return <CatLoader />;
   }
 
   return (
     <main className="p-4 bg-[#FFF9F4] min-h-screen">
-      <h1 className="text-xl font-bold mb-4 text-[#1E1E1E]">{t('reading.title')}</h1>
+      {/* ページタイトル（コンテンツがある場合のみ表示） */}
+      {!loading && (storyData || english) && (
+        <h1 className="text-xl font-bold mb-4 text-[#1E1E1E]">{t('reading.title')}</h1>
+      )}
       
-      {/* ストーリータイトル表示 */}
-      {isStoryMode && storyTitle && (
+      {/* ストーリータイトル表示（コンテンツがある場合のみ表示） */}
+      {!loading && (storyData || english) && isStoryMode && storyTitle && (
         <div className="mb-4 text-center">
           <h2 className="text-lg font-semibold text-[#1E1E1E] italic">"{storyTitle}"</h2>
         </div>
@@ -3831,36 +4089,72 @@ function ReadingPageContent() {
           </div>
         )}
         
-        {/* Start Reading ボタン - ページ上部 */}
-        <div className="mb-6 text-center">
-            <button
-              onClick={handleStartReading}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
-                isReadingStarted
-                  ? 'bg-gray-400 text-[#1E1E1E] cursor-not-allowed'
-                  : 'bg-[#FFB86C] text-[#1E1E1E] hover:bg-[#e5a561]'
-              }`}
-              disabled={isReadingStarted}
-            >
-              {isReadingStarted ? t('reading.started') : t('reading.start')}
-            </button>
-            <p className="text-sm text-[#1E1E1E] mt-2">{t('reading.words')}: {wordCount}語</p>
-          </div>
+        {/* Start Reading ボタン - ページ上部（ローディング中とコンテンツがない場合は非表示） */}
+        {!loading && (storyData || english) && (
+          <div className="mb-6 text-center">
+              <button
+                onClick={handleStartReading}
+                className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                  isReadingStarted
+                    ? 'bg-gray-400 text-[#1E1E1E] cursor-not-allowed'
+                    : 'bg-[#FFB86C] text-[#1E1E1E] hover:bg-[#e5a561]'
+                }`}
+                disabled={isReadingStarted}
+              >
+                {isReadingStarted ? t('reading.started') : t('reading.start')}
+              </button>
+              <p className="text-sm text-[#1E1E1E] mt-2">{t('reading.words')}: {wordCount}語</p>
+            </div>
+        )}
 
 
           {/* 🔧 修正②: アニメ後のエラー表示問題を修正 */}
           <div className="mb-6 space-y-4">
             {isStoryMode ? (
               // ストーリーモードの場合
-              !storyData ? (
-                loading ? (
-                  <p className="text-gray-500">📄 ストーリー読み込み中です...</p>
-                ) : (
-                  <p className="text-red-500">⚠️ ストーリーが空です。再度お試しください。</p>
-                )
-              ) : !storyData.story ? (
-                <p className="text-red-500">⚠️ ストーリーが空です。再度お試しください。</p>
-              ) : (
+              (() => {
+                // localStorageからの復元チェック
+                if (typeof window !== 'undefined' && (!storyData || !storyData?.story) && !english) {
+                  const lastReading = localStorage.getItem('lastReading');
+                  const lastStory = localStorage.getItem('lastStory');
+                  
+                  if (lastReading || lastStory) {
+                    console.log('📖 レンダリング時復元実行');
+                    try {
+                      const sourceData = lastStory || lastReading;
+                      const savedData = JSON.parse(sourceData);
+                      
+                      // 即座に状態更新
+                      setTimeout(() => {
+                        setStoryData(savedData);
+                        setEnglish(savedData.story || savedData.english || '');
+                        setStoryTitle(savedData.title || '');
+                        if (savedData.story) {
+                          const paragraphs = savedData.story.split('\n\n').filter(p => p.trim());
+                          setEnglishParagraphs(paragraphs);
+                        }
+                      }, 0);
+                      
+                      return <p className="text-gray-500">📄 ストーリー復元中...</p>;
+                    } catch (error) {
+                      console.error('❌ レンダリング時復元エラー:', error);
+                    }
+                  }
+                }
+                
+                // ローディング中または生成準備中は適切なメッセージを表示
+                if (loading) {
+                  return <p className="text-gray-500">📄 ストーリー読み込み中です...</p>;
+                }
+                
+                // データがない場合のみエラーメッセージ表示（初期状態では表示しない）
+                if (!storyData && !english && hasLoadedOnce.current) {
+                  return <p className="text-red-500">⚠️ ストーリーが空です。再度お試しください。</p>;
+                }
+                
+                // 初期状態ではローディング表示も空メッセージも表示しない
+                return null;
+              })() || (
                 // ストーリーが存在する場合の表示
                 englishParagraphs.length > 0 ? (
                   englishParagraphs.map((eng, index) => (
@@ -3875,7 +4169,7 @@ function ReadingPageContent() {
                   <div>
                     {/* フォールバック: 段落分割されていない場合 */}
                     <div className="whitespace-pre-wrap text-lg leading-relaxed">
-                      <p className="text-base text-[#1E1E1E] bg-white px-4 py-2 rounded-md">{renderClickableText(storyData.story)}</p>
+                      <p className="text-base text-[#1E1E1E] bg-white px-4 py-2 rounded-md">{renderClickableText(storyData?.story || '')}</p>
                     </div>
                     
                     {/* 日本語訳（全文の場合は最初の翻訳のみ表示） */}
@@ -3926,8 +4220,10 @@ function ReadingPageContent() {
           </div>
 
 
-          {/* Finish ボタン - テキスト下部 */}
-          {isReadingStarted && wpm === null && english && english.length > 0 && (
+          
+          
+          {/* 読書完了ボタン */}
+          {isReadingStarted && wpm === null && ((english && english.length > 0) || (storyData && storyData?.story)) && (
             <div className="mb-4 text-center">
               <button
                 onClick={handleFinishReading}
@@ -4371,27 +4667,43 @@ function ReadingPageContent() {
                 
                 <div className="space-y-3 mb-6">
                   <button
-                    onClick={() => handleNewDifficultySelect('簡単（A1〜A2）')}
+                    onClick={() => handleNewDifficultySelect('🟢 初級（A1）')}
                     className="w-full p-4 text-left border-2 border-green-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors"
                   >
-                    <div className="font-semibold text-green-800">簡単（A1〜A2）</div>
-                    <div className="text-sm text-green-600">基本的な語彙を使った文章</div>
+                    <div className="font-semibold text-green-800">🟢 初級（A1）</div>
+                    <div className="text-sm text-green-600">基本的な単語と現在形のみを使用</div>
                   </button>
                   
                   <button
-                    onClick={() => handleNewDifficultySelect('中（B1〜B2）')}
+                    onClick={() => handleNewDifficultySelect('🟡 初中級（A2）')}
+                    className="w-full p-4 text-left border-2 border-yellow-200 rounded-lg hover:bg-yellow-50 hover:border-yellow-300 transition-colors"
+                  >
+                    <div className="font-semibold text-yellow-800">🟡 初中級（A2）</div>
+                    <div className="text-sm text-yellow-600">過去形・未来形を含む基本的な表現</div>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleNewDifficultySelect('🟠 中級（B1）')}
+                    className="w-full p-4 text-left border-2 border-orange-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors"
+                  >
+                    <div className="font-semibold text-orange-800">🟠 中級（B1）</div>
+                    <div className="text-sm text-orange-600">日常会話に必要な語彙と関係代名詞</div>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleNewDifficultySelect('🔵 中上級（B2）')}
                     className="w-full p-4 text-left border-2 border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
                   >
-                    <div className="font-semibold text-[#1E1E1E]">中（B1〜B2）</div>
-                    <div className="text-sm text-[#1E1E1E]">標準的な語彙を使った文章</div>
+                    <div className="font-semibold text-blue-800">🔵 中上級（B2）</div>
+                    <div className="text-sm text-blue-600">幅広い語彙と複雑な従属節</div>
                   </button>
                   
                   <button
-                    onClick={() => handleNewDifficultySelect('難しい（C1〜C2）')}
-                    className="w-full p-4 text-left border-2 border-[#C9A86C] rounded-lg hover:bg-[#FFF9F4] hover:border-[#C9A86C] transition-colors"
+                    onClick={() => handleNewDifficultySelect('🟣 上級（C1+）')}
+                    className="w-full p-4 text-left border-2 border-purple-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors"
                   >
-                    <div className="font-semibold text-[#1E1E1E]">難しい（C1〜C2）</div>
-                    <div className="text-sm text-[#1E1E1E]">高度な語彙を使った文章</div>
+                    <div className="font-semibold text-purple-800">🟣 上級（C1+）</div>
+                    <div className="text-sm text-purple-600">学術的・専門的語彙と高度な構文</div>
                   </button>
                 </div>
                 

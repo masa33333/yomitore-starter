@@ -29,9 +29,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ content: raw });
     }
 
-    if (!level || level < 1 || level > 10) {
+    if (!level || level < 1 || level > 5) {
       console.log('❌ 不正なレベル:', level);
-      return NextResponse.json({ error: '語彙レベルが不正です (1-10)' }, { status: 400 });
+      return NextResponse.json({ error: '語彙レベルが不正です (1-5)' }, { status: 400 });
     }
 
     // デバッグ用ログ
