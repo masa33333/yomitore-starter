@@ -35,6 +35,9 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
   
   if (isStoryMode) {
     const { genre, tone, feeling } = params;
+    // ユーザーの語彙レベルを取得（デフォルト3）
+    const userLevel = params.level || '3';
+    
     if (genre && tone && feeling) {
       // 実際のOpenAI APIでストーリー生成を試行
       try {
@@ -71,7 +74,7 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
 }
 
 重要な制約:
-- 語彙レベル${params.level || '3'}に適したレベルの単語のみを使用
+- 語彙レベル${userLevel}に適したレベルの単語のみを使用
 - ストーリーは150-250語程度
 - JSON形式を厳密に守る
 - contentは配列形式で段落ごとに分ける
@@ -135,7 +138,10 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
     }
   } else {
     // 読み物モード - 実際のコンテンツ生成
-    const { topic, level } = params;
+    const { topic } = params;
+    // ユーザーの語彙レベルを取得（デフォルト3）
+    const userLevel = params.level || '3';
+    
     if (topic) {
       try {
         const { OpenAI } = await import('openai');
@@ -171,7 +177,7 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
 }
 
 重要な制約:
-- 語彙レベル${level || '3'}に適したレベルの単語のみを使用
+- 語彙レベル${userLevel}に適したレベルの単語のみを使用
 - 読み物は200-300語程度
 - ${topic}について教育的で興味深い内容にする
 - JSON形式を厳密に守る

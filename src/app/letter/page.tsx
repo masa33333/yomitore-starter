@@ -578,19 +578,7 @@ ${catName}`
         console.log('❌ No content available to show:', decision.reason);
       }
       
-      // 📮 Special handling for Seoul letter loading
-      const totalWords = parseInt(localStorage.getItem('wordCountTotal') || '0', 10);
-      console.log('📧 Current total words:', totalWords);
-      
-      if (totalWords >= 5000 && !storedLetter) {
-        console.log('📮 Seoul threshold reached but no letter found, ensuring Seoul letter exists...');
-        const { ensureSeoulLetterSaved } = await import('@/lib/ensureSeoulLetter');
-        ensureSeoulLetterSaved();
-        
-        // Re-check after ensuring Seoul letter
-        storedLetter = getCurrentRouteLetter();
-        console.log('📮 Re-checked letter after ensuring Seoul letter:', storedLetter);
-      }
+      // 📮 Seoul letter loading handled by existing letterStorage system
       
       // 📮 Handle letter content (priority 1)
       if (storedLetter && decision.type === 'letter') {
@@ -640,6 +628,61 @@ ${catName}`
         
         console.log('📮 Successfully loaded stored letter content');
         return;
+      }
+      
+      // 📮 Fallback: Load static letter data if no stored letter found
+      if (decision.type === 'letter' && decision.toCity) {
+        console.log('📮 No stored letter found, loading static letter data for:', decision.toCity);
+        try {
+          const staticLetterData = await import(`@/app/letters/${decision.toCity.toLowerCase()}/text.json`);
+          const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+          
+          let contentToShow = '';
+          if (staticLetterData.en && staticLetterData.en[userLevel]) {
+            contentToShow = staticLetterData.en[userLevel];
+          } else if (staticLetterData.en) {
+            const availableLevels = Object.keys(staticLetterData.en).map(Number);
+            if (availableLevels.length > 0) {
+              contentToShow = staticLetterData.en[availableLevels[0]];
+            }
+          }
+          
+          if (contentToShow) {
+            console.log('📮 Successfully loaded static letter:', { 
+              city: decision.toCity,
+              contentLength: contentToShow.length 
+            });
+            
+            setLetterText(contentToShow);
+            setCityName(decision.toCity);
+            
+            const cityImageMap: { [key: string]: string } = {
+              'Tokyo': '/letters/tokyo.png',
+              'Seoul': '/letters/seoul.png',
+              'Beijing': '/letters/beijing.png'
+            };
+            setCityImage(cityImageMap[decision.toCity] || '/letters/tokyo.png');
+            setDiaryNotFound(false);
+            
+            const letterDiary = {
+              id: 1,
+              en: contentToShow,
+              jp: staticLetterData.jp || '',
+              location: decision.toCity,
+              cityName: decision.toCity,
+              cityImage: cityImageMap[decision.toCity] || '/letters/tokyo.png',
+              type: 'letter'
+            };
+            setDiary(letterDiary);
+            
+            const words = contentToShow.trim().split(/\s+/).filter((word: string) => word.length > 0);
+            setWordCount(words.length);
+            
+            return;
+          }
+        } catch (error) {
+          console.error('❌ Failed to load static letter data:', error);
+        }
       }
       
       // 📧 Handle in-flight mail content (priority 2)
@@ -1029,34 +1072,32 @@ Your Cat`;
   };
 
   // 📧 Safe content rendering preparation
-  const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+  const [userLevel, setUserLevel] = useState(1);
+  
+  useEffect(() => {
+    const level = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+    setUserLevel(level);
+  }, []);
   
   // 📧 安全なコンテンツ取得 - diary.type に基づいて処理を分岐
   let letter, englishText, pairedParagraphs = [];
   
   try {
     if (diary?.type === 'letter') {
-      // 📮 Letter content handling
-      const storedLetter = getCurrentRouteLetter();
-      const fallbackLetter = letters[0]; // Narita Airport letter as fallback
-      
-      if (storedLetter && storedLetter.en && storedLetter.en[userLevel]) {
-        letter = storedLetter;
-        englishText = storedLetter.en[userLevel];
-        console.log('📮 Using stored letter with safe parsing');
-      } else if (fallbackLetter) {
-        letter = fallbackLetter;
-        englishText = getEnglishText(fallbackLetter.en, userLevel);
-        console.log('📮 Fallback to letterData');
+      // 📮 Letter content handling - use diary data that was already loaded
+      if (diary.en && diary.jp) {
+        letter = diary;
+        englishText = diary.en;
+        console.log('📮 Using diary letter content:', { enLength: diary.en.length, jpLength: diary.jp.length });
       } else {
-        console.error('📮 No letter available');
+        console.error('📮 Diary letter content incomplete:', { hasEn: !!diary.en, hasJp: !!diary.jp });
         letter = null;
         englishText = '手紙の読み込みに失敗しました。';
       }
       
       // Letter paragraph splitting
-      const enParagraphs = englishText ? englishText.split(/\\n+/).filter(p => p.trim() !== '') : [];
-      const jpParagraphs = letter && letter.jp ? letter.jp.split(/\\n+/).filter(p => p.trim() !== '') : [];
+      const enParagraphs = englishText ? englishText.split(/\n+/).filter(p => p.trim() !== '') : [];
+      const jpParagraphs = letter && letter.jp ? letter.jp.split(/\n+/).filter(p => p.trim() !== '') : [];
       pairedParagraphs = enParagraphs.map((en, idx) => ({ en, jp: jpParagraphs[idx] || '' }));
       
     } else if (diary?.type === 'mail') {

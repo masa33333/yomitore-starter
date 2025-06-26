@@ -35,9 +35,17 @@ export default function ReadingFormPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
+    
+    // ユーザーの語彙レベルを取得
+    const vocabLevel = localStorage.getItem('vocabLevel') || 
+                      localStorage.getItem('vocabularyLevel') || 
+                      localStorage.getItem('level') || 
+                      '3';
+    
     const params = new URLSearchParams({
       mode: 'reading',
       topic,
+      level: vocabLevel,
     });
     router.push(`/reading?${params.toString()}`);
   };

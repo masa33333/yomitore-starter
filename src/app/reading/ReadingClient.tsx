@@ -76,6 +76,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // 通知状態
   const [showMailNotification, setShowMailNotification] = useState(false);
+  
+  // レベル変更状態
+  const [showLevelSelector, setShowLevelSelector] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState(3);
 
   console.log('🎨 ReadingClient rendered with:', {
     mode,
@@ -174,25 +178,62 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // ノートブック保存
-  const handleSaveToNotebook = () => {
-    const storyData = {
-      en: english,
-      ja: japanese,
-      title: storyTitle,
-      wordCount,
-      englishParagraphs,
-      japaneseParagraphs,
-      sessionWords,
-      startTime,
-      endTime,
-      wpm,
-      showJapanese,
-      timestamp: Date.now()
-    };
+  // レベル変更処理
+  const handleLevelChange = () => {
+    setShowLevelSelector(!showLevelSelector);
+  };
+  
+  // レベル再生成処理
+  const handleRegenerateWithLevel = async (newLevel: number) => {
+    setLoading(true);
+    setShowLevelSelector(false);
     
-    updateStory(storyData);
-    router.push('/notebook?from=reading');
+    try {
+      // 現在の英語テキストを新しいレベルで書き直し
+      const response = await fetch('/api/rewrite-level', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          originalText: english,
+          targetLevel: newLevel,
+          title: storyTitle || displayTitle
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // 新しいレベルのテキストで更新
+        setEnglish(data.rewrittenText);
+        setEnglishParagraphs(data.rewrittenText.split('\n\n').filter(p => p.trim()));
+        
+        // 日本語翻訳をリセット（必要に応じて再翻訳）
+        setJapanese('');
+        setJapaneseParagraphs([]);
+        setShowJapanese(false);
+        
+        // 語数を再計算
+        const words = data.rewrittenText.trim().split(/\s+/).filter(w => w.length > 0);
+        setWordCount(words.length);
+        
+        // 読書状態をリセット
+        setIsReadingStarted(false);
+        setStartTime(null);
+        setEndTime(null);
+        setWpm(null);
+        setSessionWords([]);
+        
+        console.log('✅ レベル変換完了:', { newLevel, newWordCount: words.length });
+      } else {
+        console.error('❌ レベル変換エラー');
+        alert('レベル変換に失敗しました。もう一度お試しください。');
+      }
+    } catch (error) {
+      console.error('❌ レベル変換エラー:', error);
+      alert('レベル変換に失敗しました。もう一度お試しください。');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 英語テキストをクリック可能な単語に分割
@@ -345,12 +386,48 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 </div>
               )}
               
-              <button
-                onClick={handleSaveToNotebook}
-                className="w-full bg-[#FFE1B5] text-[#1E1E1E] px-6 py-3 rounded-md font-medium hover:bg-[#e5c89d] transition-colors"
-              >
-                📓 ノートブックに保存
-              </button>
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleLevelChange}
+                    className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-600 transition-colors"
+                  >
+                    📊 レベル変更
+                  </button>
+                  
+                  <button
+                    onClick={() => router.push('/choose')}
+                    className="flex-1 bg-green-500 text-white px-4 py-2 rounded-md font-medium hover:bg-green-600 transition-colors"
+                  >
+                    📚 他のものを読む
+                  </button>
+                </div>
+                
+                {/* レベル選択UI */}
+                {showLevelSelector && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="font-medium mb-3 text-center">語彙レベルを選択</h4>
+                    <div className="grid grid-cols-5 gap-2">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <button
+                          key={level}
+                          onClick={() => handleRegenerateWithLevel(level)}
+                          className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                            selectedLevel === level 
+                              ? 'bg-blue-500 text-white' 
+                              : 'bg-white text-blue-600 hover:bg-blue-100'
+                          }`}
+                        >
+                          Lv.{level}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-2 text-xs text-gray-600 text-center">
+                      選択したレベルで同じ内容を再生成します
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
