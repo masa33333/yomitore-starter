@@ -43,14 +43,14 @@ Output only the Japanese translation, nothing else.`;
         { role: "user", content: userPrompt }
       ],
       temperature: 0.3,
-      max_tokens: 300,
+      max_tokens: 1000,
     });
 
     let translation = completion.choices[0].message.content?.trim() ?? "";
     console.log('📥 OpenAIからの翻訳応答:', translation);
     
-    // 引用符を除去
-    translation = translation.replace(/^[「」"'『』]/g, '').replace(/[「」"'『』]$/g, '').trim();
+    // 引用符を除去（文頭・文末のみ）
+    translation = translation.replace(/^["'「『]/, '').replace(/["'」』]$/, '').trim();
     
     console.log('📥 クリーニング後の翻訳:', translation);
 

@@ -257,13 +257,25 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         </div>
       ) : (
         <div className="space-y-6">
-          {/* 英語テキスト */}
+          {/* テキスト表示（段落ごと） */}
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <div className="prose max-w-none">
               {englishParagraphs.map((paragraph, index) => (
-                <p key={index} className="mb-4 text-base leading-relaxed text-[#1E1E1E]">
-                  {renderClickableText(paragraph)}
-                </p>
+                <div key={index} className="mb-6">
+                  {/* 英語段落 */}
+                  <p className="mb-3 text-base leading-relaxed text-[#1E1E1E]">
+                    {renderClickableText(paragraph)}
+                  </p>
+                  
+                  {/* 対応する日本語段落 */}
+                  {showJapanese && japaneseParagraphs[index] && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <p className="text-base text-[#1E1E1E] italic">
+                        {japaneseParagraphs[index]}
+                      </p>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
             
@@ -287,20 +299,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               )}
             </div>
           </div>
-
-          {/* 日本語翻訳 */}
-          {showJapanese && japanese && (
-            <div className="bg-blue-50 rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold mb-3 text-[#1E1E1E]">🗾 日本語翻訳</h3>
-              <div className="prose max-w-none">
-                {japaneseParagraphs.map((paragraph, index) => (
-                  <p key={index} className="mb-3 text-base text-[#1E1E1E]">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* 単語情報 */}
           {selectedWord && wordInfo && (

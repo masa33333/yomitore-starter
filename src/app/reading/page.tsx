@@ -72,8 +72,7 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
 
 重要な制約:
 - 語彙レベル${params.level || '3'}に適したレベルの単語のみを使用
-- ストーリーは400-600語程度の充実した内容にする
-- 各段落は80-120語程度で詳細に書く
+- ストーリーは150-250語程度
 - JSON形式を厳密に守る
 - contentは配列形式で段落ごとに分ける
 - themesには関連する3つのテーマを含める`;
@@ -85,7 +84,7 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
               { role: 'user', content: userPrompt }
             ],
             temperature: 0.7,
-            max_tokens: 1200,
+            max_tokens: 800,
           });
 
           const content = response.choices[0]?.message?.content;
@@ -136,7 +135,7 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
     }
   } else {
     // 読み物モード - 実際のコンテンツ生成
-    const { topic, emotion, style, level } = params;
+    const { topic, level } = params;
     if (topic) {
       try {
         const { OpenAI } = await import('openai');
@@ -148,15 +147,16 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
             apiKey: process.env.OPENAI_API_KEY,
           });
           
-          const systemMessage = `You are a professional English educational content writer specializing in creating engaging reading materials for intermediate English learners.`;
+          const systemMessage = `You are a professional English educational content writer specializing in creating engaging reading materials for English learners.`;
           
           const userPrompt = `
-語彙レベル: ${level || '3'}
-テーマ: ${topic}
-感情・雰囲気: ${emotion || 'neutral'}
-文体: ${style || 'informative'}
-
-この条件に基づいて英語の読み物を1つ作成し、以下のstrict JSON形式で出力してください：
+## 指示
+1. 英語で、以下の条件で読み物を作成せよ
+   - テーマ: ${topic}
+   - 段落数: 5
+   - 情報量: 200–300 英単語相当
+   - 専門家視点の驚きウンチクを交え、中学生にもわかる表現で
+2. 以下のstrict JSON形式で出力してください：
 
 {
   "title": "[Engaging Title About ${topic}]",
@@ -172,9 +172,8 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
 
 重要な制約:
 - 語彙レベル${level || '3'}に適したレベルの単語のみを使用
-- 読み物は400-600語程度の充実した内容にする
+- 読み物は200-300語程度
 - ${topic}について教育的で興味深い内容にする
-- 各段落は80-120語程度で詳細に書く
 - JSON形式を厳密に守る
 - contentは配列形式で段落ごとに分ける
 - themesには関連する3つのテーマを含める`;
