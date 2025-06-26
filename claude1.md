@@ -1,1 +1,26 @@
-🟢 初級 (A1)''基本的な単語と現在形のみを使用', level: 1, 2 }, 🟡 初中級 (A2)''過去形・未来形を含む基本的な表現', level: 3, 4 }, '🟠 中級 (B1)', '日常会話に必要な語彙と関係代名詞', level: 5, 6 }, '🔵 中上級 (B2)', '幅広い語彙と複雑な従属節', level: 7, 8 },'🟣 上級 (C1+)', description: '学術的・専門的語彙と高度な構文', level: 9, 10。
+GET /reading?mode=story&genre=Romance&tone=Romantic&feeling=Satisfaction&level=3 200 in 7228ms
+ GET / 200 in 171ms
+ GET /choose 200 in 312ms
+ GET /story-form 200 in 89ms
+🏗️ Server Component executing with params: {
+  mode: 'story',
+  genre: 'Science Fiction',
+  tone: 'Lighthearted',
+  feeling: 'Terrifying',
+  level: '3'
+}
+🚀 OpenAI APIでストーリー生成開始
+✅ OpenAI APIストーリー生成成功: { title: 'The Galactic Ghost Ship', storyLength: 1604, themesCount: 3 }
+✅ Server Component data prepared: {
+  mode: 'story',
+  hasInitialData: true,
+  title: 'The Galactic Ghost Ship'
+}
+🎨 ReadingClient rendered with: {
+  mode: 'story',
+  hasInitialData: true,
+  title: 'The Galactic Ghost Ship',
+  englishLength: 1604,
+  paragraphCount: 5
+}
+ GET /reading?mode=story&genre=Science+Fiction&tone=Lighthearted&feeling=Terrifying&level=3 200 in 4687ms

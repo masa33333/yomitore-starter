@@ -1,3 +1,5 @@
+'use client';
+
 import Player from 'react-lottie-player';
 import { useEffect, useState } from 'react';
 

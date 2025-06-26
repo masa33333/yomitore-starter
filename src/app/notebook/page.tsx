@@ -153,6 +153,14 @@ export default function NotebookPage() {
   return (
     <main className="p-4 max-w-4xl mx-auto bg-[#FFF9F4] min-h-screen">
       <div className="mb-6">
+        {/* Back to Reading Button */}
+        <button
+          onClick={() => router.push('/reading?from=notebook')}
+          className="mb-4 flex items-center gap-2 px-4 py-2 bg-[#FFE1B5] text-[#1E1E1E] rounded-md font-medium hover:bg-[#e5a561] transition-colors"
+        >
+          ← 読書画面へ戻る
+        </button>
+        
         <h1 className="text-xl font-bold text-[#1E1E1E] mb-2">{t('notebook.title')}</h1>
         <p className="text-[#1E1E1E]">
           {words.length > 0 ? (
