@@ -1,5 +1,6 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
+import { getPromptTemplate } from "@/constants/promptTemplates";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -13,22 +14,23 @@ export async function POST(req: Request) {
 
     console.log('🔄 レベル変換リクエスト:', { targetLevel, textLength: originalText.length });
 
-    const systemMessage = `You are a professional English educational content writer specializing in rewriting content for different vocabulary levels.`;
+    const promptTemplate = getPromptTemplate(targetLevel);
+    
+    const systemMessage = `You are an expert English rewriter specializing in NGSL vocabulary control.`;
+    
+    const userPrompt = `${promptTemplate}
 
-    const userPrompt = `
-Rewrite the following English text to match vocabulary level ${targetLevel} (1=beginner, 5=advanced).
+TASK: Rewrite the following text to match Level ${targetLevel} vocabulary constraints while keeping the same meaning and story.
 
 Original text:
 "${originalText}"
 
-Requirements:
-- Keep the EXACT same story, plot, and meaning
-- Keep the same number of paragraphs and overall structure  
-- Only change vocabulary difficulty to match level ${targetLevel}
-- Maintain the same tone and style
-- For level 1-2: Use simple, basic vocabulary and simple sentence structures
-- For level 3: Use intermediate vocabulary with some complex sentences
-- For level 4-5: Use advanced vocabulary and complex sentence structures
+REQUIREMENTS:
+- Keep the EXACT same story and meaning
+- Keep the same number of paragraphs
+- Follow ALL NGSL vocabulary constraints from the template above
+- Ensure proper word count as specified in the template
+- Every word must be within the specified NGSL range
 
 Output only the rewritten text, nothing else.`;
 

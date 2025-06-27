@@ -31,6 +31,20 @@ interface ReadingClientProps {
   mode: string;
 }
 
+// 品詞の英語→日本語変換
+const posToJapanese: { [key: string]: string } = {
+  'noun': '名詞',
+  'verb': '動詞',
+  'adjective': '形容詞',
+  'adverb': '副詞',
+  'pronoun': '代名詞',
+  'conjunction': '接続詞',
+  'preposition': '前置詞',
+  'interjection': '間投詞',
+  'determiner': '限定詞',
+  'unknown': '不明'
+};
+
 export default function ReadingClient({ searchParams, initialData, mode }: ReadingClientProps) {
   const router = useRouter();
   const { displayLang } = useLanguage();
@@ -42,12 +56,41 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     ? (initialData?.title || searchParams.genre || 'ストーリー')
     : (searchParams.topic || searchParams.theme || '読み物');
 
+  // notebookからの戻りかどうかを初期化時に判定
+  const isFromNotebook = () => {
+    if (typeof window === 'undefined') return false;
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('fromNotebook') === 'true' || urlParams.get('from') === 'notebook';
+  };
+
   // 基本状態
   const [loading, setLoading] = useState(false);
-  const [english, setEnglish] = useState<string>(initialData?.story || 'コンテンツを読み込み中...');
+  const [english, setEnglish] = useState<string>(() => {
+    // notebookから戻った場合はlocalStorageから復元、そうでなければinitialDataを使用
+    if (isFromNotebook() && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('currentReadingEnglish');
+      return saved || 'コンテンツを読み込み中...';
+    }
+    return initialData?.story || 'コンテンツを読み込み中...';
+  });
+  
+  // クライアントサイドでの状態復元フラグ
+  const [isClientRestored, setIsClientRestored] = useState(false);
   const [japanese, setJapanese] = useState<string>('');
-  const [storyTitle, setStoryTitle] = useState<string>(initialData?.title || '');
+  const [storyTitle, setStoryTitle] = useState<string>(() => {
+    if (isFromNotebook() && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('currentReadingTitle');
+      return saved || '';
+    }
+    return initialData?.title || '';
+  });
   const [englishParagraphs, setEnglishParagraphs] = useState<string[]>(() => {
+    if (isFromNotebook() && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('currentReadingEnglish');
+      if (saved) {
+        return saved.split('\n\n').filter(p => p.trim());
+      }
+    }
     if (initialData?.story) {
       return initialData.story.split('\n\n').filter(p => p.trim());
     }
@@ -57,11 +100,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // 読書状態
   const [showJapanese, setShowJapanese] = useState(false);
-  const [isReadingStarted, setIsReadingStarted] = useState(false);
+  const [isReadingStarted, setIsReadingStarted] = useState(() => {
+    if (isFromNotebook() && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('currentReadingStarted');
+      return saved === 'true';
+    }
+    return false;
+  });
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [wpm, setWpm] = useState<number | null>(null);
   const [wordCount, setWordCount] = useState<number>(() => {
+    if (isFromNotebook() && typeof window !== 'undefined') {
+      const saved = localStorage.getItem('currentReadingWordCount');
+      if (saved) return parseInt(saved, 10);
+    }
     if (initialData?.story) {
       return initialData.story.trim().split(/\s+/).filter(w => w.length > 0).length;
     }
@@ -72,7 +125,18 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
   const [loadingWordInfo, setLoadingWordInfo] = useState(false);
-  const [sessionWords, setSessionWords] = useState<WordInfo[]>([]);
+  const [sessionWords, setSessionWords] = useState<WordInfo[]>(() => {
+    if (isFromNotebook() && typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('currentSessionWords');
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        console.error('Error parsing saved session words:', error);
+        return [];
+      }
+    }
+    return [];
+  });
   
   // 通知状態
   const [showMailNotification, setShowMailNotification] = useState(false);
@@ -92,11 +156,151 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     firstParagraphPreview: englishParagraphs[0]?.substring(0, 100) + '...'
   });
 
+  // コンポーネントマウント時にテストログ出力とデータ統一
+  React.useEffect(() => {
+    console.log('🚀 ReadingClient mounted!');
+    console.log('📋 English paragraphs:', englishParagraphs);
+    console.log('📊 Word count:', wordCount);
+    
+    // URLパラメータをチェックしてnotebookからの戻りかどうかを判定
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromNotebook = urlParams.get('fromNotebook') === 'true' || urlParams.get('from') === 'notebook';
+    console.log('📚 From notebook?', fromNotebook);
+    console.log('📚 URL params:', {
+      fromNotebook: urlParams.get('fromNotebook'),
+      from: urlParams.get('from'),
+      allParams: Object.fromEntries(urlParams.entries())
+    });
+    
+    // notebookから戻った場合の完全な状態復元処理
+    if (fromNotebook) {
+      console.log('📚 Complete restoration for notebook return...');
+      try {
+        const savedEnglish = localStorage.getItem('currentReadingEnglish');
+        const savedTitle = localStorage.getItem('currentReadingTitle');
+        const savedWordCount = localStorage.getItem('currentReadingWordCount');
+        const savedReadingStarted = localStorage.getItem('currentReadingStarted');
+        const savedJapanese = localStorage.getItem('currentReadingJapanese');
+        const savedEndTime = localStorage.getItem('currentReadingEndTime');
+        const savedWpm = localStorage.getItem('currentReadingWpm');
+        const savedSessionWords = localStorage.getItem('currentSessionWords');
+        
+        console.log('📚 Saved data check:', {
+          hasEnglish: !!savedEnglish,
+          englishLength: savedEnglish?.length || 0,
+          hasTitle: !!savedTitle,
+          hasWordCount: !!savedWordCount,
+          hasReadingStarted: !!savedReadingStarted,
+          hasJapanese: !!savedJapanese,
+          hasEndTime: !!savedEndTime,
+          hasWpm: !!savedWpm,
+          hasSessionWords: !!savedSessionWords
+        });
+        
+        // 英語テキストの復元（最重要）
+        if (savedEnglish && savedEnglish.trim() !== '') {
+          console.log('🔄 Restoring English text from localStorage...');
+          setEnglish(savedEnglish);
+          setEnglishParagraphs(savedEnglish.split('\n\n').filter(p => p.trim()));
+        }
+        
+        // タイトルの復元
+        if (savedTitle) {
+          setStoryTitle(savedTitle);
+        }
+        
+        // 語数の復元
+        if (savedWordCount) {
+          setWordCount(parseInt(savedWordCount, 10));
+        }
+        
+        // 読書開始状態の復元
+        if (savedReadingStarted === 'true') {
+          setIsReadingStarted(true);
+        }
+        
+        // 日本語翻訳の復元
+        if (savedJapanese) {
+          setJapanese(savedJapanese);
+          setJapaneseParagraphs(savedJapanese.split('\n\n').filter(p => p.trim()));
+          setShowJapanese(true);
+        }
+        
+        // 読書完了状態の復元
+        if (savedEndTime) {
+          setEndTime(parseInt(savedEndTime, 10));
+        }
+        
+        if (savedWpm) {
+          setWpm(parseInt(savedWpm, 10));
+        }
+        
+        // セッション単語の復元
+        if (savedSessionWords) {
+          try {
+            const words = JSON.parse(savedSessionWords);
+            setSessionWords(words);
+            console.log('📝 Session words restored:', words.length);
+          } catch (error) {
+            console.error('❌ Error parsing session words:', error);
+          }
+        }
+        
+        setIsClientRestored(true);
+        console.log('✅ Complete reading state restored from localStorage');
+      } catch (error) {
+        console.error('❌ Error with complete restoration:', error);
+        setIsClientRestored(true);
+      }
+    } else {
+      setIsClientRestored(true);
+    }
+    
+    // localStorage の単語データを統一
+    try {
+      const myNotebookData = JSON.parse(localStorage.getItem('myNotebook') || '[]');
+      const clickedWordsData = JSON.parse(localStorage.getItem('clickedWords') || '[]');
+      
+      console.log('📝 Data sync check:', {
+        myNotebookCount: myNotebookData.length,
+        clickedWordsCount: clickedWordsData.length
+      });
+      
+      // myNotebookにデータがあってclickedWordsが空の場合、データを移行
+      if (myNotebookData.length > 0 && clickedWordsData.length === 0) {
+        localStorage.setItem('clickedWords', JSON.stringify(myNotebookData));
+        console.log('📝 Migrated myNotebook data to clickedWords:', myNotebookData.length, 'items');
+      }
+    } catch (error) {
+      console.error('❌ Data sync error:', error);
+    }
+  }, []);
+
+  // 読書状態をlocalStorageに保存する関数
+  const saveCurrentReadingState = () => {
+    try {
+      localStorage.setItem('currentReadingEnglish', english);
+      localStorage.setItem('currentReadingJapanese', japanese);
+      localStorage.setItem('currentReadingTitle', storyTitle);
+      localStorage.setItem('currentReadingWordCount', wordCount.toString());
+      localStorage.setItem('currentReadingStarted', isReadingStarted.toString());
+      if (endTime) localStorage.setItem('currentReadingEndTime', endTime.toString());
+      if (wpm) localStorage.setItem('currentReadingWpm', wpm.toString());
+      localStorage.setItem('currentSessionWords', JSON.stringify(sessionWords));
+      console.log('📚 Reading state saved to localStorage');
+    } catch (error) {
+      console.error('❌ Error saving reading state:', error);
+    }
+  };
+
   // 読書開始処理
   const handleStartReading = () => {
     setIsReadingStarted(true);
     setStartTime(Date.now());
     console.log('📖 読書開始');
+    
+    // 読書状態をlocalStorageに保存
+    saveCurrentReadingState();
   };
 
   // 読書完了処理
@@ -115,10 +319,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       timeInMinutes: timeInMinutes.toFixed(1),
       wpm: calculatedWpm
     });
+    
+    // 読書完了状態を保存
+    setTimeout(() => {
+      saveCurrentReadingState();
+    }, 100);
   };
 
   // 単語クリック処理
   const handleWordClick = async (word: string) => {
+    console.log('🔍 handleWordClick called with:', word);
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
@@ -126,7 +336,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const response = await fetch('/api/word-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word, sentence: english })
+        body: JSON.stringify({ 
+          word: word,
+          originalForm: word, 
+          sentence: english 
+        })
       });
       
       if (response.ok) {
@@ -135,16 +349,51 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         
         // セッション単語に追加
         const newSessionWord = {
-          word: data.word,
+          word: word, // クリックした単語を見出し語として使用
           originalForm: word,
-          partOfSpeech: data.partOfSpeech,
-          meaning: data.meaning,
-          japaneseMeaning: data.japaneseMeaning,
-          sentence: data.sentence,
-          sentenceJapanese: data.sentenceJapanese
+          partOfSpeech: data.partOfSpeech || 'unknown',
+          meaning: data.meaning || data.paraphrase || '',
+          japaneseMeaning: data.japaneseMeaning || '意味不明',
+          sentence: data.sentence || data.exampleEnglish || '',
+          sentenceJapanese: data.sentenceJapanese || data.exampleJapanese || ''
         };
         
         setSessionWords(prev => [...prev, newSessionWord]);
+        
+        // localStorageにも保存してnotebookページで確認できるように
+        try {
+          // notebookページが優先的に読み込むclickedWordsに保存
+          const existingClickedWords = JSON.parse(localStorage.getItem('clickedWords') || '[]');
+          const clickedWordExists = existingClickedWords.some((w: any) => w.word === newSessionWord.word);
+          
+          console.log('📝 保存しようとする単語:', newSessionWord);
+          console.log('📝 既存のclickedWords数:', existingClickedWords.length);
+          console.log('📝 clickedWordsに単語存在チェック:', clickedWordExists);
+          
+          if (!clickedWordExists) {
+            const updatedClickedWords = [...existingClickedWords, newSessionWord];
+            localStorage.setItem('clickedWords', JSON.stringify(updatedClickedWords));
+            console.log('✅ 単語をclickedWordsに保存完了:', newSessionWord.word);
+            console.log('📝 clickedWords保存後の単語数:', updatedClickedWords.length);
+          }
+          
+          // 互換性のためmyNotebookにも保存
+          const existingMyNotebook = JSON.parse(localStorage.getItem('myNotebook') || '[]');
+          const myNotebookExists = existingMyNotebook.some((w: WordInfo) => w.word === newSessionWord.word);
+          
+          if (!myNotebookExists) {
+            const updatedMyNotebook = [...existingMyNotebook, newSessionWord];
+            localStorage.setItem('myNotebook', JSON.stringify(updatedMyNotebook));
+            console.log('✅ 単語をmyNotebookにも保存完了:', newSessionWord.word);
+          }
+          
+          // 単語追加後に読書状態を保存
+          setTimeout(() => {
+            saveCurrentReadingState();
+          }, 100);
+        } catch (error) {
+          console.error('❌ マイノート保存エラー:', error);
+        }
       }
     } catch (error) {
       console.error('❌ 単語情報取得エラー:', error);
@@ -172,6 +421,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         setJapanese(data.translation);
         setJapaneseParagraphs(data.translation.split('\n\n'));
         setShowJapanese(true);
+        
+        // 翻訳取得後に状態を保存
+        setTimeout(() => {
+          saveCurrentReadingState();
+        }, 100);
       }
     } catch (error) {
       console.error('❌ 翻訳エラー:', error);
@@ -236,18 +490,40 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
+  // 親要素のクリックハンドラー（Event Delegation）
+  const handleTextClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
+    console.log('🖱️ 段落がクリックされました');
+    const target = e.target as HTMLElement;
+    console.log('🎯 クリックされた要素:', target);
+    console.log('🎯 要素のクラス:', target.className);
+    console.log('🎯 要素のテキスト:', target.textContent);
+    
+    // クリックされた要素が単語要素か確認
+    if (target.classList.contains('clickable-word')) {
+      const word = target.textContent || '';
+      console.log('🖱️ Event Delegation: 単語クリック検出:', word);
+      e.preventDefault();
+      e.stopPropagation();
+      handleWordClick(word);
+    }
+  };
+
   // 英語テキストをクリック可能な単語に分割
   const renderClickableText = (text: string) => {
+    console.log('🎨 renderClickableText called with:', text.substring(0, 100) + '...');
     const words = text.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
     
-    return words.map((part, index) => {
+    let clickableWordCount = 0;
+    const result = words.map((part, index) => {
       if (/^[a-zA-Z]+$/.test(part)) {
+        clickableWordCount++;
+        console.log(`✨ クリック可能な単語 ${clickableWordCount}:`, part);
         return (
           <span
             key={index}
-            onClick={() => handleWordClick(part)}
-            className="cursor-pointer hover:bg-yellow-200 hover:bg-opacity-50 transition-colors duration-200 rounded"
+            className="clickable-word cursor-pointer hover:bg-yellow-200 hover:bg-opacity-50 transition-colors duration-200"
             title="クリックして意味を調べる"
+            data-word={part}
           >
             {part}
           </span>
@@ -255,6 +531,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }
       return <span key={index}>{part}</span>;
     });
+    
+    console.log(`🎯 この段落のクリック可能単語数: ${clickableWordCount}`);
+    return result;
   };
 
   if (loading) {
@@ -292,74 +571,70 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               onClick={handleStartReading}
               className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-medium hover:bg-[#e5a561] transition-colors"
             >
-              📖 読み始める
+              読み始める
             </button>
           </div>
         </div>
       ) : (
         <div className="space-y-6">
           {/* テキスト表示（段落ごと） */}
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <div className="prose max-w-none">
-              {englishParagraphs.map((paragraph, index) => (
+          <div className="bg-white rounded-lg p-6 shadow-sm" style={{ pointerEvents: 'auto' }}>
+            <div className="max-w-none" style={{ pointerEvents: 'auto' }}>
+              {englishParagraphs.map((paragraph, index) => {
+                console.log(`📝 段落 ${index + 1}:`, paragraph.substring(0, 50) + '...');
+                return (
                 <div key={index} className="mb-6">
                   {/* 英語段落 */}
-                  <p className="mb-3 text-base leading-relaxed text-[#1E1E1E]">
+                  <p 
+                    className="mb-3 text-base leading-relaxed text-[#1E1E1E]"
+                    onClick={handleTextClick}
+                    style={{ 
+                      pointerEvents: 'auto',
+                      userSelect: 'auto'
+                    }}
+                  >
                     {renderClickableText(paragraph)}
                   </p>
                   
                   {/* 対応する日本語段落 */}
                   {showJapanese && japaneseParagraphs[index] && (
-                    <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="bg-[#FFF9F4] border border-[#FFE1B5] p-4 rounded-lg">
                       <p className="text-base text-[#1E1E1E] italic">
                         {japaneseParagraphs[index]}
                       </p>
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
             
             <div className="mt-6 flex flex-wrap gap-3">
               {!showJapanese && (
                 <button
                   onClick={handleShowJapanese}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                  className="bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#e5a561] transition-colors"
                 >
-                  🗾 日本語を表示
+                  日本語を表示
                 </button>
               )}
               
               {!endTime && (
                 <button
                   onClick={handleCompleteReading}
-                  className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
+                  className="bg-[#FFE1B5] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#f0d1a0] transition-colors font-medium"
                 >
-                  ✅ 読書完了
+                  読書完了
                 </button>
               )}
             </div>
           </div>
 
-          {/* 単語情報 */}
-          {selectedWord && wordInfo && (
-            <div className="bg-yellow-50 rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold mb-3 text-[#1E1E1E]">📚 単語情報</h3>
-              <div className="space-y-2">
-                <p><strong>単語:</strong> {wordInfo.word}</p>
-                <p><strong>品詞:</strong> {wordInfo.partOfSpeech}</p>
-                <p><strong>意味:</strong> {wordInfo.meaning}</p>
-                <p><strong>日本語:</strong> {wordInfo.japaneseMeaning}</p>
-                <p><strong>例文:</strong> {wordInfo.sentence}</p>
-                <p><strong>例文(日本語):</strong> {wordInfo.sentenceJapanese}</p>
-              </div>
-            </div>
-          )}
 
           {/* 読書完了後の表示 */}
           {endTime && (
-            <div className="bg-green-50 rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold mb-3 text-[#1E1E1E]">🎉 読書完了！</h3>
+            <div className="bg-[#FFF9F4] border border-[#FFE1B5] rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold mb-3 text-[#1E1E1E]">読書完了！</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <p className="text-sm text-gray-600">読書速度</p>
@@ -371,17 +646,79 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 </div>
               </div>
               
+              {/* 今日のマイノート */}
               {sessionWords.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">
+                <div className="bg-[#FFF9F4] border border-[#C9A86C] rounded p-4 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-[#1E1E1E]">今日のマイノート</h3>
+                  </div>
+                  
+                  <p className="text-sm text-[#1E1E1E] mb-3">
                     クリックした単語: {sessionWords.length}個
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  
+                  <div className="space-y-3 mb-4">
                     {sessionWords.map((word, index) => (
-                      <span key={index} className="bg-white px-2 py-1 rounded text-sm">
-                        {word.word}
-                      </span>
+                      <div key={index} className="bg-white rounded-lg p-3 border border-[#C9A86C]">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="space-y-2">
+                              {/* 見出し語 */}
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-bold text-xl text-[#1E1E1E]">{word.word}</span>
+                                {word.originalForm && word.originalForm !== word.word && (
+                                  <span className="font-semibold text-lg text-gray-600">
+                                    {word.originalForm}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              {/* 品詞 */}
+                              <div className="flex items-center gap-2">
+                                <span className="bg-[#FFE1B5] text-[#1E1E1E] text-xs px-2 py-1 rounded-md font-medium">
+                                  {posToJapanese[word.partOfSpeech] || word.partOfSpeech}
+                                </span>
+                              </div>
+                              
+                              {/* 意味 */}
+                              <div className="space-y-1">
+                                <div className="text-sm">
+                                  <span className="font-medium text-gray-700">英語:</span>
+                                  <span className="ml-2">{word.meaning}</span>
+                                </div>
+                                <div className="text-sm">
+                                  <span className="font-medium text-gray-700">日本語:</span>
+                                  <span className="ml-2">{word.japaneseMeaning}</span>
+                                </div>
+                              </div>
+                              
+                              {/* 例文 */}
+                              {(word.sentence || word.sentenceJapanese) && (
+                                <div className="space-y-1">
+                                  <div className="text-sm bg-gray-50 p-2 rounded border-l-4 border-[#FFB86C]">
+                                    {word.sentence && (
+                                      <div className="italic text-gray-800">{word.sentence}</div>
+                                    )}
+                                    {word.sentenceJapanese && (
+                                      <div className="text-gray-600 mt-1">{word.sentenceJapanese}</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
+                  </div>
+                  
+                  <div className="text-center">
+                    <button
+                      onClick={() => router.push('/notebook')}
+                      className="bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded text-sm hover:bg-[#e5a561] transition-colors"
+                    >
+                      マイノートを見る
+                    </button>
                   </div>
                 </div>
               )}
@@ -390,22 +727,22 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div className="flex gap-3">
                   <button
                     onClick={handleLevelChange}
-                    className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-600 transition-colors"
+                    className="flex-1 bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded-md font-medium hover:bg-[#e5a561] transition-colors"
                   >
-                    📊 レベル変更
+                    レベル変更
                   </button>
                   
                   <button
                     onClick={() => router.push('/choose')}
-                    className="flex-1 bg-green-500 text-white px-4 py-2 rounded-md font-medium hover:bg-green-600 transition-colors"
+                    className="flex-1 bg-[#FFE1B5] text-[#1E1E1E] px-4 py-2 rounded-md font-medium hover:bg-[#f0d1a0] transition-colors"
                   >
-                    📚 他のものを読む
+                    他のものを読む
                   </button>
                 </div>
                 
                 {/* レベル選択UI */}
                 {showLevelSelector && (
-                  <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="bg-[#FFF9F4] border border-[#FFE1B5] p-4 rounded-lg">
                     <h4 className="font-medium mb-3 text-center">語彙レベルを選択</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5].map((level) => (
@@ -414,8 +751,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                           onClick={() => handleRegenerateWithLevel(level)}
                           className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
                             selectedLevel === level 
-                              ? 'bg-blue-500 text-white' 
-                              : 'bg-white text-blue-600 hover:bg-blue-100'
+                              ? 'bg-[#FFB86C] text-[#1E1E1E]' 
+                              : 'bg-white text-[#1E1E1E] hover:bg-[#FFF9F4] border border-[#FFE1B5]'
                           }`}
                         >
                           Lv.{level}

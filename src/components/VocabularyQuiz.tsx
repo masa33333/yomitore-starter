@@ -284,12 +284,12 @@ export function VocabularyQuiz() {
                 className={`px-4 py-3 rounded-lg border transition-all duration-200
                   ${selectedAnswer === option
                     ? option === currentQuestion.correctAnswer
-                      ? 'bg-green-100 border-green-500 text-green-800'
+                      ? 'bg-[#FFF9F4] border-[#FFB86C] text-[#1E1E1E]'
                       : 'bg-red-100 border-red-500 text-red-800'
                     : selectedAnswer && option === currentQuestion.correctAnswer
-                      ? 'bg-green-100 border-green-500 text-green-800'
+                      ? 'bg-[#FFF9F4] border-[#FFB86C] text-[#1E1E1E]'
                       : 'bg-white hover:bg-gray-50 border-gray-300'}
-                  ${selectedAnswer ? 'cursor-not-allowed' : 'cursor-pointer hover:border-blue-400'}
+                  ${selectedAnswer ? 'cursor-not-allowed' : 'cursor-pointer hover:border-[#FFE1B5]'}
                 `}
               >
                 {option}

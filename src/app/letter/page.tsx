@@ -40,21 +40,21 @@ function LetterPageContent() {
   const [contentDecision, setContentDecision] = useState<any>(null);
 
   // 📮 到着手紙専用のレンダリング関数
-  const renderArrivalLetter = () => {
+  const renderArrivalLetter = (letterData: any, currentUserLevel: number, paragraphs: any[]) => {
     console.log('📮 Rendering arrival letter content');
     
     // letter type content header
     const letterHeader = (
-      <div className="border-l-4 border-blue-500 pl-4 mb-4">
+      <div className="border-l-4 border-[#FFB86C] pl-4 mb-4">
         <div className="flex items-center mb-2">
-          <span className="text-blue-600 text-lg">📮</span>
-          <span className="ml-2 text-blue-600 font-semibold">到着手紙</span>
+          <span className="text-[#FFB86C] text-lg">📮</span>
+          <span className="ml-2 text-[#1E1E1E] font-semibold">到着手紙</span>
         </div>
       </div>
     );
 
     // letter content validation
-    if (!letter?.en?.[userLevel]) {
+    if (!letterData?.en) {
       return (
         <>
           {letterHeader}
@@ -69,8 +69,8 @@ function LetterPageContent() {
     return (
       <>
         {letterHeader}
-        {pairedParagraphs.length > 0 ? (
-          pairedParagraphs.map((pair, index) => (
+        {paragraphs.length > 0 ? (
+          paragraphs.map((pair, index) => (
             <div key={index}>
               <p className="text-gray-700 leading-relaxed mb-1 text-lg">
                 {renderClickableText(pair.en)}
@@ -547,6 +547,25 @@ ${catName}`
 
   useEffect(() => {
     const loadDiary = async () => {
+      // Seoul手紙の事前保存チェック
+      try {
+        const { preloadSeoulLetter, shouldPreloadSeoulLetter, isSeoulLetterPreloaded } = await import('@/lib/preloadSeoulLetter');
+        const totalWords = parseInt(localStorage.getItem('wordCountTotal') || '0', 10);
+        
+        console.log('📮 Seoul letter preload check:', {
+          totalWords,
+          shouldPreload: shouldPreloadSeoulLetter(totalWords),
+          isPreloaded: isSeoulLetterPreloaded()
+        });
+        
+        // 一時的に強制的にSeoul手紙を保存してテスト
+        console.log('📮 Force preloading Seoul letter for testing...');
+        await preloadSeoulLetter();
+        
+      } catch (error) {
+        console.error('❌ Failed to preload Seoul letter:', error);
+      }
+      
       // URL から id を取得
       const id = searchParams.get('id');
       console.log('🔍 diary.id:', id);
@@ -633,17 +652,24 @@ ${catName}`
       // 📮 Fallback: Load static letter data if no stored letter found
       if (decision.type === 'letter' && decision.toCity) {
         console.log('📮 No stored letter found, loading static letter data for:', decision.toCity);
+        console.log('📮 Debug: toCity lowercase:', decision.toCity.toLowerCase());
         try {
           const staticLetterData = await import(`@/app/letters/${decision.toCity.toLowerCase()}/text.json`);
+          console.log('📮 Static letter data loaded successfully:', staticLetterData);
           const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+          console.log('📮 User level:', userLevel);
+          console.log('📮 Available levels in static data:', Object.keys(staticLetterData.en || {}));
           
           let contentToShow = '';
           if (staticLetterData.en && staticLetterData.en[userLevel]) {
             contentToShow = staticLetterData.en[userLevel];
+            console.log('📮 Using exact level match:', userLevel);
           } else if (staticLetterData.en) {
             const availableLevels = Object.keys(staticLetterData.en).map(Number);
+            console.log('📮 Available levels (numbers):', availableLevels);
             if (availableLevels.length > 0) {
               contentToShow = staticLetterData.en[availableLevels[0]];
+              console.log('📮 Using fallback level:', availableLevels[0]);
             }
           }
           
@@ -682,6 +708,42 @@ ${catName}`
           }
         } catch (error) {
           console.error('❌ Failed to load static letter data:', error);
+          console.error('❌ Error details:', {
+            message: error.message,
+            stack: error.stack,
+            toCity: decision.toCity,
+            expectedPath: `@/app/letters/${decision.toCity.toLowerCase()}/text.json`
+          });
+          
+          // エラーの場合は fallback content を設定
+          const fallbackContent = `Hello from ${decision.toCity}!\n\nI'm writing to you from this amazing city. Unfortunately, there was a problem loading my detailed letter.\n\nI'll try to send you a proper letter next time!\n\nLove,\nYour traveling cat`;
+          
+          setLetterText(fallbackContent);
+          setCityName(decision.toCity);
+          
+          const cityImageMap: { [key: string]: string } = {
+            'Tokyo': '/letters/tokyo.png',
+            'Seoul': '/letters/seoul.png',
+            'Beijing': '/letters/beijing.png'
+          };
+          setCityImage(cityImageMap[decision.toCity] || '/letters/tokyo.png');
+          setDiaryNotFound(false);
+          
+          const letterDiary = {
+            id: 1,
+            en: fallbackContent,
+            jp: 'エラーのため手紙の読み込みに失敗しました。',
+            location: decision.toCity,
+            cityName: decision.toCity,
+            cityImage: cityImageMap[decision.toCity] || '/letters/tokyo.png',
+            type: 'letter'
+          };
+          setDiary(letterDiary);
+          
+          const words = fallbackContent.trim().split(/\s+/).filter((word: string) => word.length > 0);
+          setWordCount(words.length);
+          
+          console.log('📮 Set fallback letter content due to loading error');
         }
       }
       
@@ -1137,7 +1199,7 @@ Your Cat`;
     <main className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl w-full">
         {showNotice && (
-          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-800 rounded shadow animate-fade-in">
+          <div className="mb-4 p-3 bg-[#FFF9F4] border border-[#FFB86C] text-[#1E1E1E] rounded shadow animate-fade-in">
             {(() => {
               const contentType = diary?.type || 'letter';
               return contentType === 'mail' ? '✉️ 新しいメールが届きました！' : '✨ 新しい手紙が届きました！';
@@ -1211,7 +1273,7 @@ Your Cat`;
                 if (contentType === 'mail') {
                   return renderInFlightMail();
                 } else if (contentType === 'letter') {
-                  return renderArrivalLetter();
+                  return renderArrivalLetter(letter, userLevel, pairedParagraphs);
                 } else {
                   return (
                     <p className="text-red-600 text-center py-4">
@@ -1236,7 +1298,7 @@ Your Cat`;
 
             {/* 📊 進捗情報まとめ（読了後に表示） */}
             {isCompleted && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+              <div className="bg-[#FFF9F4] border border-[#FFE1B5] rounded-xl p-6 mb-8">
                 <h3 className="font-bold text-gray-800 mb-4 text-lg">📊 読書進捗まとめ</h3>
                 <div className="space-y-3 text-gray-700">
                   <p className="text-sm">今回の語数：<span className="font-semibold">{wordCount}語</span></p>
@@ -1249,7 +1311,7 @@ Your Cat`;
                     return nextCity ? (
                       <p className="text-sm">次の目的地：<span className="font-semibold">{nextCity.cityName}</span>（あと <span className="font-semibold text-orange-600">{(nextCity.requiredWords - totalWords).toLocaleString()}語</span>）</p>
                     ) : (
-                      <p className="text-sm font-semibold text-green-600">🎉 すべての都市に到達済みです！</p>
+                      <p className="text-sm font-semibold text-[#FFB86C]">🎉 すべての都市に到達済みです！</p>
                     );
                   })()}
                 </div>

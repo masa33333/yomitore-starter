@@ -1,6 +1,8 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 import { vocabularyData } from "@/data/vocabularyData"; // ← NGSL Lv1-7 が入った TS
+import { getAllowedWords, analyzeVocabulary } from "@/constants/ngslData";
+import { getPromptTemplate } from "@/constants/promptTemplates";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -37,18 +39,11 @@ export async function POST(req: Request) {
     // デバッグ用ログ
     console.log('📝 生成リクエスト:', requestData);
 
-    // ---- 1. 語彙リスト取得 ----
-    const levelKey = `level${level}` as keyof typeof vocabularyData;
-    const words = vocabularyData[levelKey];
-    if (!words) {
-      console.log('❌ 語彙データが見つかりません:', levelKey);
-      return NextResponse.json({ error: `Invalid level: ${level}` }, { status: 400 });
-    }
+    // ---- 1. NGSL語彙リスト取得 ----
+    const allowedWordsArray = getAllowedWords(level);
+    const allowedWords = allowedWordsArray.join(", ");
     
-    // 新しいデータ構造に対応
-    const allowedWords = Array.isArray(words) && typeof words[0] === 'object' 
-      ? words.map((item: any) => item.word).join(", ")
-      : words.join(", ");
+    console.log(`✅ Level ${level} 許可語彙数:`, allowedWordsArray.length);
 
     // ---- 2. コンテンツタイプ別プロンプト生成 ----
     let userPrompt = '';
@@ -88,79 +83,20 @@ export async function POST(req: Request) {
       const tone = genreMap[genre as keyof typeof genreMap] || 'engaging';
       const emotion = feelingMap[feeling as keyof typeof feelingMap] || 'satisfying';
 
-      userPrompt = `
-You are an English writer for language learners.
+      // NGSLテンプレートを使用
+      const promptTemplate = getPromptTemplate(level);
+      
+      userPrompt = `${promptTemplate}
 
-Please create a short story in English based on the following conditions:
+Story Requirements:
+- Main character: ${character}
+- Genre/tone: ${tone}
+- Conflict or situation: ${situation}
+- Emotional effect at the end: ${emotion}
 
-- Target vocabulary level: ${level}
-- Structure: 3–5 paragraphs
-- Story content:
-  - Main character: ${character}
-  - Genre/tone: ${tone}
-  - Conflict or situation: ${situation}
-  - Emotional effect at the end: ${emotion}
-- Use natural English for learners at this level.
+CRITICAL: Only use vocabulary from NGSL Level 1-${level * 500} range. Every word must comply with the vocabulary constraints above.
 
-Vocabulary constraints:
-${allowedWords}
-
-Write a story that uses primarily these vocabulary words while maintaining natural, grammatically correct English.
-
-After the English story, provide its **natural Japanese translation**.
-
-=== 語彙レベル制御ガイドライン（必ず厳守） ===
-
-ユーザーの語彙レベル（vocabLevel: ${level}）に応じて、使用語・文構造・文体・表現の抽象度を必ず調整してください。
-
-🟦 vocabLevel = "easy" または Level 1〜3（初級学習者）
-- 語彙：CEFR A1〜A2（最頻出1000語内）
-- 禁止語：nestled, adored, captivated, long for, mingle, unfold, sparkle, shrug, bustling, legendary, crack, elusive
-- 推奨代替語：busy (bustling), famous (legendary), sound/break (crack), hard to find (elusive)
-- 構文：冒頭2文は必ず「1文 = 主語 + 動詞（S＋V）」のみ。関係詞禁止
-- 表現：比喩・抽象表現は禁止。すべて具体的に。
-- 例：He opened the book. He saw a strange drawing.
-
-🟩 vocabLevel = "normal" または Level 4〜6（中級学習者）
-- 語彙：B1〜B2レベル
-- 禁止語リストの語彙はなるべく避ける（低頻度なら可）
-- 構文：関係詞・接続詞使用可。ただし1文に1つまで
-- 表現：軽い比喩は可。ただし文脈で明確に理解できること。
-- 例：He opened the old book and saw something strange. It looked like a secret code.
-
-🟥 vocabLevel = "hard" または Level 7〜10（上級学習者 CEFR B1-B2）
-- 語彙：CEFR B1-B2レベル（C1レベルまで使用可、ただしC2/ネイティブレベルは避ける）
-- 使用可能語：sophisticated, elaborate, magnificent, extraordinary, fascinating, intriguing, compelling, enchanted, mysterious, ancient等
-- 構文：複文・重文使用可。関係詞の連続使用も可
-- 文長：制限なし（ただし理解可能な範囲で）
-- 表現：比喩・抽象表現・文学的表現使用可
-- 注意：意味が文脈から推測できるよう工夫すること
-- 例：The moment he opened the tome, an uncanny symbol shimmered on the page, hinting at forgotten rituals.
-
-=== 【最重要指示】語彙レベル変更時の内容一貫性 ===
-
-【🔒 絶対に変更してはいけない要素】
-❌ 主人公の名前・性格・職業を変更すること
-❌ 舞台設定・時代・場所を変更すること
-❌ ストーリーの展開・イベント・結末を変更すること
-❌ テーマや物語構造を変更すること
-❌ 登場人物の関係性を変更すること
-❌ 新しい話を作ることは絶対禁止
-
-【✅ 変更可能な要素（これのみ調整）】
-✅ 語彙の難易度レベルのみ
-✅ 文の構造・長さのみ
-✅ 表現の抽象度のみ
-
-【全体の注意点】
-・同じストーリー構成でも、語彙レベルが変われば **語彙・文体・構文** を必ず変化させてください。
-・語彙レベルを変更した場合でも、ストーリーの**内容・構成・登場人物は一切変更しない**でください。
-・同じストーリーのまま、語彙・構文のレベルのみを変更してください。
-・特に冒頭（最初の2段落）は、選ばれたレベルの中でも「最も簡単」にすること。
-・レベル指定がある場合、それに**完全に準拠**した語彙・文体で書いてください。
-
-Return your answer **exactly** in this template:
-
+Output format:
 【英語】
 <English story>
 
@@ -198,93 +134,31 @@ Return your answer **exactly** in this template:
           styleInstruction = 'Write in an informative and engaging tone.';
       }
 
-      userPrompt = `
-<allowed>
-${allowedWords}
-</allowed>
+      // NGSLテンプレートを使用
+      const promptTemplate = getPromptTemplate(level);
+      
+      userPrompt = `${promptTemplate}
 
-You are a master educational content creator for English learners.
-Write an ORIGINAL English passage that satisfies **ALL** of the following rules.
+Topic: ${theme}${subTopic ? ` (focus: ${subTopic})` : ""}
+Style: ${styleInstruction}
 
-1. **Vocabulary**: use **ONLY** the words in <allowed>. However, keep all grammar accurate and natural. 
-Do not use childish, broken, or ungrammatical English.
-2. **Structure**: Write at least 3 paragraphs with logical development. Separate each paragraph with a blank line.
-   - Introduction → 1st Turning Point → Development → 2nd Turning Point
-   - Insert **ONE surprising fact** that is *real and verifiable* (no fiction).
-   - Show clear **cause-and-effect** links.
-3. **Style**: ${styleInstruction}
-4. **Topic**: ${theme}${subTopic ? ` (focus: ${subTopic})` : ""}
-5. **Length**: Write between 220 and 260 English words. Do NOT stop before reaching 220 words. If you write less than 220 words, you have failed the task.
-6. **Accuracy**: Do **NOT** invent fictional people, places, or events. All facts must be true.
-7. **Translation**: After each English paragraph, provide its Japanese translation. Do not place all translations at the end. Format as: English paragraph → Japanese translation → English paragraph → Japanese translation, etc.
-8. **Formatting**: Do NOT include any labels like "【English】" or "【Japanese】". Only the text itself should be shown.
-9. **Pre-check**: Before completing your output, count your own word total. If it is less than 220, continue writing until you meet the requirement.
+CRITICAL: Only use NGSL Level 1-${level <= 3 ? 1500 : level * 500} vocabulary. Every word must comply with vocabulary constraints above.
 
-=== 語彙レベル制御ガイドライン（必ず厳守） ===
+Requirements:
+- Structure: 3-4 paragraphs with logical development
+- Include one surprising but verifiable fact
+- Translation: After each English paragraph, provide Japanese translation
+- NO labels like "【English】" or "【Japanese】"
 
-ユーザーの語彙レベル（vocabLevel: ${level}）に応じて、使用語・文構造・文体・表現の抽象度を必ず調整してください。
+Output format:
+English paragraph 1
+Japanese translation 1
 
-🟦 vocabLevel = "easy" または Level 1〜3（初級学習者）
-- 語彙：CEFR A1〜A2（最頻出1000語内）
-- 禁止語：nestled, adored, captivated, long for, mingle, unfold, sparkle, shrug, bustling, legendary, crack, elusive
-- 推奨代替語：busy (bustling), famous (legendary), sound/break (crack), hard to find (elusive)
-- 構文：冒頭2文は必ず「1文 = 主語 + 動詞（S＋V）」のみ。関係詞禁止
-- 表現：比喩・抽象表現は禁止。すべて具体的に。
-- 例：He opened the book. He saw a strange drawing.
+English paragraph 2  
+Japanese translation 2
 
-🟩 vocabLevel = "normal" または Level 4〜6（中級学習者）
-- 語彙：B1〜B2レベル
-- 禁止語リストの語彙はなるべく避ける（低頻度なら可）
-- 構文：関係詞・接続詞使用可。ただし1文に1つまで
-- 表現：軽い比喩は可。ただし文脈で明確に理解できること。
-- 例：He opened the old book and saw something strange. It looked like a secret code.
-
-🟥 vocabLevel = "hard" または Level 7〜10（上級学習者 CEFR B1-B2）
-- 語彙：CEFR B1-B2レベル（C1レベルまで使用可、ただしC2/ネイティブレベルは避ける）
-- 使用可能語：sophisticated, elaborate, magnificent, extraordinary, fascinating, intriguing, compelling, enchanted, mysterious, ancient等
-- 構文：複文・重文使用可。関係詞の連続使用も可
-- 文長：制限なし（ただし理解可能な範囲で）
-- 表現：比喩・抽象表現・文学的表現使用可
-- 注意：意味が文脈から推測できるよう工夫すること
-- 例：The moment he opened the tome, an uncanny symbol shimmered on the page, hinting at forgotten rituals.
-
-=== 【最重要指示】語彙レベル変更時の内容一貫性 ===
-
-【🔒 絶対に変更してはいけない要素】
-❌ 主人公の名前・性格・職業を変更すること
-❌ 舞台設定・時代・場所を変更すること
-❌ ストーリーの展開・イベント・結末を変更すること
-❌ テーマや物語構造を変更すること
-❌ 登場人物の関係性を変更すること
-❌ 新しい話を作ることは絶対禁止
-
-【✅ 変更可能な要素（これのみ調整）】
-✅ 語彙の難易度レベルのみ
-✅ 文の構造・長さのみ
-✅ 表現の抽象度のみ
-
-【全体の注意点】
-・同じストーリー構成でも、語彙レベルが変われば **語彙・文体・構文** を必ず変化させてください。
-・語彙レベルを変更した場合でも、ストーリーの**内容・構成・登場人物は一切変更しない**でください。
-・同じストーリーのまま、語彙・構文のレベルのみを変更してください。
-・特に冒頭（最初の2段落）は、選ばれたレベルの中でも「最も簡単」にすること。
-・レベル指定がある場合、それに**完全に準拠**した語彙・文体で書いてください。
-
-Return your answer in this exact format (TOTAL ENGLISH WORDS MUST BE 220-260):
-
-<English paragraph 1>
-
-<Japanese translation of paragraph 1>
-
-<English paragraph 2>
-
-<Japanese translation of paragraph 2>
-
-<English paragraph 3>
-
-<Japanese translation of paragraph 3>
-
-Remember: Count all English words across all paragraphs. Total must be 220-260 words.
+English paragraph 3
+Japanese translation 3
       `.trim();
     }
 
@@ -394,6 +268,25 @@ Remember: Count all English words across all paragraphs. Total must be 220-260 w
     if (!eng || eng.trim() === '') {
       console.log('❌ 英語テキストが生成されませんでした');
       return NextResponse.json({ error: '英語テキストの生成に失敗しました' }, { status: 500 });
+    }
+
+    // 語彙レベル検証
+    const vocabularyAnalysis = analyzeVocabulary(eng);
+    console.log('📊 語彙レベル分析:', {
+      level: level,
+      totalWords: vocabularyAnalysis.totalWords,
+      levelPercentages: vocabularyAnalysis.percentages,
+      isCompliant: level === 1 ? vocabularyAnalysis.isLevel1Compliant :
+                   level === 2 ? vocabularyAnalysis.isLevel2Compliant :
+                   level === 3 ? vocabularyAnalysis.isLevel3Compliant : true
+    });
+
+    // レベル3での高次語彙使用をチェック
+    if (level === 3) {
+      const level4Plus = vocabularyAnalysis.percentages[4] + vocabularyAnalysis.percentages[5];
+      if (level4Plus > 5) {
+        console.warn(`⚠️ Level 3 制約違反: Level 4-5 語彙が ${level4Plus}% 使用されています (許可: 5%以下)`);
+      }
     }
 
     console.log('✅ 【GPT-3.5-turbo】読み物生成成功:', { 

@@ -49,7 +49,7 @@ export default function VocabularyLevelSelector({ currentLevel, onChange }: Voca
               onClick={() => onChange(level.value)}
               className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                 isSelected
-                  ? 'bg-blue-100 border-blue-500 shadow-md'
+                  ? 'bg-[#FFF9F4] border-[#FFB86C] shadow-md'
                   : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
               }`}
             >

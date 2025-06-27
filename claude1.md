@@ -1,101 +1,100 @@
-# 🔧 Task: /reading-form を「テーマ入力だけ」に簡素化し、
-# 生成は「 指定語彙レベルで英訳」　
+promptTemplates.ts
+ts
+コードをコピーする
+// promptTemplates.ts
 
-## 1. UI 変更
-### ❌ 削除
-- 「感情・雰囲気」フィールド  
-- 「文体」フィールド
-### ✅ 残す
-- Input: `テーマ (topic)` のみ
-```tsx
-<form onSubmit={...}>
-  <Label>知りたいテーマ</Label>
-  <Input name="topic" required />
-  <Button type="submit">生成</Button>
-</form>
-2. 生成仕様
-英語で読み物を 200–300 英単語相当 の情報量で、
-ユーザー語彙レベル (${level}) に合わせて生成
-教育的で興味深い内容にする
-構成は 5 段落：導入・キーファクト・例示・追加洞察・まとめ
+export const promptTemplates = {
+  level1: `あなたは英語学習者のための文章を作成するAIです。
 
-Did you know? などの締め文は不要
+【条件】
+・対象レベル：Level 1（NGSL 1–500 の語彙を中心に使用）
+・語彙制限：
+  - 使用語の 80%以上は NGSL 1–500 の単語で構成
+  - NGSL 501–1000 の単語は全体の 20% を上限とする
+  - NGSL 1001番以降の語彙は使用しない
+・語数：150語前後
+・内容：親しみやすく、日常的な話題
+・文体：やさしく、短く、読みやすい英語
+・文法も初級に合わせる（現在形中心、関係代名詞などは使わない）
 
-JSON 構造を厳守
+【出力】
+・本文（段落をつけて）
+・語彙使用比率（NGSL 1–500：◯語、501–1000：◯語、割合：◯%）`,
 
-新 Prompt
+  level2: `あなたは英語学習者のための文章を作成するAIです。
 
-You are a professional English educational content writer specializing in creating engaging reading materials for English learners.
+【条件】
+・対象レベル：Level 2（NGSL 1–1000 の語彙を中心に使用）
+・語彙制限：
+  - NGSL 1–1000 の語彙を全体の80%以上使用
+  - NGSL 1001–1500 の語彙は全体の20%以内
+  - NGSL 1501番以降の語彙は使わない
+・語数：200語前後
+・内容：少し深みのある内容（例：趣味の紹介、子どものころの思い出）
+・文体：中学生でも読める程度のやさしさ
+・文法：過去形や助動詞の使用可。複文も軽くOK。
 
-## 指示
-1. 英語で、以下の条件で読み物を作成せよ
-   - テーマ: ${topic}
-   - 段落数: 5
-   - 情報量: 200–300 英単語相当
-   - 専門家視点の驚きウンチクを交え、中学生にもわかる表現で
-2.  以下のstrict JSON形式で出力してください：
- {
-    "title": "[Engaging
-  Title About ${topic}]",
-    "content": [
-      "[First paragraph:
-  Introduction to the
-  topic]",
-      "[Second paragraph:
-   Key information or
-  interesting facts]",
-      "[Third paragraph:
-  Examples or practical
-  applications]",
-      "[Fourth paragraph:
-   Additional insights or
-   perspectives]",
-      "[Fifth paragraph:
-  Conclusion or takeaway
-  message]"
-    ],
-    "themes": ["[Related
-  theme 1]", "[Related
-  theme 2]", "[Related
-  theme 3]"]
-  }
+【出力】
+・本文（段落をつけて）
+・語彙使用比率（1–1000：◯語、1001–1500：◯語、割合：◯%）`,
 
-重要な制約:
-  - 語彙レベル${level}に適したレベルの単語のみを使用
-  - 読み物は200-300語程度
-  - ${topic}について教育的で興味深い内容にする
-  - JSON形式を厳密に守る
-  - contentは配列形式で段落ごとに分ける
-  - themesには関連する3つのテーマを含める
+  level3: `あなたは英語学習者のための文章を作成するAIです。
 
-実装変更
-app/api/generate/route.ts
+【条件】
+・対象レベル：Level 3
+・語彙制限：
+  - NGSL 1–1500 までの語彙を自由に使用可能
+  - NGSL 1501番以降は極力避けるが、ストーリー性重視なら使用可（多くても全体の5%以内）
+・語数：250語前後
+・内容：ちょっと驚きや発見のある内容（例：文化の違い、動物の意外な習性など）
+・文体：自然な英語だが難解すぎない表現に留める
+・文法：高校英語程度まで可（現在完了、関係詞、比較など）
 
-受け取る body: { topic: string }
+【出力】
+・本文（段落をつけて）
+・語彙使用比率（NGSL 1–1500内の語彙：◯%、超過語彙：◯%、語数）`,
 
-level はユーザープロファイルまたは cookies/session で取得
+  level4: `あなたは英語学習者のための文章を作成するAIです。
 
-Emotion / style 引数の削除
+【条件】
+・対象レベル：Level 4
+・語彙制限：
+  - NGSL 1–2500 の語彙を中心に構成
+  - NGSL以外の語彙や専門語彙も最大10%までなら使用可（自然な文脈で）
+・語数：300〜350語
+・内容：教養や国際的視点を含んだ、読後に学びがあるテーマ（例：教育制度の違い、気候変動、働き方の変化）
+・文体：ややアカデミックだが読みやすさ重視
+・文法：高度な構文も可。ただし冗長な表現は避ける
 
-generateStory() シグネチャを (topic: string, level: number) に簡素化
+【出力】
+・本文（段落あり）
+・語彙使用比率（NGSL 1–2500：◯%、NGSL以外：◯%、語数）`,
 
-3. 受入基準
-✅ フォームは テーマ入力欄＋生成ボタン のみ
+  level5: `あなたは英語学習者のための文章を作成するAIです。
 
-✅ 生成結果 JSON に、段落数 5
+【条件】
+・対象レベル：Level 5（上級者・準ネイティブレベル）
+・語彙制限：なし（ただし、意味の取りづらい専門用語の多用は避ける）
+・語数：400〜500語
+・内容：知的好奇心を刺激する、抽象的なテーマや複雑な社会問題（例：AIと倫理、アイデンティティの多様性、都市と孤独）
+・文体：論説・エッセイ風の構成もOK。英語圏の新聞・コラムを参考に
+・文法：完全に自然な英語として成立するもの。自然な倒置・省略・比喩表現なども可
 
-✅ 英文は level に適した語彙で 200–300 words 相当
+【出力】
+・本文（段落つき）
+・語彙難易度に応じたハイライト単語の提示（5〜10語）
+・それらの単語について簡単な英語定義を併記`
+};
 
-✅ Notebook → 戻るフローは既存ストアで維持（別タスクで対応済）
 
-4. テスト
-テーマ: “コーヒー” → 英語で 5 段落、ウンチク入り
 
-level = 3 で平易語彙、level = 7 で高度語彙になるか確認
 
-空テーマで送信時はバリデーションでブロック
 
-**備考**  
-- 旧 `emotion` / `style` 型定義・入力欄を完全削除  
-- Front と API 両方でパラメータ整合を取ること  
-- `.schema.ts` などバリデーションスキーマを更新したら Zod エラー確認。
+🛠 使用例（API呼び出し用）
+ts
+コードをコピーする
+import { promptTemplates } from './promptTemplates';
+
+const userLevel = 'level2';
+const prompt = promptTemplates[userLevel as keyof typeof promptTemplates];
+

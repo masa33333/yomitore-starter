@@ -50,35 +50,35 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
             apiKey: process.env.OPENAI_API_KEY,
           });
           
-          const systemMessage = `You are a professional English creative writer specializing in educational content for intermediate English learners.`;
+          // NGSL基準の語彙レベル制約テンプレート取得
+          const { getPromptTemplate } = await import('@/constants/promptTemplates');
+          const promptTemplate = getPromptTemplate(parseInt(userLevel));
           
-          const userPrompt = `
-語彙レベル: ${params.level || '3'}
-テーマ: ${genre}
-得たい感情: ${feeling}
-表現スタイル: ${tone}
-主人公の性別: 女性
+          const systemMessage = `You are an expert English creative writer specializing in NGSL vocabulary control.`;
+          
+          const userPrompt = `${promptTemplate}
 
-この条件に基づいて英語の読み物を1つ作成し、以下のstrict JSON形式で出力してください：
+ジャンル: ${genre}
+感情: ${feeling}
+トーン: ${tone}
+主人公: 女性
 
+Create a story with the above genre/feeling/tone, following Level ${userLevel} vocabulary constraints.
+
+Output in this exact JSON format:
 {
-  "title": "[Your Story Title Here]",
+  "title": "[Story Title]",
   "content": [
-    "[First paragraph: Setup - introduce character and setting]",
-    "[Second paragraph: Inciting incident - something changes]",
-    "[Third paragraph: Rising action - character faces challenges]",
-    "[Fourth paragraph: Climax - main conflict reaches peak]",
-    "[Fifth paragraph: Resolution - conflict resolved and character changed]"
+    "[Paragraph 1: Setup]",
+    "[Paragraph 2: Development]",
+    "[Paragraph 3: Conflict]",
+    "[Paragraph 4: Resolution]",
+    "[Paragraph 5: Conclusion]"
   ],
-  "themes": ["[Related theme 1]", "[Related theme 2]", "[Related theme 3]"]
+  "themes": ["[Theme 1]", "[Theme 2]", "[Theme 3]"]
 }
 
-重要な制約:
-- 語彙レベル${userLevel}に適したレベルの単語のみを使用
-- ストーリーは150-250語程度
-- JSON形式を厳密に守る
-- contentは配列形式で段落ごとに分ける
-- themesには関連する3つのテーマを含める`;
+CRITICAL: Follow ALL NGSL vocabulary constraints. Every word must be within the specified range.`;
 
           const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo-0125',
@@ -153,36 +153,32 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
             apiKey: process.env.OPENAI_API_KEY,
           });
           
-          const systemMessage = `You are a professional English educational content writer specializing in creating engaging reading materials for English learners.`;
+          // NGSL基準の語彙レベル制約テンプレート取得
+          const { getPromptTemplate } = await import('@/constants/promptTemplates');
+          const promptTemplate = getPromptTemplate(parseInt(userLevel));
           
-          const userPrompt = `
-## 指示
-1. 英語で、以下の条件で読み物を作成せよ
-   - テーマ: ${topic}
-   - 段落数: 5
-   - 情報量: 200–300 英単語相当
-   - 専門家視点の驚きウンチクを交え、中学生にもわかる表現で
-2. 以下のstrict JSON形式で出力してください：
+          const systemMessage = `You are an expert English educational content writer. Follow NGSL vocabulary guidelines exactly.`;
+          
+          const userPrompt = `${promptTemplate}
 
+テーマ: ${topic}
+
+Create reading material about "${topic}" following the Level ${userLevel} constraints above.
+
+Output in this exact JSON format:
 {
-  "title": "[Engaging Title About ${topic}]",
+  "title": "[Title about ${topic}]",
   "content": [
-    "[First paragraph: Introduction to the topic]",
-    "[Second paragraph: Key information or interesting facts]",
-    "[Third paragraph: Examples or practical applications]",
-    "[Fourth paragraph: Additional insights or perspectives]",
-    "[Fifth paragraph: Conclusion or takeaway message]"
+    "[Paragraph 1]",
+    "[Paragraph 2]", 
+    "[Paragraph 3]",
+    "[Paragraph 4]",
+    "[Paragraph 5]"
   ],
-  "themes": ["[Related theme 1]", "[Related theme 2]", "[Related theme 3]"]
+  "themes": ["[Theme 1]", "[Theme 2]", "[Theme 3]"]
 }
 
-重要な制約:
-- 語彙レベル${userLevel}に適したレベルの単語のみを使用
-- 読み物は200-300語程度
-- ${topic}について教育的で興味深い内容にする
-- JSON形式を厳密に守る
-- contentは配列形式で段落ごとに分ける
-- themesには関連する3つのテーマを含める`;
+CRITICAL: Follow ALL vocabulary constraints. Every word must be within the specified NGSL range.`;
 
           const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo-0125',

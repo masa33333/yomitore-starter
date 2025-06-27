@@ -156,7 +156,7 @@ export default function NotebookPage() {
         {/* Back to Reading Button */}
         <button
           onClick={() => router.push('/reading?from=notebook')}
-          className="mb-4 flex items-center gap-2 px-4 py-2 bg-[#FFE1B5] text-[#1E1E1E] rounded-md font-medium hover:bg-[#e5a561] transition-colors"
+          className="mb-4 flex items-center gap-2 px-4 py-2 bg-[#FFB86C] text-[#1E1E1E] rounded-md font-bold hover:bg-[#e5a561] transition-colors"
         >
           ← 読書画面へ戻る
         </button>
@@ -202,7 +202,7 @@ export default function NotebookPage() {
             
             <button
               onClick={handleClearAll}
-              className="px-4 py-2 bg-[#FFB86C] text-[#1E1E1E] rounded-md font-semibold hover:bg-[#e5a561] transition-colors"
+              className="px-4 py-2 bg-[#FFE1B5] text-[#1E1E1E] rounded-md font-normal hover:bg-[#f0d1a0] transition-colors"
             >
 {t('notebook.deleteAll')}
             </button>

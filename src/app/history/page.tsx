@@ -111,10 +111,10 @@ export default function HistoryPage() {
                   {item.isStoryMode && (item.genre || item.tone || item.aftertaste) && (
                     <div className="flex gap-2 mt-1">
                       {item.genre && (
-                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">{item.genre}</span>
+                        <span className="bg-[#FFF9F4] border border-[#FFB86C] text-[#1E1E1E] text-xs px-2 py-1 rounded">{item.genre}</span>
                       )}
                       {item.tone && (
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">{item.tone}</span>
+                        <span className="bg-[#FFE1B5] text-[#1E1E1E] text-xs px-2 py-1 rounded">{item.tone}</span>
                       )}
                       {item.aftertaste && (
                         <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">{item.aftertaste}</span>
