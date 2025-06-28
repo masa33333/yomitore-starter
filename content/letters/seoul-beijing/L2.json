@@ -1,0 +1,31 @@
+{
+  "id": "seoul-beijing-arrival",
+  "type": "letter",
+  "level": "L2",
+  "trigger": {
+    "type": "word_count",
+    "value": 20000,
+    "condition": "cumulative_words >= 20000"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I arrived in Beijing yesterday after my wonderful time in Seoul! The journey was exciting, and I couldn't help but notice how different Beijing feels. The streets are so wide, and there are many tall buildings everywhere.What surprised me most was seeing so many people doing tai chi in the parks early in the morning. I learned that this is a very old Chinese exercise that helps people stay healthy. It's very different from what I saw in Seoul!The food here is very good. I tried something called 'Peking duck' - it's much different from the fish I ate in Seoul. The smell was so good that my nose couldn't stop twitching! People here also use chopsticks, but they're longer than the ones in Korea and Japan.I saw many cats in the streets of Beijing. They look a bit different from me, and they told me interesting stories about the Forbidden City. Did you know that cats used to live there and help protect important old books from mice?I hope you can visit Beijing someday too. It's a big city with lots to see and learn about.Your friend,Mike",
+    "japanese": "読者さんへ昨日、ソウルでの素晴らしい時間を過ごした後、北京に到着しました！旅はわくわくするものでした。北京の雰囲気はとても違っていて、驚きました。道路はとても広く、高いビルがたくさん建っています。一番驚いたのは、早朝に公園で太極拳をしている人をたくさん見かけたことです。これは中国の古い運動で、健康のためにみんなが行っているそうです。ソウルで見たものとはまったく違いました！ここの食べ物はとてもおいしいです。北京ダックというものを食べてみましたが、ソウルで食べた魚とは全然違います。においがとてもよくて、私の鼻がずっとひくひくしていました！ここの人も箸を使いますが、韓国や日本のものより長いんですよ。北京の街で多くの猫たちに会いました。私とは少し違う感じの猫たちで、故宮について面白い話を聞かせてくれました。昔、猫たちが故宮に住んでいて、大切な古い本をネズミから守っていたって知っていましたか？あなたもいつか北京に来られることを願っています。見るものや学ぶことがたくさんある大きな街です。あなたの友達より、ミケ"
+  },
+  "media": {
+    "img": "cat_beijing_arrival.png"
+  },
+  "stats": {
+    "L_core": 34,
+    "L_plus": 2,
+    "L_advanced": 64,
+    "word_count": 201
+  },
+  "metadata": {
+    "created": "2025-06-28T00:45:12.582Z",
+    "template_version": "1.0"
+  }
+}

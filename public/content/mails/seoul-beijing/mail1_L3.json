@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail1",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 65,
+    "condition": "cumulative_reading_time >= 65"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from the plane between Seoul and Beijing! The view from my window is incredible - I can see fluffy white clouds below and snow-covered mountains in the distance. The flight attendant just gave me a special Chinese-style meal, which was quite different from Korean food.Everyone on the plane seems excited about visiting Beijing. I heard some passengers talking about the Great Wall and the Forbidden City. I can't wait to see these famous places myself! I also want to try authentic Peking duck and visit the local markets.The captain just announced we'll be landing in 30 minutes. I'm getting butterflies in my stomach thinking about all the adventures ahead!Best wishes,Mike",
+    "japanese": "読者様へソウルから北京への飛行機の中から、わくわくしながら手紙を書いています！窓からの眺めが信じられないほど素晴らしくて、真っ白なふわふわの雲と、遠くに雪をかぶった山々が見えます。客室乗務員が中国風の特別な機内食を持ってきてくれたのですが、韓国料理とはまた違った味わいでした。機内の乗客のみなさんも北京観光を楽しみにしているようです。万里の長城や紫禁城の話をしている人たちの会話が聞こえてきました。私も早く自分の目でその有名な場所を見てみたいです！本場の北京ダックを食べたり、地元の市場を訪れたりするのも楽しみです。機長が着陸30分前だとアナウンスしたところです。これから始まる冒険を思うと、胸がドキドキしてきます！よろしく、ミケより"
+  },
+  "stats": {
+    "L_core": 28,
+    "L_plus": 4,
+    "L_advanced": 69,
+    "word_count": 127
+  },
+  "metadata": {
+    "created": "2025-06-28T00:59:41.793Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 65
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail3",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 335,
+    "condition": "cumulative_reading_time >= 335"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I'm so happy on this plane! The sky is really pretty from up here. I can see big white clouds like cotton candy. The food on the plane is good too. They gave me fish and rice.I met a nice girl next to me. She showed me pictures of Paris. The Eiffel Tower is so big! She says it lights up at night. I can't wait to see it!We will land in 2 hours. I want to eat French bread and cheese first. Then I will go see the tower. Talk to you soon from Paris!Love,ミケ",
+    "japanese": "親愛なる読者へ飛行機の中がとても楽しいの！上空からの空がとてもきれい。まるわた飴みたいな大きな白い雲が見えるわ。機内食もおいしかったの。お魚とご飯が出たのよ。隣の席に優しい女の子が座ってたの。パリの写真を見せてくれたわ。エッフェル塔、すごく大きいのね！夜にはライトアップされるんですって。早く見たいわ！あと2時間で着陸よ。まずはフランスのパンとチーズを食べたいわ。そのあとで塔を見に行くつもり。パリから、またすぐに連絡するわね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 31,
+    "L_plus": 0,
+    "L_advanced": 69,
+    "word_count": 101
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:42.469Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 335
+  }
+}

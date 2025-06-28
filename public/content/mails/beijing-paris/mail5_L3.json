@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail5",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 395,
+    "condition": "cumulative_reading_time >= 395"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I've discovered something incredible today! While exploring the Marais district, I stumbled upon a charming little café hidden in a narrow alleyway. The owner, Monsieur Pierre, is a delightful gentleman who speaks with both his hands and heart. He taught me about French pastries and even showed me how to make a perfect croissant!The most fascinating part was learning about the café's history - it's been owned by the same family for over 150 years! The old photographs on the walls tell stories of Paris through different eras. I spent hours there, sipping café au lait and listening to Monsieur Pierre's tales about old Paris.Can't wait to return tomorrow for another baking lesson!Love,Mike",
+    "japanese": "親愛なる読者へ今日、信じられないような素敵な発見をしたの！マレ地区を探索していたら、細い路地に隠れた小さな素敵なカフェを見つけたの。オーナーのピエールさんは、手振りと心で語る素敵な紳士で、フランスのお菓子について教えてくれて、完璧なクロワッサンの作り方まで見せてくれたわ！一番魅力的だったのは、このカフェが150年以上も同じ家族で営まれているという歴史を知ったこと。壁に飾られた古い写真には、様々な時代のパリの物語が詰まっているの。私はそこで何時間も過ごして、カフェオレを飲みながらピエールさんの語る古きパリの話に耳を傾けていたわ。明日もまた、次のお菓子作りのレッスンが楽しみ！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 24,
+    "L_plus": 1,
+    "L_advanced": 75,
+    "word_count": 122
+  },
+  "metadata": {
+    "created": "2025-06-28T01:06:25.416Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 395
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail7",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 245,
+    "condition": "cumulative_reading_time >= 245"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I can't believe the amazing discoveries I'm making in Beijing! Today, I visited the magnificent Summer Palace, which stretches endlessly along Kunming Lake. The traditional architecture with its vibrant colors and intricate designs left me speechless. While exploring the Long Corridor, I met a local artist painting the lake scenery. He invited me to try traditional Chinese calligraphy!Speaking of art, yesterday I joined a mask-painting workshop in a hidden alley of the Hutong district. The instructor showed us how to create Peking Opera masks using special techniques. Mine turned out looking more like a playful cat than a warrior, but everyone loved it!The more I explore Beijing, the more secrets I uncover. Next, I'm planning to visit the Temple of Heaven early morning to watch locals practicing Tai Chi.Warmest regards,Mike",
+    "japanese": "読者様へ北京での素晴らしい発見が続いていることが信じられません！今日は昆明湖沿いに広がる壮大な頤和園を訪れました。鮮やかな色彩と緻密なデザインの伝統建築に言葉を失ってしまいました。長廊を探索している時、湖の風景を描いている地元のアーティストに出会い、なんと私も伝統的な中国書道を体験させてもらえました！アートと言えば、昨日は胡同地区の隠れた路地で京劇のお面作りのワークショップに参加しました。講師が特別な技法を使って描く方法を教えてくれました。私が作ったのは戦士というより遊び心のある猫のような仕上がりでしたが、みんなに気に入ってもらえました！北京を探検すればするほど、新しい秘密を発見します。次は天壇公園で早朝の太極拳を見学する予定です。温かい気持ちを込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 16,
+    "L_plus": 8,
+    "L_advanced": 76,
+    "word_count": 140
+  },
+  "metadata": {
+    "created": "2025-06-28T01:02:16.521Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 245
+  }
+}

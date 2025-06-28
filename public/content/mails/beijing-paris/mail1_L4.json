@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail1",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 275,
+    "condition": "cumulative_reading_time >= 275"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from my flight to Paris! The view from the window is incredible - we're flying over snowy mountains and fluffy white clouds. I can see tiny houses and rivers like silver threads below.The flight attendant just gave me a special fish-shaped meal because I'm a cat! Some children in nearby seats were really interested in me and kept waving. I made new friends!I heard Paris has many beautiful buildings and parks. I can't wait to see the Eiffel Tower and walk along the Seine River. They say French cats are very elegant - I hope to meet some of them soon.Will write again when I land!Love,Mike",
+    "japanese": "親愛なる読者へパリへの飛行機の中から、わくわくしながら手紙を書いています！窓からの眺めが信じられないくらい素晴らしいの - 雪をかぶった山々とふわふわの白い雲の上を飛んでいるわ。下には小さな家々が見えて、川は銀色の糸のように見えるの。客室乗務員が私が猫だからって、魚の形の特別な機内食をくれたの！近くの席の子供たちが私にすごく興味を持って、ずっと手を振ってくれていたわ。新しい友達ができたみたい！パリには美しい建物や公園がたくさんあると聞いているの。エッフェル塔を見たり、セーヌ川沿いを歩いたりするのが待ちきれないわ。フランスの猫はとても優雅だって聞いたから、早く会ってみたいな。着いたらまた書くね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 24,
+    "L_plus": 4,
+    "L_advanced": 72,
+    "word_count": 123
+  },
+  "metadata": {
+    "created": "2025-06-28T01:04:19.877Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 275
+  }
+}

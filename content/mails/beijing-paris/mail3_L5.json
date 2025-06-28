@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail3",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 335,
+    "condition": "cumulative_reading_time >= 335"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,The plane journey has been absolutely extraordinary! I just witnessed the most magnificent sunset from 35,000 feet - the clouds were painted in shades of gold and crimson, creating an ethereal spectacle. The kind flight attendant, noticing my enthusiasm for photography, even suggested the perfect moment to capture this celestial masterpiece.During our brief stopover in Dubai, I encountered a delightful Persian cat in the airport lounge. We shared quite an interesting conversation about the intricacies of international feline travel. She recommended some charming Parisian cafés where local cats often gather - I've added them to my must-visit list!The anticipation of seeing the Eiffel Tower is making my whiskers tingle with excitement. I've heard there's a quaint patisserie nearby that serves the most exquisite salmon-flavored macarons specially made for cats. Can you imagine?With purrs from above the clouds,Miké",
+    "japanese": "親愛なる読者へ飛行機の旅は本当に素晴らしいものでした！高度35,000フィートから最も美しい夕陽を目撃したんです - 雲が金色と深紅色に染まり、まるで天空のショーのようでした。親切なフライトアテンダントは、私が写真撮影に夢中なのに気付いて、この天空の傑作を撮影するのに最適なタイミングまで教えてくれました。ドバイでの短い寄港中、空港ラウンジでステキなペルシャ猫に出会いました。国際的な猫の旅について、とても興味深い会話を交わしたんです。彼女は地元の猫たちがよく集まるパリのカフェをいくつか教えてくれました - さっそく訪問リストに加えましたよ！エッフェル塔を見られる期待に、ヒゲが興奮で震えています。近くには猫専用のサーモン風味のマカロンを出す素敵なパティスリーがあるそうです。想像できますか？雲の上からご機嫌な喉鳴りとともに、ミケより"
+  },
+  "stats": {
+    "L_core": 17,
+    "L_plus": 3,
+    "L_advanced": 79,
+    "word_count": 146
+  },
+  "metadata": {
+    "created": "2025-06-28T01:03:14.541Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 335
+  }
+}

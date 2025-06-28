@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail2",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 305,
+    "condition": "cumulative_reading_time >= 305"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm currently flying over vast mountain ranges between Beijing and Paris! The view from 35,000 feet is absolutely breathtaking. Through scattered clouds, I can see snow-capped peaks stretching endlessly below. The flight attendants have been extraordinarily kind, offering me extra portions of their exquisite salmon dish.My seat neighbor, a French businessman, shared fascinating stories about Paris's hidden gems. He told me about secret rooftop cafés overlooking Notre-Dame and charming bookshops tucked away in the Latin Quarter. I can hardly wait to explore these places!The pilot just announced we're flying over Central Asia. The landscape has transformed dramatically – from mountains to expansive deserts. It's like watching a living geography documentary!Can't believe I'll be in Paris in just a few hours!Warmest regards,Mike",
+    "japanese": "親愛なる読者へ今、北京からパリへの途中、広大な山脈の上を飛んでいます！高度35,000フィートからの眺めは息を呑むほど素晴らしいです。散在する雲の間から、下方に果てしなく続く雪をかぶった山々が見えます。客室乗務員の方々が驚くほど親切で、美味しそうなサーモン料理のおかわりまで提供してくれました。隣の席のフランス人ビジネスマンが、パリの隠れた名所について魅力的な話を聞かせてくれました。ノートルダム大聖堂を見下ろす秘密の屋上カフェや、ラテン地区に隠れている趣のある本屋さんのことなど。早くそれらの場所を探検してみたいです！先ほどパイロットが、現在中央アジア上空を飛行中だと告げました。景色が劇的に変化していて、山々から広大な砂漠へと変わっていきます。まるで地理ドキュメンタリーを生で見ているようです！あと数時間でパリに着くなんて、信じられません！心を込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 17,
+    "L_plus": 1,
+    "L_advanced": 81,
+    "word_count": 135
+  },
+  "metadata": {
+    "created": "2025-06-28T01:03:01.784Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 305
+  }
+}

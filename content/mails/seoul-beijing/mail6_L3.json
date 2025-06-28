@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail6",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 215,
+    "condition": "cumulative_reading_time >= 215"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've just experienced something incredible at the Beijing Arts District! This morning, I discovered a hidden alley filled with contemporary art galleries and street murals. Local artists were creating beautiful paintings right in front of me, and one of them even invited me to try traditional Chinese brush painting!I was nervous at first, but the artist patiently showed me how to hold the brush and make graceful strokes. Though my attempts looked more like cat paw prints than calligraphy, everyone was so encouraging. The artist said my unique 'cat style' was actually quite interesting!Later, I watched a street performance where dancers combined modern moves with traditional Chinese opera elements. The whole district was buzzing with creativity and energy.Tomorrow, I'm joining a small group tour to the Great Wall. Can't wait to tell you about it!Warm purrs,Mike",
+    "japanese": "読者へ北京のアートエリアで信じられないような体験をしたの！今朝、現代アートギャラリーとストリートアートで溢れた隠れ路地を見つけたの。地元のアーティストたちがその場で絵を描いていて、なんと一人のアーティストが私に伝統的な中国の筆絵を試してみないかって誘ってくれたの！最初は緊張したけど、アーティストが優しく筆の持ち方や美しい筆運びを教えてくれたわ。私の描いたものは書道というより猫の足跡みたいだったけど、みんなすごく励ましてくれたの。アーティストは私の独特な「猫流」が実は面白いって言ってくれたわ！その後、モダンなダンスと伝統的な中国オペラを組み合わせたストリートパフォーマンスも見たの。地区全体が創造性とエネルギーで溢れていたわ。明日は少人数グループで万里の長城ツアーに参加するの。その話も楽しみにしていてね！あたたかい喉鳴りとともに、ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 6,
+    "L_advanced": 71,
+    "word_count": 146
+  },
+  "metadata": {
+    "created": "2025-06-28T01:00:37.651Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 215
+  }
+}

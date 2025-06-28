@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail5",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 185,
+    "condition": "cumulative_reading_time >= 185"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm having the most extraordinary adventures in Beijing! Today, I ventured into the depths of a traditional Chinese medicine market, where centuries-old remedies and mysterious herbs filled countless wooden drawers. The aromatic symphony of ginger, star anise, and countless unfamiliar spices created an intoxicating atmosphere.While exploring the narrow alleyways, I stumbled upon a hidden courtyard where elderly locals were practicing tai chi with such grace and precision. One kind gentleman even invited me to join their morning ritual tomorrow! Can you imagine me, a cat, learning tai chi?The most fascinating discovery was a tiny workshop where craftsmen were creating intricate shadow puppets. Their skilled hands carved delicate figures from leather, bringing ancient stories to life. I'm sending you a beautiful dragon puppet as a souvenir!Best whiskers,Mike",
+    "japanese": "親愛なる読者へ北京での素晴らしい冒険が続いています！今日は伝統的な漢方薬市場の奥深くまで探検してきました。何世紀も伝わる薬草や神秘的なハーブが無数の木製の引き出しに詰まっていて、生姜や八角、そして数えきれないほどの見たことのないスパイスの香りが織りなす世界は、まるで魔法のようでした。細い路地を歩いていると、隠れた中庭を見つけました。そこでは地元のお年寄りたちが、優雅で正確な太極拳を練習していたんです。親切なおじいさんの一人が、明日の朝の練習に誘ってくれました！私のような猫が太極拳を習うなんて、想像できますか？一番魅力的な発見は、影絵人形を作る小さな工房でした。職人さんたちが皮革を丁寧に彫って繊細な人形を作り、古い物語に命を吹き込んでいました。素敵な龍の影絵人形をお土産として送りますね！ヒゲの挨拶を添えてミケより"
+  },
+  "stats": {
+    "L_core": 14,
+    "L_plus": 3,
+    "L_advanced": 83,
+    "word_count": 135
+  },
+  "metadata": {
+    "created": "2025-06-28T00:55:49.450Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 185
+  }
+}

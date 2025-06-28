@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail3",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 125,
+    "condition": "cumulative_reading_time >= 125"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear 読者,Guess what! I just landed in Beijing! The flight was so much fun. From the plane window, I saw many white clouds like big cotton balls. During the flight, I made a friend - a small Chinese girl who shared her snacks with me. She taught me how to say 'hello' in Chinese: 'Ni hao!'When we got closer to Beijing, I could see the Great Wall! It was like a long snake on the mountains. So cool! The airport is very big, and there are many people speaking Chinese. I can't wait to try Peking duck and visit the Forbidden City tomorrow.I'm staying at a nice hotel near Tiananmen Square. The city lights at night are beautiful!Talk to you soon,ミケ",
+    "japanese": "親愛なる読者へどうでしょう！ついに北京に到着しました！フライトはとても楽しかったです。飛行機の窓からは、大きな綿菓子のような白い雲がたくさん見えました。フライト中に、スナックを分けてくれた中国人の女の子と友達になりました。彼女が中国語で「こんにちは」の言い方を教えてくれたんです：「ニーハオ！」北京に近づいた時、万里の長城が見えました！まるで山々の上を這う長い蛇のようでした。すごくクール！空港はとても大きくて、中国語を話す人がたくさんいます。明日の北京ダックと紫禁城観光が待ちきれません。天安門広場の近くの素敵なホテルに泊まっています。夜の街の明かりがとてもきれいです！またすぐに連絡します。ミケより"
+  },
+  "stats": {
+    "L_core": 31,
+    "L_plus": 2,
+    "L_advanced": 67,
+    "word_count": 125
+  },
+  "metadata": {
+    "created": "2025-06-28T00:58:41.774Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 125
+  }
+}

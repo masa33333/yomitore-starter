@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail2",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 95,
+    "condition": "cumulative_reading_time >= 95"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm finally on my way to Beijing! The plane journey is incredible. From my window seat, I can see fluffy clouds that look like cotton candy floating beneath us. Sometimes, when the clouds part, I catch glimpses of vast mountains and winding rivers. It's absolutely breathtaking!The flight attendants are so kind, and they even gave me special cat-friendly meals. I met a friendly Chinese family sitting next to me who told me fascinating stories about the Great Wall and the Forbidden City. I can't wait to visit these places!Tomorrow, I'll be exploring Beijing's ancient streets and trying authentic dumplings that everyone keeps talking about. The thought of walking through centuries-old temples and palaces makes my whiskers tingle with excitement!Best wishes from 35,000 feet in the air,Mike",
+    "japanese": "親愛なる読者へついに北京への途中です！飛行機での旅は素晴らしいものになっています。窓際の席から見える綿菓子のような雲が私たちの下を漂っているんです。時々、雲の切れ間から、広大な山々や蛇行する川が見えるんですよ。本当に息をのむような景色です！客室乗務員はとても親切で、猫用の特別な機内食まで用意してくれました。隣に座った中国人家族はとても友好的で、万里の長城や紫禁城についての魅力的な話を聞かせてくれました。早くそれらの場所に行ってみたいです！明日は、北京の古い通りを探検して、みんなが話題にしている本場の餃子を食べてみるつもりです。何世紀も前からある寺院や宮殿を歩くことを考えると、私のヒゲが興奮で震えるほどです！上空35,000フィートからの最高の願いを込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 25,
+    "L_plus": 4,
+    "L_advanced": 72,
+    "word_count": 138
+  },
+  "metadata": {
+    "created": "2025-06-28T01:01:18.304Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 95
+  }
+}

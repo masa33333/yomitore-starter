@@ -1,0 +1,31 @@
+{
+  "id": "beijing-paris-arrival",
+  "type": "letter",
+  "level": "L5",
+  "trigger": {
+    "type": "word_count",
+    "value": 40000,
+    "condition": "cumulative_words >= 40000"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,From the moment I arrived in Paris from Beijing, I've been utterly captivated by this magnificent city. The architectural grandeur is simply breathtaking – did you know that Baron Haussmann's 19th-century renovation created those iconic wide boulevards and uniform limestone buildings that give Paris its distinctive character?As a curious cat, I've discovered fascinating contrasts between Eastern and Western cultures. While Beijing's hutongs reflect centuries of communal living, Paris's apartment buildings tell stories of individual expression through their ornate balconies and mansard roofs. The local cats here have introduced me to their sophisticated lifestyle – lounging in café windows and receiving treats from charming bistro owners.One particularly memorable experience was witnessing the 'golden hour' at Place des Vosges, where the setting sun bathes the historic square in ethereal light. I learned that this square, the oldest planned square in Paris, was once the site of royal tournaments and celebrations.The culinary scene here is extraordinary. Unlike Beijing's bold flavors, Parisian cuisine emphasizes subtle refinement. I've developed quite a fondness for croissants aux amandes, though I do miss Beijing's steamed fish!To my fellow adventurers: every journey enriches our understanding of the world. Whether you're studying English or exploring new horizons, embrace the unknown with an open heart.Warmest purrs,Mike",
+    "japanese": "親愛なる読者へ北京からパリに到着した瞬間から、私はこの素晴らしい街の虜になってしまいました。建築の壮大さは息をのむほどです。19世紀にオスマン男爵が行った大改造で、パリの象徴となる広い大通りと統一された石灰岩の建物が作られたことをご存知でしょうか？好奇心旺盛な猫として、東西の文化の興味深い対比を発見しました。北京の胡同が何世紀にもわたる共同生活を映し出す一方、パリのアパルトマンは装飾的なバルコニーとマンサード屋根を通じて、個性的な表現を語っています。地元の猫たちは、カフェの窓辺でくつろぎ、魅力的なビストロのオーナーからおやつをもらうという洗練された暮らしぶりを教えてくれました。特に印象に残っているのは、ヴォージュ広場での「ゴールデンアワー」です。沈みゆく太陽が歴史ある広場を幻想的な光で包み込む様子は格別でした。パリ最古の計画広場であるこの場所は、かつて王族の騎馬試合や祝祭が行われた場所だったそうです。こちらの食文化も素晴らしいものです。北京の大胆な味わいとは異なり、パリの料理は繊細な洗練さを重視します。アーモンドクロワッサンのとりこになってしまいましたが、北京の蒸し魚も恋しいですね！冒険仲間のみなさんへ：どんな旅も、世界への理解を深めてくれます。英語を学んでいる方も、新しい地平線を探検している方も、未知なるものに心を開いて挑戦してください。温かい鳴き声とともに、ミケより"
+  },
+  "media": {
+    "img": "cat_paris_arrival.png"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 2,
+    "L_advanced": 79,
+    "word_count": 220
+  },
+  "metadata": {
+    "created": "2025-06-28T00:47:22.343Z",
+    "template_version": "1.0"
+  }
+}

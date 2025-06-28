@@ -1,0 +1,31 @@
+{
+  "id": "seoul-beijing-arrival",
+  "type": "letter",
+  "level": "L3",
+  "trigger": {
+    "type": "word_count",
+    "value": 20000,
+    "condition": "cumulative_words >= 20000"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've just arrived in Beijing from Seoul, and I'm amazed by this incredible city! The journey was quite an adventure. The Great Wall stretches like a giant stone dragon, and I learned it's not just one wall but many walls built over 2,000 years. Isn't that fascinating?The food here is so different from Seoul's. While Seoul had lots of spicy dishes, Beijing's food has more subtle flavors. I tried Peking duck yesterday – the crispy skin was heavenly! The locals taught me to wrap it in thin pancakes with green onions. They also showed me how to use chopsticks properly, which is different from how we use them in Japan.The hutongs (traditional alleyways) are like mazes where cats like me love to explore. I met many local cats who told me about secret spots where fishermen give away tasty treats. The most surprising thing was seeing elderly people practicing tai chi in parks early in the morning – it's such a peaceful sight!I hope you'll visit Beijing someday. There's so much history and culture to discover here.Warm purrs,Mike",
+    "japanese": "親愛なる読者へソウルからついに北京に到着しました！この街には本当に圧倒されています。旅は大冒険でした。万里の長城は巨大な石の龍のように広がっていて、実はひとつの壁ではなく、2000年以上かけて築かれた複数の壁だと知りました。とても興味深いですよね。こちらの食事はソウルとはまったく違います。ソウルには辛い料理が多かったのですが、北京の料理はより繊細な味わいです。昨日は北京ダックを試してみました - パリパリの皮が絶品でした！地元の人々が、薄いパンケーキに葱を巻いて食べる方法を教えてくれました。箸の使い方も日本とは違うんですよ。胡同（伝統的な路地）は迷路のようで、私のような猫の探検にぴったりです。地元の猫たちが、漁師さんがおいしいおやつをくれる秘密の場所を教えてくれました。一番驚いたのは、早朝に公園で太極拳を練習する年配の方々の姿です - とても平和な光景でした！いつか北京を訪れてください。ここには発見すべき歴史と文化がたくさんあります。温かい気持ちを込めて、ミケより"
+  },
+  "media": {
+    "img": "cat_beijing_arrival.png"
+  },
+  "stats": {
+    "L_core": 29,
+    "L_plus": 5,
+    "L_advanced": 65,
+    "word_count": 191
+  },
+  "metadata": {
+    "created": "2025-06-28T00:45:25.174Z",
+    "template_version": "1.0"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail1",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 65,
+    "condition": "cumulative_reading_time >= 65"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm on the plane from Seoul to Beijing! The view from my window is so nice. I can see white clouds like fluffy cotton balls below us. The sky is very blue and pretty.The food on the plane was good. I had rice, fish, and some small cakes. A nice lady next to me gave me some snacks too! She is from Beijing and told me about many good places to visit.I'm so happy because I will see the Great Wall soon! I want to eat Beijing duck and walk in the big parks. The lady said there are many nice shops and good food near my hotel.I will write to you again when I get to Beijing!Best wishes,Mike",
+    "japanese": "親愛なる読者へソウルから北京行きの飛行機の中です！窓からの眺めがとてもきれいです。下には綿菓子みたいな白い雲が見えます。空がとても青くてきれいです。機内食はおいしかったです。ご飯と魚、小さなケーキが出ました。隣の親切な女性がお菓子もくれました！彼女は北京の人で、たくさんの観光スポットを教えてくれました。もうすぐ万里の長城が見られるので、とてもワクワクしています！北京ダックを食べたり、大きな公園を散歩したりしたいです。その女性が、私のホテルの近くにはたくさんの素敵なお店や美味しい食べ物があると教えてくれました。北京に着いたらまた書きます！どうぞよろしく、ミケより"
+  },
+  "stats": {
+    "L_core": 33,
+    "L_plus": 1,
+    "L_advanced": 66,
+    "word_count": 128
+  },
+  "metadata": {
+    "created": "2025-06-28T00:58:20.716Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 65
+  }
+}

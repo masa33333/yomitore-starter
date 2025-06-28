@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail3",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 125,
+    "condition": "cumulative_reading_time >= 125"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,Guess what? I just had the most incredible first evening in Beijing! After landing at the airport, I took a taxi into the heart of the city. The streetlights were twinkling like stars, and the bustling night markets filled the air with mouthwatering aromas.I've already discovered this amazing local spot where they make hand-pulled noodles. The chef's skillful movements were mesmerizing - stretching and pulling the dough until it transformed into perfect noodles! The taste was absolutely heavenly with rich broth and tender beef.Tomorrow, I'm planning to visit the Great Wall. My hotel concierge told me about a less touristy section called Mutianyu. Can't wait to walk on this ancient wonder and take in the breathtaking views!Missing you,Mike",
+    "japanese": "読者へどうでしょう？北京での最初の夜が信じられないほど素晴らしかったんです！空港に着いてからタクシーで街の中心部へ向かいました。街灯が星のようにきらめき、賑やかな夜市場からは食欲をそそる香りが漂ってきました。早速見つけた現地のお店で、手打ち麺を作っているところを見ました。シェフの技が本当に見事で、生地を伸ばして引き延ばし、完璧な麺に変身させていく様子に魅了されました！濃厚なスープと柔らかい牛肉と一緒に食べた麺は、本当に天国のような味でした。明日は万里の長城に行く予定です。ホテルのコンシェルジュが、観光客の少ない慕田峪というセクションを教えてくれました。この古代の驚異の上を歩いて、息をのむような景色を楽しむのが待ちきれません！会いたいですミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 4,
+    "L_advanced": 73,
+    "word_count": 128
+  },
+  "metadata": {
+    "created": "2025-06-28T01:01:30.791Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 125
+  }
+}

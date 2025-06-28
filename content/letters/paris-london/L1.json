@@ -1,0 +1,31 @@
+{
+  "id": "paris-london-arrival",
+  "type": "letter",
+  "level": "L1",
+  "trigger": {
+    "type": "word_count",
+    "value": 65000,
+    "condition": "cumulative_words >= 65000"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I arrived in London yesterday from Paris! The big city is so different. I see many red buses and black taxis on the streets. The buildings here are tall and old, made of brown and gray stones.In Paris, I ate good bread and cheese. But here in London, I found fish and chips! The fish is hot and soft, and I like it very much. Many cats here told me that fish and chips is the most loved food in London.The weather here changes a lot. In the morning it was sunny, but now it rains. People carry black umbrellas and walk fast. They also drink hot tea many times a day. This is very different from Paris.I saw the big clock called Big Ben. It is very tall! At night, the river Thames is beautiful with many lights. I like to sit and watch the boats go by.I miss Paris a little, but London is good too. Next time, I will tell you more about my new friends here!Love,Mike",
+    "japanese": "親愛なる読者へ昨日、パリからロンドンに着きました！この大きな街はとても違います。通りには赤いバスと黒いタクシーがたくさん走っています。建物は茶色や灰色の石でできた背の高い古い建物ばかりです。パリではおいしいパンとチーズを食べていましたが、ここロンドンではフィッシュアンドチップスを見つけました！魚は熱々で柔らかくて、とても気に入りました。ここの猫たちが教えてくれたのですが、フィッシュアンドチップスはロンドンで一番愛されている食べ物なんだそうです。天気はよく変わります。朝は晴れていたのに、今は雨です。人々は黒い傘を持って早足で歩いています。また、一日に何度も熱いお茶を飲みます。これはパリとはとても違います。ビッグベンという大きな時計を見ました。とても高いんです！夜になるとテムズ川はたくさんの明かりできれいです。座って船が通るのを見るのが好きです。パリが少し恋しいですが、ロンドンも素敵です。次は、ここで出会った新しい友達のことをお話しますね！愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_london_arrival.png"
+  },
+  "stats": {
+    "L_core": 36,
+    "L_plus": 1,
+    "L_advanced": 63,
+    "word_count": 178
+  },
+  "metadata": {
+    "created": "2025-06-28T00:47:39.702Z",
+    "template_version": "1.0"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail2",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 35,
+    "condition": "cumulative_reading_time >= 35"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear 読者,Just had my first plane meal, and guess what? They served me a special cat-friendly dish! The flight attendant even gave me extra fish because I was such a well-behaved passenger. From my window seat, I watched the clouds change into amazing shapes - one looked just like a giant ball of yarn!Through the clouds, I caught glimpses of the ocean sparkling below. It's so different from seeing Tokyo from above! I heard Seoul has many tasty fish markets and cozy cafes. Can't wait to explore them all!I'm also excited about visiting the palace with its beautiful gardens. The other passengers told me about night markets that stay open until very late. Sounds like a cat's perfect adventure!Flying high above Asia,ミケ",
+    "japanese": "親愛なる読者へ初めての機内食を食べたところなの。なんと、私用の特別な猫メニューが出たのよ！客室乗務員さんが、私があまりにもお行儀よかったからって、おまけにお魚をくれたの。窓際の席から雲を眺めていたら、面白い形に変化していくのが見えたわ。ひとつなんて、まるで巨大な毛糸玉みたいだったの！雲の間から、キラキラ光る海が見えたわ。東京を上から見るのとは全然違う感じね！ソウルには美味しい魚市場や居心地の良いカフェがたくさんあるって聞いたの。早く全部探検してみたいわ！それに、美しい庭園のある宮殿にも行くのが楽しみ。他の乗客から、夜遅くまで開いている夜市場の話も聞いたわ。猫にぴったりの冒険になりそう！アジアの空の上から、ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 5,
+    "L_advanced": 72,
+    "word_count": 130
+  },
+  "metadata": {
+    "created": "2025-06-28T00:15:07.346Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 35
+  }
+}

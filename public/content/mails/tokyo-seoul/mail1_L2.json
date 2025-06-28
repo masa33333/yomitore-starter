@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail1",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 5,
+    "condition": "cumulative_reading_time >= 5"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited! I'm on the plane from Tokyo to Seoul right now. The view from my window is beautiful - I can see white clouds below and blue sky all around. The flight attendant just gave me a nice lunch box with rice and fish. This is my first time going to Seoul! I want to try Korean food, especially kimchi and bibimbap. I heard there are many big shopping streets with bright lights at night. I also want to go to the palace and wear traditional Korean clothes.The plane will land soon. I can't wait to see Seoul!Best wishes,Mike",
+    "japanese": "読者さんへとってもワクワクしています！今、東京からソウルへ向かう飛行機の中です。窓からの眺めが素晴らしくて、下には白い雲が広がり、周りは青い空ばかり。客室乗務員さんがついさっき、お米と魚が入ったおいしいお弁当をくれました。ソウルに行くのは初めてなんです！韓国料理、特にキムチやビビンバップを食べてみたいです。夜はたくさんの明るい光で輝く大きなショッピング街があるって聞きました。お城に行って、韓国の伝統的な服も着てみたいです。もうすぐ着陸です。ソウルに早く着きたくて待ちきれません！それでは、ミケより"
+  },
+  "stats": {
+    "L_core": 31,
+    "L_plus": 4,
+    "L_advanced": 65,
+    "word_count": 108
+  },
+  "metadata": {
+    "created": "2025-06-28T00:13:55.441Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 5
+  }
+}

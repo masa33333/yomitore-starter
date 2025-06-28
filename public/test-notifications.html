@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>読みトレ通知システム テスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .test-result { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>📮 読みトレ通知システム テスト</h1>
+    
+    <div class="test-section">
+        <h2>1. 基本設定テスト</h2>
+        <button onclick="testBasicSettings()">基本設定確認</button>
+        <div id="basicResults" class="test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 語彙レベル別コンテンツテスト</h2>
+        <button onclick="testVocabLevels()">語彙レベル別表示</button>
+        <div id="vocabResults" class="test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 手紙・メール表示テスト</h2>
+        <button onclick="testLetterMail()">手紙・メール切り替え</button>
+        <div id="letterMailResults" class="test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 条件達成シミュレーション</h2>
+        <button onclick="simulateWordCount()">語数達成シミュレート</button>
+        <button onclick="simulateReadingTime()">読書時間達成シミュレート</button>
+        <div id="simulationResults" class="test-result"></div>
+    </div>
+
+    <script>
+        async function testBasicSettings() {
+            const results = document.getElementById('basicResults');
+            results.innerHTML = '';
+            
+            // localStorage の基本設定を確認
+            const catName = localStorage.getItem('catName') || 'ねこ';
+            const vocabLevel = localStorage.getItem('vocabLevel') || 'L1';
+            const totalWords = localStorage.getItem('totalWordsRead') || '0';
+            
+            results.innerHTML += `<p class="success">✅ 猫の名前: ${catName}</p>`;
+            results.innerHTML += `<p class="success">✅ 語彙レベル: ${vocabLevel}</p>`;
+            results.innerHTML += `<p class="success">✅ 累計読書語数: ${totalWords}語</p>`;
+        }
+
+        async function testVocabLevels() {
+            const results = document.getElementById('vocabResults');
+            results.innerHTML = '<p>語彙レベル別コンテンツを確認中...</p>';
+            
+            const levels = ['L1', 'L2', 'L3', 'L4', 'L5'];
+            let testResults = '';
+            
+            for (const level of levels) {
+                try {
+                    const response = await fetch(`/content/letters/tokyo-seoul/${level}.json`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        testResults += `<p class="success">✅ ${level}: ${data.stats.word_count}語 (コア語彙${data.stats.L_core}%)</p>`;
+                    } else {
+                        testResults += `<p class="error">❌ ${level}: 読み込み失敗</p>`;
+                    }
+                } catch (error) {
+                    testResults += `<p class="error">❌ ${level}: エラー - ${error.message}</p>`;
+                }
+            }
+            
+            results.innerHTML = testResults;
+        }
+
+        async function testLetterMail() {
+            const results = document.getElementById('letterMailResults');
+            results.innerHTML = '<p>手紙・メール表示をテスト中...</p>';
+            
+            let testResults = '';
+            
+            // 手紙テスト
+            try {
+                const letterResponse = await fetch('/content/letters/tokyo-seoul/L3.json');
+                if (letterResponse.ok) {
+                    const letterData = await letterResponse.json();
+                    testResults += `<p class="success">✅ 手紙: ${letterData.type} - ${letterData.stats.word_count}語</p>`;
+                }
+            } catch (error) {
+                testResults += `<p class="error">❌ 手紙読み込みエラー</p>`;
+            }
+            
+            // メールテスト
+            try {
+                const mailResponse = await fetch('/content/mails/tokyo-seoul/mail1_L3.json');
+                if (mailResponse.ok) {
+                    const mailData = await mailResponse.json();
+                    testResults += `<p class="success">✅ メール: ${mailData.type} - ${mailData.stats.word_count}語</p>`;
+                }
+            } catch (error) {
+                testResults += `<p class="error">❌ メール読み込みエラー</p>`;
+            }
+            
+            results.innerHTML = testResults;
+        }
+
+        function simulateWordCount() {
+            const results = document.getElementById('simulationResults');
+            
+            // 語数達成をシミュレート
+            const currentWords = parseInt(localStorage.getItem('totalWordsRead') || '0');
+            const targetWords = 5000; // Tokyo → Seoul の閾値
+            
+            if (currentWords >= targetWords) {
+                results.innerHTML = `<p class="success">✅ 語数条件達成済み: ${currentWords}語 >= ${targetWords}語</p>`;
+                results.innerHTML += `<p><a href="/letter?type=letter&route=tokyo-seoul&level=L3" target="_blank">→ Seoul到着手紙を表示</a></p>`;
+            } else {
+                // 条件達成をシミュレート
+                localStorage.setItem('totalWordsRead', targetWords.toString());
+                results.innerHTML = `<p class="success">✅ 語数条件達成をシミュレート: ${targetWords}語</p>`;
+                results.innerHTML += `<p><a href="/letter?type=letter&route=tokyo-seoul&level=L3" target="_blank">→ Seoul到着手紙を表示</a></p>`;
+            }
+        }
+
+        function simulateReadingTime() {
+            const results = document.getElementById('simulationResults');
+            
+            // 読書時間達成をシミュレート
+            const readingTime = 5; // 5分経過
+            
+            results.innerHTML = `<p class="success">✅ 読書時間条件達成をシミュレート: ${readingTime}分</p>`;
+            results.innerHTML += `<p><a href="/letter?type=mail&route=tokyo-seoul&level=L3&mail=1" target="_blank">→ 機内メール1通目を表示</a></p>`;
+        }
+
+        // ページ読み込み時に基本設定をテスト
+        window.onload = function() {
+            testBasicSettings();
+        };
+    </script>
+</body>
+</html>

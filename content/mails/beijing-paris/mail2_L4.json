@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail2",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 305,
+    "condition": "cumulative_reading_time >= 305"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I just had an unforgettable experience on my flight from Beijing! The airplane flew right through a stunning sunset, and the clouds looked like golden cotton candy. You wouldn't believe what happened during dinner - a friendly flight attendant noticed I was curious about different meals and brought me samples of both Western and Asian cuisine to try!The passenger next to me, a French professor, told me fascinating stories about Paris. He recommended visiting the Louvre at sunset and finding a hidden café near Notre-Dame that serves the best croissants in the city. I can hardly wait to explore these spots!Through the window, I can see Europe's landscape appearing below. The patchwork of fields and winding rivers is absolutely mesmerizing. Only a few more hours until Paris!Best wishes,Mike",
+    "japanese": "親愛なる読者へ北京からの飛行機で、忘れられない体験をしたの！夕陽の真ん中を飛行機が通り抜けて、雲が黄金色の綿菓子みたいに見えたの。夕食の時に信じられないことが起きたわ - 親切な客室乗務員が、私が機内食に興味を持っているのに気付いて、洋食とアジア料理の両方のサンプルを持ってきてくれたの！隣の席に座っていたフランス人の教授が、パリについての魅力的な話をたくさん聞かせてくれたわ。ルーブル美術館は夕暮れ時に訪れるのがおすすめで、ノートルダム大聖堂の近くには街一番美味しいクロワッサンを出す隠れ家的なカフェがあるんですって。早く行ってみたいわ！窓の外には、ヨーロッパの景色が見え始めているわ。パッチワークのような畑と蛇行する川の風景が本当に魅惑的なの。パリまであと数時間！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 1,
+    "L_advanced": 76,
+    "word_count": 136
+  },
+  "metadata": {
+    "created": "2025-06-28T01:04:31.002Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 305
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail6",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 215,
+    "condition": "cumulative_reading_time >= 215"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,Exciting news from the heart of Beijing! I've discovered something incredible at the Temple of Heaven. While exploring the ancient buildings, I met a group of elderly locals practicing tai chi in the park. They invited me to join their morning routine, and it was such a peaceful experience!The most fascinating part was learning about the temple's acoustics. There's a special spot called the Echo Wall where whispers can be heard from 60 meters away! I tested it with a friendly tourist from Canada, and we were amazed by how clearly we could hear each other.Tomorrow, I'm planning to visit the Summer Palace. I heard there's a beautiful marble boat and the longest painted corridor in the world. Can't wait to share more stories!Warm purrs,Mike",
+    "japanese": "読者さんへ北京の中心部から興奮するニュースをお届けします！天壇公園で信じられないような発見をしました。古代の建造物を探検していると、公園で太極拳を練習している地元のお年寄りグループに出会いました。朝の日課に誘っていただき、とても心が落ち着く体験でした！最も魅力的だったのは、寺院の音響効果について学んだことです。回音壁という特別な場所があり、60メートル離れた場所からでもささやき声が聞こえるんです！カナダからの親切な観光客と試してみましたが、お互いの声がこんなにはっきり聞こえることに驚きました。明日は頤和園に行く予定です。美しい大理石の船や、世界一長い回廊があるそうです。もっとたくさんの物語を共有するのが待ちきれません！温かい喉鳴りとともに、ミケより"
+  },
+  "stats": {
+    "L_core": 21,
+    "L_plus": 8,
+    "L_advanced": 71,
+    "word_count": 136
+  },
+  "metadata": {
+    "created": "2025-06-28T01:02:04.553Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 215
+  }
+}

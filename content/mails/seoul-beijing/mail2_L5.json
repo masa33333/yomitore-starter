@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail2",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 95,
+    "condition": "cumulative_reading_time >= 95"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm currently flying high above the clouds, halfway between Seoul and Beijing! The view from my window is absolutely mesmerizing. I've never seen such magnificent cloud formations – they look like giant cotton castles floating in an endless blue ocean.The flight attendants have been extraordinarily kind, offering me special feline-friendly accommodations. I was pleasantly surprised when they served a delectable in-flight meal that included premium tuna! Several passengers couldn't resist taking photos of me enjoying my gourmet feast.As we approach Beijing, my excitement grows exponentially. I've heard fascinating stories about the Great Wall, and I can hardly wait to prowl along its ancient stones. The thought of exploring the Forbidden City's mysterious corridors and experiencing the vibrant night markets has me purring with anticipation.Talk to you soon from Beijing!Best whiskers,Mike",
+    "japanese": "読者さんへ今、ソウルと北京の間の上空を飛んでいます！窓からの眺めが本当に魅惑的で、こんな見事な雲の形は見たことがありません。まるで巨大な綿の城が青い大海原に浮かんでいるようです。客室乗務員の方々が猫に優しい特別な配慮をしてくださって、とても親切です。機内食では上質なツナが出てきて、とても驚きました！多くの乗客が、私が美食を楽しんでいる様子を写真に収めていましたよ。北京に近づくにつれ、どんどんワクワクしてきます。万里の長城については興味深い話をたくさん聞いていて、その古代の石の上を歩き回るのが待ちきれません。紫禁城の神秘的な回廊や、活気のある夜市を探検する想像だけで、思わず喉がゴロゴロ言ってしまいます。北京から、また連絡しますね！ヒゲ攻めのミケより"
+  },
+  "stats": {
+    "L_core": 16,
+    "L_plus": 3,
+    "L_advanced": 81,
+    "word_count": 143
+  },
+  "metadata": {
+    "created": "2025-06-28T00:55:11.337Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 95
+  }
+}

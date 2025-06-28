@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail6",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 215,
+    "condition": "cumulative_reading_time >= 215"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've discovered something extraordinary today in Beijing! I ventured into the ancient hutongs, those maze-like alleyways that have existed for centuries. While wandering through these narrow passages, I encountered a remarkable traditional medicine shop. The elderly shopkeeper, noticing my curiosity, invited me inside and demonstrated the art of brewing herbal remedies.The shop was filled with mysterious drawers containing dried herbs, roots, and ingredients I'd never seen before. The aromatic blend of medicinal herbs created an enchanting atmosphere. What fascinated me most was learning about how each ingredient serves a specific purpose in maintaining health and harmony.Later, I joined a local family for dinner in their courtyard home. They taught me the proper technique for making dumplings from scratch! The grandmother's secret recipe has been passed down for generations.Exploring Beijing's hidden corners is truly magical!Love,Mike",
+    "japanese": "親愛なる読者へ今日、北京で素晴らしい発見をしました！何世紀も前から存在する迷路のような路地、胡同を探検していたんです。細い路地を歩いているとき、驚くべき伝統的な漢方薬店に出会いました。私の好奇心に気づいた年配の店主さんが、店内に招き入れてくれて、薬草を煎じる技術を見せてくれたんです。お店には、乾燥させた薬草や根、見たことのない材料が入った不思議な引き出しがたくさんありました。薬草の香りが混ざり合って、魅惑的な雰囲気を作り出していました。特に興味深かったのは、それぞれの材料が健康と調和を保つための特定の目的を持っていることを学んだことです。その後、中庭のある家で地元の家族と夕食を共にしました。餃子の作り方を一から教えてもらったんです！おばあちゃんの秘伝のレシピは何世代にもわたって受け継がれてきたそうです。北京の隠れた場所を探検するのは、本当に魔法のような体験です！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 2,
+    "L_advanced": 79,
+    "word_count": 146
+  },
+  "metadata": {
+    "created": "2025-06-28T00:56:01.859Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 215
+  }
+}

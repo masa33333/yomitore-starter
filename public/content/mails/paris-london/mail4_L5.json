@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail4",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 575,
+    "condition": "cumulative_reading_time >= 575"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I've just experienced something absolutely extraordinary! While exploring Westminster Abbey, I stumbled upon a secret medieval passageway that most tourists never discover. The ancient stones whispered centuries of history, and I swear I caught glimpses of royal ghosts gliding through the shadowy corridors! The most fascinating part was finding an old manuscript that detailed the coronation ceremonies of past monarchs - the illuminated pages were breathtaking.In the evening, I attended a mysterious dinner party at a Victorian mansion in Kensington. The host, a eccentric historian, shared fascinating tales about London's underground rivers and hidden bunkers from WWII. She's invited me to join a midnight tour of the city's most haunted locations tomorrow!Can't wait to share more adventures!Love,Mike",
+    "japanese": "親愛なる読者へ信じられないような体験をしたの！ウェストミンスター寺院を探検していたら、ほとんどの観光客が知らない中世の秘密の通路を見つけちゃった。古い石壁からは何世紀もの歴史が囁きかけてきて、薄暗い廊下では王族の幽霊がすーっと通り過ぎるのを見たような気がしたわ！特に興味深かったのは、過去の君主たちの戴冠式の詳細が記された古い写本を見つけたこと。装飾された羊皮紙の美しさに息をのむほどだったの。夜には、ケンジントンにあるビクトリア朝の邸宅で不思議なディナーパーティーに参加したの。主催者の風変わりな歴史家が、ロンドンの地下河川や第二次世界大戦時の隠れ地下壕について、魅力的な話を聞かせてくれたわ。明日の真夜中には、ロンドンで最も幽霊が出るという場所をめぐるツアーに誘われちゃった！また新しい冒険を報告するね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 17,
+    "L_plus": 2,
+    "L_advanced": 82,
+    "word_count": 127
+  },
+  "metadata": {
+    "created": "2025-06-28T01:09:59.473Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 575
+  }
+}

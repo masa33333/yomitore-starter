@@ -1,0 +1,31 @@
+{
+  "id": "london-newyork-arrival",
+  "type": "letter",
+  "level": "L5",
+  "trigger": {
+    "type": "word_count",
+    "value": 90000,
+    "condition": "cumulative_words >= 90000"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm thrilled to share my incredible journey from London to New York! The moment I landed, I was overwhelmed by the sheer magnificence of this metropolis. The towering skyscrapers of Manhattan pierce the clouds, creating a skyline that's vastly different from London's historic architecture.Did you know that New York's iconic subway system has over 850 miles of track? That's nearly four times longer than London's Underground! As a curious cat, I've been exploring every nook and cranny of this fascinating city. The diversity here is remarkable - I've heard more languages in Central Park than I ever did in Hyde Park!The food culture here is particularly intriguing. While London has its fish and chips, New York's street food scene is extraordinary. I've discovered these amazing things called 'hot dogs' - though I must confess, as a cat, I'm more interested in the pigeons that gather around the food carts!The most striking difference I've noticed is the pace of life. New Yorkers seem to move at twice the speed of Londoners! Even the local cats here have adapted to this fast-paced lifestyle - they're incredibly street-smart and agile.One fascinating experience was meeting a group of bodega cats. These working-class felines are respected members of their communities, keeping shops mouse-free while receiving endless affection from customers. It's quite different from my leisurely life in London!Warmest purrs,Mike",
+    "japanese": "親愛なる読者へロンドンからニューヨークへの素晴らしい旅の様子をお伝えしたいと思います！着陸した瞬間、この大都市の壮大さに圧倒されました。マンハッタンの高層ビル群は雲を突き刺すように聳え立ち、ロンドンの歴史的な建築物とは全く異なる景観を作り出しています。ニューヨークの象徴的な地下鉄システムは、総延長が1,370キロメートル以上もあるってご存知でしたか？ロンドンの地下鉄の約4倍の長さなんです！好奇心旺盛な猫の私は、この魅力的な街のあらゆる場所を探検しています。多様性がとても印象的で、セントラルパークではハイドパークで聞いた以上の言語を耳にしました！食文化も特に興味深いですね。ロンドンにはフィッシュ・アンド・チップスがありますが、ニューヨークのストリートフードは格別です。「ホットドッグ」という素晴らしい食べ物を発見しました - まあ、猫の私としては、フードカートの周りに集まる鳩の方に興味があるんですけどね！最も印象的な違いは生活のペースです。ニューヨーカーはロンドン市民の2倍のスピードで動いているように見えます！地元の猫たちもこの忙しいライフスタイルに適応していて、とても賢く機敏です。特に印象的だったのは、ボデガキャット（商店猫）たちとの出会いです。これらの働き者の猫たちは、店内のネズミ退治をしながら、お客さんから無限の愛情を受けている、尊敬される地域社会の一員なんです。ロンドンでののんびりした生活とは大違いですよ！温かな鳴き声とともに、ミケより"
+  },
+  "media": {
+    "img": "cat_newyork_arrival.png"
+  },
+  "stats": {
+    "L_core": 24,
+    "L_plus": 4,
+    "L_advanced": 73,
+    "word_count": 246
+  },
+  "metadata": {
+    "created": "2025-06-28T00:50:07.263Z",
+    "template_version": "1.0"
+  }
+}

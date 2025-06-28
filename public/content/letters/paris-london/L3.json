@@ -1,0 +1,31 @@
+{
+  "id": "paris-london-arrival",
+  "type": "letter",
+  "level": "L3",
+  "trigger": {
+    "type": "word_count",
+    "value": 65000,
+    "condition": "cumulative_words >= 65000"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I've finally arrived in London after my exciting journey from Paris! The moment I stepped out of St Pancras Station, I was captivated by the majestic red-brick architecture and the bustling atmosphere that's so different from Paris's elegant boulevards.Did you know that London's black cabs must pass a rigorous test called 'The Knowledge,' where drivers memorize over 25,000 streets? I learned this from a friendly cabbie who gave me a ride to Westminster. Speaking of Westminster, I was fascinated by Big Ben's clockwork - they actually place old pennies on the pendulum to adjust its timing!The biggest culture shock was definitely afternoon tea. While Parisians enjoy their quick espressos, Londoners take their time with elaborate tea ceremonies. I tried scones with clotted cream and jam at a charming tea house near Covent Garden. Such a delightful difference from Paris's croissants!I've noticed how cats are treated differently here too. Unlike Paris's café cats, London's cats often rule their own territories in private gardens. I met a distinguished ginger cat who guards the British Museum's courtyard - he told me fascinating stories about the Egyptian cat mummies inside!The weather may be unpredictable, but London's charm is constant. I hope you'll visit someday and discover your own London stories!Warm purrs,Mike",
+    "japanese": "親愛なる読者へパリからの興奮に満ちた旅を経て、ついにロンドンに到着しました！セントパンクラス駅を出た瞬間、威厳のある赤レンガ建築とパリの優雅な大通りとは全く異なる活気に魅了されました。ロンドンの黒タクシーの運転手は「ザ・ナレッジ」という厳しい試験に合格しなければならず、25,000以上もの通りを暗記するって知っていましたか？これは、私を乗せてくれた親切なタクシー運転手から教えてもらいました。ウェストミンスターといえば、ビッグベンの時計仕掛けに魅了されましたよ。実は振り子の調整に古いペニー硬貨を使っているんですって！最も文化の違いを感じたのは、アフタヌーンティーでした。パリジャンが短時間でエスプレッソを楽しむ一方、ロンドン市民は手の込んだティーセレモニーにたっぷり時間をかけます。コベントガーデン近くの素敵な喫茶店で、クロテッドクリームとジャムをのせたスコーンを試してみました。パリのクロワッサンとはまた違った素晴らしさです！猫の扱われ方も違うことに気付きました。パリのカフェで過ごす猫たちと違って、ロンドンの猫たちは個人の庭で自分の縄張りを支配しています。大英博物館の中庭を守る威厳のある茶トラ猫に出会いましたが、館内のエジプトの猫のミイラについて興味深い話を聞かせてくれましたよ！天気は変わりやすいかもしれませんが、ロンドンの魅力は変わりません。皆さんもぜひ訪れて、自分だけのロンドンストーリーを見つけてください！温かい轟き声とともに、ミケより"
+  },
+  "media": {
+    "img": "cat_london_arrival.png"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 3,
+    "L_advanced": 77,
+    "word_count": 225
+  },
+  "metadata": {
+    "created": "2025-06-28T00:48:10.931Z",
+    "template_version": "1.0"
+  }
+}

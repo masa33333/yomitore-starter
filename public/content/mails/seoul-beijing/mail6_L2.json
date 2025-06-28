@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail6",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 215,
+    "condition": "cumulative_reading_time >= 215"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing from a tea shop near a big temple in Beijing! You'll never believe what I found here - special cat-shaped mooncakes! The owner told me these are only made during the Moon Festival.The streets are so lively! I saw old men playing chess in the park and kids flying kites in the sky. The best part was when I met a friendly local cat who showed me a secret path between the old houses.At night, the streets come alive with red lanterns and food stalls. I tried something called 'jianbing' - it's like a thin pancake with eggs and sauce. So good!Tomorrow, I'm going to climb the Great Wall. I heard there's a special morning light that makes everything gold!Love,Mike",
+    "japanese": "読者へ北京のとある大きなお寺の近くの茶館から手紙を書いています！信じられないものを見つけたんです - 猫の形をした月餅です！店主さんによると、これは月見の時期にしか作らないんだそうです。街はとても賑やかです！公園では年配の方々が将棋をさしていて、空には子供たちの凧が舞っています。一番良かったのは、地元の親切な猫に出会って、古い民家の間の隠れ道を案内してもらったことです。夜になると、赤い提灯と屋台で通りが活気づきます。「煎餅（ジェンビン）」という薄いパンケーキのような食べ物を試してみました。卵とソースが入っていて、とても美味しかったです！明日は万里の長城に登る予定です。朝の特別な光で全てが金色に輝くって聞いたんです！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 25,
+    "L_plus": 4,
+    "L_advanced": 71,
+    "word_count": 133
+  },
+  "metadata": {
+    "created": "2025-06-28T00:59:12.487Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 215
+  }
+}

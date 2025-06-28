@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail3",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 335,
+    "condition": "cumulative_reading_time >= 335"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I can see Paris! From the airplane window, I saw the Eiffel Tower! It's so big and beautiful. The city looks like a big picture book. Many people on the plane got excited when they saw it too.The flight attendant gave me some French cheese. It was good but very different from the cheese I know. She told me it's called 'Camembert.' I can't wait to try more French food in Paris!Tomorrow, I will go to see the Eiffel Tower up close. I heard it lights up at night. I want to see that! I also want to try real French bread and walk along the Seine River.Miss you!Love,ミケ",
+    "japanese": "親愛なる読者へパリが見えてきたよ！飛行機の窓からエッフェル塔が見えたの！とても大きくて美しかったわ。街全体が大きな絵本みたいだった。他の乗客の人たちも見えた時にとても興奮していたわ。客室乗務員さんがフランスのチーズをくれたの。美味しかったけど、今まで食べたことのあるチーズとは全然違ったわ。「カマンベール」って言うんだって。パリでもっといろんなフランス料理を試すのが待ちきれないわ！明日はエッフェル塔に近くまで行ってみるつもり。夜にライトアップされるって聞いたの。それも見たいわ！本場のフランスパンも食べてみたいし、セーヌ川沿いも歩いてみたいの。会いたいわ！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 32,
+    "L_plus": 3,
+    "L_advanced": 65,
+    "word_count": 117
+  },
+  "metadata": {
+    "created": "2025-06-28T01:07:32.205Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 335
+  }
+}

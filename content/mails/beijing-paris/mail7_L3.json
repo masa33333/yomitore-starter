@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail7",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 455,
+    "condition": "cumulative_reading_time >= 455"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear reader,I've just experienced something incredible at the Louvre! While admiring the Mona Lisa, I noticed how she seems to follow you with her eyes. It's fascinating how Leonardo da Vinci created this effect. The museum guide told me interesting stories about other paintings too.Then, I discovered a charming café near the museum. The owner, Marcel, makes the best croissants I've ever tasted. He taught me that French people never eat croissants in the afternoon - it's strictly a morning treat! Can you believe that?Tomorrow, I'm planning to visit Notre-Dame Cathedral. Even though it's still under reconstruction, I hear the surrounding area is beautiful.Missing you from Paris,Mike",
+    "japanese": "親愛なる読者へルーブル美術館で信じられないような体験をしたの！モナ・リザを見ていたら、彼女の目が私の動きを追ってくるみたいなの。レオナルド・ダ・ヴィンチがどうやってそんな効果を作り出したのか、とても興味深いわ。美術館のガイドさんは他の絵についても面白い話を聞かせてくれたの。それから、美術館の近くで素敵なカフェを見つけたわ。オーナーのマルセルさんが作るクロワッサンが、今まで食べた中で一番おいしかった！面白いことに、フランス人は午後にクロワッサンを食べることは決してないんだって - 朝食専用なのよ！信じられる？明日はノートルダム大聖堂に行く予定よ。まだ修復中だけど、周辺エリアがとても美しいって聞いているの。パリからあなたのことを想いながら、ミケより"
+  },
+  "stats": {
+    "L_core": 16,
+    "L_plus": 5,
+    "L_advanced": 79,
+    "word_count": 118
+  },
+  "metadata": {
+    "created": "2025-06-28T01:06:47.662Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 455
+  }
+}

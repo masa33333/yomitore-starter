@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail3",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 125,
+    "condition": "cumulative_reading_time >= 125"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear 読者,I've just arrived in Beijing! The plane ride was incredible - I saw the most beautiful sunset from high above the clouds. When we descended, I could see the magnificent Great Wall snaking across the mountains like a giant dragon!At the airport, I met a friendly local cat who told me about a special night market where they serve the most wonderful dumplings. I can't wait to try them! He also mentioned a secret garden near the Forbidden City where cats gather to share stories.The air here feels different from Seoul, and there's this exciting energy everywhere. Tomorrow, I'm planning to explore the hutongs - those traditional narrow alleys I've heard so much about. I heard there are many cozy tea houses where cats and humans share ancient tales.Purrs and whiskers,ミケ",
+    "japanese": "親愛なる読者へ北京に到着しました！飛行機からの眺めは素晴らしく、雲の上から最高に美しい夕日を見ることができました。降下中には、山々の間を大きな龍のように這う万里の長城が見えました！空港で出会った地元の猫が、最高に美味しい餃子を出す夜市場のことを教えてくれました。早く行ってみたいです！その子はまた、紫禁城の近くにある、猫たちが集まって物語を語り合う秘密の庭のことも教えてくれました。ここの空気はソウルとは違って、どこにもワクワクするようなエネルギーが満ちています。明日は、よく聞いていた伝統的な路地「胡同」を探検する予定です。そこには、猫と人間が古い物語を共有する素敵な茶館がたくさんあるそうです。にゃんこの挨拶を添えてミケより"
+  },
+  "stats": {
+    "L_core": 26,
+    "L_plus": 9,
+    "L_advanced": 65,
+    "word_count": 138
+  },
+  "metadata": {
+    "created": "2025-06-28T01:00:04.572Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 125
+  }
+}

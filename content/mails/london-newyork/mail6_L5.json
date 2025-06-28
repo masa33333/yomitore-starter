@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail6",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 845,
+    "condition": "cumulative_reading_time >= 845"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I've discovered something absolutely extraordinary today! While exploring Central Park, I stumbled upon a hidden underground jazz club beneath an old brownstone building. The melodious tunes of saxophone and piano drifted through the vintage-styled entrance, drawing me in like a magical spell.Inside, I was transported to what felt like 1920s New York. Professional musicians were performing classic jazz standards while locals swayed to the rhythm. A charismatic elderly gentleman named Duke, who's been playing piano there for 40 years, shared fascinating stories about the club's history and the legendary musicians who once performed on that very stage.The intimate atmosphere, dim lighting, and soul-stirring music created an unforgettable experience. I even tried some traditional New Orleans-style gumbo while enjoying the performance. This hidden gem truly captures the essence of New York's rich musical heritage.With jazz-filled purrs,Mike",
+    "japanese": "親愛なる読者へ今日、絶対に信じられないような素晴らしい発見をしました！セントラルパークを探索している時に、古い茶色石造りの建物の地下にある隠れジャズクラブを見つけたんです。サックスとピアノの心地よい音色がレトロな雰囲気の入り口から漂ってきて、まるで魔法にかけられたかのように私を誘い込みました。中に入ると、まるで1920年代のニューヨークにタイムスリップしたような気分に。プロのミュージシャンたちがクラシックジャズを演奏する中、地元の人々がリズムに合わせて体を揺らしていました。そこで40年間ピアノを弾き続けているという魅力的な紳士デュークさんに出会い、このクラブの歴史や、かつてこのステージで演奏した伝説的なミュージシャンたちの興味深い話を聞かせてもらいました。親密な雰囲気、程よい照明、そして心を揺さぶる音楽が、忘れられない体験を作り出してくれました。演奏を楽しみながら、伝統的なニューオーリンズスタイルのガンボも味わってみましたよ。この隠れた名所は、ニューヨークの豊かな音楽の歴史を見事に映し出していました。ジャズな気分でゴロゴロと、ミケより"
+  },
+  "stats": {
+    "L_core": 18,
+    "L_plus": 3,
+    "L_advanced": 79,
+    "word_count": 147
+  },
+  "metadata": {
+    "created": "2025-06-28T01:12:01.394Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 845
+  }
+}

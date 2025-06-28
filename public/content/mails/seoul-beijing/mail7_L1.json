@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail7",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 245,
+    "condition": "cumulative_reading_time >= 245"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I saw something very special in Beijing today! I went to a big place called the Temple of Heaven. The building is big and blue, and has three levels. Many people say it is more than 500 years old!I saw lots of old men and women in the park. They were doing tai chi in the morning. Some people were also singing and dancing. It was so much fun to watch them!The best part was when I found a small cat living near the temple. We played together, and she showed me her special spots in the park. Tomorrow, I want to go see the Great Wall. People say it is very, very long!Love,Mike",
+    "japanese": "読者へ今日、北京でとても特別なものを見ました！天壇という大きな場所に行きました。建物は大きくて青く、3層になっています。多くの人が500年以上前のものだと言っています！公園では、たくさんのおじいさんやおばあさんを見かけました。朝から太極拳をしていました。歌を歌ったり踊ったりしている人もいて、見ているととても楽しかったです！一番良かったのは、お寺の近くに住んでいる小さな猫に出会えたことです。一緒に遊んで、その猫が公園の特別な場所を案内してくれました。明日は万里の長城に行きたいと思います。とても、とても長いと聞いています！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 29,
+    "L_plus": 4,
+    "L_advanced": 66,
+    "word_count": 119
+  },
+  "metadata": {
+    "created": "2025-06-28T00:58:04.528Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 245
+  }
+}

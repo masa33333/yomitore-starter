@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail5",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 605,
+    "condition": "cumulative_reading_time >= 605"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Subject: Incredible adventures in London's historic center!Dear reader,You won't believe what happened today! While exploring Westminster Abbey, I stumbled upon a secret cat passage behind an ancient tapestry. Following it led me to a hidden garden where I met the Abbey's resident cat guardian, Winston. He's been protecting the church's precious artifacts for generations!Winston shared fascinating stories about the royal ceremonies he's witnessed and showed me his favorite spot overlooking the Thames. We even discovered a mysterious medieval manuscript in the library that mentions a prophecy about traveling cats!The most extraordinary part? Winston introduced me to a society of London's cathedral cats who gather monthly for 'High Tea' atop St. Paul's Cathedral! Can you imagine cats in tiny bowties sipping Earl Grey?Tomorrow, I'm joining their exclusive gathering. I can hardly wait!Purrs and excitement,Mike",
+    "japanese": "件名：ロンドン市街での信じられない冒険！親愛なる読者へ今日の出来事を聞いてください！ウェストミンスター寺院を探検していたら、古いタペストリーの後ろに秘密の猫用通路を見つけたんです。そこを通っていくと、隠された庭園に出て、寺院の守護猫のウィンストンに出会いました。彼は何世代にもわたって教会の貴重な品々を守ってきたそうです！ウィンストンは自分が目撃した王室の儀式について魅力的な話を聞かせてくれて、テムズ川が見える自分のお気に入りの場所も見せてくれました。図書館では、旅する猫についての予言が書かれた不思議な中世の写本まで発見したんですよ！最も驚いたのは、ウィンストンがロンドンの大聖堂の猫たちの集まりを紹介してくれたこと。彼らは毎月セントポール大聖堂の屋上で「ハイティー」を楽しむんです！小さな蝶ネクタイをつけた猫たちがアールグレイを飲む様子を想像できますか？明日、その特別な集まりに参加することになりました。今から待ちきれません！わくわくする気持ちとともに、ミケより"
+  },
+  "stats": {
+    "L_core": 14,
+    "L_plus": 1,
+    "L_advanced": 85,
+    "word_count": 149
+  },
+  "metadata": {
+    "created": "2025-06-28T01:10:12.258Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 605
+  }
+}

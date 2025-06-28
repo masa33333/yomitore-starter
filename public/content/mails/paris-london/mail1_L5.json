@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail1",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 485,
+    "condition": "cumulative_reading_time >= 485"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I'm currently on the plane from Paris to London, and I can't contain my excitement! The view from my window is absolutely mesmerizing - the fluffy clouds below look like a magical carpet stretching to the horizon. The flight attendant just served me some delightful British-style afternoon tea, complete with delicate finger sandwiches and scones.Speaking of London, I've heard so many fascinating things about it! I can't wait to see the majestic Big Ben, ride the iconic red double-decker buses, and explore the mysterious Tower of London. Did you know they still have real ravens living there? The locals say these ravens protect the Crown and the Tower!I'll be landing at Heathrow Airport in about an hour. My whiskers are tingling with anticipation of all the adventures ahead!Best wishes,Mike",
+    "japanese": "親愛なる読者様へ今パリからロンドンへ向かう飛行機の中にいます。わくわくが止まりません！窓から見える景色が本当に素晴らしくて、下に広がるふわふわした雲が地平線まで続く魔法の絨毯のようです。先ほど客室乗務員さんが、イギリス風のアフタヌーンティーを出してくれました。繊細なフィンガーサンドイッチとスコーンが付いていましたよ。ロンドンについては、たくさんの興味深い話を聞いています！威厳のあるビッグベンや、象徴的な赤い2階建てバス、神秘的なロンドン塔など、早く見てみたくてたまりません。ロンドン塔には今でも本物のカラスが住んでいるって知っていましたか？地元の人々は、このカラスたちが王冠とロンドン塔を守っているのだと言うんです！あと1時間ほどでヒースロー空港に着陸します。これから始まる冒険に、私のヒゲがわくわくしています！どうぞよろしくミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 1,
+    "L_advanced": 77,
+    "word_count": 141
+  },
+  "metadata": {
+    "created": "2025-06-28T01:09:24.222Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 485
+  }
+}

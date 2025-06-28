@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail5",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 395,
+    "condition": "cumulative_reading_time >= 395"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I've discovered something truly extraordinary in Paris! Today, I ventured into the hidden passages of Montmartre, where local artists were creating masterpieces right before my eyes. The cobblestone streets were alive with music, and the aroma of freshly baked croissants filled the air.In a quaint little café, I met a charming French cat named Pierre who showed me secret spots only locals know about. We climbed to the top of an ancient bell tower, where the view of Paris was absolutely breathtaking – the Eiffel Tower sparkled like a jewel against the sunset!The most fascinating part? I stumbled upon a midnight jazz concert in an underground cave-turned-club. The atmosphere was magical, with cats and humans swaying together to the smooth saxophone melodies.Wish you could experience this enchanting city with me!Love,ミケ",
+    "japanese": "親愛なる読者へパリで本当に素晴らしい発見をしたの！今日、モンマルトルの隠れた路地を探検していたら、目の前でアーティストたちが傑作を生み出していたの。石畳の通りには音楽が響き渡り、焼きたてのクロワッサンの香りが漂っていたわ。素敵な小さなカフェで、ピエールという魅力的なフランス猫に出会って、地元の人しか知らない秘密のスポットを案内してもらったの。私たち一緒に古い鐘楼の頂上まで登ったの。そこからのパリの眺めは息をのむほど美しくて、エッフェル塔が夕陽に宝石のように輝いていたわ！一番驚いたのは、地下洞窟を改装したクラブでの真夜中のジャズコンサートに偶然出くわしたこと。猫も人間も、サックスのメロディーに合わせて体を揺らす様子は、まるで魔法のような雰囲気だったわ。あなたもこの魅惑的な街を一緒に体験できたらいいのに！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 3,
+    "L_advanced": 78,
+    "word_count": 137
+  },
+  "metadata": {
+    "created": "2025-06-28T01:03:38.880Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 395
+  }
+}

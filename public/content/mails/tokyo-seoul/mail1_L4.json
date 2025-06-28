@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail1",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 5,
+    "condition": "cumulative_reading_time >= 5"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from the airplane! The flight from Tokyo to Seoul is only about 2 hours, but every minute feels special. Right now, I'm sitting by the window, watching fluffy white clouds float below us like a soft blanket. The sky is such a beautiful shade of blue up here!The flight attendants are very kind and keep checking if I'm comfortable. I just had my first airplane meal - it was different from what I usually eat, but quite good! There's a friendly Korean family sitting next to me, and their little girl keeps smiling at me.I can't wait to arrive in Seoul! I've heard so much about the street food and night markets. People say the city lights are spectacular at night. I'm planning to visit some ancient palaces and try Korean BBQ too!Will write again soon!Love,Mike",
+    "japanese": "親愛なる読者へ飛行機の中から手紙を書いています！東京からソウルまでたった2時間のフライトですが、一分一分がとても特別な気持ちです。今、窓際の席に座って、私たちの下に広がる真っ白な雲を眺めています。まるでふわふわの毛布のようですよ。ここからの空の青さは本当に美しいです！客室乗務員の方々がとても親切で、快適に過ごせているか気にかけてくれます。初めての機内食を食べたところです。普段食べているものとは違いましたが、とてもおいしかったです！隣には韓国人家族が座っていて、小さな女の子が私に笑いかけてくれます。早くソウルに着きたくてワクワクしています！屋台料理や夜市場のことをたくさん聞いています。夜の街の明かりはとても素晴らしいそうです。古い宮殿を訪れたり、韓国式バーベキューも試してみる予定です！また soon !愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 32,
+    "L_plus": 4,
+    "L_advanced": 65,
+    "word_count": 155
+  },
+  "metadata": {
+    "created": "2025-06-28T00:14:16.148Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 5
+  }
+}

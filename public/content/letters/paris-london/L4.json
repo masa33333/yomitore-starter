@@ -1,0 +1,31 @@
+{
+  "id": "paris-london-arrival",
+  "type": "letter",
+  "level": "L4",
+  "trigger": {
+    "type": "word_count",
+    "value": 65000,
+    "condition": "cumulative_words >= 65000"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I'm thrilled to share my journey from Paris to London! After crossing the English Channel through the Chunnel, I arrived in this magnificent city that's completely different from Paris. The first thing that caught my attention was Big Ben standing proudly against the cloudy sky.Did you know that London's famous black cabs must memorize over 25,000 streets? My taxi driver told me fascinating stories about the city's history while navigating through the narrow lanes. I was particularly intrigued by the Tower Bridge, which isn't actually the London Bridge that many tourists mistake it for!The contrast between Paris and London is remarkable. While Paris has its elegant cafés, London boasts cozy pubs where cats like me can observe humans enjoying their afternoon tea. The English gardens are quite different from French formal gardens - they're more natural and wild, perfect for adventurous cats like myself.Yesterday, I had an interesting encounter with a British Shorthair who showed me around Covent Garden. We watched street performers and shared some fish and chips (though I must admit, I miss French cuisine a bit). The most surprising discovery was finding Japanese cat cafés here - it seems our influence has spread worldwide!I hope my adventures inspire you to explore new places. Remember, every city has its own charm, just waiting to be discovered by curious travelers like us.Warmest purrs,Mike",
+    "japanese": "親愛なる読者へパリからロンドンまでの旅の様子をお伝えしたいと思います！英仏海峡をチャンネルトンネルで渡り、パリとは全く異なるこの素晴らしい都市に到着しました。最初に目に入ったのは、曇り空に堂々とそびえ立つビッグ・ベンでした。ロンドンの有名な黒タクシーの運転手は、なんと25,000以上もの道を暗記しなければならないってご存知でしたか？タクシー運転手さんは、狭い路地を縫うように走りながら、街の歴史について魅力的な話を聞かせてくれました。特に印象的だったのは、多くの観光客が勘違いしているロンドン橋とは異なるタワーブリッジについての話でした！パリとロンドンの対比が興味深いです。パリにはエレガントなカフェがありますが、ロンドンには私たち猫が人間のアフタヌーンティーを観察できる居心地の良いパブがあります。イギリスの庭園はフランスの整形式庭園とは全く異なり、より自然で野性的で、私のような冒険好きな猫にぴったりです。昨日は、コベントガーデンを案内してくれたブリティッシュ・ショートヘアと素敵な出会いがありました。一緒にストリートパフォーマンスを見たり、フィッシュアンドチップスを分け合ったりしました（でも正直、フランス料理が少し恋しいです）。最も驚いたのは、ここで日本の猫カフェを見つけたこと。私たち猫の影響力は世界中に広がっているようです！私の冒険が、新しい場所を探検する際のインスピレーションになれば嬉しいです。覚えていてください、どの街にも、私たちのような好奇心旺盛な旅行者を待っている独自の魅力があるのです。温かい気持ちを込めて、ミケより"
+  },
+  "media": {
+    "img": "cat_london_arrival.png"
+  },
+  "stats": {
+    "L_core": 24,
+    "L_plus": 4,
+    "L_advanced": 72,
+    "word_count": 237
+  },
+  "metadata": {
+    "created": "2025-06-28T00:48:27.247Z",
+    "template_version": "1.0"
+  }
+}

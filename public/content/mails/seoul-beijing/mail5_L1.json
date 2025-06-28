@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail5",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 185,
+    "condition": "cumulative_reading_time >= 185"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm at a nice Chinese restaurant in Beijing! The food smells so good. I found a place where many local cats go. They told me about a big wall near Beijing. They say it's very long and old. I want to go there!The cats here walk differently from Seoul cats. They look happy and walk slowly. I learned some cat words in Chinese. Now I can say 'hello' and 'fish' in Chinese!Tomorrow, I will go to see the big wall with my new cat friends. I can't wait!Love,Mike",
+    "japanese": "読者へ北京の素敵な中華料理店にいます！料理のいい匂いがしてきます。地元の猫たちがよく集まる場所を見つけました。彼らが北京近くにある大きな壁のことを教えてくれました。とても長くて古い壁だそうです。そこに行きたいです！ここの猫たちはソウルの猫たちと歩き方が違います。幸せそうにゆっくり歩いています。中国語で猫の言葉をいくつか覚えました。「こんにちは」と「魚」が中国語で言えるようになりました！明日は新しい猫の友達と一緒に大きな壁を見に行きます。とても楽しみです！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 38,
+    "L_plus": 2,
+    "L_advanced": 60,
+    "word_count": 97
+  },
+  "metadata": {
+    "created": "2025-06-28T00:57:46.863Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 185
+  }
+}

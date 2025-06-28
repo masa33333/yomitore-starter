@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail7",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 455,
+    "condition": "cumulative_reading_time >= 455"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,Today, I discovered something extraordinary at Montmartre! I climbed those famous steps to reach Sacré-Cœur, and the sight took my breath away. Paris spread out before me like a beautiful painting. I watched local artists creating masterpieces in the square, their brushes dancing on canvas. One artist even offered to paint my portrait!I strolled through the charming cobblestone streets, where music filled the air. Street performers played accordions, and the melody felt so perfectly Parisian. In a small café, I tasted the most wonderful croissant - still warm from the oven! The friendly owner taught me how to say 'Délicieux' properly.The best part? I met another traveling cat from Japan! We shared stories and promised to meet again in Tokyo.With Parisian whiskers,Mike",
+    "japanese": "親愛なる読者へ今日、モンマルトルで素晴らしい発見がありました！サクレ・クール寺院まで有名な階段を登ったら、目の前に広がる景色に息を呑みました。パリの街が美しい絵画のように広がっていたんです。広場では地元のアーティストたちが傑作を生み出していて、キャンバスの上で筆が踊るように動いていました。なんと、一人のアーティストが私の肖像画を描きたいと言ってくれたんですよ！石畳の魅力的な通りを歩いていると、音楽が空気を満たしていました。ストリートミュージシャンたちがアコーディオンを演奏していて、その音色が本当にパリらしかったです。小さなカフェでは、焼きたてのクロワッサンを味わいました！親切なオーナーが「デリシュー」の正しい発音を教えてくれました。一番うれしかったのは、日本から来た旅行中の猫と出会えたこと！お互いの物語を共有して、東京での再会を約束しました。パリジャン風のヒゲで、ミケより"
+  },
+  "stats": {
+    "L_core": 22,
+    "L_plus": 5,
+    "L_advanced": 74,
+    "word_count": 130
+  },
+  "metadata": {
+    "created": "2025-06-28T01:05:27.006Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 455
+  }
+}

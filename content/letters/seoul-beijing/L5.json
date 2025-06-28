@@ -1,0 +1,31 @@
+{
+  "id": "seoul-beijing-arrival",
+  "type": "letter",
+  "level": "L5",
+  "trigger": {
+    "type": "word_count",
+    "value": 20000,
+    "condition": "cumulative_words >= 20000"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've finally arrived in Beijing after my fascinating journey from Seoul! The moment I stepped into this ancient capital, I was immediately struck by the magnificent blend of historical grandeur and modern vitality. The Forbidden City's imposing walls stand in stark contrast to the gleaming skyscrapers that pierce the horizon.Did you know that Beijing's hutongs, the traditional alleyways, were designed based on feng shui principles? These narrow passages, where local cats and I love to explore, tell stories spanning over 800 years. Unlike Japanese neighborhoods with their precise organization, hutongs form an intricate maze that reflects the organic growth of community life.The most intriguing discovery was the Temple of Heaven's Echo Wall. While Japanese temples emphasize tranquil harmony, this architectural marvel demonstrates the sophisticated acoustical engineering of ancient China. Speaking in a whisper at one point of the wall, your voice travels clearly to the opposite side – a feat that even impressed this tech-savvy feline!The local cuisine has been an adventure in itself. Unlike Seoul's seafood-centric dishes or Japan's delicate flavors, Beijing's culinary landscape is dominated by robust spices and hearty ingredients. The Peking duck, with its crispy skin and tender meat, is a masterpiece that puts my Japanese fish preferences to shame.Keep exploring and learning, dear Reader. Every city has its own personality waiting to be discovered.Warmest purrs,Mike",
+    "japanese": "親愛なる読者へソウルから北京にようやく到着しました！この古都に足を踏み入れた瞬間、歴史的な威厳と現代の活力が見事に調和した景観に心を奪われました。紫禁城の威風堂々とした城壁と、地平線を突き刺す輝くような超高層ビル群が、鮮やかな対比を見せています。北京の胡同（フートン）と呼ばれる伝統的な路地が、風水の原理に基づいて設計されていたことをご存知でしょうか？私たち猫たちが探検を楽しむこれらの細い路地には、800年以上の物語が詰まっています。整然とした日本の街並みとは異なり、胡同は地域社会の自然な発展を反映した複雑な迷路を形成しています。最も興味深かったのは天壇の回音壁です。日本の寺院が静寂な調和を重視するのに対し、この建築の傑作は古代中国の高度な音響工学を示しています。壁の一点でささやいた声が反対側まではっきりと届く様子には、ハイテクに詳しい私でさえ感嘆しました！地元の料理も大きな発見でした。ソウルの海鮮中心の料理や日本の繊細な味わいとは異なり、北京の食文化は力強いスパイスと心温まる食材が特徴です。北京ダックの パリッとした皮としっとりした肉は、日本の魚料理への私の執着を恥じさせるほどの傑作です。探究と学びを続けてください、親愛なる読者。どの都市にも、発見を待つ独自の個性が息づいているのです。温かな願いを込めて、ミケより"
+  },
+  "media": {
+    "img": "cat_beijing_arrival.png"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 5,
+    "L_advanced": 76,
+    "word_count": 235
+  },
+  "metadata": {
+    "created": "2025-06-28T00:45:57.247Z",
+    "template_version": "1.0"
+  }
+}

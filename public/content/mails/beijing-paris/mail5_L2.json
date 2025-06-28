@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail5",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 395,
+    "condition": "cumulative_reading_time >= 395"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm exploring amazing side streets in Paris now! After walking near the Louvre, I found a small bakery making fresh bread. The smell was so good that I had to go in! The baker was very nice and gave me a warm croissant. There are many cats here too. I met a friendly white cat near Notre-Dame. She showed me her favorite spot to watch birds. From there, we could see the whole city! The lights at night are beautiful. The Eiffel Tower sparkles every hour. It's like magic! Tomorrow, I'm going to visit a cafe where cats can drink milk with customers.Can't wait to tell you more!Love,Mike",
+    "japanese": "親愛なる読者へ今、パリの素敵な路地を探検中です！ルーヴル美術館の近くを歩いていたら、焼きたてパンのお店を見つけました。とても良い香りがしたので、つい入ってしまいました！パン屋さんはとても親切で、温かいクロワッサンをくれました。ここには猫もたくさんいます。ノートルダム大聖堂の近くで白猫の友達ができました。彼女は鳥を見るのにお気に入りの場所を教えてくれました。そこからは街全体が見渡せたんです！夜の光がとてもきれいです。エッフェル塔は1時間ごとにキラキラ光ります。まるで魔法みたい！明日は、お客さんと一緒に猫がミルクを飲めるカフェに行く予定です。また報告しますね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 25,
+    "L_plus": 3,
+    "L_advanced": 72,
+    "word_count": 118
+  },
+  "metadata": {
+    "created": "2025-06-28T01:07:52.305Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 395
+  }
+}

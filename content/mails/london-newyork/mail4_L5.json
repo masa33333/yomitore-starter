@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail4",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 785,
+    "condition": "cumulative_reading_time >= 785"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing to share something incredible! I just experienced my first Broadway show in New York - 'The Lion King'! The magnificent costumes, mesmerizing choreography, and powerful musical performances completely transported me to the African savanna. The intricate animal puppetry was absolutely breathtaking; I couldn't believe how lifelike they made each character appear.After the show, I ventured into Times Square, where the dazzling billboards illuminated the night sky like artificial stars. The energy here is indescribable - street performers, diverse crowds, and the constant buzz of city life create an electrifying atmosphere that's uniquely New York.Tomorrow, I'm planning to explore Central Park and visit the Metropolitan Museum of Art. I heard there's a special exhibition featuring Japanese art that I absolutely can't miss!Warmest regards from the city that never sleeps,Mike",
+    "japanese": "親愛なる読者へ素晴らしい体験を共有させてください！ニューヨークで初めてのブロードウェイショー「ライオンキング」を観てきました！壮大な衣装、魅惑的な振付、そして力強い音楽パフォーマンスのおかげで、まるでアフリカのサバンナにいるような気分でした。精巧な動物の操り人形は息をのむほど見事で、それぞれのキャラクターがこんなにも生き生きと表現されているなんて信じられませんでした。ショーの後、タイムズスクエアに足を運びました。まるで人工の星のように、きらめく広告板が夜空を照らしていました。ここのエネルギーは言葉では言い表せません - ストリートパフォーマー、多様な群衆、そして絶え間ない都市の生活音が作り出す電撃的な雰囲気は、まさにニューヨークならではのものです。明日は、セントラルパークを散策して、メトロポリタン美術館を訪れる予定です。日本美術の特別展があるそうで、これは絶対に見逃せません！眠らない街より、心を込めてミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 5,
+    "L_advanced": 76,
+    "word_count": 140
+  },
+  "metadata": {
+    "created": "2025-06-28T01:11:35.281Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 785
+  }
+}

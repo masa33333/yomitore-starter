@@ -1,0 +1,31 @@
+{
+  "id": "beijing-paris-arrival",
+  "type": "letter",
+  "level": "L2",
+  "trigger": {
+    "type": "word_count",
+    "value": 40000,
+    "condition": "cumulative_words >= 40000"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,From Beijing to Paris - what an exciting journey! The sky in Paris is so bright and blue. I can see the Eiffel Tower from my window. It's much bigger than I thought!Yesterday, I walked along the Seine River. Many cats here sit by the water and watch boats go by. They told me a fun fact - there are over 30,000 cats living in Paris! The local cats are very nice. They showed me their favorite spots to catch fish.The food here is very different from Beijing. In Paris, cats love fresh bread and cheese. The streets smell so good in the morning when the bakeries open. I saw many cats waiting outside small cafes for bits of croissants.The buildings here are all very old and pretty. They have small windows where cats can sit and watch people. At night, the city lights up, and it's like magic.I miss the dumplings from Beijing, but Paris is wonderful too. I hope you can visit someday!Love,Mike",
+    "japanese": "親愛なる読者へ北京からパリへ - なんてわくわくする旅でしょう！パリの空はとても明るく、青いんです。窓から見えるエッフェル塔は、想像していたよりずっと大きかったです！昨日、セーヌ川沿いを歩きました。ここでは多くの猫が川辺に座って、船を眺めているんです。彼らが教えてくれた面白い話によると、パリには3万匹以上の猫が住んでいるそうです！地元の猫たちはとても親切で、魚を捕まえるのにお気に入りの場所を案内してくれました。ここの食べ物は北京とはとても違います。パリの猫は新鮮なパンとチーズが大好きなんです。朝になってパン屋さんが開店すると、通りは良い香りでいっぱいになります。小さなカフェの外でクロワッサンのかけらを待っている猫をたくさん見かけました。建物は全てとても古くて素敵です。猫が座って人々を眺められる小さな窓がたくさんあります。夜になると街が明るく照らされて、まるで魔法のようです。北京の餃子は恋しいですが、パリもすてきです。皆さんもいつか訪れることができますように！愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_paris_arrival.png"
+  },
+  "stats": {
+    "L_core": 30,
+    "L_plus": 4,
+    "L_advanced": 66,
+    "word_count": 172
+  },
+  "metadata": {
+    "created": "2025-06-28T00:46:36.550Z",
+    "template_version": "1.0"
+  }
+}

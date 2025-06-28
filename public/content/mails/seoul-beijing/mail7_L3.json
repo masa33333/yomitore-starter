@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail7",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 245,
+    "condition": "cumulative_reading_time >= 245"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm exploring the Great Wall of China today! The view is absolutely breathtaking. From the watchtower, I can see the wall stretching endlessly across mountains and valleys. It's like a huge dragon sleeping on the mountains!I met a friendly local tour guide who shared fascinating stories about how ancient soldiers lived here. She showed me secret passages and hidden chambers that tourists rarely get to see. I even found ancient writings carved into the stones!The most exciting part was climbing the steepest section called 'Heaven's Ladder.' It was challenging, but reaching the top made me feel like I conquered a piece of history. Now I understand why they say you're not a true hero until you climb the Great Wall!Best wishes,Mike",
+    "japanese": "読者様へ今日は万里の長城を探検しています！景色が本当に息をのむほど美しいです。見張り台からは、山々や谷を越えて果てしなく続く城壁が見えます。まるで山々の上で眠る巨大な龍のようです！親切な現地ガイドさんと出会い、古代の兵士たちの生活について興味深い話を聞かせてもらいました。観光客があまり見ることのない秘密の通路や隠し部屋も案内してくれました。石に刻まれた古代の文字も発見しましたよ！一番エキサイティングだったのは「天梯」と呼ばれる最も急な区間を登ったことです。大変でしたが、頂上に到達した時は歴史の一部を征服したような気分でした。「万里の長城に登らずして真の英雄とは言えない」というのが本当によく分かりました！どうぞよろしく、ミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 4,
+    "L_advanced": 77,
+    "word_count": 131
+  },
+  "metadata": {
+    "created": "2025-06-28T01:00:47.672Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 245
+  }
+}

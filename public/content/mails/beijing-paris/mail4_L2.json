@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail4",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 365,
+    "condition": "cumulative_reading_time >= 365"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,Exciting news from the plane! I made a new friend – a little boy who shared his toys with me. We played with his toy plane while looking at real clouds through the window. The sky looks so different up here!The flight attendant gave me special cat food and a small blue blanket. So nice! From my window seat, I can see mountains covered in snow. It's like being in a dream.Paris is getting closer. I can't wait to see the big tower that lights up at night. Did you know they have special cat cafés there? I hope to meet French cats and learn how they say 'meow'.Flying high above the world,Mike",
+    "japanese": "読者さんへ飛行機からワクワクするニュースです！新しい友達ができました - 一緒におもちゃで遊んでくれた小さな男の子です。窓の外の本物の雲を見ながら、彼のおもちゃの飛行機で遊びました。ここから見る空はとても違って見えます！客室乗務員さんが特別な猫用フードと小さな青い毛布をくれました。とても親切でした！窓側の席から、雪に覆われた山々が見えます。まるで夢の中にいるようです。パリがだんだん近づいています。夜にライトアップする大きな塔を早く見たいです。パリには特別な猫カフェがあるって知っていましたか？フランスの猫たちに会って、彼らがどうやって「ニャー」と鳴くのか知りたいです。空高く飛びながら、ミケより"
+  },
+  "stats": {
+    "L_core": 33,
+    "L_plus": 2,
+    "L_advanced": 64,
+    "word_count": 121
+  },
+  "metadata": {
+    "created": "2025-06-28T01:07:42.474Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 365
+  }
+}

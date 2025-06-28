@@ -1,0 +1,31 @@
+{
+  "id": "paris-london-arrival",
+  "type": "letter",
+  "level": "L2",
+  "trigger": {
+    "type": "word_count",
+    "value": 65000,
+    "condition": "cumulative_words >= 65000"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so happy to tell you about my trip from Paris to London! The journey by train through the Channel Tunnel was exciting. I could see the blue sea before we went underground.When I arrived in London, I was surprised by how different it is from Paris. The red buses and black taxis are everywhere! And the buildings here are a mix of old and new. Big Ben is very tall and beautiful.I met many friendly cats here. They told me that London cats love fish and chips! It's different from French cats who eat fancy food. I also learned that cats can go into many parks here. Hyde Park is my favorite - it's so big and green!Did you know that London has many cats living in important places? There are cats at 10 Downing Street and the Tower of London. They help keep mice away and are very important workers!I hope you can visit London too. It's a wonderful city with kind people and good food. The rain is not as bad as people say!Love,Mike",
+    "japanese": "親愛なる読者へパリからロンドンへの旅について、お話しできることをとても嬉しく思います！ 海峡トンネルを通る列車の旅はわくわくしました。地下に入る前に青い海が見えましたよ。ロンドンに着いて、パリとの違いに驚きました。赤いバスと黒いタクシーが至る所を走っています！ そして建物は古いものと新しいものが混在しているんです。ビッグベンはとても高くて美しいです。ここでたくさんの親切な猫たちに出会いました。ロンドンの猫はフィッシュアンドチップスが大好きだそうです！ 高級な食事をするフランスの猫たちとは違いますね。それから、ここでは多くの公園に猫が入れることも分かりました。ハイドパークが私のお気に入り - とても広くて緑がいっぱいなんです！ロンドンには多くの猫が重要な場所で暮らしているって知っていましたか？ ダウニング街10番地やロンドン塔にも猫がいて、ネズミを追い払う大切な仕事をしているんです！あなたもぜひロンドンに来てください。親切な人々と美味しい食べ物がある素晴らしい街です。雨も、みんなが言うほど悪くないですよ！愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_london_arrival.png"
+  },
+  "stats": {
+    "L_core": 33,
+    "L_plus": 3,
+    "L_advanced": 64,
+    "word_count": 187
+  },
+  "metadata": {
+    "created": "2025-06-28T00:47:53.391Z",
+    "template_version": "1.0"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail2",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 305,
+    "condition": "cumulative_reading_time >= 305"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I just had a funny moment on the plane! My neighbor was sleeping, and he jumped when I dropped my book. He looked at me and smiled. The view from up here is so nice - I can see big white clouds below us like soft cotton.The food on the plane was good. I got fish with rice and some sweet cake. But the best part? A small French girl taught me how to say 'hello' and 'thank you' in French! I keep practicing: 'Bonjour' and 'Merci'!Paris is only 3 hours away now. I can't wait to see the Eiffel Tower and eat fresh bread. More stories coming soon!Love,ミケ",
+    "japanese": "親愛なる読者へ飛行機の中で面白いことがありました！隣の人が寝ていたのですが、私が本を落としたときにびっくりして飛び起きちゃったんです。でも笑顔で許してくれました。ここからの景色がとてもきれい - 下に見える白い雲が綿菓子みたいです。機内食も美味しかったです。魚と米、それに甘いケーキが出ました。でも一番良かったのは、フランス人の女の子が「こんにちは」と「ありがとう」をフランス語で教えてくれたこと！「Bonjour」と「Merci」の練習を繰り返しています！パリまであと3時間です。エッフェル塔を見たり、焼きたてのパンを食べるのが待ちきれません。また soon に新しい話を送ります！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 31,
+    "L_plus": 0,
+    "L_advanced": 69,
+    "word_count": 112
+  },
+  "metadata": {
+    "created": "2025-06-28T01:07:21.855Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 305
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail5",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 815,
+    "condition": "cumulative_reading_time >= 815"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I hope you're enjoying following my journey! Today, I explored one of the most fascinating neighborhoods in New York - Greenwich Village. The artistic atmosphere here is absolutely extraordinary! Every corner tells a different story through magnificent street art, eccentric boutiques, and charming cafes.I stumbled upon this remarkable jazz club where legendary musicians once performed. The historic architecture and cobblestone streets transport you to a different era. While wandering around Washington Square Park, I watched street performers showcasing incredible talents - from classical violin to avant-garde dance performances.The highlight was discovering a hidden speakeasy-style restaurant, accessed through a vintage phone booth! The fusion of history and modern creativity in this area is truly captivating.Until next time,Miké",
+    "japanese": "親愛なる読者へ私の旅の様子を楽しんでいただけていますか！今日は、ニューヨークで最も魅力的な地区の一つ、グリニッジ・ビレッジを探索しました。ここのアーティスティックな雰囲気は本当に素晴らしいんです！通りの角々で、見事なストリートアート、個性的なブティック、魅力的なカフェを通じて、それぞれ異なる物語が語られています。偶然、かつて伝説的なミュージシャンたちが演奏していたジャズクラブを見つけました。歴史的な建築物と石畳の通りは、まるで異なる時代へと私たちを運んでくれます。ワシントン・スクエア・パークを歩きながら、クラシックバイオリンからアバンギャルドなダンスまで、ストリートパフォーマーたちの信じられないほどの才能を目の当たりにしました。一番の見どころは、なんとビンテージな電話ボックスを通って入る、隠れ家的なレストランを発見したことです！この地域の歴史とモダンな創造性の融合は、本当に心を捉えて離しません。また次回、ミケより"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 7,
+    "L_advanced": 73,
+    "word_count": 123
+  },
+  "metadata": {
+    "created": "2025-06-28T01:11:48.232Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 815
+  }
+}

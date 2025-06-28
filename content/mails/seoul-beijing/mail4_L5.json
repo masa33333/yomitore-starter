@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail4",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 155,
+    "condition": "cumulative_reading_time >= 155"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've just had the most incredible experience at the Temple of Heaven! This ancient imperial complex is absolutely breathtaking. The circular Hall of Prayer for Good Harvests stands majestically against the sky, its intricate blue tiles gleaming in the sunlight. The symbolism here is fascinating - everything represents the connection between Earth and Heaven.I joined a group of elderly locals practicing tai chi in the park surrounding the temple. They welcomed me warmly and even taught me some basic movements! The peaceful atmosphere, combined with the morning mist and ancient cypress trees, created an almost mystical environment.What truly captured my imagination was the Echo Wall. When I whispered at one end, my friend at the other end could hear it clearly - the acoustics are remarkable! The mathematical precision of ancient Chinese architecture never ceases to amaze me.Looking forward to exploring more of Beijing's treasures!Love,Mike",
+    "japanese": "親愛なる読者へ天壇公園での体験が素晴らしかったの！この古代の皇帝専用の建造物群は本当に息をのむほど美しいわ。円形の祈年殿が空に向かって威厳を放ち、精緻な青い瓦が陽光に輝いているの。ここにあるすべてのものが地球と天との繋がりを表現しているなんて、とても興味深いわ。お寺の周りの公園で太極拳を練習していた地元のお年寄りたちのグループに加わったの。みんな温かく迎えてくれて、基本的な動きまで教えてくれたのよ！朝もやと古い糸杉に囲まれた静かな雰囲気は、まるで神秘的な世界にいるような感じだったわ。特に印象的だったのは回音壁よ。壁の一方端でささやいた言葉が、反対側にいる友達にはっきりと聞こえるなんて - この音響効果には驚いたわ！古代中国建築の数学的な精密さには本当に感動してしまうわ。北京のまだ見ぬ素晴らしいものたちとの出会いが待ち遠しいわ！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 17,
+    "L_plus": 6,
+    "L_advanced": 77,
+    "word_count": 152
+  },
+  "metadata": {
+    "created": "2025-06-28T00:55:35.890Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 155
+  }
+}

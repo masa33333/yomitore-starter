@@ -1,0 +1,31 @@
+{
+  "id": "beijing-paris-arrival",
+  "type": "letter",
+  "level": "L4",
+  "trigger": {
+    "type": "word_count",
+    "value": 40000,
+    "condition": "cumulative_words >= 40000"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing from the enchanting city of Paris! The journey from Beijing was quite an adventure. As I sit here on a charming balcony overlooking the Seine River, I can hardly believe how different everything is from both Beijing and my hometown in Japan.Did you know that Paris has over 100,000 cats living here? Many of them reside in the city's countless cafés, continuing a centuries-old tradition of keeping mice away from food storage. I've already made friends with several local felines who taught me about the best spots for watching street musicians and finding fresh croissants.The most fascinating discovery is how Parisians treat their cats. Unlike in Beijing where I saw many cats in markets, or Japan where we're often considered lucky charms, Paris cats are viewed as sophisticated companions. They freely wander through art galleries and even have special seats in some restaurants!Yesterday, I experienced something remarkable. While strolling near the Eiffel Tower, I came across a small jazz café where a ginger cat plays piano with his paws every evening. The locals say he learned by watching the regular pianist for years. Can you imagine?Keep studying English diligently - it opens doors to wonderful adventures like these!Warm purrs,Mike",
+    "japanese": "親愛なる読者へ魅惑的なパリから手紙を書いています！北京からの旅は、とても素晴らしい冒険でした。今、セーヌ川を見下ろす魅力的なバルコニーに座って、北京や日本の故郷とどれほど違うのかと、まだ信じられない思いです。パリには10万匹以上の猫が住んでいるって知っていましたか？多くの猫は市内の数え切れないカフェで暮らしていて、何世紀も前から続く、食料庫からネズミを追い払う伝統を守っているんです。既に何匹かの地元の猫たちと友達になって、ストリートミュージシャンを見るのに最高の場所や、新鮮なクロワッサンを見つけられる場所を教えてもらいました。最も興味深い発見は、パリジャンの猫への接し方です。市場で多くの猫を見かけた北京や、縁起物として扱われることの多い日本とは違って、パリの猫たちは洗練された伴侶として見られています。美術館を自由に歩き回り、レストランによっては専用の席まであるんですよ！昨日は素晴らしい経験をしました。エッフェル塔の近くを散歩していたら、茶トラの猫が毎晩自分の肉球でピアノを弾く小さなジャズカフェを見つけたんです。地元の人々によると、その猫は何年もの間、常連のピアニストを見て覚えたのだとか。想像できますか？英語の勉強、頑張ってくださいね。このような素晴らしい冒険への扉が開かれますよ！温かな轟きとともに、ミケより"
+  },
+  "media": {
+    "img": "cat_paris_arrival.png"
+  },
+  "stats": {
+    "L_core": 24,
+    "L_plus": 4,
+    "L_advanced": 71,
+    "word_count": 213
+  },
+  "metadata": {
+    "created": "2025-06-28T00:47:06.792Z",
+    "template_version": "1.0"
+  }
+}

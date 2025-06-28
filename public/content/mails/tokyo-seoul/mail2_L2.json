@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail2",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 35,
+    "condition": "cumulative_reading_time >= 35"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to tell you about my flight! The airplane is much bigger than I thought. From my window seat, I can see white clouds that look like cotton candy. The food on the plane is good. I got fish and rice. The nice flight attendant gave me extra snacks because I said 'thank you' in Korean. I learned a few Korean words before my trip!We're going to land in Seoul soon. I can't wait to see the big buildings and try Korean food. I heard they have good fish soup and rice cakes. I'll write again when I get to Seoul!Love,Mike",
+    "japanese": "親愛なる読者へフライトについて教えるのがとても楽しみ！飛行機は思っていたよりずっと大きかったの。窓側の席から見える白い雲は、まるわたあめみたい！機内食もおいしかったわ。お魚とご飯が出たの。韓国語で「ありがとう」って言ったら、優しい客室乗務員さんがおやつをおまけでくれたの。旅行前に韓国語を少し勉強しておいて良かった！もうすぐソウルに着陸するわ。大きなビルや韓国料理が楽しみ。魚のスープやお餅がとってもおいしいって聞いているの。ソウルに着いたらまた書くね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 30,
+    "L_plus": 0,
+    "L_advanced": 70,
+    "word_count": 112
+  },
+  "metadata": {
+    "created": "2025-06-28T00:14:45.331Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 35
+  }
+}

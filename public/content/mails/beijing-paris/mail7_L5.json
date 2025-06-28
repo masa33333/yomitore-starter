@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail7",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 455,
+    "condition": "cumulative_reading_time >= 455"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm having an incredible time exploring France! After arriving in Paris, I decided to venture out to the charming countryside of Provence. The endless fields of lavender stretched before me like a purple ocean, their fragrance filling the air with an intoxicating sweetness. In a small village, I discovered a centuries-old bakery where the artisan baker still uses traditional stone ovens.The most fascinating experience was participating in a local grape harvest festival. The villagers welcomed me warmly, sharing their homemade wine and teaching me traditional Provençal dances. I even helped stomp grapes the old-fashioned way - what a messy but unforgettable experience!Tomorrow, I'm heading back to Paris to explore its famous art museums. I can't wait to share more adventures with you!Love,Mike",
+    "japanese": "親愛なる読者へフランスでの素晴らしい時間を過ごしています！パリに到着後、プロヴァンスの魅力的な田舎へ足を延ばすことにしました。ラベンダー畑が紫の海のように果てしなく広がり、その香りが空気を甘く包み込んでいました。小さな村で見つけた何世紀も前からある伝統的なパン屋では、職人さんが今でも石窯を使って焼き上げているんです。一番心に残っているのは、地元のブドウ収穫祭に参加したことです。村人たちが温かく迎えてくれて、自家製ワインを振る舞ってくれたり、伝統的なプロヴァンス地方の踊りを教えてくれたりしました。昔ながらの方法でブドウを踏んで搾る作業も手伝わせてもらいました - めちゃくちゃ服が汚れましたが、忘れられない経験になりました！明日はパリに戻って、有名な美術館を巡る予定です。また新しい冒険をお伝えできるのが待ちきれません！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 18,
+    "L_plus": 7,
+    "L_advanced": 75,
+    "word_count": 133
+  },
+  "metadata": {
+    "created": "2025-06-28T01:04:03.211Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 455
+  }
+}

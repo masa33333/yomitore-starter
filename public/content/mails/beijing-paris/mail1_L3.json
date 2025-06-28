@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail1",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 275,
+    "condition": "cumulative_reading_time >= 275"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to send you this email from the airplane! Right now, I'm flying high above the clouds, heading from Beijing to Paris. The view from my window is incredible - I can see endless white clouds that look like soft cotton candy.The flight attendants are very kind, and they gave me a special cat meal. I made friends with a little French girl sitting next to me. She taught me how to say 'hello' in French: 'Bonjour!' I heard that Paris has a big tower called the Eiffel Tower, and many nice places to eat cheese. I can't wait to see the beautiful city lights at night. They say Paris is the most beautiful city in the world!Will write again soon!Love,Mike",
+    "japanese": "親愛なる読者へ飛行機の中から、わくわくしながらメールを送っています！今、北京からパリに向かって、雲の上を飛んでいるところです。窓からの眺めが信じられないくらい素敵で、まるで綿あめのような真っ白な雲が果てしなく続いています。客室乗務員の方々がとても親切で、特別な猫用機内食を用意してくれました。隣の席に座っているフランス人の女の子と仲良くなって、フランス語で「こんにちは」を教えてもらいました。「ボンジュール！」です。パリにはエッフェル塔という大きな塔があって、おいしいチーズを食べられる素敵なお店がたくさんあると聞いています。夜のきれいな街の明かりが早く見たいです。パリは世界で一番美しい街だって言われているんですよ！また近いうちに書きます！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 30,
+    "L_plus": 3,
+    "L_advanced": 67,
+    "word_count": 131
+  },
+  "metadata": {
+    "created": "2025-06-28T01:05:43.260Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 275
+  }
+}

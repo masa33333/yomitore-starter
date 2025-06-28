@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail2",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 35,
+    "condition": "cumulative_reading_time >= 35"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing this email from high above the clouds! The view from the airplane window is spectacular - I can see fluffy white clouds stretching endlessly beneath us. The flight attendant just brought me a special Korean-style bibimbap for my in-flight meal, and it's remarkably different from Japanese airline food.I've been practicing some basic Korean phrases with my seat neighbor, a friendly elderly Korean lady. She's teaching me how to pronounce 'annyeonghaseyo' (hello) correctly, and we're having such a delightful time despite the language barrier. She showed me photos of Namsan Tower and Gyeongbokgung Palace on her phone - they look absolutely magnificent!In about an hour, we'll be landing in Seoul. I can hardly contain my excitement about exploring the vibrant streets of Myeongdong and tasting authentic Korean street food!Warm regards from 35,000 feet,Mike",
+    "japanese": "読者さんへ雲の上から書いています！飛行機の窓からの眺めが素晴らしくて、真っ白なふわふわの雲が果てしなく広がっているのが見えます。機内食は特別な韓国風ビビンバップが出てきて、日本の航空会社の機内食とはまったく違う味わいでした。隣の席の親切な韓国人のおばあさんと一緒に、基本的な韓国語のフレーズを練習しているんです。「アンニョンハセヨ」（こんにちは）の正しい発音を教えてもらっていて、言葉の壁を越えてとても楽しい時間を過ごしています。彼女が携帯で南山タワーと景福宮の写真を見せてくれたのですが、本当に壮大で見事でした！あと1時間ほどでソウルに着陸します。明洞の活気あふれる街並みを探索したり、本場の韓国屋台料理を味わうのが今から待ちきれません！上空35,000フィートより、ミケより"
+  },
+  "stats": {
+    "L_core": 21,
+    "L_plus": 3,
+    "L_advanced": 76,
+    "word_count": 145
+  },
+  "metadata": {
+    "created": "2025-06-28T00:15:18.819Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 35
+  }
+}

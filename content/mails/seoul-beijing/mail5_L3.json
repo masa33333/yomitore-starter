@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail5",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 185,
+    "condition": "cumulative_reading_time >= 185"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've discovered something incredible! Here in Beijing, there's a hidden tea house in the heart of a traditional hutong neighborhood. Walking through the narrow alleyways, I came across this special place where they perform ancient tea ceremonies. The tea master showed me how to properly appreciate different types of tea - the way to hold the cup, smell the aroma, and taste each unique flavor. What fascinated me most was how they use special tools to prepare the tea, each one having its own important purpose.Later, I met some local students who invited me to their calligraphy class. Can you imagine? Me, trying to write Chinese characters! Though my attempts weren't perfect, everyone was so encouraging. They even gave me a brush pen as a gift!Tomorrow, I'm planning to visit the Summer Palace. I heard it's breathtaking at sunset.Purrs and love,Mike",
+    "japanese": "読者さんへ信じられないような発見をしたの！北京の伝統的なフートン地区の中心部で、隠れた茶館を見つけたの。細い路地を歩いていたら、古来からの茶道を披露している特別な場所に出会ったのよ。お茶の先生が、様々な種類のお茶の正しい味わい方を教えてくれたの - お茶碗の持ち方や、香りの嗅ぎ方、それぞれの味わいの特徴まで。特に興味深かったのは、お茶を入れるための特別な道具たち。それぞれに大切な役割があるのよ。その後、地元の学生たちと出会って、書道教室に招待してもらったの。想像できる？私が漢字を書いているなんて！上手くはなかったけど、みんなとても励ましてくれて。お別れに筆までプレゼントしてくれたの！明日は頤和園に行く予定よ。夕暮れ時がとても美しいって聞いているの。にゃんとも愛を込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 21,
+    "L_plus": 7,
+    "L_advanced": 73,
+    "word_count": 151
+  },
+  "metadata": {
+    "created": "2025-06-28T01:00:26.754Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 185
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail3",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 545,
+    "condition": "cumulative_reading_time >= 545"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I can't believe I'm writing to you from high above the clouds! The journey from Paris to London has been extraordinary. The sunset viewed from 30,000 feet is absolutely breathtaking - the sky transformed into a canvas of brilliant oranges and purples. I've befriended a charming elderly British couple sitting next to me who shared fascinating stories about London's hidden gems.They told me about secret underground bunkers from WWII that have been converted into unique wine bars, and ancient Roman ruins beneath modern office buildings! The anticipation is killing me. In just an hour, I'll be landing at Heathrow Airport, ready to explore these incredible historical layers of London.The flight attendant just announced we're beginning our descent. I can already see the twinkling lights of London below!Excitement overflowing,Miké",
+    "japanese": "親愛なる読者へ雲の上から手紙を書いていると思うと、とても不思議な気持ちです！パリからロンドンへの旅は、本当に素晴らしいものになっています。高度30,000フィートから見る夕陽は息をのむほど美しく、空全体がオレンジと紫の鮮やかなキャンバスに変わりました。隣に座っている愛らしいイギリス人の老夫婦と仲良くなり、ロンドンの隠れた名所について、たくさんの魅力的な話を聞かせてもらいました。第二次世界大戦時の地下壕がユニークなワインバーに改装されていることや、現代的なオフィスビルの地下に古代ローマの遺跡が眠っているなんて！もう待ちきれません。あと1時間でヒースロー空港に到着し、ロンドンの歴史的な重層性を探検できると思うと、胸が躍ります。今、客室乗務員が降下開始のアナウンスをしました。もう下方にロンドンのまたたく光が見えています！興奮でいっぱいのミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 4,
+    "L_advanced": 78,
+    "word_count": 138
+  },
+  "metadata": {
+    "created": "2025-06-28T01:09:47.537Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 545
+  }
+}

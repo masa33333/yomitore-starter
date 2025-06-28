@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail2",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 725,
+    "condition": "cumulative_reading_time >= 725"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm currently over the Atlantic Ocean, and the view is absolutely mesmerizing! The sunset from 35,000 feet is unlike anything I've ever witnessed - the clouds transformed into a sea of cotton candy in shades of pink and gold. The experience is simply otherworldly.The flight attendants have been extraordinarily accommodating, even providing me with a special feline menu. Can you believe they have salmon prepared five different ways? My fellow passengers seem equally intrigued by having a sophisticated cat as their travel companion.As we get closer to New York, my anticipation grows exponentially. I've heard so much about Central Park's squirrels - they're supposedly quite different from their London counterparts. And the legendary New York pizza... I'm particularly curious about how it compares to Italian pizza I tried in London's Little Italy.With whiskers tingling with excitement,Miké",
+    "japanese": "親愛なる読者へ今、大西洋の上空を飛行中です。この景色には本当に心を奪われています！35,000フィートの高さから見る夕陽は、今まで見たことのないような光景です - 雲が綿あめのように、ピンクと金色に染まっているんです。まるで別世界のような体験です。客室乗務員の方々が特別に気を配ってくださって、なんと猫用の特別メニューまで用意してくれたんですよ。サーモンが5種類もあるなんて、信じられますか？洗練された猫が同乗していることに、他の乗客の皆さんも興味津々のようです。ニューヨークに近づくにつれ、期待が高まる一方です。セントラルパークのリスについて色々と聞いているんです - ロンドンのリスとはだいぶ違うらしいんですよ。それに伝説的なニューヨークのピザ... ロンドンのリトルイタリーで食べたイタリアンピザと比べてどう違うのか、とても興味があります。ヒゲを震わせながらワクワクしています。ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 1,
+    "L_advanced": 76,
+    "word_count": 146
+  },
+  "metadata": {
+    "created": "2025-06-28T01:11:12.264Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 725
+  }
+}

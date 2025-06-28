@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail7",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 245,
+    "condition": "cumulative_reading_time >= 245"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,  Today I tried a special tea ceremony at a local tea house in Beijing! The tea master showed me how to properly hold the small cups and pour tea in the traditional way. When I made a mistake, everyone laughed kindly.  Then I visited an old street where people were making beautiful candy art. A skilled candy maker created a dragon shape for me! It was too pretty to eat, but it was sweet and good.  The most exciting part was meeting a group of students who invited me to play Chinese chess. Although I didn't know the rules well, they taught me patiently.  Missing you from Beijing!  Love, Mike",
+    "japanese": "親愛なる読者へ  今日、北京のお茶屋さんで特別なお茶会を体験したよ！お茶の先生が、小さな茶器の正しい持ち方やお茶の注ぎ方を教えてくれたんだ。失敗した時は、みんなで優しく笑ってくれたよ。  それから、飴細工を作っている古い通りに行ったんだ。上手な職人さんが、私のために龍の形の飴を作ってくれたの！食べるのがもったいないくらい綺麗だったけど、とても美味しかったよ。  一番楽しかったのは、中国将棋に誘ってくれた学生たちと出会えたこと。ルールはよく分からなかったけど、みんな親切に教えてくれたんだ。  北京から愛を込めて！  ミケより"
+  },
+  "stats": {
+    "L_core": 21,
+    "L_plus": 6,
+    "L_advanced": 73,
+    "word_count": 113
+  },
+  "metadata": {
+    "created": "2025-06-28T00:59:22.008Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 245
+  }
+}

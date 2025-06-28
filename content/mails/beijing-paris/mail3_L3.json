@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail3",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 335,
+    "condition": "cumulative_reading_time >= 335"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,The flight to Paris has been full of surprises! I made friends with a little girl who shared her cookies with me. The view from up here is magical - we passed over snow-covered mountains and endless deserts. The flight attendants are so kind, they even gave me an extra pillow when I was feeling tired.I'm getting excited about Paris! Everyone says the Eiffel Tower lights up beautifully at night. I can't wait to try fresh croissants and watch artists painting in Montmartre. The plane is starting to descend now, and I can see the French countryside through breaks in the clouds. It looks like a beautiful patchwork of green and gold fields.Looking forward to sharing more Paris adventures with you!Love,Mike",
+    "japanese": "親愛なる読者へパリへの飛行機旅、とても素敵な驚きの連続です！隣の席の小さな女の子がクッキーを分けてくれて、すっかり仲良くなりました。窓からの眺めは本当に魔法のよう - 雪に覆われた山々や果てしない砂漠の上を飛びました。客室乗務員の方々もとても親切で、疲れていた私に追加の枕まで用意してくれました。パリへの期待が高まってきています！エッフェル塔は夜になるときれいにライトアップされるって皆が言うんです。焼きたてクロワッサンを味わったり、モンマルトルで絵を描く芸術家たちを見たりするのが待ちきれません。飛行機が降下し始めて、雲の切れ間からフランスの田園風景が見えてきました。緑と金色の畑がパッチワークみたいにきれいです。もっとたくさんのパリでの冒険を皆さんにお伝えできるのが楽しみです！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 2,
+    "L_advanced": 75,
+    "word_count": 129
+  },
+  "metadata": {
+    "created": "2025-06-28T01:06:06.246Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 335
+  }
+}

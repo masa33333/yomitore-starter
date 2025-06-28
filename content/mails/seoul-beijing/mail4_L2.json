@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail4",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 155,
+    "condition": "cumulative_reading_time >= 155"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing from my seat on the plane! The flight from Seoul to Beijing is amazing - I can see white fluffy clouds under the wings. Guess what? I made friends with a kind lady sitting next to me. She told me all about Beijing's Great Wall and showed me pictures on her phone!The flight attendant just brought lunch. I got a special fish meal (because I'm a cat!), and it's really good. I can't wait to land in Beijing. Through the window, I can see China's mountains now. They look so different from Korea's!In just one hour, I'll be in Beijing. I heard there are many interesting places to see. The Forbidden City, Summer Palace, and of course, the Great Wall! I'm so excited!Love,Mike",
+    "japanese": "読者へ飛行機の座席から書いています！ソウルから北京への飛行はすごく楽しいの - 翼の下には白くてふわふわした雲が見えるわ。そうそう、隣に座っているやさしいお姉さんと友達になったの。北京の万里の長城のことをいろいろ教えてくれて、スマートフォンで写真も見せてくれたわ！今、客室乗務員が昼食を持ってきたところ。私は特別な魚料理をもらったの（だって猫だもの！）とってもおいしいわ。早く北京に着きたいな。窓から中国の山々が見えてきたわ。韓国の山とは全然違って見えるの！あと1時間で北京に着くわ。面白いところがたくさんあるって聞いているの。紫禁城に頤和園、そしてもちろん万里の長城！とってもワクワクしているわ！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 30,
+    "L_plus": 3,
+    "L_advanced": 67,
+    "word_count": 139
+  },
+  "metadata": {
+    "created": "2025-06-28T00:58:52.284Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 155
+  }
+}

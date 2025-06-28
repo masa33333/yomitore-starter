@@ -1,0 +1,31 @@
+{
+  "id": "tokyo-seoul-arrival",
+  "type": "letter",
+  "level": "L4",
+  "trigger": {
+    "type": "word_count",
+    "value": 5000,
+    "condition": "cumulative_words >= 5000"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing from Seoul, where I've just arrived after my journey from Tokyo! The vibrant energy of this city is absolutely captivating. As a curious cat, I've already made some fascinating discoveries that I'm eager to share with you.Did you know that Seoul's history spans over 2,000 years? While exploring the streets, I noticed how modern skyscrapers harmoniously coexist with ancient palaces. The most intriguing difference from Tokyo is how the local cats here have their own special hangout spots in traditional hanok villages!The food scene here is incredibly diverse. While Tokyo's fish markets are my favorite, Seoul's street food markets have introduced me to new flavors I never imagined existed. The local cats taught me about 'tteokbokki' - these spicy rice cakes that humans seem to love. Though I prefer fish, watching people enjoy these bright red treats is quite entertaining!One surprising discovery was the 'cat cafes' here - they're quite different from those in Tokyo. The Korean cats explained that they incorporate traditional elements like floor heating (ondol) into their resting areas. How clever!Keep exploring and learning, just like I do. Every new city has its own special charm waiting to be discovered.Warmest purrs,Mike",
+    "japanese": "親愛なる読者へ東京から到着したソウルから手紙を書いています！この街の活気に心が躍っています。好奇心旺盛な猫である私は、既にいくつかの興味深い発見をしましたので、ぜひ共有させてください。ソウルの歴史は2000年以上もあるって知っていましたか？街を探検していると、現代的な高層ビルと古代の宮殿が見事に調和しているのに気づきました。東京との最も興味深い違いは、地元の猫たちが韓屋村に独自の たまり場を持っていることです！食文化もとても多様です。東京の魚市場が大好きな私ですが、ソウルの屋台では想像もしなかった新しい味との出会いがありました。地元の猫たちが「トッポッキ」について教えてくれました - 人間が大好きな辛い餅料理です。私は魚派ですが、人々が真っ赤な料理を楽しむ様子を見るのは面白いですね！驚いたのは、ここの「猫カフェ」です - 東京とはかなり違います。韓国の猫たちは、休憩スペースに温突という伝統的な床暖房を取り入れているんですよ。なんて賢いんでしょう！私のように、探検と学びを続けてください。新しい街には、それぞれ特別な魅力が待っているのですから。温かい気持ちを込めて、ミケより"
+  },
+  "media": {
+    "img": "cat_seoul_arrival.png"
+  },
+  "stats": {
+    "L_core": 29,
+    "L_plus": 5,
+    "L_advanced": 66,
+    "word_count": 209
+  },
+  "metadata": {
+    "created": "2025-06-28T00:43:37.525Z",
+    "template_version": "1.0"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail3",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 755,
+    "condition": "cumulative_reading_time >= 755"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I can't believe what happened during my flight from London! The pilot announced we were flying over Greenland, and suddenly the Northern Lights appeared outside my window! The magnificent green and purple ribbons danced across the dark sky - it was absolutely breathtaking. Several passengers gasped in amazement, and even the flight attendants stopped to watch the spectacular show.I'm now just a few hours away from New York. The anticipation is building as I think about exploring Central Park, visiting the iconic Empire State Building, and experiencing the vibrant energy of Times Square. I've heard so much about New York's famous street food - especially the authentic bagels and hot dogs from street vendors.I'll write again once I land!Best wishes,Mike",
+    "japanese": "読者さんへロンドンからの飛行機での出来事が信じられません！パイロットがグリーンランド上空を飛行中だと告げた直後、突然私の窓の外にオーロラが現れたのです！壮麗な緑と紫のリボンが暗い空で踊っていて、本当に息をのむような美しさでした。何人もの乗客が感嘆の声を上げ、客室乗務員の方々まで立ち止まってこの素晴らしいショーに見入っていました。ニューヨークまであと数時間です。セントラルパークの散策や、象徴的なエンパイアステートビルの見学、そしてタイムズスクエアの躍動的なエネルギーを体験することを思うと、期待が高まります。ニューヨークの有名なストリートフード、特に本場のベーグルや露店のホットドッグについてたくさん聞いてきました。着陸したらまた書きますね！では、またミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 5,
+    "L_advanced": 75,
+    "word_count": 129
+  },
+  "metadata": {
+    "created": "2025-06-28T01:11:22.696Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 755
+  }
+}

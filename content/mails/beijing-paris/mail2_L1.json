@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail2",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 305,
+    "condition": "cumulative_reading_time >= 305"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I'm so happy on this airplane to Paris! The view from my window is very nice. I can see white clouds below me, like a big cotton sea. The food on the plane was good. I had fish with rice, and the nice lady next to me gave me some of her bread. She likes cats and showed me pictures of her three cats at home.I can't wait to see the Eiffel Tower! I want to climb to the top and look at Paris from up there. People say Paris is very pretty at night.Talk to you soon!Love,ミケ",
+    "japanese": "親愛なる読者へパリに向かう飛行機の中で、とても幸せな気持ちです！窓からの景色がとてもきれい。下には白い雲が広がっていて、大きな綿の海みたい。機内食もおいしかったよ。魚とご飯が出て、隣に座っていた優しいお姉さんがパンをわけてくれたの。その人は猫が好きで、家で飼っている3匹の猫の写真を見せてくれました。早くエッフェル塔が見たいな！てっぺんまで登って、パリの街を見下ろしてみたいの。みんな、夜のパリはとてもきれいだって言うんだ。またすぐに連絡するね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 34,
+    "L_plus": 0,
+    "L_advanced": 66,
+    "word_count": 104
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:33.979Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 305
+  }
+}

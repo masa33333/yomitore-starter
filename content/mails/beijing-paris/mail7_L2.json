@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail7",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 455,
+    "condition": "cumulative_reading_time >= 455"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I just had a wonderful dinner at a small French restaurant in Versailles! The chef was so kind and showed me how to make real French onion soup. The kitchen was filled with such nice smells - fresh bread, cheese, and herbs. Did you know they cook onions for a very long time until they become sweet and soft? It's like magic! And the soup has special cheese on top that melts and gets brown. The chef let me try making it myself. I made a small mess, but it was so much fun!Tomorrow, I'm going to visit a famous palace here. I heard it's very big and beautiful. I can't wait!Love,Mike",
+    "japanese": "親愛なる読者へベルサイユの小さなフランスレストランで素敵なディナーを楽しんできました！シェフがとても親切で、本物のフレンチオニオンスープの作り方を教えてくれたんです。キッチンは焼きたてパンやチーズ、ハーブの良い香りでいっぱいでした。玉ねぎを甘くて柔らかくなるまでとても長い時間煮込むって知っていましたか？まるで魔法みたい！そして上に特別なチーズをのせて、溶かして焦げ目をつけるんです。シェフは私に実際に作らせてくれました。ちょっと失敗しちゃいましたが、とても楽しかったです！明日は、ここにある有名な宮殿を見に行きます。とても大きくて美しいと聞いています。今からわくわくです！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 28,
+    "L_plus": 6,
+    "L_advanced": 67,
+    "word_count": 120
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:10.847Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 455
+  }
+}

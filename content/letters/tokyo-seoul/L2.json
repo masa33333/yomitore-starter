@@ -1,0 +1,31 @@
+{
+  "id": "tokyo-seoul-arrival",
+  "type": "letter",
+  "level": "L2",
+  "trigger": {
+    "type": "word_count",
+    "value": 5000,
+    "condition": "cumulative_words >= 5000"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I'm Miké, your feline friend from Tokyo! I just got to Seoul, and wow - this city is so big and bright! The buildings here are different from Tokyo. Many old temples stand next to new tall buildings.The food here smells so good! I saw people eat something called 'kimchi' - it's red and looks hot! In Tokyo, we eat fish, but here, I see lots of meat cooking on tables. The smell makes my nose happy!I met some Korean cats today. They told me about special places where cats can sleep in the sun. They also showed me their favorite fish market. The fish here is fresh and good, just like in Tokyo, but it looks different.The people here are nice. They give cats food and pat our heads, just like in Tokyo. But they speak different words to us. In Tokyo, people say 'neko-chan', but here they say 'goyang-i'.I'm having so much fun learning new things! I hope you can visit Seoul too one day.Love,Miké",
+    "japanese": "親愛なる読者へ東京から来た猫のミケです！ソウルに着いたばかりですが、この街はとても大きくて明るいです！建物は東京とは違います。古いお寺が新しい高層ビルの隣に立っています。ここの食べ物はとてもいい匂い！人々が'キムチ'という赤くて熱そうな物を食べているのを見ました。東京では魚をよく食べますが、ここではテーブルで肉を焼いているのをたくさん見かけます。その匂いで私の鼻は幸せです！今日は韓国の猫たちと出会いました。日向ぼっこができる特別な場所を教えてくれました。お気に入りの魚市場も案内してくれました。ここの魚も東京と同じく新鮮で美味しそうですが、見た目が違います。ここの人々は優しいです。東京と同じように、猫にご飯をくれたり頭を撫でてくれたりします。でも、私たちに話しかける言葉が違います。東京では「ねこちゃん」と言いますが、ここでは「ゴヤンイ」と言います。新しいことを学ぶのはとても楽しいです！あなたもいつか、ソウルに来られることを願っています。愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_seoul_arrival.png"
+  },
+  "stats": {
+    "L_core": 33,
+    "L_plus": 2,
+    "L_advanced": 66,
+    "word_count": 178
+  },
+  "metadata": {
+    "created": "2025-06-28T00:43:07.555Z",
+    "template_version": "1.0"
+  }
+}

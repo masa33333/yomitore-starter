@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail1",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 695,
+    "condition": "cumulative_reading_time >= 695"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from 35,000 feet above the Atlantic Ocean! The journey from London to New York has been absolutely fascinating. Through my window seat, I've witnessed the most spectacular transformation of colors - from London's misty morning grey to the brilliant azure of the ocean beneath us.The flight attendants are extraordinarily kind, and they even gave me an extra serving of their gourmet salmon! I've made friends with a charming elderly couple from Scotland who shared fascinating stories about their previous New York adventures.I can hardly contain my excitement about exploring New York! Times Square's legendary lights, Central Park's vastness, and the majestic Statue of Liberty are all waiting for me. I've heard the pizza here is unbelievably good - I can't wait to try an authentic New York slice!Will write more upon landing!Warmest purrs,Mike",
+    "japanese": "親愛なる読者へ大西洋上空35,000フィートから、ワクワクしながらメールを書いています！ロンドンからニューヨークへの旅は、本当に素晴らしい体験の連続です。窓際の席から、ロンドンの霞んだ灰色の朝から、眼下に広がる海の鮮やかな青へと、色彩が劇的に変化していく様子を目撃しています。客室乗務員の方々が驚くほど親切で、なんとグルメなサーモンのおかわりまでくれました！スコットランドからいらしたご年配のご夫婦と仲良くなり、彼らの以前のニューヨーク旅行について、魅力的な話をたくさん聞かせていただきました。ニューヨーク観光への期待で胸がいっぱいです！タイムズスクエアの伝説的な光景、セントラルパークの広大さ、そして威厳のある自由の女神、すべてが私を待っています。ここのピザは信じられないほど美味しいと聞いています - 本場のニューヨークピザが待ちきれません！着陸後、また書きますね！温かい声でごあいさつ、ミケより"
+  },
+  "stats": {
+    "L_core": 18,
+    "L_plus": 1,
+    "L_advanced": 81,
+    "word_count": 152
+  },
+  "metadata": {
+    "created": "2025-06-28T01:10:59.960Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 695
+  }
+}

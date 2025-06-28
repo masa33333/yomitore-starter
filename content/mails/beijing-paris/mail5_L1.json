@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail5",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 395,
+    "condition": "cumulative_reading_time >= 395"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I'm so happy to tell you about my flight! The plane is very big, and I got a nice window seat. I can see white clouds below - they look like soft cotton! Some little kids near me are eating sandwiches and laughing. They gave me fish to eat on the plane, and it was good.Paris is close now! I want to see the big tower that lights up at night. People say Paris has good bread and cheese. I can't wait to try them! The sun is setting, and the sky is red and orange.I will write again when I get to Paris!Love,ミケ",
+    "japanese": "親愛なる読者へフライトのことを教えるのがとても嬉しいわ！飛行機はとても大きくて、窓際の良い席に座れたの。下には白い雲が見えるわ - まるでふわふわの綿みたい！近くには小さな子供たちがサンドイッチを食べて笑っているわ。機内食は魚が出て、美味しかったわ。もうすぐパリよ！夜にライトアップされる大きな塔が見たいわ。パリにはおいしいパンとチーズがあるって聞いたわ。早く試してみたいの！今、夕日が沈んでいって、空が赤やオレンジ色に染まっているわ。パリに着いたらまた書くわね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 32,
+    "L_plus": 0,
+    "L_advanced": 68,
+    "word_count": 109
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:59.507Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 395
+  }
+}

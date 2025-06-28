@@ -1,0 +1,31 @@
+{
+  "id": "london-newyork-arrival",
+  "type": "letter",
+  "level": "L1",
+  "trigger": {
+    "type": "word_count",
+    "value": 90000,
+    "condition": "cumulative_words >= 90000"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm Mike, a cat who just arrived in New York from London! The big buildings here make me feel so small. I can see many yellow cars on the streets - they call them taxis. They are very different from the black taxis in London.Yesterday, I went to Central Park. It is a big green place in the middle of the city. I saw many dogs and cats playing there. The trees are very tall, and I found good spots to take a nap in the sun.The food here is new to me. I tried something called a 'hot dog' - but don't worry, it's not made from real dogs! I also saw many food trucks on the streets. The smells are so good!The people here walk very fast and talk very loud. But they are nice and some give me food. At night, the city is very bright with many lights. It's like the sun never goes down.I miss London, but New York is fun too. Next time, I want to go up the tall building called Empire State Building.Love,Mike",
+    "japanese": "親愛なる読者へロンドンからニューヨークに来たばかりの猫のミケです！ここの高いビルを見ると、自分がとても小さく感じます。道にはたくさんの黄色い車が走っています - タクシーと呼ばれているものです。ロンドンの黒いタクシーとはとても違います。昨日、セントラルパークに行きました。街の真ん中にある大きな緑の場所です。そこでたくさんの犬や猫が遊んでいるのを見ました。木はとても高く、日向ぼっこにぴったりの場所を見つけました。ここの食べ物は私にとって新しいものばかりです。「ホットドッグ」という食べ物を試しました - 安心してください、本物の犬から作ったものではありません！道にはたくさんのフードトラックもあります。においがとてもおいしそうです！ここの人々はとても速く歩き、大きな声で話します。でも親切で、食べ物をくれる人もいます。夜になると、街は明かりでとても明るくなります。まるで太陽が沈まないみたいです。ロンドンが恋しいですが、ニューヨークも楽しいです。次は、エンパイアステートビルディングという高いビルに登ってみたいです。愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_newyork_arrival.png"
+  },
+  "stats": {
+    "L_core": 37,
+    "L_plus": 1,
+    "L_advanced": 62,
+    "word_count": 191
+  },
+  "metadata": {
+    "created": "2025-06-28T00:49:09.283Z",
+    "template_version": "1.0"
+  }
+}

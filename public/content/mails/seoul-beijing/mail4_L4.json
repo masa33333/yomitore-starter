@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail4",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 155,
+    "condition": "cumulative_reading_time >= 155"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've just discovered something incredible in Beijing! After checking into my hotel, I found a hidden gem - a night market filled with thousands of sparkling red lanterns. The aroma of steamed dumplings and grilled meats drifted through the narrow alleyways, making my whiskers tingle with excitement.Local cats told me about a magical place called the Forbidden City, where ancient emperors' cats once roamed freely. Tomorrow, I'm planning to explore its mysterious courtyards and maybe even find secret passages! They say there are special stone carvings of cats hidden throughout the palace.The city lights at night are spectacular, especially from my hotel window. I can see the modern skyscrapers blending perfectly with traditional temples. It's like being in two different worlds at once!Purrs and whiskers,Mike",
+    "japanese": "親愛なる読者へ北京で信じられないような発見をしたの！ホテルにチェックインした後、素敵な場所を見つけたの - 何千もの赤い提灯で輝く夜市よ。蒸し餃子や焼き肉の香りが細い路地に漂って、私のヒゲがわくわくするほど震えたわ。地元の猫たちが、紫禁城という魔法のような場所について教えてくれたの。そこは昔、皇帝の猫たちが自由に歩き回っていた場所なんですって。明日は、その不思議な中庭を探検して、もしかしたら秘密の通路も見つけられるかもしれないわ！宮殿中には、猫の特別な石彫りが隠されているらしいの。夜の街の明かりは見事よ。特に私のホテルの窓からの眺めは最高。現代的な高層ビルが伝統的な寺院と完璧に調和しているの。まるで二つの異なる世界にいるみたい！ゴロゴロと愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 7,
+    "L_advanced": 73,
+    "word_count": 133
+  },
+  "metadata": {
+    "created": "2025-06-28T01:01:42.816Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 155
+  }
+}

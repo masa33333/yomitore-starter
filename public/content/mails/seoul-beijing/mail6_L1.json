@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail6",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 215,
+    "condition": "cumulative_reading_time >= 215"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Hi Reader,The plane just landed in Beijing! The night view from the window was beautiful - so many bright lights! I made a friend on the plane, a little girl who shared her cookies with me. She liked my soft fur and big eyes.From the plane, I saw the Great Wall! It looked like a long snake on the mountains. I can't wait to walk on it tomorrow. Beijing is much bigger than Seoul. The buildings are very tall, and there are many people on the streets. I hear they have good fish here. I want to try it!I will send you pictures of the Great Wall soon.Love,Mike",
+    "japanese": "読者へ今、北京に着陸したところです！窓から見た夜景がとてもきれいでした - たくさんの明るい光が輝いていました！機内で友達ができたんです。小さな女の子がクッキーを分けてくれました。私の柔らかい毛並みと大きな目を気に入ってくれたみたい。飛行機から万里の長城が見えたんです！山々の上を這う大きな蛇みたいでした。明日、そこを歩くのが待ちきれません。北京はソウルよりずっと大きいです。建物はとても高くて、通りにはたくさんの人がいます。ここの魚料理が美味しいって聞きました。食べてみたいです！すぐに万里の長城の写真を送りますね。愛を込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 29,
+    "L_plus": 1,
+    "L_advanced": 70,
+    "word_count": 113
+  },
+  "metadata": {
+    "created": "2025-06-28T00:57:55.786Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 215
+  }
+}

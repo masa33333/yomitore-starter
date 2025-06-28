@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail6",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 635,
+    "condition": "cumulative_reading_time >= 635"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,The most extraordinary thing happened today! While exploring the Tower of London, I encountered a group of the legendary ravens that protect the tower. These magnificent birds are absolutely massive - much larger than any birds I've seen in Paris! According to the Yeoman Warder (nicknamed 'Beefeater') who guided us, if the ravens ever leave the Tower, the kingdom will fall. There are currently seven ravens living here, though only six are required by royal decree.The most fascinating part was watching them interact with visitors. One particularly clever raven named Merlina actually performed tricks for treats! She can mimic human speech and loves playing with small shiny objects. I spent nearly two hours observing these remarkable creatures and learning about their centuries-old connection to British history.Until next time,Mike",
+    "japanese": "親愛なる読者へ今日、最も驚くべきことが起きました！ロンドン塔を探検している時、塔を守る伝説的なカラスたちのグループに出会ったんです。これらの見事な鳥たちは本当に大きくて、パリで見たどんな鳥よりも大きいんです！私たちを案内してくれた衛士（「ビーフイーター」というニックネームで呼ばれています）によると、もしカラスたちが塔を去ってしまったら、王国が滅びるのだそうです。現在7羽のカラスが住んでいますが、王室の法令では6羽いれば良いことになっているそうです。最も魅力的だったのは、彼らが訪問者たちとやり取りする様子でした。特にマーリナという賢いカラスは、おやつと引き換えに芸を披露してくれたんです！人間の声を真似することができて、小さな光るもので遊ぶのが大好きなんです。これらの素晴らしい生き物たちを観察し、イギリスの歴史との何世紀にも及ぶつながりについて学ぶのに、2時間近くを費やしてしまいました。では、また次回ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 1,
+    "L_advanced": 76,
+    "word_count": 134
+  },
+  "metadata": {
+    "created": "2025-06-28T01:10:24.231Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 635
+  }
+}

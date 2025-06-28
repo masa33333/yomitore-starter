@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail1",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 275,
+    "condition": "cumulative_reading_time >= 275"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm on the plane from Beijing to Paris! The sky is so blue up here. I can see white clouds under me like soft cotton. The plane is big and clean. I sit by the window and look outside.I ate chicken and rice on the plane. It was good! A nice flight attendant gave me extra cookies. She likes cats!I'm so happy to go to Paris. I want to see the Eiffel Tower and eat French bread. People say Paris is very pretty. I can't wait to walk on the streets and see the city.Will write again soon!Love,Mike",
+    "japanese": "読者へ北京からパリへ向かう飛行機の中だよ！ここから見える空はとってもきれいな青色。下には綿菓子みたいな白い雲が見えるんだ。飛行機は大きくて清潔。窓際の席に座って外を眺めているよ。機内食はチキンとご飯だったんだけど、おいしかったよ！親切な客室乗務員さんがクッキーをおまけにくれたの。猫好きな人だったみたい！パリに行けるなんてすごく嬉しいな。エッフェル塔を見たり、フランスパンを食べたりするのが楽しみ。みんなパリはとてもきれいな街だって言うんだ。街を歩いて、いろんなものを見るのが待ちきれないよ。また書くね！ミケより"
+  },
+  "stats": {
+    "L_core": 30,
+    "L_plus": 0,
+    "L_advanced": 70,
+    "word_count": 108
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:25.543Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 275
+  }
+}

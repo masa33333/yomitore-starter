@@ -1,0 +1,31 @@
+{
+  "id": "london-newyork-arrival",
+  "type": "letter",
+  "level": "L2",
+  "trigger": {
+    "type": "word_count",
+    "value": 90000,
+    "condition": "cumulative_words >= 90000"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I've just arrived in New York from London! The city is so big and tall - much different from London's old buildings. When I got here, I saw many yellow taxis and big screens in Times Square. It was like a sea of lights!The food here is very different. In London, I ate fish and chips, but here I tried a hot dog from a street cart. The smell was so good! And guess what? I learned that the first hot dog cart started here in 1860! The people here walk very fast and talk loud. They don't stop like London people do for tea time. I miss my afternoon tea, but I love watching people in Central Park. Many cats here live in tall buildings, not in houses like in London.I made a friend - a black cat named Shadow who lives near Brooklyn Bridge. He showed me where to find the best pizza! Did you know New York cats love pizza too?I hope you can visit New York one day. It's different but fun!Love,Mike",
+    "japanese": "親愛なる読者へロンドンからニューヨークに到着したところです！この街はとても大きくて高い建物だらけで、ロンドンの古い建物とはずいぶん違います。着いてすぐ、たくさんの黄色いタクシーとタイムズスクエアの大きなスクリーンを見ました。まるで光の海のようでした！食べ物もとても違います。ロンドンではフィッシュアンドチップスを食べていましたが、ここでは屋台のホットドッグを試してみました。とてもいい匂いでしたよ！そうそう、最初のホットドッグの屋台は1860年にここで始まったんですって！人々はとても速く歩いて、大きな声で話します。ロンドンの人たちのようにティータイムで立ち止まることもありません。午後のお茶は恋しいですが、セントラルパークで人々を眺めるのが大好きです。ここの猫たちは、ロンドンのような一軒家ではなく、高層ビルに住んでいます。ブルックリン橋の近くに住むシャドウという黒猫と友達になりました。彼が一番おいしいピザの場所を教えてくれたんです！ニューヨークの猫たちもピザが大好きだって知っていましたか？いつか皆さんもニューヨークに来られることを願っています。違う世界ですが、とても楽しいところですよ！愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_newyork_arrival.png"
+  },
+  "stats": {
+    "L_core": 35,
+    "L_plus": 2,
+    "L_advanced": 64,
+    "word_count": 184
+  },
+  "metadata": {
+    "created": "2025-06-28T00:49:22.588Z",
+    "template_version": "1.0"
+  }
+}

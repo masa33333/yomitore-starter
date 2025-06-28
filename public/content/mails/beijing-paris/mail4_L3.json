@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail4",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 365,
+    "condition": "cumulative_reading_time >= 365"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear 読者,I'm writing this from my hotel in Paris! The airplane journey was long, but I saw something incredible. During our flight over Russia, I watched the Northern Lights dancing in the dark sky. It was like a magical green curtain moving in the wind. Even the flight attendants were excited!My window seat gave me a perfect view, and I couldn't stop taking pictures. Some other passengers came to my side to watch too. We were all amazed by nature's light show. The pilot even made an announcement about it!Now that I'm in Paris, I can't wait to visit the Eiffel Tower tomorrow. I heard it sparkles at night!Love,ミケ",
+    "japanese": "親愛なる読者へパリのホテルから書いています！飛行機の旅は長かったけど、信じられないものを見たの。ロシア上空を飛んでいる時に、夜空でオーロラが踊っているのを見たの。まるで魔法の緑のカーテンが風に揺れているみたいだった。客室乗務員さんまで興奮していたわ！窓際の席だったから完璧に見えて、写真を撮りまくっちゃった。他の乗客も私の席の方に来て一緒に見ていたの。みんな自然が作り出す光のショーに魅了されていたわ。パイロットさんまでアナウンスしてくれたのよ！パリに着いたところだけど、明日のエッフェル塔訪問が待ちきれない。夜にはキラキラ光るって聞いているの！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 3,
+    "L_advanced": 78,
+    "word_count": 117
+  },
+  "metadata": {
+    "created": "2025-06-28T01:06:15.453Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 365
+  }
+}

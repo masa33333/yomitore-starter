@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail6",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 425,
+    "condition": "cumulative_reading_time >= 425"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to tell you about my amazing discoveries in Paris! Today, I went to the Louvre Museum, and guess what? The Mona Lisa is much smaller than I imagined! But the building itself is incredible - it's like a beautiful palace. The glass pyramid outside looks magical when the sunlight hits it.I spent hours wandering through the galleries, discovering masterpieces around every corner. There were so many tourists from different countries, all speaking different languages. It felt like being at a global art party! The best part was finding a quiet corner with paintings of cats from ancient Egypt.Later, I enjoyed a warm croissant at a charming café near the Seine River. The view of boats passing by was so peaceful. Paris is truly living up to its reputation as the most beautiful city in the world!Love,Mike",
+    "japanese": "親愛なる読者へパリでの素晴らしい発見について、早く伝えたくてウキウキしています！今日、ルーブル美術館に行ってきました。そしてなんと、モナ・リザは想像していたよりもずっと小さかったんです！でも、建物自体は信じられないほど素晴らしく、まるで美しい宮殿のようでした。外のガラスのピラミッドは、日光が当たると魔法のように輝いていました。ギャラリーをあちこち歩き回って、あらゆる角で傑作を発見しながら何時間も過ごしました。世界中から来た観光客がそれぞれ違う言語を話していて、まるで世界規模のアートパーティーにいるような気分でした！一番良かったのは、古代エジプトの猫の絵がある静かな一角を見つけたことです。その後、セーヌ川沿いの魅力的なカフェで温かいクロワッサンを楽しみました。通り過ぎる船を眺める景色はとても穏やかでした。パリは本当に、世界で最も美しい街という評判に恥じない場所です！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 25,
+    "L_plus": 8,
+    "L_advanced": 66,
+    "word_count": 146
+  },
+  "metadata": {
+    "created": "2025-06-28T01:06:37.234Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 425
+  }
+}

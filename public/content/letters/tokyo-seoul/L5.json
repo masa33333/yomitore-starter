@@ -1,0 +1,31 @@
+{
+  "id": "tokyo-seoul-arrival",
+  "type": "letter",
+  "level": "L5",
+  "trigger": {
+    "type": "word_count",
+    "value": 5000,
+    "condition": "cumulative_words >= 5000"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I, Miké, arrived in Seoul after an exciting journey from Tokyo. As a curious cat exploring this vibrant metropolis, I've discovered fascinating cultural treasures that I must share with you.The most striking difference I noticed is how Seoul harmoniously blends contemporary architecture with traditional hanok houses. Unlike Tokyo's compact spaces, Seoul's palaces and temples are surrounded by vast courtyards, perfect for a cat's adventures! The local cats introduced me to hidden alleyways where street food vendors create mesmerizing aromas.Did you know that Seoul's history spans over 2,000 years? I learned from a wise street cat that the city was once protected by massive fortress walls, parts of which still stand today. The ancient gates tell stories of dynasties and brave warriors, while modern K-pop music echoes through the streets.The food culture here intrigues me. While Tokyo's fish markets are my favorite, Seoul's traditional markets offer unique delicacies. I've discovered kimchi, which reminds me of Japanese tsukemono but with a distinctive spicy kick that made my whiskers tingle!Most fascinating is how the locals treat cats differently here. In Tokyo, we're often seen as lucky charms, but here, I'm greeted with curious smiles and gentle scratches behind my ears. The cafe culture is different too – while Tokyo has cat cafes, Seoul's cafes often feature unique themes I've never seen before.Warmest purrs,Miké",
+    "japanese": "親愛なる読者へ私、ミケは、東京から心躍る旅を経てソウルに到着しました。好奇心旺盛な猫として、この活気に満ちた大都市を探検し、発見した魅力的な文化の宝物をあなたと共有したいと思います。最も印象的な違いは、ソウルが現代建築と伝統的な韓屋をいかに調和的に融合させているかです。東京のコンパクトな空間と異なり、ソウルの宮殿や寺院は広大な中庭に囲まれていて、猫の冒険にぴったり！地元の猫たちが、屋台の誘惑的な香りが漂う隠れた路地を案内してくれました。ソウルの歴史が2000年以上にも及ぶことをご存知でしたか？賢い野良猫から、かつての街が巨大な城壁で守られていて、その一部が今でも残っていることを教えてもらいました。古代の門は王朝と勇敢な戦士たちの物語を伝え、現代のK-POP音楽が街中に響き渡っています。ここの食文化も興味深いです。東京の魚市場が大好きな私ですが、ソウルの伝統市場では独特の珍味を発見。キムチは日本の漬物を思い出させますが、私のヒゲがピリッとするような独特の辛さがあります！最も興味深いのは、地元の人々の猫への接し方の違いです。東京では私たち猫は縁起物として見られることが多いですが、ここでは好奇心あふれる笑顔と優しい耳かきで迎えられます。カフェ文化も異なり、東京には猫カフェがありますが、ソウルのカフェは今まで見たことのないようなユニークなテーマで溢れています。温かな鳴き声とともに、ミケより"
+  },
+  "media": {
+    "img": "cat_seoul_arrival.png"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 5,
+    "L_advanced": 72,
+    "word_count": 239
+  },
+  "metadata": {
+    "created": "2025-06-28T00:43:54.650Z",
+    "template_version": "1.0"
+  }
+}

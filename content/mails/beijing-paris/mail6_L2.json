@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail6",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 425,
+    "condition": "cumulative_reading_time >= 425"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I finally arrived in Paris! The last few hours of the flight were so exciting. I could see the Alps covered in snow through the window. They looked like white sugar on a big cake! When we started going down, I saw the city lights of Paris. They were like little stars on the ground.The best part was seeing the Eiffel Tower from the air! It was lit up and looked just like a golden Christmas tree. The French people on the plane started saying 'Ooh la la!' and clapping. I joined them because I was so happy too!Tomorrow I'm going to visit the Eiffel Tower up close. I can't wait!Love,Mike",
+    "japanese": "読者さんへついにパリに到着しました！フライトの最後の数時間がとても楽しかったです。窓からアルプスの雪景色が見えました。まるで大きなケーキに白い砂糖をかけたみたいでした！降下を始めた時、パリの街明かりが見えました。地上に散りばめられた小さな星のようでした。一番良かったのは、空からエッフェル塔が見えたことです！ライトアップされていて、まるで金色のクリスマスツリーのようでした。フランス人の乗客たちが「ウーラーラー！」と言って拍手を始めたので、私も嬉しくて一緒に拍手しちゃいました！明日はエッフェル塔に近くまで行ってみるつもりです。今からわくわくします！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 2,
+    "L_advanced": 76,
+    "word_count": 119
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:01.207Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 425
+  }
+}

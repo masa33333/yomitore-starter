@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail2",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 95,
+    "condition": "cumulative_reading_time >= 95"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited! I'm on the airplane from Seoul to Beijing now. The clouds below look like cotton candy. I just had my first airplane meal - it was fun to eat in the sky! The nice flight attendant gave me extra snacks because I said 'thank you' in Chinese.From my window, I can see mountains and rivers. The pilot said we'll arrive in Beijing in one hour. I can't wait! I heard Beijing has a very big wall and a beautiful palace. I want to try hot pot and dumplings too.Oh, there's a friendly old man sitting next to me. He's teaching me how to say 'hello' and 'goodbye' in Chinese. I'm learning new words!See you soon from Beijing!Love,Mike",
+    "japanese": "読者へとってもワクワクしています！今、ソウルから北京への飛行機の中です。下に見える雲は綿あめみたい。初めての機内食を食べたよ - 空の上で食事するなんて楽しかった！中国語で「ありがとう」と言ったら、親切な客室乗務員さんがおやつをおまけしてくれたんだ。窓から山や川が見えるよ。パイロットが、あと1時間で北京に着くって言ってたの。早く着きたいな！北京にはすっごく長い壁と美しい宮殿があるって聞いたよ。火鍋と餃子も食べてみたいな。あ、隣に座っているやさしいおじいさんが、中国語で「こんにちは」と「さようなら」の言い方を教えてくれてるの。新しい言葉を覚えているところ！北京から、またすぐ連絡するね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 28,
+    "L_plus": 2,
+    "L_advanced": 70,
+    "word_count": 133
+  },
+  "metadata": {
+    "created": "2025-06-28T00:58:30.544Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 95
+  }
+}

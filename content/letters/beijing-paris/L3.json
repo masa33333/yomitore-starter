@@ -1,0 +1,31 @@
+{
+  "id": "beijing-paris-arrival",
+  "type": "letter",
+  "level": "L3",
+  "trigger": {
+    "type": "word_count",
+    "value": 40000,
+    "condition": "cumulative_words >= 40000"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,From the moment I arrived in Paris from Beijing, I knew this city was magical! The streets here are so different from the bustling lanes of Beijing. The first thing that caught my eye was the beautiful Eiffel Tower, standing tall against the blue sky.Did you know that Parisians actually didn't like the Eiffel Tower when it was first built? They thought it was too modern and ugly! But now it's the symbol of Paris, just like how things changed in Beijing's Forbidden City over time.The cats here live differently from those in Beijing. In Paris, many cats sit in café windows, watching people pass by while enjoying the warm sun. The local cats taught me about special spots where you can watch artists paint in Montmartre. They also showed me their favorite cheese shop, though I still prefer fish!What surprises me most is how different the buildings are. While Beijing has wide streets and modern buildings mixed with traditional temples, Paris has narrow cobblestone streets and beautiful old buildings with special iron balconies.I hope you can visit both cities someday and see these wonderful differences yourself!With purrs,Mieke",
+    "japanese": "親愛なる読者へ北京からパリに到着した瞬間から、この街が魔法のような場所だと感じました！ここの通りは、賑やかな北京の路地とはまったく違います。最初に目に飛び込んできたのは、青空に向かってそびえ立つ美しいエッフェル塔でした。パリジャンたちは、最初エッフェル塔を嫌っていたって知っていましたか？当時は現代的すぎて醜いと思われていたんです！でも今ではパリのシンボルになっています。北京の紫禁城も時とともに変化してきたように。ここの猫たちは北京の猫たちとは違う暮らし方をしています。パリでは、多くの猫がカフェの窓辺に座って、暖かい日差しを浴びながら通行人を眺めています。地元の猫たちは、モンマルトルで画家たちが絵を描くのを見られる特別な場所を教えてくれました。お気に入りのチーズ屋さんも紹介してくれましたが、私はやっぱり魚の方が好きです！一番驚いているのは、建物の違いです。北京には広い通りと現代的な建物が伝統的な寺院と混在していますが、パリには石畳の細い通りと、特徴的な鉄製のバルコニーがある美しい古い建物が並んでいます。いつか皆さんもこの二つの街を訪れて、これらの素晴らしい違いを自分の目で見ることができますように！にゃんこの挨拶を添えて、ミケより"
+  },
+  "media": {
+    "img": "cat_paris_arrival.png"
+  },
+  "stats": {
+    "L_core": 27,
+    "L_plus": 5,
+    "L_advanced": 68,
+    "word_count": 199
+  },
+  "metadata": {
+    "created": "2025-06-28T00:46:50.434Z",
+    "template_version": "1.0"
+  }
+}

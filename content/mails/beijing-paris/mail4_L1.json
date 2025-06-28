@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail4",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 365,
+    "condition": "cumulative_reading_time >= 365"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm having so much fun on the plane! I saw a funny cat movie and ate good food. Now we are flying over many small towns. From my window, I can see white clouds and blue sky. It looks like soft cotton candy!The flight attendant gave me extra fish because I am a good cat. She said Paris is full of nice food and pretty places. I want to see the big tower and eat French bread. I heard there are many cats in Paris streets!Only two more hours until Paris! I'm so happy!Love,Mike",
+    "japanese": "親愛なる読者へ飛行機の中がとても楽しいよ！面白い猫の映画を見て、おいしい食事も食べたんだ。今、たくさんの小さな町の上を飛んでいるよ。窓から見える白い雲と青い空が、ふわふわの綿菓子みたい！客室乗務員さんが、私がいい子だからって魚をおまけしてくれたんだ。パリにはおいしい食べ物と素敵な場所がいっぱいあるって教えてくれたよ。大きな塔を見たいし、フランスパンも食べたいな。パリの街には猫がたくさんいるって聞いたんだ！パリまであと2時間！とってもワクワクしてるよ！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 30,
+    "L_plus": 0,
+    "L_advanced": 70,
+    "word_count": 102
+  },
+  "metadata": {
+    "created": "2025-06-28T01:08:50.496Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 365
+  }
+}

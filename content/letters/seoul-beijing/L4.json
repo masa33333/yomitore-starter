@@ -1,0 +1,31 @@
+{
+  "id": "seoul-beijing-arrival",
+  "type": "letter",
+  "level": "L4",
+  "trigger": {
+    "type": "word_count",
+    "value": 20000,
+    "condition": "cumulative_words >= 20000"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm thrilled to write to you from Beijing! The journey from Seoul was quite an adventure. As I walked through the streets of this ancient city, I was immediately struck by the magnificent blend of old and new. The Great Wall stretches like a mighty dragon across the mountains - did you know it's not actually visible from space? That's a common myth!The local cats here told me fascinating stories about the Forbidden City, where imperial cats once lived like royalty. They had their own servants and special dining areas! Speaking of food, the Beijing street markets are a sensory delight. The aroma of Peking duck and dumplings fills the air, though I must admit I still prefer my fish.What surprised me most was discovering that many traditional Beijing homes, called hutongs, have special cat-sized passages built into their walls. These were originally designed to let cats hunt mice that threatened grain storage. How practical!I've made friends with a wise old temple cat who taught me about feng shui and how cats are considered lucky in Chinese culture, though differently from our maneki-neko tradition in Japan. The local cats here move with such grace through the ancient courtyards, as if dancing with centuries of history.Warmest purrs,ミケ",
+    "japanese": "親愛なる読者様へ北京から手紙を書いています！ソウルからの旅は本当に素晴らしい冒険でした。この古都の街を歩いていると、古いものと新しいものが見事に調和している様子に心を打たれました。万里の長城は山々の間を龍のように伸びていますが、実は宇宙から見えないってご存知でしたか？これは有名な都市伝説なんです！地元の猫たちが故宮について面白い話を聞かせてくれました。かつては宮廷猫が王族のように暮らしていて、専属の世話係まで居たそうです！お食事の話といえば、北京の市場は感覚を刺激する楽園です。北京ダックや餃子の香りが漂っていますが、正直私はやっぱりお魚が好きですね。最も驚いたのは、胡同と呼ばれる伝統的な北京の民家に、猫用の通り道が壁に作られていることです。これは穀物倉庫を脅かすネズミを退治するために作られたそうです。なんて実用的なんでしょう！お寺に住む年老いた賢い猫と友達になり、風水や中国での猫の縁起物としての意味を教えてもらいました。日本の招き猫とは違った形です。地元の猫たちは何世紀もの歴史がある中庭を、まるで歴史と踊るように優雅に歩き回っています。温かいご挨拶を添えてミケより"
+  },
+  "media": {
+    "img": "cat_beijing_arrival.png"
+  },
+  "stats": {
+    "L_core": 24,
+    "L_plus": 7,
+    "L_advanced": 69,
+    "word_count": 217
+  },
+  "metadata": {
+    "created": "2025-06-28T00:45:40.328Z",
+    "template_version": "1.0"
+  }
+}

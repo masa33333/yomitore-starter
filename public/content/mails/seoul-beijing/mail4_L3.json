@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail4",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 155,
+    "condition": "cumulative_reading_time >= 155"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I have incredible news! While I was exploring Beijing today, I discovered a mysterious hidden alleyway called a 'hutong'. The narrow streets were filled with the most wonderful sights and smells. Local residents were practicing tai chi in a small courtyard, and the aroma of steamed dumplings filled the air.An elderly lady invited me into her traditional courtyard house for tea. Despite our language barrier, we shared stories through gestures and smiles. She showed me her collection of vintage photographs of old Beijing - it was fascinating to see how the city has transformed!Later, I found a charming little shop selling handmade paper cuttings. The intricate designs were mesmerizing. The shopkeeper taught me the basic techniques, and I'm sending you a small dragon cutting I made as a souvenir!With excitement,Mike",
+    "japanese": "親愛なる読者へ今日、北京を探検していて、素晴らしい発見がありました！「胡同（フートン）」と呼ばれる隠れた路地を見つけたんです。細い通りには、驚くような光景と香りが溢れていました。地元の人々が小さな中庭で太極拳を練習していて、蒸し餃子の香りが漂っていました。おばあさんが、お茶を飲みに伝統的な中庭のある家に招いてくれました。言葉は通じなかったけれど、ジェスチャーと笑顔で会話を楽しみました。古い北京の写真コレクションを見せてもらって、街の変遷を見るのはとても興味深かったです！その後、手作りの切り絵を売っている素敵な小さな店を見つけました。繊細なデザインに魅了されてしまいました。店主に基本的な技法を教えてもらい、私が作った小さな龍の切り絵をお土産として送ります！わくわくしながら、ミケより"
+  },
+  "stats": {
+    "L_core": 16,
+    "L_plus": 4,
+    "L_advanced": 80,
+    "word_count": 136
+  },
+  "metadata": {
+    "created": "2025-06-28T01:00:14.926Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 155
+  }
+}

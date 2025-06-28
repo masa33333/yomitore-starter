@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail3",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 335,
+    "condition": "cumulative_reading_time >= 335"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I can't believe what just happened on the plane! The flight attendant found a little mouse trying to sneak into the first-class cabin. Everyone was so surprised, but I helped catch it because, you know, I'm a cat! The crew gave me extra fish for dinner as a reward.The sunset view from 30,000 feet was breathtaking. The clouds turned pink and orange, like a giant cotton candy ocean. Through the window, I saw the snowy peaks of mountains and vast deserts.Paris is only two hours away now. I'm so excited to see the Eiffel Tower at night! The French passengers told me about a famous cat café near Montmartre. I can't wait to meet local Parisian cats and taste French cheese.Purrs and whiskers,Mike",
+    "japanese": "親愛なる読者へ飛行機の中で信じられないことが起きたの！ファーストクラスの客室に小さなネズミが忍び込もうとしているのを客室乗務員が見つけたの。みんなびっくりしていたけど、私が猫だから捕まえるのを手伝ったわ！お礼にクルーが夕食に魚を余分にくれたの。高度30,000フィートからの夕日がとても綺麗だった。雲がピンクやオレンジ色に染まって、巨大なわたあめの海みたい。窓からは雪をかぶった山々や広大な砂漠が見えたわ。パリまであと2時間！夜のエッフェル塔が見られるなんて、わくわくする！フランス人の乗客が、モンマルトルの近くに有名な猫カフェがあるって教えてくれたの。パリの猫たちに会えることや、フランスチーズを味わうのが待ちきれないわ。ゴロゴロと尻尾フリフリ、ミケより"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 2,
+    "L_advanced": 76,
+    "word_count": 133
+  },
+  "metadata": {
+    "created": "2025-06-28T01:04:42.913Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 335
+  }
+}

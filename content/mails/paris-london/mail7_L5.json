@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail7",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 665,
+    "condition": "cumulative_reading_time >= 665"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I've just had the most extraordinary day exploring the historic Tower of London! The atmosphere here is absolutely mesmerizing - imagine centuries of royal history surrounding you at every turn. The legendary Crown Jewels left me completely spellbound; they sparkle with such magnificent brilliance that I couldn't take my eyes off them.The most fascinating part was meeting the famous ravens. Did you know there must always be at least six ravens at the Tower? According to legend, if they ever leave, the kingdom will fall. The ravens are surprisingly intelligent and quite cheeky - one of them tried to steal my sandwich during lunch!The Yeoman Warders (Beefeaters) shared such captivating stories about the Tower's mysterious past. Every stone seems to whisper tales of intrigue and drama. I even participated in a twilight tour, which was absolutely spine-tingling!Purrs and whiskers,Mike",
+    "japanese": "親愛なる読者へ今日はロンドン塔を探検して、本当に素晴らしい1日を過ごしました！あらゆる場所で何世紀もの王室の歴史に囲まれる雰囲気は、まさに魅惑的です。伝説的なクラウンジュエルには完全に魅了されてしまいました。あまりにも華麗な輝きを放っているので、目が離せませんでした。最も興味深かったのは、有名なカラスたちとの出会いです。ロンドン塔には常に最低6羽のカラスがいなければならないって知っていましたか？伝説によると、もしカラスたちがいなくなれば、王国が滅びるのだそうです。カラスたちは驚くほど賢くてちょっとずうずうしいんです - 昼食の時に1羽が私のサンドイッチを盗もうとしたんですよ！衛兵（ビーフイーター）たちは、塔の神秘的な過去について、とても魅力的な話を聞かせてくれました。どの石も陰謀とドラマの物語を囁いているようです。夕暮れ時のツアーにも参加したのですが、本当にぞくぞくするような体験でした！ご機嫌な猫のミケより"
+  },
+  "stats": {
+    "L_core": 22,
+    "L_plus": 1,
+    "L_advanced": 77,
+    "word_count": 147
+  },
+  "metadata": {
+    "created": "2025-06-28T01:10:36.865Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 665
+  }
+}

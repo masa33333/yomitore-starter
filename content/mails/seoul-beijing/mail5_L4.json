@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail5",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 185,
+    "condition": "cumulative_reading_time >= 185"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I've made an incredible discovery in Beijing! The ancient Temple of Heaven is even more magnificent than I imagined. Walking through its massive grounds, I witnessed elderly locals practicing tai chi in perfect harmony. Some of them invited me to join their morning exercises, and despite being a cat, I managed to follow their graceful movements!The temple's architecture is simply breathtaking. The intricate designs and vibrant colors tell stories from centuries ago. I learned that emperors used to pray here for good harvests. Today, I saw traditional musicians performing in the park – their melodies transported me back in time.Tonight, I'm heading to the famous night market. I heard they have special dumplings filled with unexpected ingredients. Can't wait to try them!Best whiskers,Mike",
+    "japanese": "読者さんへ北京で素晴らしい発見をしました！天壇公園が想像以上に壮大でした。広大な敷地を歩いていると、地元のお年寄りたちが見事な調和を保ちながら太極拳を練習していました。朝の運動に誘っていただき、猫の私でも何とか優雅な動きについていけました！寺院の建築美には息を呑みました。精緻な意匠と鮮やかな色彩が、何世紀も前からの物語を語り継いでいます。かつては皇帝がここで豊作を祈っていたと知りました。今日は公園で伝統音楽の演奏を聴き、まるで時間旅行をしたような気分でした。今夜は有名な夜市に行く予定です。予想外の具材が入った特別な餃子があるそうで、とても楽しみです！ヒゲの挨拶とともに、ミケより"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 8,
+    "L_advanced": 72,
+    "word_count": 132
+  },
+  "metadata": {
+    "created": "2025-06-28T01:01:53.875Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 185
+  }
+}

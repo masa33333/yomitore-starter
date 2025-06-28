@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail5",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 395,
+    "condition": "cumulative_reading_time >= 395"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I've discovered something truly wonderful in France! While exploring the countryside near Paris, I encountered a charming vineyard where local farmers have been cultivating grapes for generations. The elderly vineyard owner, Marcel, invited me to join their annual grape harvest festival.The atmosphere was magical - people singing traditional French songs, children running through the vines, and everyone working together to collect the ripe grapes. They even taught me how to properly pick and sort them! The best part was the celebratory feast afterward, where we enjoyed homemade bread, cheese, and fresh grape juice under the setting sun.Next week, Marcel's family is taking me to visit some historic wine cellars. I can't wait to learn more about French wine culture!Warmly,Mike",
+    "japanese": "親愛なる読者へフランスで本当に素晴らしい発見をしました！パリ近郊を探索していた時、地元の農家が何世代にもわたってブドウを栽培している魅力的なワイナリーに出会いました。年配のワイナリーのオーナー、マルセルさんが、年に一度のブドウ収穫祭に誘ってくれたんです。雰囲気は魔法のようでした - 人々が伝統的なフランスの歌を歌い、子どもたちがブドウ畑を走り回り、みんなで協力して熟したブドウを収穫していました。ブドウの正しい摘み方と選別の仕方まで教えてもらいました！一番良かったのは、その後のお祝いの宴です。沈みゆく太陽の下で、手作りパンやチーズ、新鮮なブドウジュースを楽しみました。来週は、マルセルさんの家族が歴史あるワインセラーに連れて行ってくれるそうです。フランスのワイン文化についてもっと学べるのが待ちきれません！温かい気持ちを込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 5,
+    "L_advanced": 76,
+    "word_count": 127
+  },
+  "metadata": {
+    "created": "2025-06-28T01:05:05.695Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 395
+  }
+}

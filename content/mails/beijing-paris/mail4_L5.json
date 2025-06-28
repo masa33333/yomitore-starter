@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail4",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 365,
+    "condition": "cumulative_reading_time >= 365"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,What an incredible afternoon in Paris! I've finally arrived at my luxurious hotel near the Champs-Élysées. The journey from Beijing was absolutely fascinating. During the flight, I encountered a charming French chef who shared captivating stories about Parisian cuisine and offered expert recommendations for authentic local restaurants.From my hotel window, I can see the magnificent Eiffel Tower illuminated against the twilight sky. The architectural grandeur of this city is simply breathtaking. Tomorrow, I'm planning to explore the historic Louvre Museum and indulge in some exquisite French pastries at a renowned pâtisserie.The concierge just informed me about a delightful evening boat cruise along the Seine River. I can hardly contain my excitement about experiencing the City of Light from the water!With joy,Mike",
+    "japanese": "親愛なる読者へパリでの素晴らしい午後をお届けします！ようやくシャンゼリゼ通り近くの高級ホテルに到着しました。北京からの旅は本当に魅力的でした。機内では、パリの料理について興味深い話を聞かせてくれ、地元のおすすめレストランを教えてくれたフランス人シェフと出会いました。ホテルの窓からは、夕暮れの空に浮かぶ壮大なエッフェル塔が見えます。この街の建築の素晴らしさには息を呑むばかりです。明日は歴史あるルーブル美術館を訪れ、有名なパティスリーで極上のフランス菓子を堪能する予定です。コンシェルジュがセーヌ川でのイブニングクルーズを教えてくれました。水上から光の都を体験できることが、今からとても楽しみです！喜びを込めてミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 6,
+    "L_advanced": 75,
+    "word_count": 132
+  },
+  "metadata": {
+    "created": "2025-06-28T01:03:25.600Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 365
+  }
+}

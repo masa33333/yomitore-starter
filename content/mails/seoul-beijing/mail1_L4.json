@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail1",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 65,
+    "condition": "cumulative_reading_time >= 65"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from the plane between Seoul and Beijing! The flight attendant just gave me a special fish-shaped cookie because I'm a cat. How nice! Through the window, I can see white clouds that look like cotton candy floating below us. Looking at my guidebook, I can't wait to visit the Great Wall. They say it's so long that it would take months to walk the whole thing! I'm also looking forward to trying Beijing duck - I heard it's crispy and wonderful. The local cats told me about a night market where they sell interesting street food.I'll send you more stories when I land in Beijing! Everyone on the plane is so friendly, especially the children who keep waving at me.Best wishes,Mike",
+    "japanese": "読者さんへソウルから北京への飛行機の中から、わくわくしながら手紙を書いています！猫の私だからという理由で、客室乗務員さんが魚の形の特別なクッキーをくれたんです。なんて親切なんでしょう！窓の外には、綿あめみたいな白い雲が下の方を漂っているのが見えます。ガイドブックを見ていると、万里の長城に早く行きたくてたまりません。全部歩くのに何ヶ月もかかるほど長いんですって！それに北京ダックも楽しみです - パリパリで美味しいって聞きました。現地の猫たちが、面白い屋台料理を売っている夜市場のことを教えてくれました。北京に着いたら、また色々なお話を送りますね！機内のみんなが親切で、特に子供たちが私に手を振ってくれるんです。よろしく、ミケより"
+  },
+  "stats": {
+    "L_core": 26,
+    "L_plus": 6,
+    "L_advanced": 68,
+    "word_count": 140
+  },
+  "metadata": {
+    "created": "2025-06-28T01:01:06.723Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 65
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail2",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 95,
+    "condition": "cumulative_reading_time >= 95"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm on the plane to Beijing! The sky looks so pretty from up here. I can see many white clouds under us. I just had my first airplane lunch - it was good! The chicken and rice came in a small box.My seat neighbor is a nice old lady who gave me some candy. She told me Beijing has a very big wall that you can see from space! I want to go there and take many pictures.The pilot just said we will land in 30 minutes. I can't wait to see Beijing! I hear they have good food and nice parks. I will write more when I get there.Love,Mike",
+    "japanese": "親愛なる読者へ北京行きの飛行機の中だよ！上空からの景色がとてもきれい。私たちの下には白い雲がたくさん見えるんだ。初めての機内食を食べたところ - おいしかったよ！チキンとご飯が小さな箱に入っていたんだ。隣の席のおばあさんがとても親切で、キャンディをくれたの。おばあさんが教えてくれたんだけど、北京には宇宙からも見える大きな壁があるんだって！そこに行って、たくさん写真を撮りたいな。パイロットが今、あと30分で着陸すると言ったよ。早く北京が見たい！おいしい食べ物とすてきな公園があるって聞いてるんだ。着いたらまた書くね。愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 35,
+    "L_plus": 0,
+    "L_advanced": 65,
+    "word_count": 116
+  },
+  "metadata": {
+    "created": "2025-06-28T00:57:17.871Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 95
+  }
+}

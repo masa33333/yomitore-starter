@@ -1,0 +1,31 @@
+{
+  "id": "london-newyork-arrival",
+  "type": "letter",
+  "level": "L3",
+  "trigger": {
+    "type": "word_count",
+    "value": 90000,
+    "condition": "cumulative_words >= 90000"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm Miké, and I've just arrived in New York from London! The first thing that caught my eye was how different the buildings are here. While London has many historical buildings with classical architecture, New York's skyscrapers seem to touch the clouds! One fascinating thing I learned is that New York's famous subway system was built in 1904, and it runs 24 hours a day. That's quite different from London's Underground, which closes at night. I was surprised to see so many cats living in the local bookstores - they're like the store guardians!The food culture here is incredibly diverse. Yesterday, I tried something called a 'hot dog' from a street vendor. In London, cats usually get fish and chips, but here, there are so many different food smells mixing in the streets. The pizza is especially good!People here walk much faster than in London, and everyone seems to be in a hurry. But they're very friendly - a kind lady even gave me some treats when I was exploring Central Park.If you ever get the chance to travel, don't hesitate! Every city has its own special charm and stories to tell.Warmly,Miké",
+    "japanese": "親愛なる読者へロンドンからニューヨークに到着したミケです！最初に目に付いたのは、建物の違いでした。ロンドンには歴史的な古典建築が多いのですが、ニューヨークの超高層ビルは雲に届きそうなほど高いんです！面白い発見なのですが、ニューヨークの有名な地下鉄は1904年に作られ、24時間運行しているそうです。夜に閉まるロンドンの地下鉄とは大違いですね。地元の本屋さんには多くの猫が住んでいて、お店の守り神のようになっているのも驚きでした！食文化もとても多様です。昨日、道端の屋台で「ホットドッグ」というものを食べてみました。ロンドンではフィッシュ・アンド・チップスが定番ですが、こちらは通りにさまざまな食べ物の香りが混ざっています。特にピザがおいしいですよ！こちらの人々はロンドンより早足で、みんな急いでいるように見えます。でも、とても親切で、セントラルパークを探検していた時には、優しい女性がおやつをくれたんです。旅行する機会があったら、ためらわずに行ってみてください！それぞれの街には、独自の魅力とストーリーがあるんですよ。心を込めて、ミケより"
+  },
+  "media": {
+    "img": "cat_newyork_arrival.png"
+  },
+  "stats": {
+    "L_core": 36,
+    "L_plus": 2,
+    "L_advanced": 61,
+    "word_count": 204
+  },
+  "metadata": {
+    "created": "2025-06-28T00:49:36.310Z",
+    "template_version": "1.0"
+  }
+}

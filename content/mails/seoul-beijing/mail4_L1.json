@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail4",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 155,
+    "condition": "cumulative_reading_time >= 155"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so happy! The plane is landing in Beijing soon. From my window, I can see big mountains and lots of green fields. The sky is very blue and beautiful today.On the plane, I met a nice old man. He told me many good things about Beijing. He says the food is very good, and there are many big old buildings to see. I want to try the special duck food he told me about.The plane has nice food too. I got fish and rice. It was good! Many people on the plane are going to see the Great Wall. I want to go there too! I can't wait to walk in Beijing's streets and see new things.Love,Mike",
+    "japanese": "読者へとってもうれしいの！もうすぐ北京に着陸するわ。窓から見える景色は、大きな山々と緑の野原がたくさん広がっているの。今日の空はとてもきれいな青色よ。機内で素敵なおじいさんに会ったの。北京のいいところをたくさん教えてくれたわ。おいしい食べ物がたくさんあって、大きな古い建物もたくさんあるって。特に教えてもらったアヒル料理を食べてみたいわ。飛行機の機内食もおいしかったの。魚とご飯が出たわ。とてもおいしかった！乗客の多くの人が万里の長城に行くみたい。私も行きたいわ！北京の街を歩いて、新しいものをたくさん見るのが待ちきれないわ。愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 35,
+    "L_plus": 2,
+    "L_advanced": 64,
+    "word_count": 127
+  },
+  "metadata": {
+    "created": "2025-06-28T00:57:38.588Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 155
+  }
+}

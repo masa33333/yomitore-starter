@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail1",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 5,
+    "condition": "cumulative_reading_time >= 5"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I can't believe I'm finally on my way to Seoul! The flight from Tokyo has been absolutely fascinating. Looking down from 35,000 feet, I watched as the shimmering lights of Tokyo gradually disappeared beneath a blanket of clouds. The flight attendant just served me this intriguing Korean-style bibimbap, and I must say, the presentation is spectacular.There's such a wonderful mix of passengers around me – families chatting excitedly, business travelers typing away on laptops, and even a K-pop group (I think!) a few rows ahead. The anticipation is building as we get closer to Seoul. I've heard so much about the vibrant street markets, the magnificent palaces, and the incredible night views from Namsan Tower.Can't wait to share more adventures with you!Best wishes,Mike",
+    "japanese": "親愛なる読者へついに私はソウルへ向かっています！東京からのフライトは本当に素晴らしい体験です。高度35,000フィートから眺めると、東京のきらめく光が雲の下に徐々に消えていくのを見ることができました。先ほど客室乗務員が韓国風のビビンバを出してくれたのですが、その盛り付けが見事でした。周りの乗客がとても興味深い構成なんです – 楽しそうに会話する家族連れ、ノートパソコンで仕事をするビジネスマン、そして（たぶん！）K-POPグループらしき人たちが数列前にいます。ソウルに近づくにつれてワクワクが増していきます。活気のある市場や壮大な宮殿、南山タワーからの素晴らしい夜景について、たくさん聞いていたので楽しみです。もっとたくさんの冒険を共有できるのが待ちきれません！よろしく、ミケより"
+  },
+  "stats": {
+    "L_core": 21,
+    "L_plus": 4,
+    "L_advanced": 75,
+    "word_count": 134
+  },
+  "metadata": {
+    "created": "2025-06-28T00:14:27.694Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 5
+  }
+}

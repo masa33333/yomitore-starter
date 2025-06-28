@@ -1,0 +1,31 @@
+{
+  "id": "paris-london-arrival",
+  "type": "letter",
+  "level": "L5",
+  "trigger": {
+    "type": "word_count",
+    "value": 65000,
+    "condition": "cumulative_words >= 65000"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,I'm thrilled to share my enchanting journey from Paris to London! As I crossed the English Channel through the Chunnel, my whiskers tingled with anticipation. The transformation from continental elegance to British grandeur was absolutely mesmerizing.London's architectural tapestry immediately captivated me – the harmonious blend of Victorian splendor and modern marvels like The Shard. Did you know that many of London's historic pubs have resident cats who serve as official 'Chief Mousers'? Speaking of which, I had the honor of meeting Larry, the Chief Mouser at 10 Downing Street. He shared fascinating tales about the secret passages beneath Westminster!The cultural contrasts with Paris are striking. While Parisian cats lounge in chic cafés, London's felines patrol majestic gardens and ancient courtyards. I've discovered that afternoon tea isn't just a tradition – it's an art form. The delicate balance of sweet and savory treats reminds me of Japanese kaiseki, though with distinctly British characteristics.Most surprisingly, I found myself embracing the unpredictable London weather. There's something magical about how the city transforms after rain, with cobblestones glistening under gas lamps and fog creating mysterious silhouettes of historic buildings.Keep exploring and learning, dear Reader. Every city has its own rhythm and secrets waiting to be discovered.Warmest purrs,Mike",
+    "japanese": "親愛なる読者へパリからロンドンへの魅惑的な旅の様子をお伝えしたいと思います！ユーロトンネルを通って英仏海峡を渡る時、私のヒゲは期待で震えていました。大陸的な優雅さからブリティッシュな荘厳さへの変化は、まさに目を見張るものでした。ロンドンの建築の織りなす風景に、私はすぐに魅了されました – ビクトリア朝の壮麗さと、ザ・シャードのような現代建築が見事に調和しているのです。ロンドンの歴史ある多くのパブには「首席ネズミ捕り」として正式に任命された猫がいることをご存知でしたか？実は、私はダウニング街10番地の首席ネズミ捕りのラリーに会う栄誉に恵まれ、ウェストミンスター地下の秘密の通路についての興味深い話を聞かせてもらいました！パリとの文化の違いは際立っています。パリの猫たちがシックなカフェでくつろぐ一方、ロンドンの猫たちは荘厳な庭園や古い中庭をパトロールしています。アフタヌーンティーは単なる伝統ではなく、芸術なのだと発見しました。甘いものと塩味の絶妙なバランスは、英国らしい特徴を持ちながらも日本の懐石料理を思い起こさせます。最も驚いたのは、変わりやすいロンドンの天気を受け入れるようになったことです。雨上がりの街は、ガス灯に照らされた石畳が輝き、霧が歴史的建造物の神秘的なシルエットを作り出す、何か魔法のような雰囲気があるのです。親愛なる読者の皆さん、探検と学びを続けてください。どの街にも、独自のリズムと発見を待つ秘密があるのですから。温かな挨拶を添えて、ミケより"
+  },
+  "media": {
+    "img": "cat_london_arrival.png"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 2,
+    "L_advanced": 78,
+    "word_count": 217
+  },
+  "metadata": {
+    "created": "2025-06-28T00:48:44.468Z",
+    "template_version": "1.0"
+  }
+}

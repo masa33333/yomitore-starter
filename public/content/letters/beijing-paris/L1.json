@@ -1,0 +1,31 @@
+{
+  "id": "beijing-paris-arrival",
+  "type": "letter",
+  "level": "L1",
+  "trigger": {
+    "type": "word_count",
+    "value": 40000,
+    "condition": "cumulative_words >= 40000"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I am Miké, and I just arrived in Paris from Beijing! The city is so different. The buildings are tall and white, and there are many small streets. In Paris, I see many cats like me sitting by the windows. They look out at the people walking by. The French cats told me that in old times, cats were very important here. They helped keep the city clean from mice!The food here is very good. I found a nice fish shop near my new home. The fish man gives me small pieces every morning. In Beijing, I ate different food, but here the fish is so fresh.I saw the big tower called Eiffel Tower. It is very tall! At night, it has many lights. I like to walk in the gardens near it. Many birds live there, and I watch them.The people here walk slowly and sit at small cafes for a long time. In Beijing, everyone walked fast. I think I will like my new life here.Come visit Paris one day!Love,Miké",
+    "japanese": "親愛なる読者へ私はミケです。BeijingからParisに到着したところです！この街はとても違います。建物は白くて高く、小さな通りがたくさんあります。Parisでは、私のような猫たちが窓辺に座っているのをよく見かけます。通り過ぎる人々を眺めているのです。フランスの猫たちが教えてくれたのですが、昔はここで猫はとても大切にされていたそうです。街をネズミから守る手助けをしていたからです！ここの食べ物はとてもおいしいです。新しい家の近くに素敵な魚屋さんを見つけました。魚屋さんは毎朝小さな切れ端をくれます。Beijingでは違う食べ物を食べていましたが、ここの魚はとても新鮮です。エッフェル塔という大きな塔を見ました。とても高いです！夜になるとたくさんの明かりが灯ります。私は近くの公園を歩くのが好きです。たくさんの鳥が住んでいて、それを眺めています。ここの人々はゆっくり歩き、小さなカフェで長い時間座っています。Beijingではみんな早足でした。きっとここでの新しい生活が気に入ると思います。いつかParisに来てくださいね！愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_paris_arrival.png"
+  },
+  "stats": {
+    "L_core": 37,
+    "L_plus": 1,
+    "L_advanced": 62,
+    "word_count": 180
+  },
+  "metadata": {
+    "created": "2025-06-28T00:46:24.215Z",
+    "template_version": "1.0"
+  }
+}

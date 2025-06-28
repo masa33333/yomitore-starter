@@ -1,7 +1,8 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
-import { vocabularyData } from "@/data/vocabularyData"; // ← NGSL Lv1-7 が入った TS
+// 旧vocabularyDataは使用せず、新しいNGSLシステムを使用
 import { getAllowedWords, analyzeVocabulary } from "@/constants/ngslData";
+import { findForbiddenWords } from "@/constants/forbiddenWords";
 import { getPromptTemplate } from "@/constants/promptTemplates";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -86,6 +87,10 @@ export async function POST(req: Request) {
       // NGSLテンプレートを使用
       const promptTemplate = getPromptTemplate(level);
       
+      // 許可語彙リストを取得
+      const allowedWords = getAllowedWords(level);
+      const vocabularyConstraint = allowedWords.slice(0, 50).join(', '); // 最初の50語を例として提示
+      
       userPrompt = `${promptTemplate}
 
 Story Requirements:
@@ -94,7 +99,9 @@ Story Requirements:
 - Conflict or situation: ${situation}
 - Emotional effect at the end: ${emotion}
 
-CRITICAL: Only use vocabulary from NGSL Level 1-${level * 500} range. Every word must comply with the vocabulary constraints above.
+CRITICAL VOCABULARY CONSTRAINT: Only use Level ${level} vocabulary and below. 
+Example allowed words: ${vocabularyConstraint}...
+ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply with NGSL Level 1-${level} classification.
 
 Output format:
 【英語】
@@ -106,21 +113,20 @@ Output format:
 
     } else {
       // 読み物用プロンプト（既存の処理）
-      const { theme, subTopic, style } = requestData;
+      const { theme, topic, subTopic, style } = requestData;
+
+      // topicをthemeとして使用（フロントエンドからtopicで送信される）
+      const actualTheme = theme || topic;
+      const actualStyle = style || '専門家がやさしく説明'; // デフォルトスタイル
 
       // バリデーション
-      if (!theme || theme.trim() === '') {
-        console.log('❌ theme が空です:', theme);
+      if (!actualTheme || actualTheme.trim() === '') {
+        console.log('❌ theme/topic が空です:', { theme, topic });
         return NextResponse.json({ error: 'テーマが指定されていません' }, { status: 400 });
       }
 
-      if (!style || style.trim() === '') {
-        console.log('❌ style が空です:', style);
-        return NextResponse.json({ error: 'スタイルが指定されていません' }, { status: 400 });
-      }
-
       let styleInstruction = '';
-      switch (style) {
+      switch (actualStyle) {
         case '専門家がやさしく説明':
           styleInstruction = 'Write in an expert tone but make it accessible and easy to understand. Use clear, simple explanations while maintaining authority and accuracy.';
           break;
@@ -137,12 +143,18 @@ Output format:
       // NGSLテンプレートを使用
       const promptTemplate = getPromptTemplate(level);
       
+      // 許可語彙リストを取得
+      const allowedWords = getAllowedWords(level);
+      const vocabularyConstraint = allowedWords.slice(0, 50).join(', '); // 最初の50語を例として提示
+      
       userPrompt = `${promptTemplate}
 
-Topic: ${theme}${subTopic ? ` (focus: ${subTopic})` : ""}
+Topic: ${actualTheme}${subTopic ? ` (focus: ${subTopic})` : ""}
 Style: ${styleInstruction}
 
-CRITICAL: Only use NGSL Level 1-${level <= 3 ? 1500 : level * 500} vocabulary. Every word must comply with vocabulary constraints above.
+CRITICAL VOCABULARY CONSTRAINT: Only use Level ${level} vocabulary and below.
+Example allowed words: ${vocabularyConstraint}...
+ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply with NGSL Level 1-${level} classification.
 
 Requirements:
 - Structure: 3-4 paragraphs with logical development
@@ -165,10 +177,21 @@ Japanese translation 3
     console.log('📤 【GPT-3.5-turbo】送信するプロンプト:', userPrompt.substring(0, 200) + '...');
     console.log('🤖 【モデル情報】使用モデル: gpt-3.5-turbo, max_tokens: 2000');
 
+    // Level別システムメッセージ
+    let systemMessage = "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. Do not include any labels or headers. COUNT YOUR WORDS before finishing - you must reach at least 220 words.";
+    
+    if (level <= 3) {
+      systemMessage = `CRITICAL: You are writing for 10-year-old children. You MUST use ONLY the simplest English words. Any word longer than 5 letters is FORBIDDEN (except: people, mother, father, sister, brother, family, house, water, today). Use only words that appear in beginner children's books. Write exactly 140-200 words in 3 paragraphs. EVERY word must be simple and basic.`;
+    } else if (level === 4) {
+      systemMessage = `You are writing for intermediate English learners (B2 level). CRITICAL: You MUST write exactly 200-240 words. COUNT your words carefully - you must reach at least 200 words. Write in at least 3 paragraphs. Include complex sentence structures and intermediate vocabulary. Do not include any labels or headers. WORD COUNT IS CRITICAL.`;
+    } else if (level >= 5) {
+      systemMessage = `You are writing for advanced English learners (C1+ level). CRITICAL: You MUST write exactly 240-280 words. COUNT your words carefully - you must reach at least 240 words. Write in at least 3 paragraphs. Use sophisticated vocabulary, complex sentence structures, nuanced expressions, and varied sentence patterns. Do not include any labels or headers. WORD COUNT IS CRITICAL.`;
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. Do not include any labels or headers. COUNT YOUR WORDS before finishing - you must reach at least 220 words." },
+        { role: "system", content: systemMessage },
         { role: "user",    content: userPrompt }
       ],
       temperature: 0.7,
@@ -250,18 +273,67 @@ Japanese translation 3
       }
     }
     
-    // 語数チェック
+    // レベル別語数チェック
     if (eng) {
       const wordCount = countWords(eng);
       console.log('📊 生成された語数:', wordCount);
-      if (wordCount < 220) {
-        console.error('❌ 語数不足:', wordCount, '< 220語');
-        console.error('❌ 要求: 220-260語, 実際:', wordCount, '語');
-        console.error('❌ 不足分:', 220 - wordCount, '語');
-      } else if (wordCount > 260) {
-        console.warn('⚠️ 語数超過:', wordCount, '> 260語');
+      
+      let minWords, maxWords, targetRange;
+      if (level <= 3) {
+        minWords = 140;
+        maxWords = 200;
+        targetRange = '140-200語';
+      } else if (level === 4) {
+        minWords = 200;
+        maxWords = 240;
+        targetRange = '200-240語';
       } else {
-        console.log('✅ 語数適正:', wordCount, '語 (220-260語範囲内)');
+        minWords = 240;
+        maxWords = 280;
+        targetRange = '240-280語';
+      }
+      
+      if (wordCount < minWords) {
+        console.error(`❌ 語数不足: ${wordCount} < ${minWords}語`);
+        console.error(`❌ 要求: ${targetRange}, 実際: ${wordCount}語`);
+        console.error(`❌ 不足分: ${minWords - wordCount}語`);
+      } else if (wordCount > maxWords) {
+        console.warn(`⚠️ 語数超過: ${wordCount} > ${maxWords}語`);
+      } else {
+        console.log(`✅ 語数適正: ${wordCount}語 (${targetRange}範囲内)`);
+      }
+      
+      // 🆕 語彙レベル分析
+      const vocabAnalysis = analyzeVocabulary(eng);
+      console.log('📚 語彙レベル分析 (Level:', level, '):', {
+        総語数: vocabAnalysis.totalWords,
+        'Level 1': `${vocabAnalysis.levelCounts[1]}語 (${vocabAnalysis.percentages[1]}%)`,
+        'Level 2': `${vocabAnalysis.levelCounts[2]}語 (${vocabAnalysis.percentages[2]}%)`,
+        'Level 3': `${vocabAnalysis.levelCounts[3]}語 (${vocabAnalysis.percentages[3]}%)`,
+        'Level 4': `${vocabAnalysis.levelCounts[4]}語 (${vocabAnalysis.percentages[4]}%)`,
+        'Level 5': `${vocabAnalysis.levelCounts[5]}語 (${vocabAnalysis.percentages[5]}%)`
+      });
+      
+      // レベル適合性チェック
+      if (level <= 3) {
+        const hasLevel4Plus = vocabAnalysis.percentages[4] > 0 || vocabAnalysis.percentages[5] > 0;
+        if (hasLevel4Plus) {
+          console.error(`❌ Level ${level} 違反: Level 4/5語彙が含まれています`, {
+            'Level 4': vocabAnalysis.percentages[4] + '%',
+            'Level 5': vocabAnalysis.percentages[5] + '%'
+          });
+        } else {
+          console.log(`✅ Level ${level} 適合: 上位レベル語彙なし`);
+        }
+        
+        // 🆕 禁止語彙チェック
+        const forbiddenWords = findForbiddenWords(eng, level);
+        if (forbiddenWords.length > 0) {
+          console.error(`❌ Level ${level} 禁止語彙検出:`, forbiddenWords);
+          console.error(`   禁止語彙数: ${forbiddenWords.length}個`);
+        } else {
+          console.log(`✅ Level ${level} 禁止語彙チェック: クリア`);
+        }
       }
     }
 

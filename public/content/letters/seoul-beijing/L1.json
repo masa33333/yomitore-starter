@@ -1,0 +1,31 @@
+{
+  "id": "seoul-beijing-arrival",
+  "type": "letter",
+  "level": "L1",
+  "trigger": {
+    "type": "word_count",
+    "value": 20000,
+    "condition": "cumulative_words >= 20000"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm Miké, writing from Beijing! After a long flight from Seoul, I finally arrived in this big city. The streets are very different from Seoul. Many people ride bikes here, and the roads are wide.When I went to the Forbidden City, I saw many red walls and gold roofs. It was so big! A nice old man told me that cats were very important in old China. They kept the royal books safe from mice. That made me feel good!The food here is new to me. I tried Peking duck - it was very good! People eat with chopsticks like in Seoul, but the food is not spicy like Korean food.At night, I saw people dancing in the park. Many old and young people were there. They looked happy. In Seoul, I did not see this.I miss Seoul's fish cakes, but Beijing is fun too. I hope you can come here one day!Love,Miké",
+    "japanese": "親愛なる読者へミケです。北京から手紙を書いています！ソウルからの長いフライトを終えて、やっとこの大きな街に着きました。街並みはソウルとはとても違います。自転車に乗っている人がたくさんいて、道路も広いんです。故宮に行ったとき、赤い壁と金色の屋根をたくさん見ました。とても大きかったです！親切なおじいさんが、昔の中国では猫がとても大切にされていたと教えてくれました。私たち猫は王室の本を鼠から守っていたんですって。それを聞いて、とても誇らしく感じました！ここの食べ物は私にとって新しいものばかり。北京ダックを食べてみたけど、とてもおいしかったです！ソウルと同じように箸を使って食べるけど、韓国料理のように辛くないんです。夜には公園で人々が踊っているのを見ました。お年寄りも若い人もたくさんいて、みんな楽しそうでした。ソウルではこんな光景は見られませんでした。ソウルのおでんが恋しいけど、北京も楽しいところです。あなたもいつか来られることを願っています！愛をこめて、ミケより"
+  },
+  "media": {
+    "img": "cat_beijing_arrival.png"
+  },
+  "stats": {
+    "L_core": 35,
+    "L_plus": 0,
+    "L_advanced": 65,
+    "word_count": 162
+  },
+  "metadata": {
+    "created": "2025-06-28T00:45:00.515Z",
+    "template_version": "1.0"
+  }
+}

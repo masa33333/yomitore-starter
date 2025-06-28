@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail3",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 125,
+    "condition": "cumulative_reading_time >= 125"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm thrilled to share my latest adventure! We've just landed in Beijing after an incredible flight. From the airplane window, I witnessed the most spectacular sunset I've ever seen - the sky transformed into a canvas of crimson and gold above the endless sea of clouds.During the flight, I befriended a local professor who shared fascinating stories about Beijing's hidden gems. He told me about secret alleyways called 'hutongs' where traditional life still thrives, and ancient teahouses where master storytellers captivate audiences with legendary tales.The anticipation is building as we approach the city center. Through the taxi window, I can already see the magnificent architecture blending modern sophistication with historical grandeur. The street food aromas wafting through the air are absolutely intoxicating!Tomorrow, I'm planning to explore the Forbidden City and climb the Great Wall. Can you believe it? This adventure is already exceeding my wildest expectations!With excitement,Mike",
+    "japanese": "親愛なる読者へ最新の冒険について、わくわくしながらお伝えします！素晴らしいフライトを経て、たった今北京に到着しました。機窓からは、今まで見た中で最も壮大な夕陽を目撃しました - 空は果てしない雲海の上で、深紅と金色のキャンバスへと変化していきました。フライト中、地元の教授と仲良くなり、北京の隠れた魅力について興味深い話を聞かせてもらいました。伝統的な生活が今も息づく「フートン」と呼ばれる秘密の路地や、語り部の達人が伝説的な物語で観客を魅了する古き良き茶館について教えてくれました。市内中心部に近づくにつれ、期待が高まっています。タクシーの窓から、現代的な洗練さと歴史的な荘厳さが調和した見事な建築物が既に見えています。街中に漂う屋台の香りが、本当に心をそそります！明日は紫禁城を探索して、万里の長城に登る予定です。信じられますか？この冒険は、既に私の想像をはるかに超えています！わくわくしながら、ミケより"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 7,
+    "L_advanced": 73,
+    "word_count": 158
+  },
+  "metadata": {
+    "created": "2025-06-28T00:55:23.295Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 125
+  }
+}

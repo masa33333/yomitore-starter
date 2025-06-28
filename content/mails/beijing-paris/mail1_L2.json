@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail1",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 275,
+    "condition": "cumulative_reading_time >= 275"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited! I'm on the plane from Beijing to Paris right now. The view from my window is amazing - I can see big white clouds below us like soft cotton candy. The plane is very high in the sky!I just had my first airplane meal. It was different from what I eat at home, but good! The nice flight attendant gave me extra bread because I said 'please' in French.I can't wait to see the Eiffel Tower! My friend told me it lights up at night like stars. I want to eat French bread and cheese too. Paris must be such a nice city!I will write to you again soon!Love,Mike",
+    "japanese": "読者さんへとってもわくわくしています！今、北京からパリへ向かう飛行機の中なんです。窓からの眺めが素晴らしくて - 真っ白な雲が綿あめみたいに下に広がっているのが見えます。飛行機はとっても高く飛んでいます！初めての機内食を食べたところです。いつも家で食べているものとは違いましたが、美味しかったですよ！フランス語で「お願いします」と言ったら、優しい客室乗務員さんがパンをおまけにくれました。エッフェル塔を早く見たいです！友達が「夜になると星みたいにライトアップされるんだよ」って教えてくれました。フランスのパンとチーズも食べてみたいな。パリはきっとすてきな街なんでしょうね！またすぐに手紙を書きますね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 31,
+    "L_plus": 1,
+    "L_advanced": 69,
+    "word_count": 121
+  },
+  "metadata": {
+    "created": "2025-06-28T01:07:11.213Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 275
+  }
+}

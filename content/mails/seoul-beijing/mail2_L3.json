@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail2",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 95,
+    "condition": "cumulative_reading_time >= 95"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to tell you about my flight to Beijing! The plane is amazing - it's a huge double-decker, and I'm sitting by the window on the upper floor. From up here, the clouds look like giant cotton candy! The flight attendant just served me some special Chinese-style dim sum, which smells wonderful. I made friends with a Chinese student sitting next to me who showed me pictures of the Great Wall and the Forbidden City. She told me fascinating stories about these places, and I can't wait to see them myself. Did you know that the Great Wall is so long it would stretch from Tokyo to Seoul?The pilot just announced we're starting our descent into Beijing. The city looks enormous from above - like a glittering sea of lights spreading in every direction!Best wishes,Mike",
+    "japanese": "読者さんへ北京への飛行機からワクワクするお知らせです！この飛行機は2階建ての大きな機体で、私は上の階の窓際の席に座っています。ここからの雲の眺めは、まるで巨大な綿あめのよう！客室乗務員が中国風の点心を運んできてくれたのですが、とても良い香りがしています。隣の席の中国人留学生と仲良くなって、万里の長城や紫禁城の写真を見せてもらいました。それらの場所についての魅力的な話を聞かせてもらい、早く実物が見たくてたまりません。万里の長城は東京からソウルまでの距離ほどの長さがあるって知っていましたか？パイロットが今、北京への着陸態勢に入ると案内がありました。上空から見る街は、あらゆる方向に広がる光の海のように広大です！では、またミケより"
+  },
+  "stats": {
+    "L_core": 29,
+    "L_plus": 2,
+    "L_advanced": 69,
+    "word_count": 147
+  },
+  "metadata": {
+    "created": "2025-06-28T00:59:54.363Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 95
+  }
+}

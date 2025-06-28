@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail1",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 275,
+    "condition": "cumulative_reading_time >= 275"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from my flight to Paris! The journey from Beijing has been incredible. Right now, I'm gazing through the window at an endless carpet of white clouds stretching beneath the golden sunset. The flight attendants keep bringing me special cat-friendly treats, and there's even a friendly French family sitting next to me whose little girl loves cats.Have you ever been to Paris? I've heard such wonderful stories about the Eiffel Tower lighting up at night and the charming cafés along the Seine River. I can't wait to explore the hidden alleyways of Montmartre and maybe even catch a glimpse of those famous Parisian cats lounging in window sills!My whiskers are tingling with anticipation for tomorrow's adventures!Love,Mike",
+    "japanese": "親愛なる読者へパリへの機内から興奮気味にメールを書いています！北京からの旅は素晴らしいものになっています。今、窓の外を見ると、黄金色の夕陽の下に白い雲の絨毯が果てしなく広がっているんです。客室乗務員さんは猫用の特別なおやつを持ってきてくれるし、隣には猫好きな女の子がいるフランス人家族が座っているんですよ。パリに行ったことはありますか？夜にライトアップされるエッフェル塔や、セーヌ川沿いの素敵なカフェについて、たくさんの素晴らしい話を聞いています。モンマルトルの隠れた路地を探検したり、窓辺でくつろぐパリの有名な猫たちを見かけたりできるのが待ちきれません！明日の冒険が待ち遠しくて、ヒゲがピクピクしています！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 22,
+    "L_plus": 6,
+    "L_advanced": 72,
+    "word_count": 136
+  },
+  "metadata": {
+    "created": "2025-06-28T01:02:49.131Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 275
+  }
+}

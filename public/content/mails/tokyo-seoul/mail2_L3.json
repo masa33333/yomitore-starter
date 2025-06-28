@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail2",
+  "type": "mail",
+  "level": "L3",
+  "trigger": {
+    "type": "reading_time",
+    "value": 35,
+    "condition": "cumulative_reading_time >= 35"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I can't believe I'm on the airplane right now! The flight attendant just brought me some tasty fish snacks, and guess what? There's a cute Korean child sitting next to me who keeps showing me pictures of their pet cat back home. How wonderful!Looking through the window, I saw fluffy white clouds that looked like cotton candy. The pilot said we're flying over Jeju Island now - my first glimpse of Korea! I'm getting more excited about visiting Seoul's famous night markets and trying Korean street food.I heard there's a beautiful palace called Gyeongbokgung where I can wear traditional Korean clothes. Can't wait to send you photos! Also, many cats told me about this place called Hongdae where young people hang out. Sounds purrfect for me!See you soon with more adventures,Mike",
+    "japanese": "読者様へ今、飛行機の中にいるなんて信じられません！客室乗務員さんが美味しいお魚のスナックを持ってきてくれたんです。そうそう、隣の席に可愛らしい韓国の子供が座っていて、故郷で飼っている猫の写真を見せてくれるんですよ。素敵でしょう！窓の外を見ると、綿菓子みたいなふわふわの白い雲が見えました。パイロットが今は済州島の上空を飛んでいると言っていて、韓国の最初の景色を見られました！ソウルの有名な夜市場に行って、韓国の屋台料理を試すのが待ちきれません。景福宮という美しい宮殿があって、そこで韓国の伝統衣装が着られるって聞きました。写真を送るのが楽しみ！それに、若者が集まる弘大という場所のことを他の猫たちから聞いていたんです。私にはぴったりな場所みたい！もっとたくさんの冒険をお知らせしますね。ミケより"
+  },
+  "stats": {
+    "L_core": 27,
+    "L_plus": 4,
+    "L_advanced": 69,
+    "word_count": 144
+  },
+  "metadata": {
+    "created": "2025-06-28T00:14:56.128Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 35
+  }
+}

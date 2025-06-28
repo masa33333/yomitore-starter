@@ -1,0 +1,31 @@
+{
+  "id": "london-newyork-arrival",
+  "type": "letter",
+  "level": "L4",
+  "trigger": {
+    "type": "word_count",
+    "value": 90000,
+    "condition": "cumulative_words >= 90000"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I'm thrilled to share my incredible journey from London to New York! The moment I stepped out of JFK Airport, I was overwhelmed by the sheer magnitude of this concrete jungle. The towering skyscrapers of Manhattan stretch endlessly into the sky, making London's buildings seem modest in comparison.Did you know that New York's subway system has over 850 miles of track? That's longer than the distance between London and Berlin! Speaking of transportation, I was fascinated to learn that the city's iconic yellow taxis got their color in 1967 to make them more visible and prevent unlicensed cabs.The cultural differences here are striking. While London cats enjoy peaceful garden naps, New York cats are true urban adventurers. We perch on fire escapes and watch the bustling streets below. The food scene is extraordinary - I've discovered something called a 'pizza rat,' which has become an internet sensation!Yesterday, I made friends with a local cat named Broadway Bob, who showed me around Times Square. The bright lights and giant billboards make it feel like daytime even at midnight! He told me about secret rooftop spots where cats gather to watch sunset over the Hudson River.Keep exploring and learning, dear reader. Every city has its own magic waiting to be discovered.Warmest purrs,Mike",
+    "japanese": "親愛なる読者様へロンドンからニューヨークまでの素晴らしい旅の様子をお伝えしたいと思います！JFK空港を出た瞬間、このコンクリートジャングルの規模に圧倒されました。マンハッタンの超高層ビル群は空へと無限に伸び、ロンドンの建物が控えめに感じるほどです。ニューヨークの地下鉄システムは850マイル以上の線路があるのをご存知ですか？これはロンドンからベルリンまでの距離よりも長いんです！交通といえば、あの象徴的な黄色いタクシーは1967年に、無許可のタクシーと区別しやすいように、この色に決められたと知って興味深く思いました。文化の違いは際立っています。ロンドンの猫たちが穏やかな庭で昼寝を楽しむ一方、ニューヨークの猫たちは真の都会の冒険家です。私たちは非常階段に腰掛けて、下の賑やかな通りを眺めます。食文化も素晴らしく、'ピザラット'という、インターネットで話題の現象まで発見しました！昨日は、ブロードウェイ・ボブという地元の猫と友達になり、タイムズスクエアを案内してもらいました。明るい照明と巨大な看板のおかげで、真夜中でも昼間のように感じるんです！彼は、猫たちがハドソン川に沈む夕日を眺める秘密の屋上スポットも教えてくれました。親愛なる読者の皆様、探検と学びを続けてください。どの街にも、発見を待つ独自の魔法があるのですから。温かい声で挨拶を送ります。ミケより"
+  },
+  "media": {
+    "img": "cat_newyork_arrival.png"
+  },
+  "stats": {
+    "L_core": 23,
+    "L_plus": 3,
+    "L_advanced": 74,
+    "word_count": 221
+  },
+  "metadata": {
+    "created": "2025-06-28T00:49:51.636Z",
+    "template_version": "1.0"
+  }
+}

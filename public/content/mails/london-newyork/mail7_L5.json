@@ -1,0 +1,30 @@
+{
+  "id": "london-newyork-mail7",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 875,
+    "condition": "cumulative_reading_time >= 875"
+  },
+  "route": {
+    "from": "london",
+    "to": "newyork"
+  },
+  "content": {
+    "english": "Dear Reader,I just had the most incredible experience at Times Square! The energy here is unlike anything I've encountered in London. The towering skyscrapers are adorned with massive digital billboards, creating a mesmerizing spectacle of light and color that transforms night into day. I was particularly captivated by the street performers - there was an extraordinary saxophone player whose melodies seemed to dance with the city's pulse.I also discovered this fascinating underground jazz club in Harlem. The authenticity of the music and the warmth of the local community completely drew me in. The legendary bassist I met shared stories about New York's rich jazz heritage that left me spellbound.Your wandering friend,Mike",
+    "japanese": "親愛なる読者へタイムズスクエアで最高の体験をしたところです！ここのエネルギーは、ロンドンで経験したどんなものとも違います。超高層ビルには巨大なデジタル広告が飾られていて、夜を昼に変えるような魅惑的な光と色のスペクタクルを作り出しています。特に印象的だったのはストリートパフォーマーたち。サックス奏者の演奏する音色が、街の鼓動と一体となって踊っているようでした。ハーレムで見つけた地下のジャズクラブも素晴らしかったです。本物の音楽と地元コミュニティの温かさに完全に魅了されてしまいました。そこで出会った伝説的なベーシストが語ってくれたニューヨークのジャズの歴史に、すっかり心を奪われてしまいました。放浪の友よりミケ"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 5,
+    "L_advanced": 75,
+    "word_count": 117
+  },
+  "metadata": {
+    "created": "2025-06-28T01:12:11.627Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 875
+  }
+}

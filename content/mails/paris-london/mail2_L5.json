@@ -1,0 +1,30 @@
+{
+  "id": "paris-london-mail2",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 515,
+    "condition": "cumulative_reading_time >= 515"
+  },
+  "route": {
+    "from": "paris",
+    "to": "london"
+  },
+  "content": {
+    "english": "Dear Reader,The Eurostar journey from Paris to London has been absolutely extraordinary! I'm currently gliding through the picturesque French countryside at phenomenal speeds. The transition through the Channel Tunnel was particularly fascinating - imagine traveling under the sea! I've befriended a charming British family in my carriage. Their delightful stories about London's hidden gems have heightened my anticipation. They've shared insider tips about the best spots for afternoon tea and secret gardens that tourists rarely discover.The landscape outside is transforming dramatically as we approach England. The French vineyards have given way to rolling green hills dotted with sheep. Through my window, I can spot ancient churches and quaint villages that look like they're straight out of a storybook.Can't wait to share more adventures!Best whiskers,Mike",
+    "japanese": "親愛なる読者へパリからロンドンへのユーロスター列車の旅が、本当に素晴らしいものになっています！今、フランスの絵のような田園風景の中を、信じられないスピードで走っています。特に英仏海峡トンネルの通過は驚きの連続でした - 海の下を走るなんて、想像してみてください！同じ車両で出会ったイギリス人家族と仲良くなりました。彼らが教えてくれたロンドンの隠れた名所の話に、どんどんワクワクしてきています。観光客があまり知らない最高のアフタヌーンティーの場所や、秘密の庭園についても教えてもらいました。イギリスに近づくにつれて、車窓の景色が劇的に変化しています。フランスのブドウ畑は、羊が点在するなだらかな緑の丘に変わりました。窓からは、まるで絵本から飛び出してきたような古い教会や、のどかな村々が見えます。もっとたくさんの冒険を共有できるのが待ちきれません！ヒゲの挨拶を添えてミケより"
+  },
+  "stats": {
+    "L_core": 19,
+    "L_plus": 2,
+    "L_advanced": 78,
+    "word_count": 134
+  },
+  "metadata": {
+    "created": "2025-06-28T01:09:35.977Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 515
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail1",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 65,
+    "condition": "cumulative_reading_time >= 65"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,  I'm on the plane from Seoul to Beijing! The sky is so blue, and I can see white clouds from my window. The plane is very big, and many people are here.   I just had some good food on the plane. The nice lady gave me fish and rice. It was good!   I can't wait to see Beijing! I want to see the big wall and eat new food. People say Beijing has many good things to eat. I also want to meet new friends there.  The plane will land soon. I'm so happy!  Love,  Mike",
+    "japanese": "読者へ  ソウルから北京行きの飛行機の中だよ！空がとても青くて、窓から白い雲が見えるんだ。飛行機はとても大きくて、たくさんの人がいるよ。  さっき機内食を食べたんだ。優しい客室乗務員さんが魚とご飯をくれたよ。とてもおいしかった！  早く北京に着きたいな！万里の長城を見たいし、新しい食べ物も試してみたいんだ。北京にはおいしいものがたくさんあるって聞いているよ。新しい友達も作りたいな。  もうすぐ着陸だ。とてもワクワクしているよ！  愛をこめて、  ミケより"
+  },
+  "stats": {
+    "L_core": 37,
+    "L_plus": 0,
+    "L_advanced": 63,
+    "word_count": 101
+  },
+  "metadata": {
+    "created": "2025-06-28T00:57:08.576Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 65
+  }
+}

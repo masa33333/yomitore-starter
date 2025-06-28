@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail5",
+  "type": "mail",
+  "level": "L2",
+  "trigger": {
+    "type": "reading_time",
+    "value": 185,
+    "condition": "cumulative_reading_time >= 185"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,Today is amazing! I went to the Great Wall! The wall is so huge and goes on forever through the mountains. I walked up many steps and saw beautiful views. At one point, I met a nice family who shared their snacks with me. Chinese people are so friendly!The ancient stones tell many stories. I imagined old soldiers walking here long ago. The air is fresh up high, and I could see far into the distance. Some parts were steep, but I climbed them all!I took many photos to share with you. Tomorrow, I'll visit the Forbidden City. I heard it's full of secrets and interesting history.Miss you!Love,Mike",
+    "japanese": "親愛なる読者へ今日は最高の1日でした！万里の長城に行ってきました！長城はとても巨大で、山々の間をどこまでも続いています。たくさんの階段を上って、美しい景色を見ました。途中で親切な家族に出会い、おやつを分けてもらいました。中国の人たちはとても親切です！古い石壁には多くの物語が刻まれています。昔の兵士たちがここを歩いていた様子を想像しました。高いところは空気が新鮮で、遠くまで見渡すことができました。急な場所もありましたが、全部登りきりました！たくさん写真を撮ったので、シェアしますね。明日は紫禁城に行く予定です。秘密や面白い歴史がたくさんあると聞いています。会いたいです！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 27,
+    "L_plus": 4,
+    "L_advanced": 68,
+    "word_count": 117
+  },
+  "metadata": {
+    "created": "2025-06-28T00:59:01.585Z",
+    "template_version": "1.0",
+    "mail_number": 5,
+    "reading_time": 185
+  }
+}

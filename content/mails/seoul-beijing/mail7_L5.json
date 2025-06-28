@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail7",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 245,
+    "condition": "cumulative_reading_time >= 245"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear 読者,I've discovered something incredible at the Great Wall! After climbing countless stairs, I stumbled upon a hidden chamber that local guides rarely mention. Inside, ancient inscriptions covered the walls, telling stories of soldiers who once guarded this magnificent structure. The most fascinating part was finding a centuries-old merchant's diary, perfectly preserved in a stone alcove!The archaeologist I met there, Professor Chen, explained that similar chambers exist throughout the wall's length. He's dedicated 20 years to uncovering these secrets! We spent hours discussing theories about hidden passages and underground tunnels that might connect different sections.Tomorrow, I'm joining his research team for a special expedition. Can you believe they've detected unusual thermal signatures suggesting more undiscovered chambers?Adventure awaits!Best whiskers,ミケ",
+    "japanese": "親愛なる読者へ万里の長城で信じられないような発見をしました！数え切れない階段を登った後、地元のガイドでもめったに触れない隠し部屋を見つけたんです。中には、かつてこの壮大な建造物を守っていた兵士たちの物語を伝える古代の碑文が壁一面に。最も驚いたのは、石のアルコーブに完璧な状態で保存されていた何世紀も前の商人の日記を見つけたことです！そこで出会った考古学者のチン教授によると、同じような部屋が長城全体に存在するそうです。彼は20年もの間これらの秘密を解き明かすことに人生を捧げているんです！私たちは長城の異なる区間をつなぐかもしれない隠し通路や地下トンネルについての理論を何時間も議論しました。明日は、教授の研究チームの特別調査に参加することになりました。まだ発見されていない部屋の存在を示す不思議な熱の痕跡が検出されているんですよ。信じられます？冒険が待っています！キャット・ウィスカーよりミケ"
+  },
+  "stats": {
+    "L_core": 15,
+    "L_plus": 5,
+    "L_advanced": 80,
+    "word_count": 128
+  },
+  "metadata": {
+    "created": "2025-06-28T00:56:14.993Z",
+    "template_version": "1.0",
+    "mail_number": 7,
+    "reading_time": 245
+  }
+}

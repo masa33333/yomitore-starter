@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail6",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 425,
+    "condition": "cumulative_reading_time >= 425"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,I'm writing this email while enjoying an incredible view from my private suite at the Ritz-Carlton in Paris! The journey from Beijing concluded with an extraordinary surprise - I was unexpectedly upgraded to first class! The flight attendant mentioned they had never transported such a distinguished feline passenger before.The aerial view of Paris during landing was absolutely breathtaking. The iconic Eiffel Tower pierced through the golden sunset clouds, creating a magical silhouette against the crimson sky. I've already scheduled a private photography session near the Seine River tomorrow morning.The hotel concierge has arranged exclusive reservations at several Michelin-starred restaurants. Can you believe they're preparing special gourmet cat meals just for me? The chef even promised to create a unique fusion dish combining French cuisine with traditional cat food elements!With elegant purrs,Miké",
+    "japanese": "親愛なる読者へパリのリッツ・カールトンの専用スイートから素晴らしい眺めを楽しみながら、このメールを書いています！北京からの旅は、思いがけない素敵なサプライズで締めくくられました - なんと突然ファーストクラスにアップグレードされたのです！客室乗務員は、これほど気品のある猫のお客様を運んだのは初めてだとおっしゃっていました。着陸時のパリの空からの眺めは、息をのむほど美しかったです。エッフェル塔が黄金色の夕暮れの雲を突き抜け、真紅の空に魔法のようなシルエットを描いていました。明日の朝にはもうセーヌ川近くでプライベート撮影会の予約をしています。ホテルのコンシェルジュが、ミシュランの星付きレストランでの特別予約をいくつか手配してくれました。私のために特別なグルメキャットミールを用意してくれるなんて、信じられますか？シェフは、フランス料理と伝統的なキャットフードの要素を組み合わせたユニークなフュージョン料理も作ってくれるそうです！優雅な喉を鳴らしながら、ミケより"
+  },
+  "stats": {
+    "L_core": 16,
+    "L_plus": 4,
+    "L_advanced": 80,
+    "word_count": 141
+  },
+  "metadata": {
+    "created": "2025-06-28T01:03:51.930Z",
+    "template_version": "1.0",
+    "mail_number": 6,
+    "reading_time": 425
+  }
+}

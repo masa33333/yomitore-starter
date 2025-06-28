@@ -1,0 +1,30 @@
+{
+  "id": "beijing-paris-mail4",
+  "type": "mail",
+  "level": "L4",
+  "trigger": {
+    "type": "reading_time",
+    "value": 365,
+    "condition": "cumulative_reading_time >= 365"
+  },
+  "route": {
+    "from": "beijing",
+    "to": "paris"
+  },
+  "content": {
+    "english": "Dear Reader,The flight attendant just brought me something special - a French-style breakfast! She noticed I was reading a Paris guidebook and surprised me with fresh croissants and café au lait. I can already feel the Parisian atmosphere! Through the window, I saw the majestic Alps covered in snow. The sight was breathtaking! Some passengers were taking photos, but I was too mesmerized to reach for my camera. I've started practicing basic French phrases with a friendly passenger sitting next to me. She's a professional chef heading to Paris for a culinary workshop. We exchanged recipes and travel stories for hours!Paris is getting closer, and I can hardly contain my excitement about visiting the Louvre and Montmartre. I've heard the sunset view from Sacré-Cœur is unforgettable.Best wishes,Mike",
+    "japanese": "読者様へ客室乗務員が特別なものを持ってきてくれたんです - フランス風の朝食です！私がパリのガイドブックを読んでいるのを見て、焼きたてのクロワッサンとカフェオレでサプライズしてくれました。もうパリの雰囲気を感じています！機窓からは、雪に覆われた壮大なアルプスが見えました。息をのむような光景でした！他の乗客は写真を撮っていましたが、私はあまりの感動にカメラを取り出すことすら忘れていました。隣の席の親切な乗客と一緒に、基本的なフランス語のフレーズを練習し始めました。彼女は料理のワークショップのためにパリへ向かう料理人で、何時間も一緒にレシピや旅の話で盛り上がりました！パリまであと少し。ルーブル美術館やモンマルトルへの訪問が待ちきれません。サクレクール寺院からの夕日の眺めは忘れられないと聞いています。どうぞよろしく、ミケより"
+  },
+  "stats": {
+    "L_core": 17,
+    "L_plus": 1,
+    "L_advanced": 82,
+    "word_count": 136
+  },
+  "metadata": {
+    "created": "2025-06-28T01:04:54.524Z",
+    "template_version": "1.0",
+    "mail_number": 4,
+    "reading_time": 365
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "tokyo-seoul-mail2",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 35,
+    "condition": "cumulative_reading_time >= 35"
+  },
+  "route": {
+    "from": "tokyo",
+    "to": "seoul"
+  },
+  "content": {
+    "english": "Dear Reader,I am on the airplane now! The view from my window is so pretty. I can see white clouds below us, and they look like soft cotton candy. The blue sky is so big and clear.The food on the plane was good. I got fish and rice. A nice lady next to me gave me some snacks too. She is also going to Seoul to see her friends.I can't wait to get to Seoul! I want to try Korean food and see the big city. The lady told me about a tall tower where you can see all of Seoul. I want to go there!I will write to you again when I get to Seoul!Love,Mike",
+    "japanese": "読者へ今、飛行機の中にいます！窓からの眺めがとてもきれいです。下には白い雲が見えて、まるでふわふわの綿あめみたい。青い空がとても広くて、澄んでいます。機内食はおいしかったです。魚とご飯が出ました。隣に座っているやさしい女性が、おやつもくれました。彼女も友達に会いにソウルへ行くそうです。早くソウルに着きたいです！韓国料理を食べてみたいし、大きな街も見てみたいです。その女性が、ソウル全体が見渡せる高いタワーのことを教えてくれました。そこに行ってみたいです！ソウルに着いたらまた書きますね！愛をこめて、ミケより"
+  },
+  "stats": {
+    "L_core": 36,
+    "L_plus": 0,
+    "L_advanced": 64,
+    "word_count": 123
+  },
+  "metadata": {
+    "created": "2025-06-28T00:14:36.525Z",
+    "template_version": "1.0",
+    "mail_number": 2,
+    "reading_time": 35
+  }
+}

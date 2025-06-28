@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail3",
+  "type": "mail",
+  "level": "L1",
+  "trigger": {
+    "type": "reading_time",
+    "value": 125,
+    "condition": "cumulative_reading_time >= 125"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,Guess what! I just arrived in Beijing! The flight from Seoul was fun. I saw white clouds under the plane, like big cotton balls. A nice lady gave me a tasty fish meal on the plane. Now I'm in my hotel room. It's very big! From my window, I can see tall buildings and many red lanterns. Tomorrow, I want to go to the Great Wall. People say it's so long you can't see the end!I also want to try Beijing duck. The smell of food from the street makes me hungry. Oh, and I saw some pandas on TV in my room. I hope I can see real ones!Best wishes,Mike",
+    "japanese": "読者様へ何と！北京に着いたところです！ソウルからの飛行機は楽しかったです。飛行機の下に見えた白い雲は、大きな綿菓子みたいでした。親切な客室乗務員さんが、おいしい魚の機内食をくれました。今はホテルの部屋にいます。とても広いんです！窓からは高いビルがたくさん見えて、赤い提灯もいっぱいあります。明日は万里の長城に行きたいです。とても長くて、終わりが見えないんだって！それから北京ダックも食べてみたいです。通りから漂ってくる食べ物の匂いでお腹が空いてきました。あ、部屋のテレビでパンダを見ました。本物に会えたらいいなあ！では、またミケより"
+  },
+  "stats": {
+    "L_core": 31,
+    "L_plus": 1,
+    "L_advanced": 68,
+    "word_count": 120
+  },
+  "metadata": {
+    "created": "2025-06-28T00:57:27.854Z",
+    "template_version": "1.0",
+    "mail_number": 3,
+    "reading_time": 125
+  }
+}

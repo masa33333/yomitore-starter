@@ -1,0 +1,30 @@
+{
+  "id": "seoul-beijing-mail1",
+  "type": "mail",
+  "level": "L5",
+  "trigger": {
+    "type": "reading_time",
+    "value": 65,
+    "condition": "cumulative_reading_time >= 65"
+  },
+  "route": {
+    "from": "seoul",
+    "to": "beijing"
+  },
+  "content": {
+    "english": "Dear Reader,I'm so excited to write to you from my flight between Seoul and Beijing! The journey has been absolutely incredible. Right now, I'm gazing through my window at an endless sea of fluffy clouds stretching across the horizon. It's like floating through a magical cotton candy kingdom!The flight attendants are incredibly attentive, and I've just enjoyed a delightful in-flight meal featuring both Korean and Chinese fusion dishes. The passenger next to me, a friendly Chinese businessman, shared fascinating stories about Beijing's hidden gems and recommended some amazing spots I must visit.I can hardly contain my excitement about exploring the Great Wall, discovering traditional hutongs, and experiencing the vibrant street food scene. I've heard the Peking duck is absolutely divine, and I can't wait to try it at a century-old restaurant my seatmate suggested.The pilot just announced we're beginning our descent. Beijing, here I come!Warmest regards,Mike",
+    "japanese": "読者様へソウルから北京への空の旅から、わくわくしながらメールを書いています！この旅は本当に素晴らしいものになっています。今、窓の外には地平線まで広がるふわふわした雲の海が見えています。まるで魔法のようなコットンキャンディーの王国を漂っているみたい！客室乗務員の方々がとても親切で、先ほど韓国と中国のフュージョン料理を取り入れた機内食を楽しみました。隣の席の親切な中国人ビジネスマンが、北京の隠れた名所について魅力的な話を聞かせてくれて、素敵なスポットをいくつも教えてくれました。万里の長城を探検したり、伝統的な胡同を発見したり、活気に満ちた屋台グルメを体験するのが、今からとても楽しみです。北京ダックは絶品だと聞いていて、隣席の方が勧めてくれた創業100年の老舗で食べるのが待ちきれません。機長が降下開始のアナウンスをしました。北京、今行きます！心を込めて、ミケより"
+  },
+  "stats": {
+    "L_core": 20,
+    "L_plus": 5,
+    "L_advanced": 75,
+    "word_count": 162
+  },
+  "metadata": {
+    "created": "2025-06-28T00:55:00.254Z",
+    "template_version": "1.0",
+    "mail_number": 1,
+    "reading_time": 65
+  }
+}
