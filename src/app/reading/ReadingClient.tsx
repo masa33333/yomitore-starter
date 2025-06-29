@@ -637,12 +637,45 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               <h3 className="font-semibold mb-3 text-[#1E1E1E]">読書完了！</h3>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
+                  <p className="text-sm text-gray-600">語数</p>
+                  <p className="text-lg font-bold">{wordCount} 語</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">読書時間</p>
+                  <p className="text-lg font-bold">
+                    {startTime && endTime ? 
+                      `${Math.floor((endTime - startTime) / 60000)}分${Math.floor(((endTime - startTime) % 60000) / 1000)}秒` : 
+                      '計測なし'
+                    }
+                  </p>
+                </div>
+                <div>
                   <p className="text-sm text-gray-600">読書速度</p>
                   <p className="text-lg font-bold">{wpm} WPM</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">語数</p>
-                  <p className="text-lg font-bold">{wordCount} 語</p>
+                  <p className="text-sm text-gray-600">合計読書時間</p>
+                  <p className="text-lg font-bold">
+                    {(() => {
+                      const totalReadingTime = parseInt(localStorage.getItem('totalReadingTime') || '0', 10);
+                      const currentSessionTime = startTime && endTime ? (endTime - startTime) : 0;
+                      const newTotalTime = totalReadingTime + currentSessionTime;
+                      
+                      // 新しい合計時間をlocalStorageに保存
+                      if (currentSessionTime > 0) {
+                        localStorage.setItem('totalReadingTime', newTotalTime.toString());
+                      }
+                      
+                      const hours = Math.floor(newTotalTime / 3600000);
+                      const minutes = Math.floor((newTotalTime % 3600000) / 60000);
+                      
+                      if (hours > 0) {
+                        return `${hours}時間${minutes}分`;
+                      } else {
+                        return `${minutes}分`;
+                      }
+                    })()}
+                  </p>
                 </div>
               </div>
               

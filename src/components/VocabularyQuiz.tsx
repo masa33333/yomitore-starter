@@ -26,6 +26,8 @@ export function VocabularyQuiz() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [finished, setFinished] = useState(false);
   const [finalLevel, setFinalLevel] = useState<number | null>(null);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   // 語彙レベルをCEFRレベルに変換
   const mapToCEFRLevel = (vocabLevel: number): 'A1' | 'A2' | 'B1' | 'B2' => {
@@ -48,6 +50,7 @@ export function VocabularyQuiz() {
       localStorage.setItem('vocabularyLevel', stableLevel.toString());
       localStorage.setItem('vocabLevel', stableLevel.toString());
       localStorage.setItem('userLevel', cefrLevel); // CEFR レベルを保存
+      localStorage.setItem('quizCompleted', 'true'); // クイズ完了フラグ
       
       // 開発用: レベル履歴をコンソールに出力
       console.log('レベル変化履歴:', testState.levelHistory);
@@ -144,15 +147,26 @@ export function VocabularyQuiz() {
     }));
   };
 
+  // クライアントサイド確認
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // 初回実行のためのuseEffect
   useEffect(() => {
-    try {
-      generateNextQuestion();
-    } catch (error) {
-      console.error('初期問題生成エラー:', error);
-      finishTest();
+    if (!showInstructions && isClient) {
+      try {
+        generateNextQuestion();
+      } catch (error) {
+        console.error('初期問題生成エラー:', error);
+        finishTest();
+      }
     }
-  }, []);
+  }, [showInstructions, isClient]);
+
+  const handleStartQuiz = () => {
+    setShowInstructions(false);
+  };
 
   
 
@@ -214,7 +228,11 @@ export function VocabularyQuiz() {
     }
   };
 
-  if (!currentQuestion && !finished) {
+  if (!isClient) {
+    return <p className="text-center">読み込み中...</p>;
+  }
+
+  if (!currentQuestion && !finished && !showInstructions) {
     return <p className="text-center">問題を準備中...</p>;
   }
 
@@ -251,6 +269,71 @@ export function VocabularyQuiz() {
     );
   }
 
+  // 説明表示中
+  if (showInstructions) {
+    return (
+      <div className="relative">
+        {/* 背景のクイズ画面をぼやかす */}
+        <div className="max-w-2xl mx-auto p-4 blur-sm">
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-semibold">
+                適応型語彙テスト (1 / 15)
+              </h2>
+              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                レベル 5
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: "6.67%" }}
+              />
+            </div>
+          </div>
+          
+          <div className="bg-white border rounded-lg p-6 mb-4">
+            <p className="mb-2 text-sm text-gray-600">この単語の意味は？</p>
+            <p className="mb-6 text-2xl font-bold text-center">sample</p>
+            
+            <div className="grid gap-3">
+              {['選択肢1', '選択肢2', '選択肢3', '選択肢4'].map((option, idx) => (
+                <button
+                  key={idx}
+                  className="px-4 py-3 rounded-lg border bg-white border-gray-300"
+                  disabled
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="text-center text-sm text-gray-500">
+            正解すると難易度が上がり、不正解だと下がります
+          </div>
+        </div>
+
+        {/* 説明ポップアップ */}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4 text-center">
+            <h3 className="text-2xl font-bold mb-6 text-gray-800">語彙レベル判定</h3>
+            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+              これから15問の単語の問題を出します。<br/>
+              表示された単語の意味としてふさわしいものを選択肢から選んでください。
+            </p>
+            <button
+              onClick={handleStartQuiz}
+              className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+            >
+              テストを始める
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (currentQuestion) {
     return (
       <div className="max-w-2xl mx-auto p-4">
@@ -259,9 +342,6 @@ export function VocabularyQuiz() {
             <h2 className="text-lg font-semibold">
               適応型語彙テスト ({testState.questionCount + 1} / 15)
             </h2>
-            <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-              レベル {testState.currentLevel}
-            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 

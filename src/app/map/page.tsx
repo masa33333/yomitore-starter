@@ -2,28 +2,40 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { generateLetter } from '@/utils/generateLetter';
 import { saveLetterToStorage } from '@/lib/letterStorage';
-import CatMap from '@/components/CatMap';
-import cities from '@/data/cities.json';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getCurrentMapImage, getFallbackMapImage, getCurrentCity } from '@/utils/mapImageUtils';
 
 export default function MapPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const [showIntro, setShowIntro] = useState(false);
   const [mapIntroShown, setMapIntroShown] = useState(true);
-
-  // 都市座標（東京とソウル）- 地図上の正確な位置
-  const cityCoordinates = {
-    Tokyo: { x: '87%', y: '45%' }, // 日本列島中央（本州）の位置 - 視覚的に最適化
-    Seoul: { x: '82%', y: '38%' }  // 朝鮮半島中央部（東京の左上）
-  };
+  const [currentMapImage, setCurrentMapImage] = useState<string>('/images/map/tokyo-seoul.png');
+  const [totalWords, setTotalWords] = useState<number>(0);
+  const [showDestination, setShowDestination] = useState(false);
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
 
   useEffect(() => {
+    // Get total words read from localStorage
+    const storedTotalWords = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+    setTotalWords(storedTotalWords);
+    
+    // Set current map image based on progress
+    const mapImage = getCurrentMapImage(storedTotalWords);
+    setCurrentMapImage(mapImage);
+    
+    // Check if this is first visit (vocabLevel not set or quiz not completed)
+    const vocabLevel = localStorage.getItem('vocabLevel');
+    const quizCompleted = localStorage.getItem('quizCompleted') === 'true';
+    setIsFirstVisit(!vocabLevel || !quizCompleted);
+    
     // 初回ユーザー向けガイド表示判定
     const mapIntroShownValue = localStorage.getItem('mapIntroShown') === 'true';
     console.log('🗺️ Map intro check:', { mapIntroShown: mapIntroShownValue, willShow: !mapIntroShownValue });
+    console.log('📊 Current progress:', { totalWords: storedTotalWords, mapImage });
     
     setMapIntroShown(mapIntroShownValue);
     
@@ -31,7 +43,7 @@ export default function MapPage() {
       console.log('✨ Showing map intro popup');
       setShowIntro(true);
       // 初回表示時はネコを東京（語数0）に配置
-      localStorage.setItem('wordCount', '0');
+      localStorage.setItem('totalWordsRead', '0');
       localStorage.setItem('lastCity', '東京');
     }
 
@@ -78,6 +90,15 @@ export default function MapPage() {
     if (shouldGenerateLetter()) {
       generateAndSaveLetter();
     }
+
+    // 1秒後に目的地表示をフェードイン
+    const destinationTimer = setTimeout(() => {
+      setShowDestination(true);
+    }, 1000);
+
+    return () => {
+      clearTimeout(destinationTimer);
+    };
   }, []);
 
   const handleStartQuiz = () => {
@@ -121,37 +142,54 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* 既存の地図表示 */}
-      <CatMap mapIntroShown={mapIntroShown} />
-
-
-      {/* 追加要素：ソウルの目的地アイコン */}
-      <div 
-        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-30 text-4xl fade-in"
-        style={{
-          left: cityCoordinates.Seoul.x,
-          top: cityCoordinates.Seoul.y,
-        }}
-      >
-        🎌
+      {/* 目的地表示ポップアップ */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-40">
+        <div className={`bg-white/90 backdrop-blur-sm rounded-xl shadow-lg px-6 py-3 border border-gray-200 transition-all duration-1000 ${
+          showDestination ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+        }`}>
+          <p className="text-xl font-bold text-gray-800 text-center">
+            最初の目的地はソウルです
+          </p>
+          <p className="text-base text-gray-700 text-center mt-1">
+            {isFirstVisit 
+              ? 'まずは自分に合った語彙レベルを見つけましょう'
+              : `あと${(50000 - totalWords).toLocaleString()}語で到着します`
+            }
+          </p>
+        </div>
       </div>
 
-      {/* 追加要素：東京→ソウルを結ぶ赤い点線 */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none z-20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <line
-          x1={cityCoordinates.Tokyo.x}
-          y1={cityCoordinates.Tokyo.y}
-          x2={cityCoordinates.Seoul.x}
-          y2={cityCoordinates.Seoul.y}
-          stroke="#ef4444"
-          strokeWidth="3"
-          strokeDasharray="10,5"
-          className="opacity-80"
+      {/* 動的地図画像の表示 */}
+      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+        <Image
+          src={currentMapImage}
+          alt={`Current journey map - ${getCurrentCity(totalWords)}`}
+          width={1200}
+          height={800}
+          className="w-full h-full object-cover"
+          style={{
+            objectPosition: 'center',
+            transform: 'scale(3)',
+          }}
+          onError={() => {
+            console.warn(`Failed to load ${currentMapImage}, using fallback`);
+            setCurrentMapImage(getFallbackMapImage());
+          }}
+          priority
         />
-      </svg>
+      </div>
+
+      {/* 次に進むボタン（初回のみ） */}
+      {isFirstVisit && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-40">
+          <button
+            onClick={() => router.push('/quiz')}
+            className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 animate-pulse hover:animate-none"
+          >
+            次に進む
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -63,6 +63,10 @@ export default function Header() {
       ja: '履歴',
       en: 'History',
     },
+    map: {
+      ja: '地図',
+      en: 'Map',
+    },
   };
 
   // 表示言語に応じたテキスト取得関数
@@ -114,6 +118,9 @@ export default function Header() {
         
         {/* 右側: ナビゲーションメニュー */}
         <nav className="flex gap-2 sm:gap-4">
+          <Link href="/map" className="hover:opacity-70 text-sm sm:text-base">
+            {getText('map')}
+          </Link>
           <Link href="/notebook" className="hover:opacity-70 text-sm sm:text-base">
             {getText('notes')}
           </Link>

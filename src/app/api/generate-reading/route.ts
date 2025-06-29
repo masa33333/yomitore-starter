@@ -5,6 +5,196 @@ import { getAllowedWords, analyzeVocabulary } from "@/constants/ngslData";
 import { findForbiddenWords } from "@/constants/forbiddenWords";
 import { getPromptTemplate } from "@/constants/promptTemplates";
 
+// カタカナを英語/ローマ字に変換する関数
+function convertKatakanaToEnglish(text: string): string {
+  if (!text) return text;
+
+  // カタカナ→英語の変換マップ
+  const katakanaToEnglish: { [key: string]: string } = {
+    // 食べ物
+    'スパゲッティ': 'spaghetti',
+    'パスタ': 'pasta',
+    'ピザ': 'pizza',
+    'ハンバーガー': 'hamburger',
+    'サンドイッチ': 'sandwich',
+    'ケーキ': 'cake',
+    'アイスクリーム': 'ice cream',
+    'コーヒー': 'coffee',
+    'ティー': 'tea',
+    'ジュース': 'juice',
+    'ビール': 'beer',
+    'ワイン': 'wine',
+    'チョコレート': 'chocolate',
+    'クッキー': 'cookie',
+    'パン': 'bread',
+    
+    // 動物
+    'ドッグ': 'dog',
+    'キャット': 'cat',
+    'バード': 'bird',
+    'フィッシュ': 'fish',
+    'ライオン': 'lion',
+    'エレファント': 'elephant',
+    'タイガー': 'tiger',
+    'パンダ': 'panda',
+    
+    // 乗り物
+    'カー': 'car',
+    'バス': 'bus',
+    'トレイン': 'train',
+    'プレーン': 'plane',
+    'バイク': 'bike',
+    'タクシー': 'taxi',
+    
+    // スポーツ
+    'サッカー': 'soccer',
+    'バスケットボール': 'basketball',
+    'テニス': 'tennis',
+    'ゴルフ': 'golf',
+    'スイミング': 'swimming',
+    'ランニング': 'running',
+    
+    // 色
+    'ブルー': 'blue',
+    'レッド': 'red',
+    'グリーン': 'green',
+    'イエロー': 'yellow',
+    'ブラック': 'black',
+    'ホワイト': 'white',
+    'ピンク': 'pink',
+    'オレンジ': 'orange',
+    
+    // 技術
+    'コンピューター': 'computer',
+    'インターネット': 'internet',
+    'スマートフォン': 'smartphone',
+    'ゲーム': 'game',
+    'アプリ': 'app',
+    'ソフトウェア': 'software',
+    
+    // 場所
+    'レストラン': 'restaurant',
+    'ホテル': 'hotel',
+    'スーパーマーケット': 'supermarket',
+    'パーク': 'park',
+    'ライブラリー': 'library',
+    'ミュージアム': 'museum',
+    'シネマ': 'cinema',
+    
+    // 国・都市
+    'アメリカ': 'America',
+    'イギリス': 'Britain',
+    'フランス': 'France',
+    'ドイツ': 'Germany',
+    'イタリア': 'Italy',
+    'スペイン': 'Spain',
+    'オーストラリア': 'Australia',
+    'カナダ': 'Canada',
+    'トーキョー': 'Tokyo',
+    'オーサカ': 'Osaka',
+    'キョート': 'Kyoto',
+    'ヨコハマ': 'Yokohama',
+    
+    // その他一般的な単語
+    'ミュージック': 'music',
+    'ムービー': 'movie',
+    'ブック': 'book',
+    'ペン': 'pen',
+    'ペーパー': 'paper',
+    'タイム': 'time',
+    'スペース': 'space',
+    'ハウス': 'house',
+    'ファミリー': 'family',
+    'フレンド': 'friend',
+    'ワーク': 'work',
+    'スクール': 'school',
+    'クラス': 'class',
+    'ティーチャー': 'teacher',
+    'スチューデント': 'student',
+  };
+
+  // カタカナからひらがなへの変換マップ（ローマ字変換用）
+  const katakanaToHiragana: { [key: string]: string } = {
+    'ア': 'あ', 'イ': 'い', 'ウ': 'う', 'エ': 'え', 'オ': 'お',
+    'カ': 'か', 'キ': 'き', 'ク': 'く', 'ケ': 'け', 'コ': 'こ',
+    'サ': 'さ', 'シ': 'し', 'ス': 'す', 'セ': 'せ', 'ソ': 'そ',
+    'タ': 'た', 'チ': 'ち', 'ツ': 'つ', 'テ': 'て', 'ト': 'と',
+    'ナ': 'な', 'ニ': 'に', 'ヌ': 'ぬ', 'ネ': 'ね', 'ノ': 'の',
+    'ハ': 'は', 'ヒ': 'ひ', 'フ': 'ふ', 'ヘ': 'へ', 'ホ': 'ほ',
+    'マ': 'ま', 'ミ': 'み', 'ム': 'む', 'メ': 'め', 'モ': 'も',
+    'ヤ': 'や', 'ユ': 'ゆ', 'ヨ': 'よ',
+    'ラ': 'ら', 'リ': 'り', 'ル': 'る', 'レ': 'れ', 'ロ': 'ろ',
+    'ワ': 'わ', 'ヲ': 'を', 'ン': 'ん',
+    'ガ': 'が', 'ギ': 'ぎ', 'グ': 'ぐ', 'ゲ': 'げ', 'ゴ': 'ご',
+    'ザ': 'ざ', 'ジ': 'じ', 'ズ': 'ず', 'ゼ': 'ぜ', 'ゾ': 'ぞ',
+    'ダ': 'だ', 'ヂ': 'ぢ', 'ヅ': 'づ', 'デ': 'で', 'ド': 'ど',
+    'バ': 'ば', 'ビ': 'び', 'ブ': 'ぶ', 'ベ': 'べ', 'ボ': 'ぼ',
+    'パ': 'ぱ', 'ピ': 'ぴ', 'プ': 'ぷ', 'ペ': 'ぺ', 'ポ': 'ぽ',
+    'キャ': 'きゃ', 'キュ': 'きゅ', 'キョ': 'きょ',
+    'シャ': 'しゃ', 'シュ': 'しゅ', 'ショ': 'しょ',
+    'チャ': 'ちゃ', 'チュ': 'ちゅ', 'チョ': 'ちょ',
+    'ニャ': 'にゃ', 'ニュ': 'にゅ', 'ニョ': 'にょ',
+    'ヒャ': 'ひゃ', 'ヒュ': 'ひゅ', 'ヒョ': 'ひょ',
+    'ミャ': 'みゃ', 'ミュ': 'みゅ', 'ミョ': 'みょ',
+    'リャ': 'りゃ', 'リュ': 'りゅ', 'リョ': 'りょ',
+    'ギャ': 'ぎゃ', 'ギュ': 'ぎゅ', 'ギョ': 'ぎょ',
+    'ジャ': 'じゃ', 'ジュ': 'じゅ', 'ジョ': 'じょ',
+    'ビャ': 'びゃ', 'ビュ': 'びゅ', 'ビョ': 'びょ',
+    'ピャ': 'ぴゃ', 'ピュ': 'ぴゅ', 'ピョ': 'ぴょ',
+  };
+
+  // ひらがなからローマ字への変換マップ
+  const hiraganaToRomaji: { [key: string]: string } = {
+    'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+    'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+    'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+    'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+    'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+    'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+    'だ': 'da', 'ぢ': 'ji', 'づ': 'zu', 'で': 'de', 'ど': 'do',
+    'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+    'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+    'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+    'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+    'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+    'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+    'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+    'わ': 'wa', 'ゐ': 'wi', 'ゑ': 'we', 'を': 'wo', 'ん': 'n',
+    'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+    'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+    'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+    'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+    'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+    'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+    'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+    'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+    'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+    'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+    'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+  };
+
+  let result = text;
+
+  // 1. まず英語変換マップで直接変換を試行
+  for (const [katakana, english] of Object.entries(katakanaToEnglish)) {
+    result = result.replace(new RegExp(katakana, 'g'), english);
+  }
+
+  // 2. 残ったカタカナをローマ字に変換
+  // カタカナをひらがなに変換
+  for (const [katakana, hiragana] of Object.entries(katakanaToHiragana)) {
+    result = result.replace(new RegExp(katakana, 'g'), hiragana);
+  }
+
+  // ひらがなをローマ字に変換
+  for (const [hiragana, romaji] of Object.entries(hiraganaToRomaji)) {
+    result = result.replace(new RegExp(hiragana, 'g'), romaji);
+  }
+
+  console.log('🔤 カタカナ変換:', { original: text, converted: result });
+  return result;
+}
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function POST(req: Request) {
@@ -116,8 +306,11 @@ Output format:
       const { theme, topic, subTopic, style } = requestData;
 
       // topicをthemeとして使用（フロントエンドからtopicで送信される）
-      const actualTheme = theme || topic;
+      let actualTheme = theme || topic;
       const actualStyle = style || '専門家がやさしく説明'; // デフォルトスタイル
+
+      // カタカナを英語/ローマ字に変換
+      actualTheme = convertKatakanaToEnglish(actualTheme);
 
       // バリデーション
       if (!actualTheme || actualTheme.trim() === '') {
@@ -158,7 +351,9 @@ ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply wit
 
 Requirements:
 - Structure: 3-4 paragraphs with logical development
-- Include one surprising but verifiable fact
+- Include TWO surprising but verifiable facts or fascinating episodes that will amaze readers
+- These facts should be unexpected, memorable, and educationally valuable
+- Make sure these surprising elements are woven naturally into the content
 - Translation: After each English paragraph, provide Japanese translation
 - NO labels like "【English】" or "【Japanese】"
 

@@ -74,7 +74,7 @@ export default function TokyoPage() {
             onClick={handleNext}
             className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 animate-pulse hover:animate-none"
           >
-            🌍 {t('tokyo_button')}
+{t('tokyo_button')}
           </button>
         )}
       </div>
