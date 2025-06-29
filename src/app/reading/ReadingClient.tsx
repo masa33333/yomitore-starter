@@ -320,10 +320,92 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       wpm: calculatedWpm
     });
     
+    // 読了回数をカウント
+    const completedReadings = parseInt(localStorage.getItem('completedReadings') || '0', 10);
+    const newCompletedReadings = completedReadings + 1;
+    localStorage.setItem('completedReadings', newCompletedReadings.toString());
+    
+    console.log('📚 読了回数:', newCompletedReadings);
+    
+    // 2回目の読了完了時に一通目の手紙を送信
+    if (newCompletedReadings === 2) {
+      sendFirstLetter();
+    }
+    
     // 読書完了状態を保存
     setTimeout(() => {
       saveCurrentReadingState();
     }, 100);
+  };
+
+  // 一通目の手紙を送信する関数
+  const sendFirstLetter = async () => {
+    try {
+      console.log('📮 一通目の手紙を生成中...');
+      
+      // ユーザーの語彙レベルを取得
+      const userVocabLevel = parseInt(localStorage.getItem('vocabLevel') || '3', 10);
+      
+      // 一通目の手紙コンテンツ生成
+      const response = await fetch('/api/travel/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'departure',
+          city: 'Tokyo',
+          level: userVocabLevel,
+          isFirstLetter: true
+        })
+      });
+      
+      if (response.ok) {
+        const letterData = await response.json();
+        console.log('📮 API レスポンス:', letterData);
+        
+        // letterページが読み込む形式でlocalStorageに保存
+        const letterText = {
+          type: 'letter',
+          jp: letterData.jp || '成田空港からの手紙です。これから素晴らしい旅が始まります！',
+          en: letterData.en || letterData.english || 'A letter from Narita Airport.',
+          city: 'Tokyo',
+          image: '/letters/tokyo.png',
+          catName: localStorage.getItem('catName') || 'ネコ',
+          isFirstLetter: true
+        };
+        
+        // letterページが期待する形式で保存
+        localStorage.setItem('letterText', JSON.stringify(letterText));
+        
+        // 既存の手紙リストにも追加（履歴用）
+        const existingLetters = JSON.parse(localStorage.getItem('letters') || '[]');
+        existingLetters.push({
+          id: existingLetters.length + 1,
+          ...letterText,
+          sentAt: Date.now()
+        });
+        localStorage.setItem('letters', JSON.stringify(existingLetters));
+        
+        // 通知フラグを設定
+        localStorage.setItem('notified', 'true');
+        localStorage.setItem('newLetter', 'true');
+        
+        console.log('📮 手紙保存完了:', letterText);
+        
+        console.log('✅ 一通目の手紙送信完了');
+        
+        // 通知を表示
+        setShowMailNotification(true);
+        
+        // 3秒後に通知を非表示
+        setTimeout(() => {
+          setShowMailNotification(false);
+        }, 3000);
+      } else {
+        console.error('❌ 手紙生成エラー:', response.statusText);
+      }
+    } catch (error) {
+      console.error('❌ 手紙送信エラー:', error);
+    }
   };
 
   // 単語クリック処理
@@ -635,7 +717,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           {endTime && (
             <div className="bg-[#FFF9F4] border border-[#FFE1B5] rounded-lg p-6 shadow-sm">
               <h3 className="font-semibold mb-3 text-[#1E1E1E]">読書完了！</h3>
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                 <div>
                   <p className="text-sm text-gray-600">語数</p>
                   <p className="text-lg font-bold">{wordCount} 語</p>
@@ -647,6 +729,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                       `${Math.floor((endTime - startTime) / 60000)}分${Math.floor(((endTime - startTime) % 60000) / 1000)}秒` : 
                       '計測なし'
                     }
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">語彙レベル</p>
+                  <p className="text-lg font-bold">
+                    Lv.{localStorage.getItem('vocabLevel') || '3'}
                   </p>
                 </div>
                 <div>

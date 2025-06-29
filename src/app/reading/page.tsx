@@ -39,87 +39,50 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
     const userLevel = params.level || '3';
     
     if (genre && tone && feeling) {
-      // 実際のOpenAI APIでストーリー生成を試行
+      // 専用のストーリー生成APIを使用
       try {
-        const { OpenAI } = await import('openai');
+        console.log('🚀 ストーリー生成API呼び出し開始');
         
-        if (process.env.OPENAI_API_KEY) {
-          console.log('🚀 OpenAI APIでストーリー生成開始');
+        const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/generate-reading`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contentType: 'story',
+            level: parseInt(userLevel),
+            storyData: {
+              protagonistType: 'woman',
+              protagonistFeature: '',
+              genre: genre,
+              situation: `${tone} situation`,
+              feeling: feeling
+            }
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`API response not ok: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('📥 ストーリー生成API応答:', data);
+
+        if (data.english) {
+          initialData = {
+            title: `${genre} Story`,
+            story: data.english,
+            themes: ['Adventure', 'Growth', 'Discovery']
+          };
           
-          const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
+          console.log('✅ ストーリー生成成功:', {
+            title: initialData.title,
+            storyLength: initialData.story.length,
+            hasJapanese: !!data.japanese
           });
-          
-          // NGSL基準の語彙レベル制約テンプレート取得
-          const { getPromptTemplate } = await import('@/constants/promptTemplates');
-          const promptTemplate = getPromptTemplate(parseInt(userLevel));
-          
-          const systemMessage = `You are an expert English creative writer specializing in NGSL vocabulary control.`;
-          
-          const userPrompt = `${promptTemplate}
-
-ジャンル: ${genre}
-感情: ${feeling}
-トーン: ${tone}
-主人公: 女性
-
-Create a story with the above genre/feeling/tone, following Level ${userLevel} vocabulary constraints.
-
-Output in this exact JSON format:
-{
-  "title": "[Story Title]",
-  "content": [
-    "[Paragraph 1: Setup]",
-    "[Paragraph 2: Development]",
-    "[Paragraph 3: Conflict]",
-    "[Paragraph 4: Resolution]",
-    "[Paragraph 5: Conclusion]"
-  ],
-  "themes": ["[Theme 1]", "[Theme 2]", "[Theme 3]"]
-}
-
-CRITICAL: Follow ALL NGSL vocabulary constraints. Every word must be within the specified range.`;
-
-          const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo-0125',
-            messages: [
-              { role: 'system', content: systemMessage },
-              { role: 'user', content: userPrompt }
-            ],
-            temperature: 0.7,
-            max_tokens: 800,
-          });
-
-          const content = response.choices[0]?.message?.content;
-          if (content) {
-            // Markdownコードブロックを除去してから解析
-            const cleanContent = content
-              .replace(/```json\s*/g, '')
-              .replace(/```\s*/g, '')
-              .trim();
-            
-            const storyData = JSON.parse(cleanContent);
-            
-            // contentが配列の場合は結合、文字列の場合はそのまま
-            const story = Array.isArray(storyData.content) 
-              ? storyData.content.join('\n\n')
-              : storyData.content;
-            
-            initialData = {
-              title: storyData.title,
-              story,
-              themes: storyData.themes || []
-            };
-            
-            console.log('✅ OpenAI APIストーリー生成成功:', {
-              title: initialData.title,
-              storyLength: initialData.story.length,
-              themesCount: initialData.themes?.length || 0
-            });
-          }
         }
       } catch (error) {
-        console.error('❌ OpenAI APIエラー、テストデータにフォールバック:', error);
+        console.error('❌ ストーリー生成APIエラー、テストデータにフォールバック:', error);
       }
       
       // OpenAI失敗時またはAPI未設定時のフォールバック
@@ -144,82 +107,44 @@ CRITICAL: Follow ALL NGSL vocabulary constraints. Every word must be within the 
     
     if (topic) {
       try {
-        const { OpenAI } = await import('openai');
+        console.log('🚀 読み物生成API呼び出し開始');
         
-        if (process.env.OPENAI_API_KEY) {
-          console.log('🚀 OpenAI APIで読み物生成開始');
+        // 専用の読み物生成APIを使用
+        const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/generate-reading`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contentType: 'reading',
+            level: parseInt(userLevel),
+            topic: topic,
+            style: '専門家がやさしく説明'
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`API response not ok: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('📥 読み物生成API応答:', data);
+
+        if (data.english) {
+          initialData = {
+            title: `About ${topic}`,
+            story: data.english,
+            themes: ['Learning', 'Knowledge', 'Education']
+          };
           
-          const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
+          console.log('✅ 読み物生成成功:', {
+            title: initialData.title,
+            storyLength: initialData.story.length,
+            hasJapanese: !!data.japanese
           });
-          
-          // NGSL基準の語彙レベル制約テンプレート取得
-          const { getPromptTemplate } = await import('@/constants/promptTemplates');
-          const promptTemplate = getPromptTemplate(parseInt(userLevel));
-          
-          const systemMessage = `You are an expert English educational content writer. Follow NGSL vocabulary guidelines exactly.`;
-          
-          const userPrompt = `${promptTemplate}
-
-テーマ: ${topic}
-
-Create reading material about "${topic}" following the Level ${userLevel} constraints above.
-
-Output in this exact JSON format:
-{
-  "title": "[Title about ${topic}]",
-  "content": [
-    "[Paragraph 1]",
-    "[Paragraph 2]", 
-    "[Paragraph 3]",
-    "[Paragraph 4]",
-    "[Paragraph 5]"
-  ],
-  "themes": ["[Theme 1]", "[Theme 2]", "[Theme 3]"]
-}
-
-CRITICAL: Follow ALL vocabulary constraints. Every word must be within the specified NGSL range.`;
-
-          const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo-0125',
-            messages: [
-              { role: 'system', content: systemMessage },
-              { role: 'user', content: userPrompt }
-            ],
-            temperature: 0.7,
-            max_tokens: 1000,
-          });
-
-          const content = response.choices[0]?.message?.content;
-          if (content) {
-            // Markdownコードブロックを除去してから解析
-            const cleanContent = content
-              .replace(/```json\s*/g, '')
-              .replace(/```\s*/g, '')
-              .trim();
-            
-            const readingData = JSON.parse(cleanContent);
-            
-            // contentが配列の場合は結合、文字列の場合はそのまま
-            const story = Array.isArray(readingData.content) 
-              ? readingData.content.join('\n\n')
-              : readingData.content;
-            
-            initialData = {
-              title: readingData.title,
-              story,
-              themes: readingData.themes || []
-            };
-            
-            console.log('✅ OpenAI API読み物生成成功:', {
-              title: initialData.title,
-              storyLength: initialData.story.length,
-              themesCount: initialData.themes?.length || 0
-            });
-          }
         }
       } catch (error) {
-        console.error('❌ OpenAI APIエラー、テストデータにフォールバック:', error);
+        console.error('❌ 読み物生成APIエラー、テストデータにフォールバック:', error);
       }
     }
     

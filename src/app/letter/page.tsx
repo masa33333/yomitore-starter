@@ -797,10 +797,58 @@ ${catName}`
         return;
       }
       
-      // 📧 FALLBACK: Use letterData[0] (Narita Airport letter) only if no stored content
-      console.log('📧 No stored content found, using Narita fallback');
-      const naritaLetter = letters[0];
+      // 📧 FALLBACK: Use static pre-created letters
+      console.log('📧 No stored content found, using static letter system...');
+      
       const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+      
+      // Try to get static letter (Tokyo first, then other cities if needed)
+      try {
+        const { getStaticLetter } = await import('@/data/staticLetters');
+        
+        // Determine which city letter to show based on user progress
+        const totalWords = parseInt(localStorage.getItem('wordCountTotal') || '0', 10);
+        let targetCity = 'tokyo'; // Default to Tokyo
+        
+        if (totalWords >= 2000) {
+          targetCity = 'beijing';
+        } else if (totalWords >= 1000) {
+          targetCity = 'seoul';
+        }
+        
+        const staticLetter = getStaticLetter(targetCity, userLevel);
+        if (staticLetter) {
+          console.log(`📧 Found static letter for ${targetCity}, level ${userLevel}`);
+          
+          setLetterText(staticLetter.en);
+          setCityName(staticLetter.city);
+          setCityImage(staticLetter.cityImage);
+          setDiaryNotFound(false);
+          
+          const letterDiary = {
+            id: 1,
+            en: staticLetter.en,
+            jp: staticLetter.jp,
+            location: staticLetter.city,
+            cityName: staticLetter.city,
+            cityImage: staticLetter.cityImage,
+            type: 'letter'
+          };
+          setDiary(letterDiary);
+          
+          const words = staticLetter.en.trim().split(/\s+/).filter((word: string) => word.length > 0);
+          setWordCount(words.length);
+          
+          console.log(`📧 Successfully loaded static ${targetCity} letter`);
+          return;
+        }
+      } catch (error) {
+        console.error('❌ Failed to load static letter:', error);
+      }
+      
+      // Last resort: Use original letterData fallback
+      console.log('📧 Using original letterData as last resort fallback');
+      const naritaLetter = letters[0];
       
       // Get appropriate English content using utility function
       const englishContent = getEnglishText(naritaLetter.en, userLevel);

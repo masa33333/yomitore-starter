@@ -355,17 +355,20 @@ Requirements:
 - These facts should be unexpected, memorable, and educationally valuable
 - Make sure these surprising elements are woven naturally into the content
 - Translation: After each English paragraph, provide Japanese translation
-- NO labels like "【English】" or "【Japanese】"
+- NO labels, headers, or numbering of any kind
 
 Output format:
-English paragraph 1
-Japanese translation 1
+English paragraph
 
-English paragraph 2  
-Japanese translation 2
+Japanese paragraph
 
-English paragraph 3
-Japanese translation 3
+English paragraph
+
+Japanese paragraph
+
+English paragraph
+
+Japanese paragraph
       `.trim();
     }
 
@@ -373,14 +376,14 @@ Japanese translation 3
     console.log('🤖 【モデル情報】使用モデル: gpt-3.5-turbo, max_tokens: 2000');
 
     // Level別システムメッセージ
-    let systemMessage = "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. Do not include any labels or headers. COUNT YOUR WORDS before finishing - you must reach at least 220 words.";
+    let systemMessage = "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. NEVER include any labels, headers, numbering, or section markers like 'Japanese Translation 1' or 'English paragraph 1'. Write only the content itself. COUNT YOUR WORDS before finishing - you must reach at least 220 words.";
     
     if (level <= 3) {
-      systemMessage = `CRITICAL: You are writing for 10-year-old children. You MUST use ONLY the simplest English words. Any word longer than 5 letters is FORBIDDEN (except: people, mother, father, sister, brother, family, house, water, today). Use only words that appear in beginner children's books. Write exactly 140-200 words in 3 paragraphs. EVERY word must be simple and basic.`;
+      systemMessage = `CRITICAL: You are writing for 10-year-old children. You MUST use ONLY the simplest English words. Any word longer than 5 letters is FORBIDDEN (except: people, mother, father, sister, brother, family, house, water, today). Use only words that appear in beginner children's books. Write exactly 140-200 words in 3 paragraphs. EVERY word must be simple and basic. NEVER include any labels or numbering.`;
     } else if (level === 4) {
-      systemMessage = `You are writing for intermediate English learners (B2 level). CRITICAL: You MUST write exactly 200-240 words. COUNT your words carefully - you must reach at least 200 words. Write in at least 3 paragraphs. Include complex sentence structures and intermediate vocabulary. Do not include any labels or headers. WORD COUNT IS CRITICAL.`;
+      systemMessage = `You are writing for intermediate English learners (B2 level). CRITICAL: You MUST write exactly 200-240 words. COUNT your words carefully - you must reach at least 200 words. Write in at least 3 paragraphs. Include complex sentence structures and intermediate vocabulary. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL.`;
     } else if (level >= 5) {
-      systemMessage = `You are writing for advanced English learners (C1+ level). CRITICAL: You MUST write exactly 240-280 words. COUNT your words carefully - you must reach at least 240 words. Write in at least 3 paragraphs. Use sophisticated vocabulary, complex sentence structures, nuanced expressions, and varied sentence patterns. Do not include any labels or headers. WORD COUNT IS CRITICAL.`;
+      systemMessage = `You are writing for advanced English learners (C1+ level). CRITICAL: You MUST write exactly 240-280 words. COUNT your words carefully - you must reach at least 240 words. Write in at least 3 paragraphs. Use sophisticated vocabulary, complex sentence structures, nuanced expressions, and varied sentence patterns. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL.`;
     }
 
     const completion = await openai.chat.completions.create({
@@ -426,7 +429,30 @@ Japanese translation 3
       
       // 英語・日本語判定の改良（文字種による判定）
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        let line = lines[i];
+        
+        // ラベル除去: 「Japanese Translation 1」「English paragraph 2」などを除去
+        const labelPatterns = [
+          /^Japanese [Tt]ranslation \d+:?/i,
+          /^English [Pp]aragraph \d+:?/i,
+          /^【日本語】/,
+          /^【英語】/,
+          /^English:/i,
+          /^Japanese:/i,
+          /^\d+\./  // 番号付きリストの除去
+        ];
+        
+        let isLabel = false;
+        for (const pattern of labelPatterns) {
+          if (pattern.test(line)) {
+            console.log('🗑️ ラベル除去:', line);
+            isLabel = true;
+            break;
+          }
+        }
+        
+        // ラベル行はスキップ
+        if (isLabel) continue;
         
         // 日本語文字（ひらがな、カタカナ、漢字）が含まれているかチェック
         const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(line);

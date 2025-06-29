@@ -68,15 +68,17 @@ export default function TokyoPage() {
           </p>
         </div>
 
-        {/* 次に進むボタン */}
-        {showButton && (
-          <button
-            onClick={handleNext}
-            className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 animate-pulse hover:animate-none"
-          >
-{t('tokyo_button')}
-          </button>
-        )}
+        {/* 次に進むボタン - 固定の高さを確保 */}
+        <div className="h-[60px] flex items-center justify-center">
+          {showButton && (
+            <button
+              onClick={handleNext}
+              className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 animate-pulse hover:animate-none"
+            >
+              {t('tokyo_button')}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 成田空港の表示 */}

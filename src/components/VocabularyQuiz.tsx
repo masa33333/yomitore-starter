@@ -168,6 +168,26 @@ export function VocabularyQuiz() {
     setShowInstructions(false);
   };
 
+  // 開発用スキップ機能
+  const handleDevSkip = (level: number) => {
+    console.log(`🚀 開発用スキップ: レベル ${level} に設定`);
+    
+    // ローカルストレージに保存
+    localStorage.setItem('vocabularyLevel', level.toString());
+    localStorage.setItem('vocabLevel', level.toString());
+    localStorage.setItem('quizCompleted', 'true');
+    
+    // CEFR レベルも設定
+    const cefrLevel = level <= 2 ? 'A1' : level <= 4 ? 'A2' : 'B1';
+    localStorage.setItem('userLevel', cefrLevel);
+    
+    // 完了状態に設定
+    setFinalLevel(level);
+    setFinished(true);
+    
+    console.log(`✅ 開発用設定完了: Level ${level}, CEFR ${cefrLevel}`);
+  };
+
   
 
 
@@ -322,12 +342,30 @@ export function VocabularyQuiz() {
               これから15問の単語の問題を出します。<br/>
               表示された単語の意味としてふさわしいものを選択肢から選んでください。
             </p>
-            <button
-              onClick={handleStartQuiz}
-              className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-            >
-              テストを始める
-            </button>
+            <div className="space-y-4">
+              <button
+                onClick={handleStartQuiz}
+                className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              >
+                テストを始める
+              </button>
+              
+              {/* 開発用スキップボタン */}
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">開発用クイックスタート:</p>
+                <div className="flex gap-2 justify-center">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => handleDevSkip(level)}
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-3 py-2 rounded text-sm transition-colors"
+                    >
+                      Lv.{level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

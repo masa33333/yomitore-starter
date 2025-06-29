@@ -11,7 +11,6 @@ import { getCurrentMapImage, getFallbackMapImage, getCurrentCity } from '@/utils
 export default function MapPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const [showIntro, setShowIntro] = useState(false);
   const [mapIntroShown, setMapIntroShown] = useState(true);
   const [currentMapImage, setCurrentMapImage] = useState<string>('/images/map/tokyo-seoul.png');
   const [totalWords, setTotalWords] = useState<number>(0);
@@ -32,20 +31,7 @@ export default function MapPage() {
     const quizCompleted = localStorage.getItem('quizCompleted') === 'true';
     setIsFirstVisit(!vocabLevel || !quizCompleted);
     
-    // 初回ユーザー向けガイド表示判定
-    const mapIntroShownValue = localStorage.getItem('mapIntroShown') === 'true';
-    console.log('🗺️ Map intro check:', { mapIntroShown: mapIntroShownValue, willShow: !mapIntroShownValue });
     console.log('📊 Current progress:', { totalWords: storedTotalWords, mapImage });
-    
-    setMapIntroShown(mapIntroShownValue);
-    
-    if (!mapIntroShownValue) {
-      console.log('✨ Showing map intro popup');
-      setShowIntro(true);
-      // 初回表示時はネコを東京（語数0）に配置
-      localStorage.setItem('totalWordsRead', '0');
-      localStorage.setItem('lastCity', '東京');
-    }
 
     const shouldGenerateLetter = () => {
       const visitedCities = JSON.parse(localStorage.getItem('visitedCities') || '[]');
@@ -101,46 +87,9 @@ export default function MapPage() {
     };
   }, []);
 
-  const handleStartQuiz = () => {
-    // localStorage に初回ガイド表示済みフラグを保存
-    localStorage.setItem('mapIntroShown', 'true');
-    setMapIntroShown(true);
-    setShowIntro(false);
-    // 語彙レベル判定画面に遷移
-    router.push('/quiz');
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
-      {/* 初回ユーザー向けガイドオーバーレイ */}
-      {showIntro && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
-          <div className="bg-white/15 backdrop-blur-sm rounded-2xl shadow-lg p-6 max-w-sm w-full mx-4 text-center">
-            <div className="mb-4">
-              <div className="space-y-3 text-white drop-shadow-lg">
-                <p 
-                  className="text-lg leading-relaxed font-bold"
-                  dangerouslySetInnerHTML={{
-                    __html: t('map_popup').replace(/\n/g, '<br/>')
-                  }}
-                />
-                <p 
-                  className="text-lg leading-relaxed font-bold"
-                  dangerouslySetInnerHTML={{
-                    __html: t('map_instruction').replace(/\n/g, '<br/>')
-                  }}
-                />
-              </div>
-            </div>
-            <button
-              onClick={handleStartQuiz}
-              className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-            >
-              {t('map_quiz_button')}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 目的地表示ポップアップ */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-40">
@@ -186,7 +135,7 @@ export default function MapPage() {
             onClick={() => router.push('/quiz')}
             className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 animate-pulse hover:animate-none"
           >
-            次に進む
+            レベル判定に進む
           </button>
         </div>
       )}
