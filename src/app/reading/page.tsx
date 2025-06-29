@@ -52,10 +52,8 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
             contentType: 'story',
             level: parseInt(userLevel),
             storyData: {
-              protagonistType: 'woman',
-              protagonistFeature: '',
               genre: genre,
-              situation: `${tone} situation`,
+              tone: tone,
               feeling: feeling
             }
           }),
@@ -69,10 +67,13 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
         console.log('📥 ストーリー生成API応答:', data);
 
         if (data.english) {
+          // APIからタイトルが返された場合はそれを使用、なければフォールバック
+          const storyTitle = data.title || `${genre} Story`;
+          
           initialData = {
-            title: `${genre} Story`,
+            title: storyTitle,
             story: data.english,
-            themes: ['Adventure', 'Growth', 'Discovery']
+            themes: [genre, tone, feeling]
           };
           
           console.log('✅ ストーリー生成成功:', {

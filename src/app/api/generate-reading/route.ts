@@ -9,9 +9,123 @@ import { getPromptTemplate } from "@/constants/promptTemplates";
 function convertKatakanaToEnglish(text: string): string {
   if (!text) return text;
 
-  // カタカナ→英語の変換マップ
+  // カタカナ→英語の変換マップ（優先度：固有名詞 → 一般名詞）
   const katakanaToEnglish: { [key: string]: string } = {
-    // 食べ物
+    // 🎵 音楽・アーティスト（最優先）
+    'ビートルズ': 'The Beatles',
+    'マイケル・ジャクソン': 'Michael Jackson',
+    'マイケルジャクソン': 'Michael Jackson',
+    'ジョン・レノン': 'John Lennon',
+    'ジョンレノン': 'John Lennon',
+    'ポール・マッカートニー': 'Paul McCartney',
+    'ポールマッカートニー': 'Paul McCartney',
+    'ジョージ・ハリスン': 'George Harrison',
+    'ジョージハリスン': 'George Harrison',
+    'リンゴ・スター': 'Ringo Starr',
+    'リンゴスター': 'Ringo Starr',
+    'エルヴィス・プレスリー': 'Elvis Presley',
+    'エルヴィス': 'Elvis Presley',
+    'マドンナ': 'Madonna',
+    'レディー・ガガ': 'Lady Gaga',
+    'レディーガガ': 'Lady Gaga',
+    'テイラー・スウィフト': 'Taylor Swift',
+    'テイラースウィフト': 'Taylor Swift',
+    'アデル': 'Adele',
+    'エド・シーラン': 'Ed Sheeran',
+    'エドシーラン': 'Ed Sheeran',
+    'クイーン': 'Queen',
+    'ローリング・ストーンズ': 'The Rolling Stones',
+    'ローリングストーンズ': 'The Rolling Stones',
+    'ピンク・フロイド': 'Pink Floyd',
+    'ピンクフロイド': 'Pink Floyd',
+    'レッド・ツェッペリン': 'Led Zeppelin',
+    'レッドツェッペリン': 'Led Zeppelin',
+    'ニルヴァーナ': 'Nirvana',
+    'コールドプレイ': 'Coldplay',
+    'ラジオヘッド': 'Radiohead',
+    
+    // 🎬 映画・ドラマ
+    'ハリー・ポッター': 'Harry Potter',
+    'ハリーポッター': 'Harry Potter',
+    'スター・ウォーズ': 'Star Wars',
+    'スターウォーズ': 'Star Wars',
+    'アベンジャーズ': 'Avengers',
+    'スパイダーマン': 'Spider-Man',
+    'バットマン': 'Batman',
+    'スーパーマン': 'Superman',
+    'ワンダーウーマン': 'Wonder Woman',
+    'アイアンマン': 'Iron Man',
+    'トイ・ストーリー': 'Toy Story',
+    'トイストーリー': 'Toy Story',
+    'ファインディング・ニモ': 'Finding Nemo',
+    'アナと雪の女王': 'Frozen',
+    'ライオン・キング': 'The Lion King',
+    'ライオンキング': 'The Lion King',
+    'ジュラシック・パーク': 'Jurassic Park',
+    'ジュラシックパーク': 'Jurassic Park',
+    'ターミネーター': 'Terminator',
+    'インディ・ジョーンズ': 'Indiana Jones',
+    'インディジョーンズ': 'Indiana Jones',
+    
+    // 👤 有名人・歴史人物
+    'アインシュタイン': 'Einstein',
+    'ガリレオ': 'Galileo',
+    'ナポレオン': 'Napoleon',
+    'シェイクスピア': 'Shakespeare',
+    'ピカソ': 'Picasso',
+    'ダ・ヴィンチ': 'Da Vinci',
+    'ダヴィンチ': 'Da Vinci',
+    'モーツァルト': 'Mozart',
+    'ベートーヴェン': 'Beethoven',
+    'ベートーベン': 'Beethoven',
+    'バッハ': 'Bach',
+    'ショパン': 'Chopin',
+    
+    // 🏢 企業・ブランド
+    'アップル': 'Apple',
+    'マイクロソフト': 'Microsoft',
+    'グーグル': 'Google',
+    'フェイスブック': 'Facebook',
+    'ツイッター': 'Twitter',
+    'インスタグラム': 'Instagram',
+    'ユーチューブ': 'YouTube',
+    'アマゾン': 'Amazon',
+    'ネットフリックス': 'Netflix',
+    'ディズニー': 'Disney',
+    'マクドナルド': 'McDonald\'s',
+    'スターバックス': 'Starbucks',
+    'コカ・コーラ': 'Coca-Cola',
+    'コカコーラ': 'Coca-Cola',
+    'ナイキ': 'Nike',
+    'アディダス': 'Adidas',
+    
+    // 🌍 国・都市・地名
+    'アメリカ': 'America',
+    'イギリス': 'Britain',
+    'フランス': 'France',
+    'ドイツ': 'Germany',
+    'イタリア': 'Italy',
+    'スペイン': 'Spain',
+    'オーストラリア': 'Australia',
+    'カナダ': 'Canada',
+    'ブラジル': 'Brazil',
+    'インド': 'India',
+    'ロシア': 'Russia',
+    'トーキョー': 'Tokyo',
+    'オーサカ': 'Osaka',
+    'キョート': 'Kyoto',
+    'ヨコハマ': 'Yokohama',
+    'ニューヨーク': 'New York',
+    'ロンドン': 'London',
+    'パリ': 'Paris',
+    'ローマ': 'Rome',
+    'ベルリン': 'Berlin',
+    'マドリード': 'Madrid',
+    'シドニー': 'Sydney',
+    'トロント': 'Toronto',
+    'モスクワ': 'Moscow',
+    
+    // 🍕 食べ物
     'スパゲッティ': 'spaghetti',
     'パスタ': 'pasta',
     'ピザ': 'pizza',
@@ -28,7 +142,7 @@ function convertKatakanaToEnglish(text: string): string {
     'クッキー': 'cookie',
     'パン': 'bread',
     
-    // 動物
+    // 🐾 動物
     'ドッグ': 'dog',
     'キャット': 'cat',
     'バード': 'bird',
@@ -38,7 +152,7 @@ function convertKatakanaToEnglish(text: string): string {
     'タイガー': 'tiger',
     'パンダ': 'panda',
     
-    // 乗り物
+    // 🚗 乗り物
     'カー': 'car',
     'バス': 'bus',
     'トレイン': 'train',
@@ -46,7 +160,7 @@ function convertKatakanaToEnglish(text: string): string {
     'バイク': 'bike',
     'タクシー': 'taxi',
     
-    // スポーツ
+    // ⚽ スポーツ
     'サッカー': 'soccer',
     'バスケットボール': 'basketball',
     'テニス': 'tennis',
@@ -175,12 +289,25 @@ function convertKatakanaToEnglish(text: string): string {
 
   let result = text;
 
-  // 1. まず英語変換マップで直接変換を試行
+  // 1. 【最優先】完全一致辞書変換
   for (const [katakana, english] of Object.entries(katakanaToEnglish)) {
     result = result.replace(new RegExp(katakana, 'g'), english);
   }
 
-  // 2. 残ったカタカナをローマ字に変換
+  // 2. 【推論】辞書にない場合の賢い推論変換
+  const remainingKatakana = result.match(/[\u30A0-\u30FF]+/g);
+  if (remainingKatakana) {
+    for (const kata of remainingKatakana) {
+      // 推論ロジック適用
+      const inferredTranslation = inferKatakanaToEnglish(kata);
+      if (inferredTranslation) {
+        result = result.replace(new RegExp(kata, 'g'), inferredTranslation);
+        console.log(`🧠 カタカナ推論: ${kata} → ${inferredTranslation}`);
+      }
+    }
+  }
+
+  // 3. 【フォールバック】残ったカタカナをローマ字に変換
   // カタカナをひらがなに変換
   for (const [katakana, hiragana] of Object.entries(katakanaToHiragana)) {
     result = result.replace(new RegExp(katakana, 'g'), hiragana);
@@ -192,6 +319,116 @@ function convertKatakanaToEnglish(text: string): string {
   }
 
   console.log('🔤 カタカナ変換:', { original: text, converted: result });
+  return result;
+}
+
+// 🧠 カタカナ推論変換機能
+function inferKatakanaToEnglish(katakana: string): string | null {
+  console.log(`🔍 推論対象: ${katakana}`);
+  
+  // パターン1: 音楽グループ名推論
+  if (katakana.includes('ズ') && katakana.length >= 4) {
+    // 「ビートルズ」「ストーンズ」のようなグループ名
+    const baseSound = katakana.replace(/ズ$/, 's');
+    console.log(`🎵 音楽グループ推論: ${katakana} → ${baseSound}`);
+    
+    if (katakana === 'ビートルズ') return 'The Beatles';
+    if (katakana === 'ローリングストーンズ') return 'The Rolling Stones';
+  }
+  
+  // パターン2: 人名推論（音韻パターン）
+  if (katakana.includes('・') || katakana.length >= 5) {
+    // 「ジョン・レノン」「ポール・マッカートニー」のような人名
+    const romanized = convertToRomanized(katakana);
+    console.log(`👤 人名推論: ${katakana} → ${romanized}`);
+    return romanized;
+  }
+  
+  // パターン3: ブランド名推論
+  if (katakana.endsWith('ー') || katakana.endsWith('ル')) {
+    // 「アップル」「グーグル」のようなブランド名
+    const romanized = convertToRomanized(katakana);
+    console.log(`🏢 ブランド推論: ${katakana} → ${romanized}`);
+    return romanized;
+  }
+  
+  // パターン4: 地名推論
+  if (katakana.includes('ニュー') || katakana.includes('サン') || katakana.includes('ロス')) {
+    // 「ニューヨーク」「サンフランシスコ」「ロサンゼルス」
+    const romanized = convertToRomanized(katakana);
+    console.log(`🌍 地名推論: ${katakana} → ${romanized}`);
+    return romanized;
+  }
+  
+  // パターン5: 一般的なカタカナ英語推論
+  if (katakana.length >= 3) {
+    const romanized = convertToRomanized(katakana);
+    console.log(`🔤 一般推論: ${katakana} → ${romanized}`);
+    return romanized;
+  }
+  
+  return null;
+}
+
+// カタカナを賢くローマ字変換（音韻ルール適用）
+function convertToRomanized(katakana: string): string {
+  let result = katakana;
+  
+  // 特殊音韻変換ルール
+  const phoneticRules: { [key: string]: string } = {
+    // 長音処理
+    'ー': '',
+    'ウ': 'u',
+    'ー$': '',
+    
+    // 音楽業界でよくある音韻
+    'ビート': 'Beat',
+    'ル': 'le',
+    'ルズ': 'les',
+    'トル': 'tol',
+    'トルズ': 'tles',
+    
+    // 二重音韻処理
+    'ッ': '',
+    'ツ': 'ts',
+    'ャ': 'ya',
+    'ュ': 'yu',
+    'ョ': 'yo',
+    
+    // 語尾処理
+    'ズ$': 's',
+    'ス$': 's',
+    'ン$': 'n'
+  };
+  
+  // 特殊ルール適用
+  for (const [pattern, replacement] of Object.entries(phoneticRules)) {
+    result = result.replace(new RegExp(pattern, 'g'), replacement);
+  }
+  
+  // 基本的なカタカナ→ローマ字変換
+  const basicKanaMap: { [key: string]: string } = {
+    'ア': 'a', 'イ': 'i', 'ウ': 'u', 'エ': 'e', 'オ': 'o',
+    'カ': 'ka', 'キ': 'ki', 'ク': 'ku', 'ケ': 'ke', 'コ': 'ko',
+    'ガ': 'ga', 'ギ': 'gi', 'グ': 'gu', 'ゲ': 'ge', 'ゴ': 'go',
+    'サ': 'sa', 'シ': 'shi', 'ス': 'su', 'セ': 'se', 'ソ': 'so',
+    'ザ': 'za', 'ジ': 'ji', 'ズ': 'zu', 'ゼ': 'ze', 'ゾ': 'zo',
+    'タ': 'ta', 'チ': 'chi', 'ツ': 'tsu', 'テ': 'te', 'ト': 'to',
+    'ダ': 'da', 'ヂ': 'ji', 'ヅ': 'zu', 'デ': 'de', 'ド': 'do',
+    'ナ': 'na', 'ニ': 'ni', 'ヌ': 'nu', 'ネ': 'ne', 'ノ': 'no',
+    'ハ': 'ha', 'ヒ': 'hi', 'フ': 'fu', 'ヘ': 'he', 'ホ': 'ho',
+    'バ': 'ba', 'ビ': 'bi', 'ブ': 'bu', 'ベ': 'be', 'ボ': 'bo',
+    'パ': 'pa', 'ピ': 'pi', 'プ': 'pu', 'ペ': 'pe', 'ポ': 'po',
+    'マ': 'ma', 'ミ': 'mi', 'ム': 'mu', 'メ': 'me', 'モ': 'mo',
+    'ヤ': 'ya', 'ユ': 'yu', 'ヨ': 'yo',
+    'ラ': 'ra', 'リ': 'ri', 'ル': 'ru', 'レ': 're', 'ロ': 'ro',
+    'ワ': 'wa', 'ヲ': 'wo', 'ン': 'n'
+  };
+  
+  for (const [kana, roman] of Object.entries(basicKanaMap)) {
+    result = result.replace(new RegExp(kana, 'g'), roman);
+  }
+  
   return result;
 }
 
@@ -245,34 +482,65 @@ export async function POST(req: Request) {
       
       if (
         !storyData ||
-        !storyData.protagonistType ||
-        !storyData.settingType
+        (!storyData.genre && !storyData.protagonistType) ||
+        (!storyData.tone && !storyData.settingType)
       ) {
         console.error('❌ ストーリー設定が不完全です');
         return NextResponse.json({ error: 'ストーリー設定が不完全です' }, { status: 400 });
       }
       
-      const { protagonistType, protagonistFeature, genre, situation, feeling } = storyData;
+      // UI側パラメータ（genre/tone/feeling）をAPI側パラメータに変換
+      const { protagonistType, protagonistFeature, genre, tone, situation, feeling } = storyData;
+      
+      // UI側からの新形式パラメータ対応
+      const actualGenre = genre || 'adventure';
+      const actualTone = tone || 'serious';
+      const actualFeeling = feeling || 'satisfying';
+      
+      // protagonistType/settingTypeが未指定の場合、genreから推定
+      const inferredProtagonist = protagonistType || 'young person';
+      const inferredSetting = storyData.settingType || 'mysterious place';
 
-      // ジャンル・トーン変換
+      // ジャンル・トーン変換（UI側パラメータ対応）
       const genreMap = {
-        'comedy': 'humorous and light-hearted',
-        'serious': 'serious and meaningful',
-        'suspense': 'suspenseful with mystery and tension',
-        'fantasy': 'fantasy with magical elements'
+        'Adventure': 'adventure with exciting journeys',
+        'Romance': 'romantic with emotional connections',
+        'Mystery': 'mysterious with puzzles to solve',
+        'Fantasy': 'fantasy with magical elements',
+        'Science Fiction': 'science fiction with futuristic elements',
+        'Drama': 'dramatic with meaningful relationships',
+        'Comedy': 'humorous and light-hearted',
+        'Thriller': 'thrilling with suspense and tension'
+      };
+
+      // トーン変換
+      const toneMap = {
+        'Lighthearted': 'lighthearted and fun',
+        'Serious': 'serious and meaningful',
+        'Mysterious': 'mysterious and intriguing',
+        'Romantic': 'romantic and emotional',
+        'Suspenseful': 'suspenseful with tension',
+        'Humorous': 'humorous and entertaining',
+        'Melancholic': 'melancholic and thoughtful',
+        'Inspiring': 'inspiring and uplifting'
       };
 
       // 読後感変換
       const feelingMap = {
-        'moved': 'emotionally touching',
-        'surprise': 'surprising twist',
-        'thrilling': 'thrilling and exciting',
-        'courage': 'inspiring and empowering'
+        'Hope': 'hopeful and optimistic',
+        'Satisfaction': 'satisfying resolution',
+        'Wonder': 'sense of wonder and amazement',
+        'Empowerment': 'empowering and inspiring',
+        'Reflection': 'thoughtful and reflective',
+        'Joy': 'joyful and uplifting',
+        'Melancholy': 'bittersweet and contemplative',
+        'Terrifying': 'thrilling with unexpected twists'
       };
 
-      const character = `${protagonistType}${protagonistFeature ? ` ${protagonistFeature}` : ''} protagonist`;
-      const tone = genreMap[genre as keyof typeof genreMap] || 'engaging';
-      const emotion = feelingMap[feeling as keyof typeof feelingMap] || 'satisfying';
+      const character = `${inferredProtagonist}${protagonistFeature ? ` ${protagonistFeature}` : ''}`;
+      const storyGenre = genreMap[actualGenre as keyof typeof genreMap] || 'engaging adventure';
+      const storyTone = toneMap[actualTone as keyof typeof toneMap] || 'engaging';
+      const emotion = feelingMap[actualFeeling as keyof typeof feelingMap] || 'satisfying';
 
       // NGSLテンプレートを使用
       const promptTemplate = getPromptTemplate(level);
@@ -285,20 +553,33 @@ export async function POST(req: Request) {
 
 Story Requirements:
 - Main character: ${character}
-- Genre/tone: ${tone}
-- Conflict or situation: ${situation}
+- Genre: ${storyGenre}
+- Tone: ${storyTone}
+- Setting: ${inferredSetting}
+- Conflict or situation: ${situation || 'a meaningful challenge that tests the character'}
 - Emotional effect at the end: ${emotion}
+- MANDATORY PLOT TWIST: Include a surprising plot twist or revelation at the end that completely changes how the reader understands the story. The twist should be unexpected but make sense when looking back at earlier clues.
 
 CRITICAL VOCABULARY CONSTRAINT: Only use Level ${level} vocabulary and below. 
 Example allowed words: ${vocabularyConstraint}...
 ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply with NGSL Level 1-${level} classification.
 
-Output format:
-【英語】
-<English story>
+CRITICAL OUTPUT REQUIREMENTS:
+- First line: Write a compelling English title (3-8 words)
+- Second line: Leave blank
+- Third line onward: Write the English story (3-4 paragraphs)
+- After English story: Leave one blank line
+- Then write the Japanese translation (3-4 paragraphs)
+- NO labels, headers, or placeholders anywhere
+- ABSOLUTELY NO decorative lines, borders, or symbols like ──── or ═══
+- NO asterisks, stars, or any visual separators
 
-【日本語】
-<Japanese translation>
+Example format:
+The Secret Garden Adventure
+
+Once upon a time, there was a girl...
+
+昔々、少女がいました...
       `.trim();
 
     } else {
@@ -351,10 +632,10 @@ ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply wit
 
 Requirements:
 - Structure: 3-4 paragraphs with logical development
-- Include TWO surprising but verifiable facts or fascinating episodes that will amaze readers
-- These facts should be unexpected, memorable, and educationally valuable
-- Make sure these surprising elements are woven naturally into the content
-- Translation: After each English paragraph, provide Japanese translation
+- MANDATORY SURPRISING FACTS: Include exactly TWO amazing, surprising, and verifiable facts that will genuinely shock readers. These should be "Did you know?" moments that make people say "Wow, I never knew that!"
+- Examples of surprising facts: "Octopuses have three hearts", "Bananas are berries but strawberries aren't", "There are more trees on Earth than stars in the Milky Way"
+- These facts should be unexpected, memorable, educationally valuable, and seamlessly integrated into the content
+- Translation: After each English paragraph, provide Japanese translation  
 - NO labels, headers, or numbering of any kind
 
 Output format:
@@ -375,15 +656,29 @@ Japanese paragraph
     console.log('📤 【GPT-3.5-turbo】送信するプロンプト:', userPrompt.substring(0, 200) + '...');
     console.log('🤖 【モデル情報】使用モデル: gpt-3.5-turbo, max_tokens: 2000');
 
-    // Level別システムメッセージ
-    let systemMessage = "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. NEVER include any labels, headers, numbering, or section markers like 'Japanese Translation 1' or 'English paragraph 1'. Write only the content itself. COUNT YOUR WORDS before finishing - you must reach at least 220 words.";
+    // Level別システムメッセージ（コンテンツタイプ別）
+    let systemMessage;
     
-    if (level <= 3) {
-      systemMessage = `CRITICAL: You are writing for 10-year-old children. You MUST use ONLY the simplest English words. Any word longer than 5 letters is FORBIDDEN (except: people, mother, father, sister, brother, family, house, water, today). Use only words that appear in beginner children's books. Write exactly 140-200 words in 3 paragraphs. EVERY word must be simple and basic. NEVER include any labels or numbering.`;
-    } else if (level === 4) {
-      systemMessage = `You are writing for intermediate English learners (B2 level). CRITICAL: You MUST write exactly 200-240 words. COUNT your words carefully - you must reach at least 200 words. Write in at least 3 paragraphs. Include complex sentence structures and intermediate vocabulary. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL.`;
-    } else if (level >= 5) {
-      systemMessage = `You are writing for advanced English learners (C1+ level). CRITICAL: You MUST write exactly 240-280 words. COUNT your words carefully - you must reach at least 240 words. Write in at least 3 paragraphs. Use sophisticated vocabulary, complex sentence structures, nuanced expressions, and varied sentence patterns. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL.`;
+    if (contentType === 'story') {
+      // ストーリー用システムメッセージ
+      if (level <= 3) {
+        systemMessage = `You are a children's story writer. Write a complete story for 10-year-old children using ONLY simple English words. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (140-200 words in 3-4 paragraphs), blank line, then Japanese translation. Create a catchy, engaging title that captures the story's essence. MANDATORY: Include a surprising plot twist at the end that changes everything. NO labels, markers, or decorative lines anywhere.`;
+      } else if (level === 4) {
+        systemMessage = `You are a story writer for intermediate English learners. Write a complete story using intermediate vocabulary. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (260-320 words in 3-4 paragraphs), blank line, then Japanese translation. Create an engaging title that reflects the story's main theme. MANDATORY: Include a clever plot twist or revelation at the end. NO labels, headers, or decorative lines.`;
+      } else {
+        systemMessage = `You are a story writer for advanced English learners. Write a sophisticated story with complex vocabulary and sentence structures. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (300-380 words in 3-4 paragraphs), blank line, then Japanese translation. Create a compelling, literary title that captures the story's depth. MANDATORY: Include a sophisticated plot twist that recontextualizes the entire narrative. NO labels, headers, or decorative lines.`;
+      }
+    } else {
+      // 読み物用システムメッセージ（既存）
+      systemMessage = "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. MANDATORY: Include exactly TWO genuinely surprising facts that will amaze readers. NEVER include any labels, headers, numbering, or section markers like 'Japanese Translation 1' or 'English paragraph 1'. Write only the content itself. COUNT YOUR WORDS before finishing - you must reach at least 220 words.";
+      
+      if (level <= 3) {
+        systemMessage = `CRITICAL: You are writing for 10-year-old children. You MUST use ONLY the simplest English words. Any word longer than 5 letters is FORBIDDEN (except: people, mother, father, sister, brother, family, house, water, today). Use only words that appear in beginner children's books. Write exactly 140-200 words in 3 paragraphs. MANDATORY: Include TWO amazing facts that will surprise children. EVERY word must be simple and basic. NEVER include any labels or numbering.`;
+      } else if (level === 4) {
+        systemMessage = `You are writing for intermediate English learners (B2 level). CRITICAL: You MUST write exactly 260-320 words. COUNT your words carefully - you must reach at least 260 words. Write in at least 4 detailed paragraphs with examples and explanations. MANDATORY: Include exactly TWO shocking, surprising facts that readers won't believe. Include complex sentence structures and intermediate vocabulary. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL - ADD MORE EXAMPLES AND DETAILS.`;
+      } else if (level >= 5) {
+        systemMessage = `You are writing for advanced English learners (C1+ level). CRITICAL: You MUST write exactly 300-380 words. COUNT your words carefully - you must reach at least 300 words. Write in at least 4 detailed paragraphs with sophisticated analysis and examples. MANDATORY: Include exactly TWO mind-blowing, counterintuitive facts that will astonish readers. Use sophisticated vocabulary, complex sentence structures, nuanced expressions, and varied sentence patterns. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL - PROVIDE COMPREHENSIVE COVERAGE.`;
+      }
     }
 
     const completion = await openai.chat.completions.create({
@@ -410,13 +705,76 @@ Japanese paragraph
       return text.trim().split(/\s+/).filter(word => word.length > 0).length;
     };
 
-    let eng, jp;
+    let eng, jp, title = '';
 
     if (contentType === 'story') {
-      // ストーリーの場合も日本語翻訳付きで処理
-      [eng, jp] = raw
-        .split(/【日本語】/i)
-        .map(part => part.replace(/【英語】/i, "").trim());
+      // ストーリーの場合: プレーンテキスト形式をパース
+      // 英語段落と日本語段落が空行で分かれている形式
+      const cleanedRaw = raw
+        .replace(/<English story>/gi, '')
+        .replace(/<Japanese translation>/gi, '')
+        .replace(/【英語】/gi, '')
+        .replace(/【日本語】/gi, '')
+        // 罫線・装飾文字の除去
+        .replace(/[─━═══─_-]{3,}/g, '')  // 罫線（3文字以上の連続）
+        .replace(/[※＊★☆◆◇■□▲△]/g, '') // 装飾記号
+        .replace(/^[-=_]{3,}$/gm, '')      // 行全体が罫線の場合
+        .replace(/^\s*[─━═_-]{3,}\s*$/gm, '') // 空白+罫線+空白の行
+        .trim();
+      
+      console.log('🎭 ストーリー生成後のクリーンアップ:', { 
+        originalLength: raw.length, 
+        cleanedLength: cleanedRaw.length,
+        preview: cleanedRaw.substring(0, 200) + '...'
+      });
+      
+      // 新形式: タイトル + 空行 + 英語ストーリー + 空行 + 日本語翻訳
+      const lines = cleanedRaw.split('\n');
+      
+      // タイトルを抽出（1行目）
+      let storyStartIndex = 0;
+      
+      if (lines.length > 0 && lines[0].trim().length > 0 && !/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(lines[0])) {
+        title = lines[0].trim();
+        storyStartIndex = 1;
+        console.log('🎭 タイトル抽出:', title);
+      }
+      
+      // 残りの部分を英語・日本語に分離
+      const remainingText = lines.slice(storyStartIndex).join('\n');
+      const sections = remainingText.split(/\n\s*\n/);
+      
+      if (sections.length >= 2) {
+        // 英語部分（前半）と日本語部分（後半）を分離
+        const englishSections = [];
+        const japaneseSections = [];
+        
+        for (const section of sections) {
+          if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(section)) {
+            // 日本語文字が含まれている場合
+            japaneseSections.push(section.trim());
+          } else if (section.trim().length > 0) {
+            // 英語のみの場合
+            englishSections.push(section.trim());
+          }
+        }
+        
+        eng = englishSections.join('\n\n');
+        jp = japaneseSections.join('\n\n');
+        
+        console.log('🎭 ストーリーパース結果:', {
+          title: title,
+          englishSections: englishSections.length,
+          japaneseSections: japaneseSections.length,
+          engLength: eng.length,
+          jpLength: jp.length
+        });
+      } else {
+        // フォールバック: 単一セクションの場合
+        eng = remainingText.trim();
+        jp = '';
+        console.log('🎭 ストーリーフォールバック: 英語のみ');
+      }
     } else {
       // 🔧 読み物の場合: 新しい段落ごと翻訳形式をパース（改良版）
       const lines = raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
@@ -431,7 +789,7 @@ Japanese paragraph
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
         
-        // ラベル除去: 「Japanese Translation 1」「English paragraph 2」などを除去
+        // ラベル・装飾除去: 「Japanese Translation 1」「English paragraph 2」「罫線」などを除去
         const labelPatterns = [
           /^Japanese [Tt]ranslation \d+:?/i,
           /^English [Pp]aragraph \d+:?/i,
@@ -439,7 +797,10 @@ Japanese paragraph
           /^【英語】/,
           /^English:/i,
           /^Japanese:/i,
-          /^\d+\./  // 番号付きリストの除去
+          /^\d+\./,  // 番号付きリストの除去
+          /^[─━═_-]{3,}$/,  // 罫線（行全体）
+          /^[※＊★☆◆◇■□▲△]+$/,  // 装飾記号のみの行
+          /^\s*[─━═_-]{3,}\s*$/  // 空白+罫線+空白
         ];
         
         let isLabel = false;
@@ -505,13 +866,13 @@ Japanese paragraph
         maxWords = 200;
         targetRange = '140-200語';
       } else if (level === 4) {
-        minWords = 200;
-        maxWords = 240;
-        targetRange = '200-240語';
+        minWords = 260;
+        maxWords = 320;
+        targetRange = '260-320語';
       } else {
-        minWords = 240;
-        maxWords = 280;
-        targetRange = '240-280語';
+        minWords = 300;
+        maxWords = 380;
+        targetRange = '300-380語';
       }
       
       if (wordCount < minWords) {
@@ -563,6 +924,25 @@ Japanese paragraph
       return NextResponse.json({ error: '英語テキストの生成に失敗しました' }, { status: 500 });
     }
 
+    // 🧹 最終クリーンアップ: 全ての罫線・装飾文字を除去
+    const finalCleanup = (text: string): string => {
+      return text
+        .replace(/[─━═══─_-]{3,}/g, '')  // 罫線（3文字以上の連続）
+        .replace(/[※＊★☆◆◇■□▲△]/g, '') // 装飾記号
+        .replace(/^[-=_]{3,}$/gm, '')      // 行全体が罫線
+        .replace(/^\s*[─━═_-]{3,}\s*$/gm, '') // 空白+罫線+空白の行
+        .replace(/\n{3,}/g, '\n\n')       // 3行以上の空行を2行に
+        .trim();
+    };
+
+    eng = finalCleanup(eng);
+    if (jp) jp = finalCleanup(jp);
+
+    console.log('🧹 最終クリーンアップ完了:', {
+      englishLength: eng.length,
+      japaneseLength: jp?.length || 0
+    });
+
     // 語彙レベル検証
     const vocabularyAnalysis = analyzeVocabulary(eng);
     console.log('📊 語彙レベル分析:', {
@@ -589,7 +969,14 @@ Japanese paragraph
       timestamp: new Date().toISOString()
     });
     
-    return NextResponse.json({ english: eng, japanese: jp || '' });
+    // ストーリーの場合はタイトルも含めてレスポンス
+    const response: any = { english: eng, japanese: jp || '' };
+    if (contentType === 'story' && title) {
+      response.title = title;
+      console.log('🎭 ストーリータイトル付きレスポンス:', title);
+    }
+    
+    return NextResponse.json(response);
   } catch (err) {
     console.error("generate-reading error:", err);
     return NextResponse.json({ error: "Failed to generate reading" }, { status: 500 });
