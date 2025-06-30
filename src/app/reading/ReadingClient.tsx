@@ -674,8 +674,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             <div>
               <TTSButton
                 text={english}
-                contentId={`reading-${Date.now()}`}
+                contentId="reading-full-content"
                 variant="secondary"
+                className="px-4 py-2"
               />
             </div>
           </div>
@@ -689,16 +690,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 console.log(`📝 段落 ${index + 1}:`, paragraph.substring(0, 50) + '...');
                 return (
                 <div key={index} className="mb-6">
-                  {/* TTSボタン */}
-                  <div className="flex items-center justify-end mb-2">
-                    <TTSButton
-                      text={paragraph}
-                      contentId={`paragraph-${index}`}
-                      variant="secondary"
-                      className="text-sm"
-                    />
-                  </div>
-                  
                   {/* 英語段落 */}
                   <p 
                     className="mb-3 text-base leading-relaxed text-[#1E1E1E]"
@@ -725,10 +716,18 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             </div>
             
             <div className="mt-6 flex flex-wrap gap-3">
+              {/* 全体音声再生ボタン */}
+              <TTSButton
+                text={english}
+                contentId="reading-full-content"
+                variant="secondary"
+                className="px-4 py-2"
+              />
+              
               {!showJapanese && (
                 <button
                   onClick={handleShowJapanese}
-                  className="bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#e5a561] transition-colors"
+                  className="bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#e5a561] transition-colors font-bold"
                 >
                   日本語を表示
                 </button>
@@ -737,7 +736,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               {!endTime && (
                 <button
                   onClick={handleCompleteReading}
-                  className="bg-[#FFE1B5] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#f0d1a0] transition-colors font-medium"
+                  className="bg-[#FFE1B5] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#f0d1a0] transition-colors font-bold"
                 >
                   読書完了
                 </button>

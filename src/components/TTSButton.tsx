@@ -91,7 +91,7 @@ export default function TTSButton({
     setIsPlaying(false);
   };
 
-  const baseClasses = "inline-flex items-center px-3 py-2 rounded-md font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const baseClasses = "inline-flex items-center rounded-md font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
   
   const variantClasses = {
     primary: "bg-primary-inactive text-text-primary hover:opacity-80 focus:ring-primary-inactive",
@@ -101,13 +101,13 @@ export default function TTSButton({
   const disabledClasses = "bg-gray-300 text-gray-500 cursor-not-allowed";
 
   return (
-    <div className={`inline-block ${className}`}>
+    <div className="inline-block">
       {/* Main TTS Button */}
       {!audioUrl ? (
         <button
           onClick={generateAndPlayAudio}
           disabled={isLoading || !text.trim()}
-          className={`${baseClasses} ${
+          className={`${baseClasses} ${className} ${
             isLoading || !text.trim() 
               ? disabledClasses 
               : variantClasses[variant]
@@ -128,7 +128,7 @@ export default function TTSButton({
       ) : (
         <button
           onClick={togglePlayPause}
-          className={`${baseClasses} ${variantClasses[variant]}`}
+          className={`${baseClasses} ${className} ${variantClasses[variant]}`}
           title={isPlaying ? "一時停止" : "再生する"}
         >
           {isPlaying ? "一時停止" : "再生する"}
