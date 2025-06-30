@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useStory } from '@/lib/store/story';
 import MailNotification from '@/components/MailNotification';
+import TTSButton from '@/components/TTSButton';
 
 // 単語情報のインターフェース
 interface WordInfo {
@@ -662,13 +663,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             <h2 className="text-lg font-semibold mb-2">読書を開始しますか？</h2>
             <p className="text-gray-600 mb-4">語数: {wordCount}語</p>
             
-            
             <button
               onClick={handleStartReading}
-              className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-medium hover:bg-[#e5a561] transition-colors"
+              className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-bold hover:bg-[#e5a561] transition-colors mb-4"
             >
               読み始める
             </button>
+            
+            {/* TTS Button for full content */}
+            <div>
+              <TTSButton
+                text={english}
+                contentId={`reading-${Date.now()}`}
+                variant="secondary"
+              />
+            </div>
           </div>
         </div>
       ) : (
@@ -680,6 +689,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 console.log(`📝 段落 ${index + 1}:`, paragraph.substring(0, 50) + '...');
                 return (
                 <div key={index} className="mb-6">
+                  {/* TTSボタン */}
+                  <div className="flex items-center justify-end mb-2">
+                    <TTSButton
+                      text={paragraph}
+                      contentId={`paragraph-${index}`}
+                      variant="secondary"
+                      className="text-sm"
+                    />
+                  </div>
+                  
                   {/* 英語段落 */}
                   <p 
                     className="mb-3 text-base leading-relaxed text-[#1E1E1E]"

@@ -10,6 +10,7 @@ import { saveToHistory } from '@/lib/saveToHistory';
 import { processNextInQueue, checkForPendingMailAfterLetterCompletion } from '@/lib/letterPriorityUtils';
 import '@/lib/testMailGeneration'; // テスト用ユーティリティを読み込み
 import '@/lib/forceMailDisplay'; // 緊急メール表示テスト
+import TTSButton from '@/components/TTSButton';
 
 function LetterPageContent() {
   const router = useRouter();
@@ -46,9 +47,19 @@ function LetterPageContent() {
     // letter type content header
     const letterHeader = (
       <div className="border-l-4 border-[#FFB86C] pl-4 mb-4">
-        <div className="flex items-center mb-2">
-          <span className="text-[#FFB86C] text-lg">📮</span>
-          <span className="ml-2 text-[#1E1E1E] font-semibold">到着手紙</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <span className="text-[#FFB86C] text-lg">📮</span>
+            <span className="ml-2 text-[#1E1E1E] font-semibold">到着手紙</span>
+          </div>
+          {letterData?.en && (
+            <TTSButton
+              text={letterData.en}
+              contentId={`arrival-letter-${cityName}`}
+              variant="secondary"
+              className="text-sm"
+            />
+          )}
         </div>
       </div>
     );
@@ -96,9 +107,19 @@ function LetterPageContent() {
     // mail type content header
     const mailHeader = (
       <div className="border-l-4 border-orange-500 pl-4 mb-4">
-        <div className="flex items-center mb-2">
-          <span className="text-orange-600 text-lg">✉️</span>
-          <span className="ml-2 text-orange-600 font-semibold">機内メール</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center">
+            <span className="text-orange-600 text-lg">✉️</span>
+            <span className="ml-2 text-orange-600 font-semibold">機内メール</span>
+          </div>
+          {diary?.en && (
+            <TTSButton
+              text={diary.en}
+              contentId={`in-flight-mail-${Date.now()}`}
+              variant="secondary"
+              className="text-sm"
+            />
+          )}
         </div>
       </div>
     );

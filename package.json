@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.50.2",
     "@types/uuid": "^10.0.0",
     "@vercel/speed-insights": "^1.0.12",
     "framer-motion": "^12.15.0",
