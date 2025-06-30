@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { mapQuizLevelToGenerationLevel, getGenerationLevelName } from '@/utils/getEnglishText';
 
 interface ReadingHistoryItem {
   id: string;
@@ -140,7 +141,12 @@ export default function HistoryPage() {
                 </div>
                 <div>
                   <span className="text-gray-500">レベル</span>
-                  <p className="font-medium">{item.level}</p>
+                  <p className="font-medium">
+                    {item.level <= 10 ? 
+                      `${getGenerationLevelName(mapQuizLevelToGenerationLevel(item.level))}` : 
+                      `Lv.${item.level}`
+                    }
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-500">語数</span>

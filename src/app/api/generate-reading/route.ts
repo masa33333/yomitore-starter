@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getAllowedWords, analyzeVocabulary } from "@/constants/ngslData";
 import { findForbiddenWords } from "@/constants/forbiddenWords";
 import { getPromptTemplate } from "@/constants/promptTemplates";
+import { mapQuizLevelToGenerationLevel } from "@/utils/getEnglishText";
 
 // カタカナを英語/ローマ字に変換する関数
 function convertKatakanaToEnglish(text: string): string {
@@ -80,6 +81,16 @@ function convertKatakanaToEnglish(text: string): string {
     'ベートーベン': 'Beethoven',
     'バッハ': 'Bach',
     'ショパン': 'Chopin',
+    
+    // 🇯🇵 日本の著名人・作家
+    '村上春樹': 'Haruki Murakami',
+    '夏目漱石': 'Natsume Soseki',
+    '芥川龍之介': 'Akutagawa Ryunosuke',
+    '川端康成': 'Kawabata Yasunari',
+    '三島由紀夫': 'Mishima Yukio',
+    '太宰治': 'Dazai Osamu',
+    '宮沢賢治': 'Miyazawa Kenji',
+    '谷崎潤一郎': 'Tanizaki Junichiro',
     
     // 🏢 企業・ブランド
     'アップル': 'Apple',
@@ -459,8 +470,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ content: raw });
     }
 
-    if (!level || level < 1 || level > 5) {
-      console.log('❌ 不正なレベル:', level);
+    // レベル検証と調整
+    let adjustedLevel = level;
+    
+    // レベルが1-5の範囲外の場合のみマッピングを適用（クイズレベルの可能性）
+    if (level > 5) {
+      adjustedLevel = mapQuizLevelToGenerationLevel(level);
+      console.log(`📊 クイズレベル→生成レベル: ${level} → ${adjustedLevel}`);
+    } else {
+      console.log(`📊 生成レベルそのまま使用: ${level}`);
+    }
+    
+    if (!adjustedLevel || adjustedLevel < 1 || adjustedLevel > 5) {
+      console.log('❌ 不正なレベル:', adjustedLevel);
       return NextResponse.json({ error: '語彙レベルが不正です (1-5)' }, { status: 400 });
     }
 
@@ -468,10 +490,10 @@ export async function POST(req: Request) {
     console.log('📝 生成リクエスト:', requestData);
 
     // ---- 1. NGSL語彙リスト取得 ----
-    const allowedWordsArray = getAllowedWords(level);
+    const allowedWordsArray = getAllowedWords(adjustedLevel);
     const allowedWords = allowedWordsArray.join(", ");
     
-    console.log(`✅ Level ${level} 許可語彙数:`, allowedWordsArray.length);
+    console.log(`✅ Level ${adjustedLevel} 許可語彙数:`, allowedWordsArray.length);
 
     // ---- 2. コンテンツタイプ別プロンプト生成 ----
     let userPrompt = '';
@@ -543,12 +565,21 @@ export async function POST(req: Request) {
       const emotion = feelingMap[actualFeeling as keyof typeof feelingMap] || 'satisfying';
 
       // NGSLテンプレートを使用
-      const promptTemplate = getPromptTemplate(level);
+      const promptTemplate = getPromptTemplate(adjustedLevel);
       
       // 許可語彙リストを取得
-      const allowedWords = getAllowedWords(level);
+      const allowedWords = getAllowedWords(adjustedLevel);
       const vocabularyConstraint = allowedWords.slice(0, 50).join(', '); // 最初の50語を例として提示
       
+      // レベル別語数要求を明確化
+      const wordCountByLevel = {
+        1: "80-120 words exactly",
+        2: "110-150 words exactly (CRITICAL: Must reach at least 110 words)",
+        3: "140-200 words exactly (CRITICAL: Must reach at least 140 words)",
+        4: "200-240 words exactly (CRITICAL: Must reach at least 200 words)",
+        5: "240-280 words exactly (CRITICAL: Must reach at least 240 words)"
+      };
+
       userPrompt = `${promptTemplate}
 
 Story Requirements:
@@ -560,9 +591,26 @@ Story Requirements:
 - Emotional effect at the end: ${emotion}
 - MANDATORY PLOT TWIST: Include a surprising plot twist or revelation at the end that completely changes how the reader understands the story. The twist should be unexpected but make sense when looking back at earlier clues.
 
-CRITICAL VOCABULARY CONSTRAINT: Only use Level ${level} vocabulary and below. 
+CRITICAL VOCABULARY CONSTRAINT: Only use Level ${adjustedLevel} vocabulary and below. 
 Example allowed words: ${vocabularyConstraint}...
-ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply with NGSL Level 1-${level} classification.
+ABSOLUTELY FORBIDDEN: Any words above Level ${adjustedLevel}. Every word must comply with NGSL Level 1-${adjustedLevel} classification.
+
+🚨 CRITICAL WORD COUNT EMERGENCY 🚨
+ABSOLUTE REQUIREMENT: ${wordCountByLevel[adjustedLevel as keyof typeof wordCountByLevel] || wordCountByLevel[3]}
+
+⚠️ WARNING: Your story will be REJECTED if it has fewer than the minimum word count.
+⚠️ You MUST write enough content to reach the required word count.
+⚠️ Count your words as you write. Stop when you reach the target range.
+
+EXPANSION STRATEGIES FOR STORIES:
+- Add detailed character descriptions and backgrounds
+- Include detailed setting descriptions with sensory details
+- Expand dialogue and character interactions
+- Add internal thoughts and emotions of characters
+- Include detailed action sequences
+- Add backstory and character motivations
+- Expand the plot with subplots or complications
+- Include detailed descriptions of scenes and environments
 
 CRITICAL OUTPUT REQUIREMENTS:
 - First line: Write a compelling English title (3-8 words)
@@ -615,28 +663,60 @@ Once upon a time, there was a girl...
       }
 
       // NGSLテンプレートを使用
-      const promptTemplate = getPromptTemplate(level);
+      const promptTemplate = getPromptTemplate(adjustedLevel);
       
       // 許可語彙リストを取得
-      const allowedWords = getAllowedWords(level);
+      const allowedWords = getAllowedWords(adjustedLevel);
       const vocabularyConstraint = allowedWords.slice(0, 50).join(', '); // 最初の50語を例として提示
       
+      // レベル別語数要求を明確化
+      const wordCountByLevel = {
+        1: "80-120 words exactly",
+        2: "110-150 words exactly (CRITICAL: Must reach at least 110 words)",
+        3: "140-200 words exactly (CRITICAL: Must reach at least 140 words)", 
+        4: "200-240 words exactly (CRITICAL: Must reach at least 200 words)",
+        5: "240-280 words exactly (CRITICAL: Must reach at least 240 words)"
+      };
+
       userPrompt = `${promptTemplate}
 
 Topic: ${actualTheme}${subTopic ? ` (focus: ${subTopic})` : ""}
 Style: ${styleInstruction}
 
-CRITICAL VOCABULARY CONSTRAINT: Only use Level ${level} vocabulary and below.
+CRITICAL VOCABULARY CONSTRAINT: Only use Level ${adjustedLevel} vocabulary and below.
 Example allowed words: ${vocabularyConstraint}...
-ABSOLUTELY FORBIDDEN: Any words above Level ${level}. Every word must comply with NGSL Level 1-${level} classification.
+ABSOLUTELY FORBIDDEN: Any words above Level ${adjustedLevel}. Every word must comply with NGSL Level 1-${adjustedLevel} classification.
+
+🚨 CRITICAL WORD COUNT EMERGENCY 🚨
+ABSOLUTE REQUIREMENT: ${wordCountByLevel[adjustedLevel as keyof typeof wordCountByLevel] || wordCountByLevel[3]}
+
+⚠️ WARNING: Your response will be REJECTED if it has fewer than the minimum word count.
+⚠️ You MUST write enough content to reach the required word count.
+⚠️ Count your words as you write. Stop when you reach the target range.
+
+EXPANSION STRATEGIES (use these to reach word count):
+- Add detailed background information and context
+- Include specific examples and real-world applications  
+- Provide step-by-step explanations
+- Add historical context or cultural information
+- Include quotes, statistics, or expert opinions
+- Expand descriptions with sensory details
+- Add comparisons and contrasts
+- Include "what if" scenarios or hypothetical examples
 
 Requirements:
-- Structure: 3-4 paragraphs with logical development
-- MANDATORY SURPRISING FACTS: Include exactly TWO amazing, surprising, and verifiable facts that will genuinely shock readers. These should be "Did you know?" moments that make people say "Wow, I never knew that!"
-- Examples of surprising facts: "Octopuses have three hearts", "Bananas are berries but strawberries aren't", "There are more trees on Earth than stars in the Milky Way"
-- These facts should be unexpected, memorable, educationally valuable, and seamlessly integrated into the content
+- Structure: 4-6 paragraphs (more paragraphs = more words)
+- MANDATORY SURPRISING FACTS: Include exactly TWO amazing, surprising, and verifiable facts
 - Translation: After each English paragraph, provide Japanese translation  
 - NO labels, headers, or numbering of any kind
+
+WORD COUNT VERIFICATION:
+After writing, count your words like this:
+"Dogs are amazing animals. They can learn many tricks and help people in different ways. [Count: 1,2,3...15 words so far]"
+
+Continue writing until you reach AT LEAST the minimum word count for Level ${adjustedLevel}.
+
+REMINDER: Write detailed, comprehensive content. Be thorough and expansive in your explanations.
 
 Output format:
 English paragraph
@@ -660,24 +740,30 @@ Japanese paragraph
     let systemMessage;
     
     if (contentType === 'story') {
-      // ストーリー用システムメッセージ
-      if (level <= 3) {
-        systemMessage = `You are a children's story writer. Write a complete story for 10-year-old children using ONLY simple English words. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (140-200 words in 3-4 paragraphs), blank line, then Japanese translation. Create a catchy, engaging title that captures the story's essence. MANDATORY: Include a surprising plot twist at the end that changes everything. NO labels, markers, or decorative lines anywhere.`;
-      } else if (level === 4) {
-        systemMessage = `You are a story writer for intermediate English learners. Write a complete story using intermediate vocabulary. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (260-320 words in 3-4 paragraphs), blank line, then Japanese translation. Create an engaging title that reflects the story's main theme. MANDATORY: Include a clever plot twist or revelation at the end. NO labels, headers, or decorative lines.`;
+      // ストーリー用システムメッセージ - 正しい語数制御
+      if (adjustedLevel === 1) {
+        systemMessage = `You are a children's story writer. Write a complete story for young children using ONLY the simplest English words. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (80-120 words exactly), blank line, then Japanese translation. MANDATORY: Include a simple plot twist. NO labels or decorative lines.`;
+      } else if (adjustedLevel === 2) {
+        systemMessage = `You are a children's story writer. Write a complete story using basic English. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (110-150 words exactly - MUST reach at least 110 words), blank line, then Japanese translation. MANDATORY: Include a surprising plot twist. NO labels or decorative lines.`;
+      } else if (adjustedLevel === 3) {
+        systemMessage = `You are a story writer for children. Write a complete story using simple but engaging English. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (140-200 words exactly - MUST reach at least 140 words), blank line, then Japanese translation. MANDATORY: Include a plot twist. NO labels or decorative lines.`;
+      } else if (adjustedLevel === 4) {
+        systemMessage = `You are a story writer for intermediate English learners. Write a complete story using intermediate vocabulary. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (200-240 words exactly - MUST reach at least 200 words), blank line, then Japanese translation. MANDATORY: Include a clever plot twist. NO labels or decorative lines.`;
       } else {
-        systemMessage = `You are a story writer for advanced English learners. Write a sophisticated story with complex vocabulary and sentence structures. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (300-380 words in 3-4 paragraphs), blank line, then Japanese translation. Create a compelling, literary title that captures the story's depth. MANDATORY: Include a sophisticated plot twist that recontextualizes the entire narrative. NO labels, headers, or decorative lines.`;
+        systemMessage = `You are a story writer for advanced English learners. Write a sophisticated story with complex vocabulary. CRITICAL FORMAT: First line = English title (3-8 words), blank line, then English story (240-280 words exactly - MUST reach at least 240 words), blank line, then Japanese translation. MANDATORY: Include a sophisticated plot twist. NO labels or decorative lines.`;
       }
     } else {
-      // 読み物用システムメッセージ（既存）
-      systemMessage = "You are an educational writer. Follow instructions strictly. Always write exactly 220-260 words in at least 3 paragraphs. MANDATORY: Include exactly TWO genuinely surprising facts that will amaze readers. NEVER include any labels, headers, numbering, or section markers like 'Japanese Translation 1' or 'English paragraph 1'. Write only the content itself. COUNT YOUR WORDS before finishing - you must reach at least 220 words.";
-      
-      if (level <= 3) {
-        systemMessage = `CRITICAL: You are writing for 10-year-old children. You MUST use ONLY the simplest English words. Any word longer than 5 letters is FORBIDDEN (except: people, mother, father, sister, brother, family, house, water, today). Use only words that appear in beginner children's books. Write exactly 140-200 words in 3 paragraphs. MANDATORY: Include TWO amazing facts that will surprise children. EVERY word must be simple and basic. NEVER include any labels or numbering.`;
-      } else if (level === 4) {
-        systemMessage = `You are writing for intermediate English learners (B2 level). CRITICAL: You MUST write exactly 260-320 words. COUNT your words carefully - you must reach at least 260 words. Write in at least 4 detailed paragraphs with examples and explanations. MANDATORY: Include exactly TWO shocking, surprising facts that readers won't believe. Include complex sentence structures and intermediate vocabulary. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL - ADD MORE EXAMPLES AND DETAILS.`;
-      } else if (level >= 5) {
-        systemMessage = `You are writing for advanced English learners (C1+ level). CRITICAL: You MUST write exactly 300-380 words. COUNT your words carefully - you must reach at least 300 words. Write in at least 4 detailed paragraphs with sophisticated analysis and examples. MANDATORY: Include exactly TWO mind-blowing, counterintuitive facts that will astonish readers. Use sophisticated vocabulary, complex sentence structures, nuanced expressions, and varied sentence patterns. NEVER include any labels, headers, or numbering. Write only the content itself. WORD COUNT IS CRITICAL - PROVIDE COMPREHENSIVE COVERAGE.`;
+      // 読み物用システムメッセージ - 正しい語数制御
+      if (adjustedLevel === 1) {
+        systemMessage = `You are an educational writer for young children. CRITICAL: Write exactly 80-120 words using ONLY the simplest English words. MANDATORY: Include TWO amazing facts that will surprise children. NEVER include any labels or numbering. COUNT YOUR WORDS carefully.`;
+      } else if (adjustedLevel === 2) {
+        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 110-150 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 110 words, you FAIL. Write at least 4 paragraphs with detailed explanations, examples, and descriptions. MANDATORY: Include TWO surprising facts. Add more details, background information, specific examples, and elaborate descriptions to reach the word count. NEVER include any labels or numbering.`;
+      } else if (adjustedLevel === 3) {
+        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 140-200 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 140 words, you FAIL. Write at least 4-5 paragraphs with detailed explanations, examples, context, and background information. MANDATORY: Include TWO amazing facts. Add more details, elaborate descriptions, specific examples, and comprehensive explanations to reach the word count. NEVER include any labels or numbering.`;
+      } else if (adjustedLevel === 4) {
+        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 200-240 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 200 words, you FAIL. Write at least 5-6 detailed paragraphs with comprehensive explanations, multiple examples, background context, and thorough analysis. MANDATORY: Include TWO shocking facts. Add extensive details, elaborate descriptions, specific examples, and comprehensive coverage to reach the word count. NEVER include any labels or numbering.`;
+      } else {
+        systemMessage = `You are an educational writer for advanced English learners. CRITICAL: Write exactly 240-280 words (MUST reach at least 240 words). Write sophisticated content with detailed analysis. MANDATORY: Include TWO mind-blowing facts. NEVER include any labels or numbering. COUNT YOUR WORDS carefully.`;
       }
     }
 
@@ -687,8 +773,8 @@ Japanese paragraph
         { role: "system", content: systemMessage },
         { role: "user",    content: userPrompt }
       ],
-      temperature: 0.7,
-      max_tokens: 2000,
+      temperature: 0.3, // 語数制御のため温度を下げる
+      max_tokens: 2500, // より多くのトークンを許可
     });
 
     // ---- 3. 出力パース ----
@@ -897,24 +983,24 @@ Japanese paragraph
       });
       
       // レベル適合性チェック
-      if (level <= 3) {
+      if (adjustedLevel <= 3) {
         const hasLevel4Plus = vocabAnalysis.percentages[4] > 0 || vocabAnalysis.percentages[5] > 0;
         if (hasLevel4Plus) {
-          console.error(`❌ Level ${level} 違反: Level 4/5語彙が含まれています`, {
+          console.error(`❌ Level ${adjustedLevel} 違反: Level 4/5語彙が含まれています`, {
             'Level 4': vocabAnalysis.percentages[4] + '%',
             'Level 5': vocabAnalysis.percentages[5] + '%'
           });
         } else {
-          console.log(`✅ Level ${level} 適合: 上位レベル語彙なし`);
+          console.log(`✅ Level ${adjustedLevel} 適合: 上位レベル語彙なし`);
         }
         
         // 🆕 禁止語彙チェック
-        const forbiddenWords = findForbiddenWords(eng, level);
+        const forbiddenWords = findForbiddenWords(eng, adjustedLevel);
         if (forbiddenWords.length > 0) {
-          console.error(`❌ Level ${level} 禁止語彙検出:`, forbiddenWords);
+          console.error(`❌ Level ${adjustedLevel} 禁止語彙検出:`, forbiddenWords);
           console.error(`   禁止語彙数: ${forbiddenWords.length}個`);
         } else {
-          console.log(`✅ Level ${level} 禁止語彙チェック: クリア`);
+          console.log(`✅ Level ${adjustedLevel} 禁止語彙チェック: クリア`);
         }
       }
     }
@@ -946,16 +1032,16 @@ Japanese paragraph
     // 語彙レベル検証
     const vocabularyAnalysis = analyzeVocabulary(eng);
     console.log('📊 語彙レベル分析:', {
-      level: level,
+      level: adjustedLevel,
       totalWords: vocabularyAnalysis.totalWords,
       levelPercentages: vocabularyAnalysis.percentages,
-      isCompliant: level === 1 ? vocabularyAnalysis.isLevel1Compliant :
-                   level === 2 ? vocabularyAnalysis.isLevel2Compliant :
-                   level === 3 ? vocabularyAnalysis.isLevel3Compliant : true
+      isCompliant: adjustedLevel === 1 ? vocabularyAnalysis.isLevel1Compliant :
+                   adjustedLevel === 2 ? vocabularyAnalysis.isLevel2Compliant :
+                   adjustedLevel === 3 ? vocabularyAnalysis.isLevel3Compliant : true
     });
 
     // レベル3での高次語彙使用をチェック
-    if (level === 3) {
+    if (adjustedLevel === 3) {
       const level4Plus = vocabularyAnalysis.percentages[4] + vocabularyAnalysis.percentages[5];
       if (level4Plus > 5) {
         console.warn(`⚠️ Level 3 制約違反: Level 4-5 語彙が ${level4Plus}% 使用されています (許可: 5%以下)`);

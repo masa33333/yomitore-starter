@@ -36,11 +36,11 @@ export default function ReadingFormPage() {
     e.preventDefault();
     setIsGenerating(true);
     
-    // ユーザーの語彙レベルを取得
-    const vocabLevel = localStorage.getItem('vocabLevel') || 
-                      localStorage.getItem('vocabularyLevel') || 
-                      localStorage.getItem('level') || 
+    // ユーザーの生成レベル（1-5）を取得
+    const vocabLevel = localStorage.getItem('level') || 
+                      localStorage.getItem('fixedLevel') || 
                       '3';
+    console.log('📊 Reading-form: 生成レベル使用:', vocabLevel);
     
     const params = new URLSearchParams({
       mode: 'reading',

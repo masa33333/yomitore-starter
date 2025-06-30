@@ -4,6 +4,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { mapQuizLevelToGenerationLevel, getGenerationLevelName } from '@/utils/getEnglishText';
 
 // 語彙レベルから難易度ラベルとCEFRレベルを取得する関数
 function getDifficultyFromLevel(level: number, lang: 'ja' | 'en' = 'ja'): string {
@@ -39,8 +40,9 @@ export default function ChoosePage() {
   const router = useRouter();
   const { displayLang } = useLanguage();
   
-  // 語彙テスト結果のレベル（固定値）
-  const [fixedLevel, setFixedLevel] = useState<number>(3);
+  // クイズレベル（1-10）と生成レベル（1-5）を分けて管理
+  const [quizLevel, setQuizLevel] = useState<number>(5);
+  const [generationLevel, setGenerationLevel] = useState<number>(3);
 
   // 表示テキストの定義
   const text = {
@@ -76,13 +78,17 @@ export default function ChoosePage() {
 
   useEffect(() => {
     try {
-      // localStorageから語彙レベルを取得
+      // localStorageからクイズレベル（1-10）を取得
       const savedVocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
       if (savedVocabLevel) {
         const levelNumber = Number(savedVocabLevel);
         if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 10) {
-          // 固定レベルを設定（語彙テスト結果）
-          setFixedLevel(levelNumber);
+          // クイズレベルを設定
+          setQuizLevel(levelNumber);
+          // 生成レベルにマッピング
+          const mappedLevel = mapQuizLevelToGenerationLevel(levelNumber);
+          setGenerationLevel(mappedLevel);
+          console.log(`📊 Choose画面: クイズLv.${levelNumber} → 生成Lv.${mappedLevel}`);
         }
       }
     } catch (error) {
@@ -93,11 +99,14 @@ export default function ChoosePage() {
 
   // カードクリック時の遷移処理
   const handleCardClick = (type: 'reading' | 'story') => {
-    // 実際の生成には固定レベル（語彙テスト結果）を使用
-    localStorage.setItem('fixedLevel', fixedLevel.toString());
-    localStorage.setItem('level', fixedLevel.toString());
-    localStorage.setItem('vocabLevel', fixedLevel.toString());
-    localStorage.setItem('vocabularyLevel', fixedLevel.toString());
+    // 生成レベル（1-5）を保存 - APIがこれを使用
+    localStorage.setItem('fixedLevel', generationLevel.toString());
+    localStorage.setItem('level', generationLevel.toString());
+    // クイズレベル（1-10）も保持（互換性のため）
+    localStorage.setItem('vocabLevel', quizLevel.toString());
+    localStorage.setItem('vocabularyLevel', quizLevel.toString());
+    
+    console.log(`📊 遷移時: 生成レベル${generationLevel}で${type}へ`);
     
     if (type === 'reading') {
       router.push('/reading-form');
@@ -109,7 +118,7 @@ export default function ChoosePage() {
   return (
     <main className="p-4 max-w-4xl mx-auto">
       <h1 className="text-xl font-bold mb-6">
-        {text.title[displayLang]}（{text.level[displayLang](getDifficultyFromLevel(fixedLevel, displayLang))}）
+        {text.title[displayLang]}（{getGenerationLevelName(generationLevel)}）
       </h1>
       
       {/* コンテンツタイプ選択カード */}

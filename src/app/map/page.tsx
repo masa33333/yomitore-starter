@@ -7,6 +7,7 @@ import { generateLetter } from '@/utils/generateLetter';
 import { saveLetterToStorage } from '@/lib/letterStorage';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getCurrentMapImage, getFallbackMapImage, getCurrentCity } from '@/utils/mapImageUtils';
+import { mapQuizLevelToGenerationLevel } from '@/utils/getEnglishText';
 
 export default function MapPage() {
   const router = useRouter();
@@ -42,15 +43,16 @@ export default function MapPage() {
 
     const generateAndSaveLetter = async () => {
       const lastCity = localStorage.getItem('lastCity');
-      const vocabLevel = localStorage.getItem('vocabLevel') || 'B1';
+      const quizLevel = parseInt(localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || '5', 10);
+      const userLevel = mapQuizLevelToGenerationLevel(quizLevel);
 
       if (!lastCity) return;
 
       try {
-        const letterText = await generateLetter(lastCity, vocabLevel);
+        console.log(`🗾 Map: Generating letter with Quiz Lv.${quizLevel} → Generation Lv.${userLevel}`);
+        const letterText = await generateLetter(lastCity, userLevel.toString());
         
         // Convert old letter format to new letter storage format
-        const userLevel = parseInt(vocabLevel, 10);
         saveLetterToStorage({
           type: "letter",
           jp: "都市からの手紙です。", // You may want to generate Japanese content too

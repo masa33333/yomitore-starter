@@ -39,8 +39,9 @@ export default function StoryFormPage() {
       return;
     }
 
-    // 🔧【修正】URLパラメータとして渡すように変更（searchParamsで取得可能にする）
-    const level = Number(localStorage.getItem('fixedLevel')) || Number(localStorage.getItem('level')) || Number(localStorage.getItem('vocabularyLevel')) || 6;
+    // ユーザーの生成レベル（1-5）を取得
+    const level = Number(localStorage.getItem('level')) || Number(localStorage.getItem('fixedLevel')) || 3;
+    console.log('📊 Story-form: 生成レベル使用:', level);
     
     // localStorageにも保存（フォールバック用）
     localStorage.setItem('storyParams', JSON.stringify({

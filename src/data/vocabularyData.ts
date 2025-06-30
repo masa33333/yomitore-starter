@@ -37,7 +37,6 @@ export const vocabularyData = {
   ],
   level4: [
     { word: "analyze", meaning: "分析する", options: ["統合する", "分析する", "要約する", "比較する"] },
-    { word: "approach", meaning: "アプローチ", options: ["回避", "アプローチ", "逃避", "拒否"] },
     { word: "concept", meaning: "概念", options: ["現実", "概念", "事実", "証拠"] },
     { word: "establish", meaning: "確立する", options: ["破壊する", "確立する", "変更する", "維持する"] },
     { word: "identify", meaning: "特定する", options: ["隠す", "特定する", "無視する", "混乱させる"] },
@@ -45,7 +44,8 @@ export const vocabularyData = {
     { word: "significant", meaning: "重要な", options: ["些細な", "重要な", "普通の", "特別な"] },
     { word: "structure", meaning: "構造", options: ["混乱", "構造", "無秩序", "複雑さ"] },
     { word: "theory", meaning: "理論", options: ["実践", "理論", "経験", "直感"] },
-    { word: "maintain", meaning: "維持する", options: ["破壊する", "維持する", "変更する", "創造する"] }
+    { word: "maintain", meaning: "維持する", options: ["破壊する", "維持する", "変更する", "創造する"] },
+    { word: "investigate", meaning: "調査する", options: ["無視する", "調査する", "隠蔽する", "推測する"] }
   ],
   level5: [
     { word: "comprehensive", meaning: "包括的な", options: ["部分的な", "包括的な", "限定的な", "表面的な"] },
@@ -57,7 +57,7 @@ export const vocabularyData = {
     { word: "sophisticated", meaning: "洗練された", options: ["単純な", "洗練された", "粗雑な", "基本的な"] },
     { word: "substantial", meaning: "相当な", options: ["わずかな", "相当な", "最小の", "無意味な"] },
     { word: "sufficient", meaning: "十分な", options: ["不足な", "十分な", "過度な", "最小限の"] },
-    { word: "terminate", meaning: "終了する", options: ["開始する", "終了する", "継続する", "中断する"] }
+    { word: "terminate", meaning: "終了する", options: ["開始する", "終了する", "継続する", "一時停止する"] }
   ],
   level6: [
     { word: "accommodate", meaning: "収容する", options: ["拒否する", "収容する", "排除する", "制限する"] },

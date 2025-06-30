@@ -2,6 +2,7 @@ import { saveLetterToStorage } from "@/lib/letterStorage";
 import { buildInFlightPrompt } from "@/lib/promptTemplates/inFlightPrompt";
 import { showNotification } from "@/lib/notificationUtils";
 import { countWords, calculateWPM } from "@/lib/wordCountUtils";
+import { mapQuizLevelToGenerationLevel } from "@/utils/getEnglishText";
 
 /**
  * 道中メール送信関数
@@ -12,9 +13,10 @@ export async function sendInFlightMail(leg: string, minute: number): Promise<voi
   try {
     console.log(`✈️ Sending in-flight mail for ${leg} at ${minute} minutes`);
     
-    // ユーザーレベル取得
-    const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
-    console.log(`✈️ User level: ${userLevel}`);
+    // ユーザーレベル取得 - クイズレベル（1-10）から生成レベル（1-5）にマッピング
+    const quizLevel = parseInt(localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || '5', 10);
+    const userLevel = mapQuizLevelToGenerationLevel(quizLevel);
+    console.log(`✈️ Level mapping: Quiz Lv.${quizLevel} → Generation Lv.${userLevel}`);
     
     // 航路解析
     const [fromCity, toCity] = leg.split('-');
@@ -110,7 +112,8 @@ export async function sendInFlightMail(leg: string, minute: number): Promise<voi
     console.error('✈️ Error sending in-flight mail:', error);
     
     // フォールバック処理
-    const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+    const quizLevel = parseInt(localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || '5', 10);
+    const userLevel = mapQuizLevelToGenerationLevel(quizLevel);
     const [fromCity, toCity] = leg.split('-');
     const catName = localStorage.getItem('catName') || 'Your cat';
     

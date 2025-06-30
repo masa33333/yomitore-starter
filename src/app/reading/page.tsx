@@ -35,13 +35,14 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
   
   if (isStoryMode) {
     const { genre, tone, feeling } = params;
-    // ユーザーの語彙レベルを取得（デフォルト3）
+    // ユーザーの語彙レベルを取得（デフォルト3）- 生成レベル（1-5）を使用
     const userLevel = params.level || '3';
     
     if (genre && tone && feeling) {
       // 専用のストーリー生成APIを使用
       try {
         console.log('🚀 ストーリー生成API呼び出し開始');
+        console.log('📊 Server Component: 生成レベル使用:', userLevel);
         
         const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/generate-reading`, {
           method: 'POST',
@@ -50,7 +51,7 @@ export default async function ReadingPage({ searchParams }: ReadingPageProps) {
           },
           body: JSON.stringify({
             contentType: 'story',
-            level: parseInt(userLevel),
+            level: parseInt(userLevel), // これは既に生成レベル（1-5）のはず
             storyData: {
               genre: genre,
               tone: tone,

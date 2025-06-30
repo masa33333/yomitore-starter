@@ -2,6 +2,7 @@ import { saveLetterToStorage } from "@/lib/letterStorage";
 import { buildArrivalPrompt } from "@/lib/promptTemplates/arrivalPrompt";
 import { showNotification } from "@/lib/notificationUtils";
 import { setArrivalMailFlag } from "@/lib/arrivalMailUtils";
+import { mapQuizLevelToGenerationLevel } from "@/utils/getEnglishText";
 
 /**
  * 到着メール送信関数
@@ -11,9 +12,10 @@ export async function sendArrivalMail(city: string): Promise<void> {
   try {
     console.log(`📬 Sending arrival mail for ${city}`);
     
-    // ユーザーレベル取得
-    const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
-    console.log(`📬 User level: ${userLevel}`);
+    // ユーザーレベル取得 - クイズレベル（1-10）から生成レベル（1-5）にマッピング
+    const quizLevel = parseInt(localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || '5', 10);
+    const userLevel = mapQuizLevelToGenerationLevel(quizLevel);
+    console.log(`📬 Level mapping: Quiz Lv.${quizLevel} → Generation Lv.${userLevel}`);
     
     // プロンプト生成
     const prompt = buildArrivalPrompt(city, userLevel);
@@ -87,7 +89,8 @@ export async function sendArrivalMail(city: string): Promise<void> {
     console.error('📬 Error sending arrival mail:', error);
     
     // フォールバック処理
-    const userLevel = parseInt(localStorage.getItem('vocabLevel') || '1', 10);
+    const quizLevel = parseInt(localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || '5', 10);
+    const userLevel = mapQuizLevelToGenerationLevel(quizLevel);
     const catName = localStorage.getItem('catName') || 'Your cat';
     
     const fallbackContent = {

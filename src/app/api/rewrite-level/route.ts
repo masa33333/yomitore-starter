@@ -16,8 +16,17 @@ export async function POST(req: Request) {
 
     const promptTemplate = getPromptTemplate(targetLevel);
     
-    const systemMessage = `You are an expert English rewriter specializing in NGSL vocabulary control.`;
+    const systemMessage = `You are an expert English rewriter specializing in NGSL vocabulary control. CRITICAL: Always ensure the rewritten text meets the exact word count requirements for the target level. Count your words carefully and add more details, examples, or descriptions if needed to reach the minimum word count.`;
     
+    // レベル別の語数要求を明確化
+    const wordCountRequirements = {
+      1: "80-120 words exactly",
+      2: "110-150 words exactly (CRITICAL: Must reach at least 110 words)",
+      3: "140-200 words exactly (CRITICAL: Must reach at least 140 words)",
+      4: "200-240 words exactly (CRITICAL: Must reach at least 200 words)",
+      5: "240-280 words exactly (CRITICAL: Must reach at least 240 words)"
+    };
+
     const userPrompt = `${promptTemplate}
 
 TASK: Rewrite the following text to match Level ${targetLevel} vocabulary constraints while keeping the same meaning and story.
@@ -25,12 +34,31 @@ TASK: Rewrite the following text to match Level ${targetLevel} vocabulary constr
 Original text:
 "${originalText}"
 
-REQUIREMENTS:
+🚨 CRITICAL WORD COUNT EMERGENCY 🚨
+ABSOLUTE REQUIREMENT: ${wordCountRequirements[targetLevel as keyof typeof wordCountRequirements] || wordCountRequirements[3]}
+
+⚠️ WARNING: Your rewrite will be REJECTED if it has fewer than the minimum word count.
+⚠️ You MUST expand the content to reach the required word count.
+⚠️ Count your words as you write.
+
+CRITICAL REQUIREMENTS:
 - Keep the EXACT same story and meaning
-- Keep the same number of paragraphs
 - Follow ALL NGSL vocabulary constraints from the template above
-- Ensure proper word count as specified in the template
 - Every word must be within the specified NGSL range
+
+EXPANSION STRATEGIES (MANDATORY if text is too short):
+- Add detailed background information and context
+- Include specific examples and illustrations
+- Expand character descriptions and motivations
+- Add sensory details and environmental descriptions
+- Include dialogue and character interactions
+- Add step-by-step explanations of processes
+- Provide historical or cultural context
+- Include comparisons and analogies
+- Add "what happened next" details
+- Expand emotional descriptions and reactions
+
+IMPORTANT: You MUST add enough content to reach the minimum word count. Be comprehensive and detailed.
 
 Output only the rewritten text, nothing else.`;
 
@@ -40,8 +68,8 @@ Output only the rewritten text, nothing else.`;
         { role: "system", content: systemMessage },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.3,
-      max_tokens: 1000,
+      temperature: 0.2, // 語数制御のため温度をさらに下げる
+      max_tokens: 2500, // より多くのトークンを許可
     });
 
     const rewrittenText = completion.choices[0].message.content?.trim() ?? "";

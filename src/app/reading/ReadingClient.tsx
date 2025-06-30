@@ -162,6 +162,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     console.log('📋 English paragraphs:', englishParagraphs);
     console.log('📊 Word count:', wordCount);
     
+    // 初期化時に正しい生成レベルをselectedLevelに設定
+    const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
+    setSelectedLevel(currentLevel);
+    console.log('📊 Initial selectedLevel set to:', currentLevel);
+    
     // URLパラメータをチェックしてnotebookからの戻りかどうかを判定
     const urlParams = new URLSearchParams(window.location.search);
     const fromNotebook = urlParams.get('fromNotebook') === 'true' || urlParams.get('from') === 'notebook';
@@ -343,8 +348,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     try {
       console.log('📮 一通目の手紙を生成中...');
       
-      // ユーザーの語彙レベルを取得
-      const userVocabLevel = parseInt(localStorage.getItem('vocabLevel') || '3', 10);
+      // ユーザーの生成レベル（1-5）を取得
+      const userVocabLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
+      console.log('📊 ReadingClient: 生成レベル使用:', userVocabLevel);
       
       // 一通目の手紙コンテンツ生成
       const response = await fetch('/api/travel/generate', {
@@ -552,6 +558,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         const words = data.rewrittenText.trim().split(/\s+/).filter(w => w.length > 0);
         setWordCount(words.length);
         
+        // 現在のレベルを更新
+        setSelectedLevel(newLevel);
+        
+        // localStorageの生成レベルも更新
+        localStorage.setItem('level', newLevel.toString());
+        localStorage.setItem('fixedLevel', newLevel.toString());
+        console.log('📊 localStorage updated: level =', newLevel);
+        
         // 読書状態をリセット
         setIsReadingStarted(false);
         setStartTime(null);
@@ -559,7 +573,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         setWpm(null);
         setSessionWords([]);
         
-        console.log('✅ レベル変換完了:', { newLevel, newWordCount: words.length });
+        console.log('✅ レベル変換完了:', { newLevel, newWordCount: words.length, selectedLevel: newLevel });
       } else {
         console.error('❌ レベル変換エラー');
         alert('レベル変換に失敗しました。もう一度お試しください。');
@@ -734,7 +748,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div>
                   <p className="text-sm text-gray-600">語彙レベル</p>
                   <p className="text-lg font-bold">
-                    Lv.{localStorage.getItem('vocabLevel') || '3'}
+                    Lv.{selectedLevel}
                   </p>
                 </div>
                 <div>
