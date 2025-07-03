@@ -15,7 +15,7 @@ type Question = {
 export function VocabularyQuiz() {
   const router = useRouter();
   const [testState, setTestState] = useState<AdaptiveTestState>({
-    currentLevel: 5,
+    currentLevel: 3,
     questionCount: 0,
     correctAnswers: 0,
     maxStableLevel: 1,
@@ -46,42 +46,104 @@ export function VocabularyQuiz() {
     return 5;                          // Quiz 9-10 → Lv.5 (上級 C1+)
   };
 
-  // 安定して正解した最高レベルを計算
-  const calculateMaxStableLevel = useCallback(() => {
-    let maxStable = 1;
+  // 最終的な語彙レベルを計算する関数
+  const calculateFinalLevel = useCallback((levelHistory: any[], correctAnswers: number, questionCount: number) => {
+    // 全体の正答率ベースの判定
+    const overallAccuracy = correctAnswers / questionCount;
     
-    // レベル履歴から連続で正解したレベルを見つける
+    // 安定して正解できる最高レベルを計算（連続正解分析）
+    let stableLevel = 1;
+    
+    // レベル別の正解率を計算
+    const levelStats: { [key: number]: { correct: number, total: number } } = {};
+    for (const entry of levelHistory) {
+      if (!levelStats[entry.level]) {
+        levelStats[entry.level] = { correct: 0, total: 0 };
+      }
+      levelStats[entry.level].total++;
+      if (entry.correct) {
+        levelStats[entry.level].correct++;
+      }
+    }
+    
+    // 各レベルで70%以上の正答率があるかチェック
     for (let level = 1; level <= 10; level++) {
-      const levelResults = testState.levelHistory.filter(h => h.level === level);
-      if (levelResults.length >= 2) {
-        const correctCount = levelResults.filter(h => h.correct).length;
-        const accuracy = correctCount / levelResults.length;
-        
+      const stats = levelStats[level];
+      if (stats && stats.total >= 1) { // 最低1問はそのレベルを経験
+        const accuracy = stats.correct / stats.total;
         if (accuracy >= 0.7) { // 70%以上の正答率
-          maxStable = level;
+          stableLevel = level;
         }
       }
     }
     
-    return Math.max(maxStable, testState.maxStableLevel);
-  }, [testState.levelHistory, testState.maxStableLevel]);
+    // 全体正答率による調整（保守的に）
+    let finalLevel: number;
+    
+    if (overallAccuracy >= 0.85) {
+      // 85%以上: 安定レベル + 1
+      finalLevel = Math.min(10, stableLevel + 1);
+    } else if (overallAccuracy >= 0.75) {
+      // 75%以上: 安定レベル
+      finalLevel = stableLevel;
+    } else if (overallAccuracy >= 0.6) {
+      // 60%以上: 安定レベル - 1
+      finalLevel = Math.max(1, stableLevel - 1);
+    } else if (overallAccuracy >= 0.5) {
+      // 50%以上: 安定レベル - 2
+      finalLevel = Math.max(1, stableLevel - 2);
+    } else {
+      // 50%未満: 大幅減点
+      finalLevel = Math.max(1, Math.min(2, stableLevel - 3));
+    }
+    
+    // 正解数による下限制限（より厳格に）
+    let minLevel = 1;
+    if (correctAnswers >= 13) {
+      minLevel = 8; // 13問以上で生成Lv.4
+    } else if (correctAnswers >= 11) {
+      minLevel = 6; // 11問以上で生成Lv.3
+    } else if (correctAnswers >= 9) {
+      minLevel = 4; // 9問以上で生成Lv.2
+    } else if (correctAnswers >= 6) {
+      minLevel = 2; // 6問以上で生成Lv.1
+    }
+    
+    finalLevel = Math.max(minLevel, finalLevel);
+    finalLevel = Math.min(10, finalLevel);
+    
+    console.log('📊 レベル計算詳細:', {
+      correctAnswers,
+      questionCount,
+      overallAccuracy: (overallAccuracy * 100).toFixed(1) + '%',
+      stableLevel,
+      minLevel,
+      finalLevel,
+      levelStats,
+      levelHistory: levelHistory.map(h => `L${h.level}:${h.correct ? '○' : '×'}`).join(' ')
+    });
+    
+    return finalLevel;
+  }, []);
 
   // テストを終了する関数
-  const finishTest = useCallback(() => {
+  const finishTest = useCallback((currentState?: AdaptiveTestState) => {
     try {
-      // 安定して正解した最高レベルを計算
-      const stableLevel = calculateMaxStableLevel();
-      const cefrLevel = mapToCEFRLevel(stableLevel);
-      setFinalLevel(stableLevel);
+      const state = currentState || testState;
+      
+      // 新しいロジックで最終レベルを計算
+      const finalQuizLevel = calculateFinalLevel(state.levelHistory, state.correctAnswers, state.questionCount);
+      const cefrLevel = mapToCEFRLevel(finalQuizLevel);
+      setFinalLevel(finalQuizLevel);
       setFinished(true);
       
       // 生成用レベル（1-5）を計算
-      const generationLevel = mapQuizLevelToGenerationLevel(stableLevel);
+      const generationLevel = mapQuizLevelToGenerationLevel(finalQuizLevel);
       
       // ローカルストレージに保存
       // クイズレベル（1-10）を保存
-      localStorage.setItem('vocabularyLevel', stableLevel.toString());
-      localStorage.setItem('vocabLevel', stableLevel.toString());
+      localStorage.setItem('vocabularyLevel', finalQuizLevel.toString());
+      localStorage.setItem('vocabLevel', finalQuizLevel.toString());
       
       // 生成レベル（1-5）を保存
       localStorage.setItem('level', generationLevel.toString());
@@ -92,16 +154,16 @@ export function VocabularyQuiz() {
       
       // 開発用: レベル履歴をコンソールに出力
       console.log('📊 レベルマッピング結果:');
-      console.log('  内部クイズレベル (1-10):', stableLevel);
+      console.log('  内部クイズレベル (1-10):', finalQuizLevel);
       console.log('  表示用生成レベル (1-5):', generationLevel);
       console.log('  CEFR レベル:', cefrLevel);
-      console.log('レベル変化履歴:', testState.levelHistory);
+      console.log('レベル変化履歴:', state.levelHistory);
     } catch (error) {
       console.error('テスト終了処理エラー:', error);
       setFinalLevel(5); // デフォルト値
       setFinished(true);
     }
-  }, [calculateMaxStableLevel]);
+  }, [calculateFinalLevel, mapToCEFRLevel, mapQuizLevelToGenerationLevel]);
 
   // 次の問題を生成する関数（最新の状態を取得）
   const generateNextQuestion = useCallback((currentState?: AdaptiveTestState) => {
@@ -110,43 +172,62 @@ export function VocabularyQuiz() {
     console.log('📝 generateNextQuestion 呼び出し:', { 
       questionCount: state.questionCount, 
       currentLevel: state.currentLevel,
+      usedWordsCount: state.usedWords.length,
       finished 
     });
 
     if (state.questionCount >= 15) {
       console.log('✅ 15問完了、テスト終了');
-      finishTest();
+      finishTest(state);
       return;
     }
 
-    const levelKey = `level${state.currentLevel}` as keyof typeof vocabularyData;
-    const levelWords = vocabularyData[levelKey];
+    // 複数レベルから単語を探索して重複を防ぐ
+    let selectedItem: VocabularyItem | null = null;
+    const searchLevels = [state.currentLevel];
     
-    console.log('📚 語彙データ確認:', { levelKey, hasWords: !!levelWords, wordsCount: levelWords?.length });
+    // 現在のレベルで見つからない場合は近隣レベルも探索
+    if (state.currentLevel > 1) searchLevels.push(state.currentLevel - 1);
+    if (state.currentLevel < 10) searchLevels.push(state.currentLevel + 1);
     
-    if (!levelWords) {
-      console.error('❌ 語彙データが見つかりません:', levelKey);
-      finishTest();
-      return;
+    for (const level of searchLevels) {
+      const levelKey = `level${level}` as keyof typeof vocabularyData;
+      const levelWords = vocabularyData[levelKey];
+      
+      if (!levelWords) continue;
+      
+      // 使用済みの単語を除外
+      const availableWords = levelWords.filter(item => 
+        !state.usedWords.includes(item.word)
+      );
+      
+      console.log(`📚 レベル${level}: 利用可能単語数 ${availableWords.length}/${levelWords.length}`);
+      
+      if (availableWords.length > 0) {
+        selectedItem = availableWords[Math.floor(Math.random() * availableWords.length)];
+        console.log(`✅ レベル${level}から選択: ${selectedItem.word}`);
+        break;
+      }
     }
-
-    // 使用済みの単語を除外してランダムに選択
-    const availableWords = levelWords.filter(item => 
-      !state.usedWords.includes(item.word)
-    );
     
-    console.log('🎯 利用可能な単語数:', availableWords.length);
+    if (!selectedItem) {
+      // すべてのレベルで使用済みの場合は、現在レベルからランダム選択
+      const levelKey = `level${state.currentLevel}` as keyof typeof vocabularyData;
+      const levelWords = vocabularyData[levelKey];
+      if (levelWords && levelWords.length > 0) {
+        selectedItem = levelWords[Math.floor(Math.random() * levelWords.length)];
+        console.log('🔄 重複回避のため、使用済み単語リストをリセット');
+        setTestState(prev => ({ ...prev, usedWords: [] }));
+      }
+    }
     
-    if (availableWords.length === 0) {
-      // 使用済み単語をリセットして再選択
-      console.log('🔄 使用済み単語リセット');
-      const randomItem = levelWords[Math.floor(Math.random() * levelWords.length)];
-      createQuestion(randomItem, true); // リセットフラグ
+    if (selectedItem) {
+      createQuestion(selectedItem, false);
     } else {
-      const randomItem = availableWords[Math.floor(Math.random() * availableWords.length)];
-      createQuestion(randomItem, false);
+      console.error('❌ 問題が生成できません');
+      finishTest(state);
     }
-  }, []);
+  }, [finishTest]);
 
   // 問題を作成する関数
   const createQuestion = (item: VocabularyItem, resetUsedWords: boolean = false) => {
@@ -182,7 +263,7 @@ export function VocabularyQuiz() {
         finishTest();
       }
     }
-  }, [showInstructions, isClient, currentQuestion, finished]);
+  }, [showInstructions, isClient, currentQuestion, finished, generateNextQuestion, finishTest]);
 
   const handleStartQuiz = () => {
     setShowInstructions(false);
@@ -229,6 +310,8 @@ export function VocabularyQuiz() {
     const isCorrect = choice === currentQuestion.correctAnswer;
     setSelectedAnswer(choice);
 
+    console.log(`📝 回答: ${currentQuestion.word} -> ${choice} (${isCorrect ? '正解' : '不正解'})`);
+
     // テスト状態を更新
     const newTestState = {
       ...testState,
@@ -237,21 +320,24 @@ export function VocabularyQuiz() {
       levelHistory: [...testState.levelHistory, { level: testState.currentLevel, correct: isCorrect }]
     };
 
-    // レベル調整
+    // より保守的なレベル調整
     let newLevel = testState.currentLevel;
-    if (isCorrect && newLevel < 10) {
+    if (isCorrect) {
+      // 正解時は1レベル上昇（最大10）
       newLevel = Math.min(10, testState.currentLevel + 1);
-      newTestState.maxStableLevel = Math.max(newTestState.maxStableLevel, newLevel);
-    } else if (!isCorrect && newLevel > 1) {
+    } else {
+      // 不正解時は1レベル下降（最小1）
       newLevel = Math.max(1, testState.currentLevel - 1);
     }
     
     newTestState.currentLevel = newLevel;
 
+    console.log(`📊 レベル変化: ${testState.currentLevel} -> ${newLevel} (正答: ${newTestState.correctAnswers}/${newTestState.questionCount})`);
+
     setTimeout(() => {
       setTestState(newTestState);
       setSelectedAnswer(null);
-      setCurrentQuestion(null); // 次の問題を生成するため
+      setCurrentQuestion(null);
       // 次の問題を生成（更新された状態を渡す）
       setTimeout(() => {
         generateNextQuestion(newTestState);
@@ -261,7 +347,7 @@ export function VocabularyQuiz() {
 
   const handleRetry = () => {
     setTestState({
-      currentLevel: 5,
+      currentLevel: 3,
       questionCount: 0,
       correctAnswers: 0,
       maxStableLevel: 1,
