@@ -55,7 +55,7 @@ export default function ReadingFormPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-page-bg px-4">
+    <div className="flex min-h-screen flex-col items-center justify-start pt-6 bg-page-bg px-4">
       <h1 className="mb-6 text-2xl font-bold text-text-primary">{text.title[displayLang]}</h1>
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
         <div>

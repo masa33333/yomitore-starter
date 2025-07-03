@@ -73,7 +73,7 @@ export default function Home() {
   }
 
   return (
-    <div className="p-6 min-h-screen flex flex-col items-center justify-center">
+    <div className="p-6 min-h-screen flex flex-col items-center justify-start pt-6">
       
       {!hasVocabLevel ? (
         // 初回ユーザー向け - 語彙レベルチェックのみ

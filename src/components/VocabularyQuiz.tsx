@@ -146,7 +146,7 @@ export function VocabularyQuiz() {
       const randomItem = availableWords[Math.floor(Math.random() * availableWords.length)];
       createQuestion(randomItem, false);
     }
-  }, [testState, finished, finishTest]);
+  }, []);
 
   // 問題を作成する関数
   const createQuestion = (item: VocabularyItem, resetUsedWords: boolean = false) => {
@@ -174,7 +174,7 @@ export function VocabularyQuiz() {
 
   // 初回実行のためのuseEffect
   useEffect(() => {
-    if (!showInstructions && isClient) {
+    if (!showInstructions && isClient && !currentQuestion && !finished) {
       try {
         generateNextQuestion();
       } catch (error) {
@@ -182,7 +182,7 @@ export function VocabularyQuiz() {
         finishTest();
       }
     }
-  }, [showInstructions, isClient, finishTest, generateNextQuestion]);
+  }, [showInstructions, isClient, currentQuestion, finished]);
 
   const handleStartQuiz = () => {
     setShowInstructions(false);
