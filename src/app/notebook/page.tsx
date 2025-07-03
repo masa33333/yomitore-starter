@@ -28,8 +28,19 @@ interface WordInfo {
 // 並び替えタイプ
 type SortType = 'recent' | 'alphabetical';
 
-// 品詞の日本語マッピング
+// 品詞の日本語マッピング（ReadingClientと統一）
 const posMap: Record<string, string> = {
+  'noun': '名詞',
+  'verb': '動詞',
+  'adjective': '形容詞',
+  'adverb': '副詞',
+  'pronoun': '代名詞',
+  'conjunction': '接続詞',
+  'preposition': '前置詞',
+  'interjection': '間投詞',
+  'determiner': '限定詞',
+  'unknown': '不明',
+  // 旧形式対応
   v: "動詞",
   n: "名詞", 
   adj: "形容詞",
@@ -37,8 +48,7 @@ const posMap: Record<string, string> = {
   prep: "前置詞",
   conj: "接続詞",
   pron: "代名詞",
-  int: "間投詞",
-  unknown: "不明"
+  int: "間投詞"
 };
 
 export default function NotebookPage() {
@@ -236,7 +246,7 @@ export default function NotebookPage() {
                       {/* 品詞 */}
                       <div>
                         <span className="inline-block bg-[#7E6944] text-white text-xs px-2 py-1 rounded-full font-medium">
-                          {posMap[word.pos] || "不明"}
+                          {posMap[word.partOfSpeech] || posMap[word.pos] || "不明"}
                         </span>
                       </div>
                     </div>

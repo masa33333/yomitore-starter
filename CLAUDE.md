@@ -950,4 +950,172 @@ src/constants/promptTemplates.ts         - 日本語→英語完全変換、制�
 
 ---
 
+## 📋 Work Session Summary (2025-06-30)
+
+### ✅ Completed Today
+
+**TTS機能完全実装 & 語彙レベル修正完了** - OpenAI TTS API統合、Supabase Storage連携、読書・手紙ページへのTTS機能統合、Beijing Level 4語彙修正
+
+#### Task 1: Supabaseクライアント作成
+- **File**: `src/lib/supabase.ts`
+- **Features**: 
+  - クライアントサイド用とサーバーサイド用（サービスロール）の両方実装
+  - 既存環境変数の活用（SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY）
+
+#### Task 2: TTS API エンドポイント実装
+- **File**: `src/app/api/tts/route.ts`
+- **Implementation**: 
+  - OpenAI TTS-1 APIを使用（Gemini TTS未対応のため）
+  - POST `/api/tts` - `{text: string, contentId: string}` 受信
+  - Supabase Storage 'audio' バケットに音声ファイル保存
+  - MD5ハッシュベースのキャッシュ機能（同一テキストの重複生成防止）
+  - 音声ファイルのパブリックURL返却
+- **Technical Specs**:
+  - Model: `tts-1` (コスト効率重視)
+  - Voice: `alloy` (英語学習者向け)
+  - Speed: 0.9x (学習者向けに少し遅め)
+  - Format: MP3
+
+#### Task 3: TTSButtonコンポーネント作成
+- **File**: `src/components/TTSButton.tsx`
+- **Features**:
+  - 音声生成・再生・一時停止機能
+  - ローディング状態・エラーハンドリング
+  - キャッシュ対応（既存音声の即座再生）
+  - UIバリエーション（primary/secondary）
+  - レスポンシブデザイン
+
+#### Task 4: TTSテスト環境構築
+- **Files**: 
+  - `src/components/TTSTest.tsx` - 包括的テストコンポーネント
+  - `src/app/tts-test/page.tsx` - 専用テストページ
+- **Features**: テキスト入力、音声生成、再生、ダウンロード、技術詳細表示
+
+#### Task 5: 読書ページTTS統合
+- **File**: `src/app/reading/ReadingClient.tsx`
+- **Implementation**:
+  - **読書開始前**: 全文TTS再生ボタン
+  - **読書中**: 全体音声再生ボタン（キャッシュ活用）
+  - 段落別TTSを削除→全体音声のキャッシュ再利用で効率化
+  - 統一されたcontentId使用 (`reading-full-content`)
+
+#### Task 6: 手紙ページTTS統合  
+- **File**: `src/app/letter/page.tsx`
+- **Implementation**:
+  - **到着手紙**: 手紙ヘッダーにTTSボタン
+  - **機内メール**: メールヘッダーにTTSボタン
+  - 手紙・メール全文の音声再生
+
+#### Task 7: Beijing Level 4語彙修正完了
+- **File**: `src/data/staticLetters.ts`
+- **Problem**: NGSL 2500+語彙が多数含まれる（cherished, contemplating, extraordinary等）
+- **Solution**: 全て適切なLevel 4語彙（NGSL 1-2500）に置換
+- **Result**: 
+  - Tokyo Level 2/4: ✅ 修正完了
+  - Seoul Level 2/4: ✅ 修正完了  
+  - Beijing Level 2/4: ✅ 修正完了
+  - Level 5: 上級レベル（C1+）なので高度語彙は適切
+
+#### Task 8: UIデザイン統一
+- **Changes**:
+  - TTSボタン: トップページ「語彙レベルを再測定」と同色（`bg-primary-inactive`）
+  - 全ボタン: `font-bold` 統一、絵文字削除
+  - 形状: `rounded-md`（「読み始める」と統一）
+  - サイズ: `px-4 py-2`（読書ページボタン群統一）
+  - テキスト: 「再生」→「再生する」
+
+### 🎯 Technical Achievements
+
+#### 1. **完全なTTSシステム実装**
+```typescript
+// API: /api/tts
+POST { text: string, contentId: string }
+→ { audioUrl: string, cached: boolean }
+
+// 効率的キャッシュ
+filename: `${contentId}_${md5(text)}.mp3`
+storage: Supabase Storage 'audio' bucket
+```
+
+#### 2. **コスト効率最適化**
+- 段落別生成廃止 → 全体音声1回生成・キャッシュ再利用
+- OpenAI TTS-1使用（最安価モデル）
+- MD5ハッシュベース重複防止
+
+#### 3. **語彙レベル完全準拠**
+- Level 2: NGSL 1-1000語彙のみ
+- Level 4: NGSL 1-2500語彙のみ  
+- 全静的手紙でレベル別語彙制御完了
+
+#### 4. **統一UI/UX**
+- 全TTSボタンでデザイン・動作統一
+- キャッシュ活用による即座再生
+- 既存UIとの完全調和
+
+### 📁 Major Files Created/Modified Today
+
+```
+src/lib/supabase.ts                       - Supabaseクライアント（新規）
+src/app/api/tts/route.ts                  - TTS APIエンドポイント（新規）
+src/components/TTSButton.tsx              - TTS再生ボタンコンポーネント（新規）
+src/components/TTSTest.tsx                - TTSテストコンポーネント（新規）
+src/app/tts-test/page.tsx                 - TTSテストページ（新規）
+src/app/reading/ReadingClient.tsx         - TTS統合、段落表示削除、ボタン統一
+src/app/letter/page.tsx                   - TTS統合（到着手紙・機内メール）
+src/data/staticLetters.ts                 - Beijing Level 4語彙修正
+```
+
+### 🎯 Current System Status
+
+#### TTS System
+- **API**: ✅ OpenAI TTS-1統合、Supabase Storage保存
+- **キャッシュ**: ✅ MD5ハッシュベース重複防止  
+- **読書ページ**: ✅ 全体音声生成・キャッシュ再利用
+- **手紙ページ**: ✅ 到着手紙・機内メール対応
+- **テスト環境**: ✅ `/tts-test`で包括的テスト可能
+
+#### 語彙レベル制御
+- **静的手紙**: ✅ 全都市・全レベルでNGSL準拠
+- **読み物生成**: ✅ Level 1-5厳格制御
+- **プロンプトシステム**: ✅ 英語プロンプト、高品質生成
+
+#### UI/UX
+- **デザイン統一**: ✅ 全ボタンで一貫したスタイル
+- **レスポンシブ**: ✅ モバイル・デスクトップ対応
+- **アクセシビリティ**: ✅ 適切な色・サイズ・間隔
+
+### 🔧 Key Technical Benefits
+
+1. **コスト効率**: 段落別→全体音声でTTSコスト大幅削減
+2. **パフォーマンス**: キャッシュ活用で即座再生、生成待機なし
+3. **品質**: OpenAI TTS-1高品質音声、学習者向け最適化
+4. **保守性**: コンポーネント化でTTS機能の一元管理
+5. **スケーラビリティ**: Supabase Storageで大容量対応
+
+### 🚀 Next Session Ready
+
+**Phase 1 TTS MVP完全実装完了**。以下が利用可能：
+
+1. **`/tts-test`**: TTS機能の包括的テスト
+2. **読書ページ**: 全文音声再生（キャッシュ効率化）
+3. **手紙ページ**: 到着手紙・機内メール音声再生
+4. **語彙レベル**: 全静的コンテンツでNGSL準拠完了
+
+次回セッションでは**Phase 2（コスト最適化）**または新機能開発に進むことができます。
+
+### 🔨 Updated TODO (2025-06-30)
+
+* [x] **TTS Phase 1 MVP実装完了 (2025-06-30 COMPLETED)**
+* [x] **Beijing Level 4語彙修正完了 (2025-06-30 COMPLETED)**
+* [x] **UIデザイン統一完了 (2025-06-30 COMPLETED)**
+* [x] **TTS効率化・キャッシュ最適化完了 (2025-06-30 COMPLETED)**
+* [ ] TTS Phase 2: 段階的生成・音声圧縮（コスト最適化）
+* [ ] TTS Phase 3: 再生速度調整・スクロール同期（UX向上）
+* [ ] Adjust cat/flag positions on map so Tokyo & Seoul markers do not overlap popup
+* [ ] Replace static map with react‑leaflet + dynamic zoom
+* [ ] Ensure `vocabLevel` propagates to generateReading()
+* [ ] Remove legacy cat emoji overlay
+
+---
+
 *End of CLAUDE.md*

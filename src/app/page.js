@@ -15,8 +15,8 @@ export default function Home() {
       en: 'Tadoku Training',
     },
     subtitle: {
-      ja: '何を読みますか？',
-      en: 'What would you like to read?',
+      ja: '今日は何を読みましょうか？',
+      en: 'What would you like to read today?',
     },
     choose: {
       ja: '読み物を選ぶ',
@@ -74,7 +74,6 @@ export default function Home() {
 
   return (
     <div className="p-6 min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-2xl font-bold text-text-primary mb-6 text-center">{getText('title')}</h1>
       
       {!hasVocabLevel ? (
         // 初回ユーザー向け - 語彙レベルチェックのみ
@@ -92,9 +91,9 @@ export default function Home() {
       ) : (
         // 既存ユーザー向け - 読み物選択 + 再測定オプション
         <div className="text-center max-w-md">
-          <p className="text-lg text-text-primary mb-8">
+          <h1 className="text-3xl text-text-primary/70 mb-8 font-light">
             {getText('subtitle')}
-          </p>
+          </h1>
           <button
             onClick={handleChooseReading}
             className="bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"

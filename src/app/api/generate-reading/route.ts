@@ -6,9 +6,17 @@ import { findForbiddenWords } from "@/constants/forbiddenWords";
 import { getPromptTemplate } from "@/constants/promptTemplates";
 import { mapQuizLevelToGenerationLevel } from "@/utils/getEnglishText";
 
-// カタカナを英語/ローマ字に変換する関数
+// カタカナを英語/ローマ字に変換する関数（テーマ・トピック専用）
 function convertKatakanaToEnglish(text: string): string {
   if (!text) return text;
+  
+  // 日本語が大部分を占める場合（日本語翻訳など）は変換しない
+  const japaneseCharCount = (text.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
+  const totalCharCount = text.length;
+  if (japaneseCharCount / totalCharCount > 0.5) {
+    console.log('🛡️ 日本語テキスト保護: カタカナ変換をスキップ');
+    return text;
+  }
 
   // カタカナ→英語の変換マップ（優先度：固有名詞 → 一般名詞）
   const katakanaToEnglish: { [key: string]: string } = {
@@ -318,16 +326,9 @@ function convertKatakanaToEnglish(text: string): string {
     }
   }
 
-  // 3. 【フォールバック】残ったカタカナをローマ字に変換
-  // カタカナをひらがなに変換
-  for (const [katakana, hiragana] of Object.entries(katakanaToHiragana)) {
-    result = result.replace(new RegExp(katakana, 'g'), hiragana);
-  }
-
-  // ひらがなをローマ字に変換
-  for (const [hiragana, romaji] of Object.entries(hiraganaToRomaji)) {
-    result = result.replace(new RegExp(hiragana, 'g'), romaji);
-  }
+  // 3. 【フォールバック】残ったカタカナをローマ字に変換（テーマのみに適用、日本語翻訳は保護）
+  // 日本語翻訳を保護するため、この段階では変換しない
+  // 日本語の文脈では「iPhone」→「アイフォン」のままにする
 
   console.log('🔤 カタカナ変換:', { original: text, converted: result });
   return result;
@@ -638,7 +639,7 @@ Once upon a time, there was a girl...
       let actualTheme = theme || topic;
       const actualStyle = style || '専門家がやさしく説明'; // デフォルトスタイル
 
-      // カタカナを英語/ローマ字に変換
+      // カタカナを英語/ローマ字に変換（テーマのみ）
       actualTheme = convertKatakanaToEnglish(actualTheme);
 
       // バリデーション
@@ -755,15 +756,15 @@ Japanese paragraph
     } else {
       // 読み物用システムメッセージ - 正しい語数制御
       if (adjustedLevel === 1) {
-        systemMessage = `You are an educational writer for young children. CRITICAL: Write exactly 80-120 words using ONLY the simplest English words. MANDATORY: Include TWO amazing facts that will surprise children. NEVER include any labels or numbering. COUNT YOUR WORDS carefully.`;
+        systemMessage = `You are an educational writer for young children. CRITICAL: Write exactly 80-120 words using ONLY the simplest English words. MANDATORY: Include TWO amazing facts that will surprise children. NEVER include any labels or numbering. COUNT YOUR WORDS carefully. IMPORTANT: Write Japanese translation in proper Japanese (hiragana, katakana, kanji) - NEVER use romaji.`;
       } else if (adjustedLevel === 2) {
-        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 110-150 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 110 words, you FAIL. Write at least 4 paragraphs with detailed explanations, examples, and descriptions. MANDATORY: Include TWO surprising facts. Add more details, background information, specific examples, and elaborate descriptions to reach the word count. NEVER include any labels or numbering.`;
+        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 110-150 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 110 words, you FAIL. Write at least 4 paragraphs with detailed explanations, examples, and descriptions. MANDATORY: Include TWO surprising facts. Add more details, background information, specific examples, and elaborate descriptions to reach the word count. NEVER include any labels or numbering. IMPORTANT: Write Japanese translation in proper Japanese (hiragana, katakana, kanji) - NEVER use romaji.`;
       } else if (adjustedLevel === 3) {
-        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 140-200 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 140 words, you FAIL. Write at least 4-5 paragraphs with detailed explanations, examples, context, and background information. MANDATORY: Include TWO amazing facts. Add more details, elaborate descriptions, specific examples, and comprehensive explanations to reach the word count. NEVER include any labels or numbering.`;
+        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 140-200 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 140 words, you FAIL. Write at least 4-5 paragraphs with detailed explanations, examples, context, and background information. MANDATORY: Include TWO amazing facts. Add more details, elaborate descriptions, specific examples, and comprehensive explanations to reach the word count. NEVER include any labels or numbering. IMPORTANT: Write Japanese translation in proper Japanese (hiragana, katakana, kanji) - NEVER use romaji.`;
       } else if (adjustedLevel === 4) {
-        systemMessage = `STOP. READ THIS CAREFULLY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 200-240 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 200 words, you FAIL. Write at least 5-6 detailed paragraphs with comprehensive explanations, multiple examples, background context, and thorough analysis. MANDATORY: Include TWO shocking facts. Add extensive details, elaborate descriptions, specific examples, and comprehensive coverage to reach the word count. NEVER include any labels or numbering.`;
+        systemMessage = `STOP. READ THIS CAREFUL LY. You are an educational writer. CRITICAL REQUIREMENT: Your response MUST contain exactly 200-240 words. NO EXCEPTIONS. Count each word as you write. If you write fewer than 200 words, you FAIL. Write at least 5-6 detailed paragraphs with comprehensive explanations, multiple examples, background context, and thorough analysis. MANDATORY: Include TWO shocking facts. Add extensive details, elaborate descriptions, specific examples, and comprehensive coverage to reach the word count. NEVER include any labels or numbering. IMPORTANT: Write Japanese translation in proper Japanese (hiragana, katakana, kanji) - NEVER use romaji.`;
       } else {
-        systemMessage = `You are an educational writer for advanced English learners. CRITICAL: Write exactly 240-280 words (MUST reach at least 240 words). Write sophisticated content with detailed analysis. MANDATORY: Include TWO mind-blowing facts. NEVER include any labels or numbering. COUNT YOUR WORDS carefully.`;
+        systemMessage = `You are an educational writer for advanced English learners. CRITICAL: Write exactly 240-280 words (MUST reach at least 240 words). Write sophisticated content with detailed analysis. MANDATORY: Include TWO mind-blowing facts. NEVER include any labels or numbering. COUNT YOUR WORDS carefully. IMPORTANT: Write Japanese translation in proper Japanese (hiragana, katakana, kanji) - NEVER use romaji.`;
       }
     }
 
