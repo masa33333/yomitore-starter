@@ -16,8 +16,8 @@ export default function CatLoader() {
   if (!animationData) {
     return (
       <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-4 bg-[#F6F0E9]/80 backdrop-blur-sm">
-        <div className="w-[200px] h-[200px] bg-[#FFB86C]/20 rounded-full flex items-center justify-center">
-          <div className="w-8 h-8 animate-spin rounded-full border-4 border-[#7E6944] border-t-transparent"></div>
+        <div className="size-[200px] bg-[#FFB86C]/20 rounded-full flex items-center justify-center">
+          <div className="size-8 animate-spin rounded-full border-4 border-[#7E6944] border-t-transparent"></div>
         </div>
         <p className="text-sm text-[#7E6944]">Generating your story…</p>
       </div>

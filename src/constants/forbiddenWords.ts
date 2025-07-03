@@ -84,10 +84,10 @@ export function isLevel3Allowed(word: string): boolean {
 export function findForbiddenWords(text: string, level: number): string[] {
   if (level > 3) return []; // Level 4以上は制限なし
   
-  const words = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
+  const words: string[] = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
   const forbidden: string[] = [];
   
-  words.forEach(word => {
+  words.forEach((word: string) => {
     if (isLevel3Forbidden(word)) {
       forbidden.push(word);
     }

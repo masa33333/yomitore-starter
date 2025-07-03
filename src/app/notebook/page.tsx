@@ -151,28 +151,28 @@ export default function NotebookPage() {
 
   if (loading) {
     return (
-      <main className="p-4 bg-[#FFF9F4] min-h-screen">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFB86C] mx-auto"></div>
-          <p className="mt-2 text-[#1E1E1E]">読み込み中...</p>
+      <main className="min-h-screen bg-page-bg p-4">
+        <div className="py-8 text-center">
+          <div className="mx-auto size-8 animate-spin rounded-full border-b-2 border-primary-active"></div>
+          <p className="mt-2 text-text-primary">読み込み中...</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="p-4 max-w-4xl mx-auto bg-[#FFF9F4] min-h-screen">
+    <main className="mx-auto min-h-screen max-w-4xl bg-page-bg p-4">
       <div className="mb-6">
         {/* Back to Reading Button */}
         <button
           onClick={() => router.push('/reading?from=notebook')}
-          className="mb-4 flex items-center gap-2 px-4 py-2 bg-[#FFB86C] text-[#1E1E1E] rounded-md font-bold hover:bg-[#e5a561] transition-colors"
+          className="mb-4 flex items-center gap-2 rounded-md bg-primary-active px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
         >
           ← 読書画面へ戻る
         </button>
         
-        <h1 className="text-xl font-bold text-[#1E1E1E] mb-2">{t('notebook.title')}</h1>
-        <p className="text-[#1E1E1E]">
+        <h1 className="mb-2 text-xl font-bold text-text-primary">{t('notebook.title')}</h1>
+        <p className="text-text-primary">
           {words.length > 0 ? (
             displayLang === 'ja' 
               ? `${words.length}${t('notebook.wordsCount')}`
@@ -186,24 +186,24 @@ export default function NotebookPage() {
       {words.length > 0 ? (
         <>
           {/* コントロールパネル */}
-          <div className="bg-white rounded-xl p-4 shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl bg-white p-4 shadow-sm">
             <div className="flex gap-2">
               <button
                 onClick={() => setSortType('recent')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                className={`rounded-md px-4 py-2 font-medium transition-colors ${
                   sortType === 'recent'
-                    ? 'bg-[#FFE1B5] text-[#1E1E1E]'
-                    : 'bg-[#F6F0E9] text-[#1E1E1E]'
+                    ? 'bg-[#FFE1B5] text-text-primary'
+                    : 'bg-primary-inactive text-text-primary'
                 }`}
               >
 {t('notebook.sortRecent')}
               </button>
               <button
                 onClick={() => setSortType('alphabetical')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                className={`rounded-md px-4 py-2 font-medium transition-colors ${
                   sortType === 'alphabetical'
-                    ? 'bg-[#FFE1B5] text-[#1E1E1E]'
-                    : 'bg-[#F6F0E9] text-[#1E1E1E]'
+                    ? 'bg-[#FFE1B5] text-text-primary'
+                    : 'bg-primary-inactive text-text-primary'
                 }`}
               >
 {t('notebook.sortAlphabetical')}
@@ -212,7 +212,7 @@ export default function NotebookPage() {
             
             <button
               onClick={handleClearAll}
-              className="px-4 py-2 bg-[#FFE1B5] text-[#1E1E1E] rounded-md font-normal hover:bg-[#f0d1a0] transition-colors"
+              className="rounded-md bg-[#FFE1B5] px-4 py-2 font-normal text-text-primary transition-colors hover:bg-[#f0d1a0]"
             >
 {t('notebook.deleteAll')}
             </button>

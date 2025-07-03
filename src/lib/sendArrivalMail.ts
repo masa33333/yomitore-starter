@@ -68,11 +68,16 @@ export async function sendArrivalMail(city: string): Promise<void> {
     // レター保存
     saveLetterToStorage({
       type: "letter",
-      city,
+      fromCity: "Previous City",
+      toCity: city,
+      level: userLevel,
       jp: mailContent.jp,
       en: {
         [userLevel]: mailContent.en
       },
+      wordCount: mailContent.en.trim().split(/\s+/).length,
+      duration: 0,
+      wpm: 0
     });
     
     console.log('📬 Arrival letter saved to storage');
@@ -102,11 +107,16 @@ export async function sendArrivalMail(city: string): Promise<void> {
     // フォールバックでもレター保存
     saveLetterToStorage({
       type: "letter",
-      city,
+      fromCity: "Previous City",
+      toCity: city,
+      level: userLevel,
       jp: fallbackContent.jp,
       en: {
         [userLevel]: fallbackContent.en
       },
+      wordCount: fallbackContent.en.trim().split(/\s+/).length,
+      duration: 0,
+      wpm: 0
     });
     
     // 到着メールフラグ設定

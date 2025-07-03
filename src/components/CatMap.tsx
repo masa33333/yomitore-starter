@@ -1,7 +1,7 @@
 'use client';
 
 // components/CatMap.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { visitedCities } from '@/data/visitedCities';
 import { getNextUnreachedCity } from '@/lib/getNextCity';
 
@@ -140,22 +140,22 @@ export default function CatMap({ mapIntroShown = true }: { mapIntroShown?: boole
       <img
         src="/images/world-map.png"
         alt="World Map"
-        className="w-full h-full object-cover opacity-90"
+        className="size-full object-cover opacity-90"
       />
       
       {/* 猫アイコン */}
       <img
         src="/images/cat-icon.png"
         alt="Cat Traveler"
-        className="absolute w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain drop-shadow-lg transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700"
+        className="absolute size-12 sm:size-16 md:size-20 object-contain drop-shadow-lg -translate-x-1/2 -translate-y-1/2 transition-all duration-700"
         style={catStyle}
       />
 
       {/* 現在地情報カード（ネコのすぐ上に小型表示） */}
       {currentCity && (
         <div
-          className={`absolute z-10 transform -translate-x-1/2 ${
-            isLowerHalf ? '-translate-y-[160%]' : 'translate-y-[80%]'
+          className={`absolute z-10 -translate-x-1/2 ${
+            isLowerHalf ? 'translate-y-[-160%]' : 'translate-y-[80%]'
           } w-max bg-white/90 backdrop-blur-sm rounded-xl shadow-md px-6 py-4`}
           style={{
             left: currentCity.x,
@@ -172,7 +172,7 @@ export default function CatMap({ mapIntroShown = true }: { mapIntroShown?: boole
 
       {/* 訪問都市履歴 - 初回時は非表示 */}
       {mapIntroShown && wordCount > 0 && (
-        <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 max-h-24 overflow-y-auto">
+        <div className="absolute bottom-4 inset-x-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 max-h-24 overflow-y-auto">
           <h3 className="text-lg font-bold text-gray-800 mb-3">{t.visitedCities}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* 🧾 3. 訪問都市の記録カード（下部） */}
@@ -185,7 +185,7 @@ export default function CatMap({ mapIntroShown = true }: { mapIntroShown?: boole
                   <span className="font-semibold text-gray-700">{getCityName(city.name)}</span>
                   <span className="text-gray-500 text-xs">{(city.words || 0).toLocaleString()} {t.wordsUnit}</span>
                 </div>
-                <p className="text-gray-600 text-xs italic">"{city.letter?.[lang] || city.letter?.en}"</p>
+                <p className="text-gray-600 text-xs italic">&quot;{city.letter?.[lang] || city.letter?.en}&quot;</p>
               </div>
             ))}
           </div>

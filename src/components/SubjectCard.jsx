@@ -13,7 +13,7 @@ export default function SubjectCard({ subject }) {
   return (
     <div
       onClick={handleClick}
-      className="group relative border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer transform hover:-translate-y-2 hover:scale-105"
+      className="group relative border rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer hover:-translate-y-2 hover:scale-105"
     >
       {/* Subject Image with slight zoom effect */}
       <div className="overflow-hidden">
@@ -39,7 +39,7 @@ export default function SubjectCard({ subject }) {
       </div>
 
       {/* Decoration Line */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+      <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-blue-400 to-green-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
     </div>
   );
 }

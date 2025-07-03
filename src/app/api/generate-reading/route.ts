@@ -214,20 +214,6 @@ function convertKatakanaToEnglish(text: string): string {
     'ミュージアム': 'museum',
     'シネマ': 'cinema',
     
-    // 国・都市
-    'アメリカ': 'America',
-    'イギリス': 'Britain',
-    'フランス': 'France',
-    'ドイツ': 'Germany',
-    'イタリア': 'Italy',
-    'スペイン': 'Spain',
-    'オーストラリア': 'Australia',
-    'カナダ': 'Canada',
-    'トーキョー': 'Tokyo',
-    'オーサカ': 'Osaka',
-    'キョート': 'Kyoto',
-    'ヨコハマ': 'Yokohama',
-    
     // その他一般的な単語
     'ミュージック': 'music',
     'ムービー': 'movie',

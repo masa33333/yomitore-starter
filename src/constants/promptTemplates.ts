@@ -1,5 +1,5 @@
 // promptTemplates.ts - NGSL基準の語彙レベル制御
-import { NGSL_1_500, NGSL_501_1000, getAllowedWords } from './ngslData';
+import { NGSL_1_500 } from './ngslData';
 
 export const promptTemplates = {
   level1: `You are creating educational content for English learners.

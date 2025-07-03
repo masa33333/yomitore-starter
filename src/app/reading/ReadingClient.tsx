@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -27,7 +27,17 @@ interface InitialData {
 }
 
 interface ReadingClientProps {
-  searchParams: any;
+  searchParams: {
+    mode?: string;
+    genre?: string;
+    tone?: string;
+    feeling?: string;
+    level?: string;
+    topic?: string;
+    theme?: string;
+    emotion?: string;
+    style?: string;
+  };
   initialData: InitialData | null;
   mode: string;
 }
@@ -280,7 +290,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     } catch (error) {
       console.error('❌ Data sync error:', error);
     }
-  }, []);
+  }, [englishParagraphs, wordCount]);
 
   // 読書状態をlocalStorageに保存する関数
   const saveCurrentReadingState = () => {
@@ -491,13 +501,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // 日本語翻訳取得
+  // 日本語翻訳表示/非表示切り替え
   const handleShowJapanese = async () => {
+    // 既に日本語が表示されている場合は非表示にする
+    if (showJapanese) {
+      setShowJapanese(false);
+      return;
+    }
+    
+    // 日本語翻訳が既にある場合は表示するだけ
     if (japanese) {
       setShowJapanese(true);
       return;
     }
     
+    // 日本語翻訳がない場合は取得してから表示
     try {
       const response = await fetch('/api/translate', {
         method: 'POST',
@@ -618,7 +636,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         return (
           <span
             key={index}
-            className="clickable-word cursor-pointer hover:bg-yellow-200 hover:bg-opacity-50 transition-colors duration-200"
+            className="clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200"
             title="クリックして意味を調べる"
             data-word={part}
           >
@@ -635,17 +653,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-lg">読み込み中...</div>
       </div>
     );
   }
 
   return (
-    <main className="p-4 bg-[#FFF9F4] min-h-screen">
+    <main className="min-h-screen bg-page-bg p-4">
       {/* ページタイトル */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1E1E1E] mb-2">
+        <h1 className="mb-2 text-2xl font-bold text-text-primary">
           {mode === 'story' ? (initialData?.title || displayTitle) : displayTitle}
         </h1>
         {mode === 'story' && searchParams.genre && (
@@ -658,14 +676,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
       {/* コンテンツ表示 */}
       {!isReadingStarted ? (
-        <div className="bg-white rounded-lg p-6 shadow-sm">
-          <div className="text-center mb-6">
-            <h2 className="text-lg font-semibold mb-2">読書を開始しますか？</h2>
-            <p className="text-gray-600 mb-4">語数: {wordCount}語</p>
+        <div className="rounded-lg bg-white p-6 shadow-sm">
+          <div className="mb-6 text-center">
+            <h2 className="mb-2 text-lg font-semibold">読書を開始しますか？</h2>
+            <p className="mb-4 text-gray-600">語数: {wordCount}語</p>
             
             <button
               onClick={handleStartReading}
-              className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-bold hover:bg-[#e5a561] transition-colors mb-4"
+              className="mb-4 rounded-md bg-primary-active px-6 py-3 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
             >
               読み始める
             </button>
@@ -692,7 +710,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div key={index} className="mb-6">
                   {/* 英語段落 */}
                   <p 
-                    className="mb-3 text-base leading-relaxed text-[#1E1E1E]"
+                    className="mb-3 text-base leading-relaxed text-text-primary"
                     onClick={handleTextClick}
                     style={{ 
                       pointerEvents: 'auto',
@@ -704,8 +722,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   
                   {/* 対応する日本語段落 */}
                   {showJapanese && japaneseParagraphs[index] && (
-                    <div className="bg-[#FFF9F4] border border-[#FFE1B5] p-4 rounded-lg">
-                      <p className="text-base text-[#1E1E1E] italic">
+                    <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-4">
+                      <p className="text-base italic text-text-primary">
                         {japaneseParagraphs[index]}
                       </p>
                     </div>
@@ -724,19 +742,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 className="px-4 py-2"
               />
               
-              {!showJapanese && (
-                <button
-                  onClick={handleShowJapanese}
-                  className="bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#e5a561] transition-colors font-bold"
-                >
-                  日本語を表示
-                </button>
-              )}
+              <button
+                onClick={handleShowJapanese}
+                className="rounded-md bg-primary-active px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
+              >
+                {showJapanese ? '日本語を隠す' : '日本語を表示'}
+              </button>
               
               {!endTime && (
                 <button
                   onClick={handleCompleteReading}
-                  className="bg-[#FFE1B5] text-[#1E1E1E] px-4 py-2 rounded-md hover:bg-[#f0d1a0] transition-colors font-bold"
+                  className="rounded-md bg-[#FFE1B5] px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#f0d1a0]"
                 >
                   読書完了
                 </button>
@@ -747,9 +763,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
           {/* 読書完了後の表示 */}
           {endTime && (
-            <div className="bg-[#FFF9F4] border border-[#FFE1B5] rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold mb-3 text-[#1E1E1E]">読書完了！</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-6 shadow-sm">
+              <h3 className="mb-3 font-semibold text-text-primary">読書完了！</h3>
+              <div className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-3">
                 <div>
                   <p className="text-sm text-gray-600">語数</p>
                   <p className="text-lg font-bold">{wordCount} 語</p>
@@ -801,26 +817,26 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               
               {/* 今日のマイノート */}
               {sessionWords.length > 0 && (
-                <div className="bg-[#FFF9F4] border border-[#C9A86C] rounded p-4 mb-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-[#1E1E1E]">今日のマイノート</h3>
+                <div className="mb-4 rounded border border-[#C9A86C] bg-page-bg p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-bold text-text-primary">今日のマイノート</h3>
                   </div>
                   
-                  <p className="text-sm text-[#1E1E1E] mb-3">
+                  <p className="mb-3 text-sm text-text-primary">
                     クリックした単語: {sessionWords.length}個
                   </p>
                   
-                  <div className="space-y-3 mb-4">
+                  <div className="mb-4 space-y-3">
                     {sessionWords.map((word, index) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border border-[#C9A86C]">
+                      <div key={index} className="rounded-lg border border-[#C9A86C] bg-white p-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="space-y-2">
                               {/* 見出し語 */}
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-bold text-xl text-[#1E1E1E]">{word.word}</span>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-xl font-bold text-text-primary">{word.word}</span>
                                 {word.originalForm && word.originalForm !== word.word && (
-                                  <span className="font-semibold text-lg text-gray-600">
+                                  <span className="text-lg font-semibold text-gray-600">
                                     {word.originalForm}
                                   </span>
                                 )}
@@ -828,7 +844,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                               
                               {/* 品詞 */}
                               <div className="flex items-center gap-2">
-                                <span className="bg-[#FFE1B5] text-[#1E1E1E] text-xs px-2 py-1 rounded-md font-medium">
+                                <span className="rounded-md bg-[#FFE1B5] px-2 py-1 text-xs font-medium text-text-primary">
                                   {posToJapanese[word.partOfSpeech] || word.partOfSpeech}
                                 </span>
                               </div>
@@ -848,12 +864,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                               {/* 例文 */}
                               {(word.sentence || word.sentenceJapanese) && (
                                 <div className="space-y-1">
-                                  <div className="text-sm bg-gray-50 p-2 rounded border-l-4 border-[#FFB86C]">
+                                  <div className="rounded border-l-4 border-primary-active bg-gray-50 p-2 text-sm">
                                     {word.sentence && (
                                       <div className="italic text-gray-800">{word.sentence}</div>
                                     )}
                                     {word.sentenceJapanese && (
-                                      <div className="text-gray-600 mt-1">{word.sentenceJapanese}</div>
+                                      <div className="mt-1 text-gray-600">{word.sentenceJapanese}</div>
                                     )}
                                   </div>
                                 </div>
@@ -868,7 +884,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <div className="text-center">
                     <button
                       onClick={() => router.push('/notebook')}
-                      className="bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded text-sm hover:bg-[#e5a561] transition-colors"
+                      className="rounded bg-primary-active px-4 py-2 text-sm text-text-primary transition-colors hover:bg-[#e5a561]"
                     >
                       マイノートを見る
                     </button>
@@ -880,14 +896,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div className="flex gap-3">
                   <button
                     onClick={handleLevelChange}
-                    className="flex-1 bg-[#FFB86C] text-[#1E1E1E] px-4 py-2 rounded-md font-medium hover:bg-[#e5a561] transition-colors"
+                    className="flex-1 rounded-md bg-primary-active px-4 py-2 font-medium text-text-primary transition-colors hover:bg-[#e5a561]"
                   >
                     レベル変更
                   </button>
                   
                   <button
                     onClick={() => router.push('/choose')}
-                    className="flex-1 bg-[#FFE1B5] text-[#1E1E1E] px-4 py-2 rounded-md font-medium hover:bg-[#f0d1a0] transition-colors"
+                    className="flex-1 rounded-md bg-[#FFE1B5] px-4 py-2 font-medium text-text-primary transition-colors hover:bg-[#f0d1a0]"
                   >
                     他のものを読む
                   </button>
@@ -895,8 +911,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 
                 {/* レベル選択UI */}
                 {showLevelSelector && (
-                  <div className="bg-[#FFF9F4] border border-[#FFE1B5] p-4 rounded-lg">
-                    <h4 className="font-medium mb-3 text-center">語彙レベルを選択</h4>
+                  <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-4">
+                    <h4 className="mb-3 text-center font-medium">語彙レベルを選択</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5].map((level) => (
                         <button
@@ -904,15 +920,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                           onClick={() => handleRegenerateWithLevel(level)}
                           className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
                             selectedLevel === level 
-                              ? 'bg-[#FFB86C] text-[#1E1E1E]' 
-                              : 'bg-white text-[#1E1E1E] hover:bg-[#FFF9F4] border border-[#FFE1B5]'
+                              ? 'bg-primary-active text-text-primary' 
+                              : 'border border-[#FFE1B5] bg-white text-text-primary hover:bg-page-bg'
                           }`}
                         >
                           Lv.{level}
                         </button>
                       ))}
                     </div>
-                    <div className="mt-2 text-xs text-gray-600 text-center">
+                    <div className="mt-2 text-center text-xs text-gray-600">
                       選択したレベルで同じ内容を再生成します
                     </div>
                   </div>

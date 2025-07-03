@@ -55,11 +55,11 @@ export default function ReadingFormPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF9F4] flex flex-col items-center justify-center px-4">
-      <h1 className="text-2xl font-bold text-[#1E1E1E] mb-6">{text.title[displayLang]}</h1>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-page-bg px-4">
+      <h1 className="mb-6 text-2xl font-bold text-text-primary">{text.title[displayLang]}</h1>
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
         <div>
-          <label className="block text-[#1E1E1E] font-semibold mb-2">
+          <label className="mb-2 block font-semibold text-text-primary">
             {text.question1[displayLang]}
           </label>
           <input

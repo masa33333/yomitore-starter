@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { saveToHistory } from "@/lib/saveToHistory"
-import { saveLetterToStorage } from "@/lib/letterStorage"
 
 export default function TestMailSave() {
   useEffect(() => {

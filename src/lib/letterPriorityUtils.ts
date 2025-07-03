@@ -15,13 +15,14 @@ type LetterData = {
   wpm: number;
   catName?: string;
   cityImage?: string;
+  reason?: string;
 };
 
 /**
  * キューの次のアイテムを処理
  * Process next item in queue
  */
-export function processNextInQueue(): boolean {
+export function processNextInQueue(): LetterData | null {
   try {
     console.log('📋 processNextInQueue: Checking for queued letters/mails...');
     
@@ -29,13 +30,13 @@ export function processNextInQueue(): boolean {
     const queueData = localStorage.getItem('letterQueue');
     if (!queueData) {
       console.log('📋 processNextInQueue: No queue data found');
-      return false;
+      return null;
     }
     
     const queue = JSON.parse(queueData);
     if (!Array.isArray(queue) || queue.length === 0) {
       console.log('📋 processNextInQueue: Queue is empty');
-      return false;
+      return null;
     }
     
     // 最初のアイテムを処理
@@ -46,10 +47,15 @@ export function processNextInQueue(): boolean {
     localStorage.setItem('letterText', JSON.stringify(nextItem));
     console.log('📋 processNextInQueue: Processed item:', nextItem.type);
     
-    return true;
+    // reasonが未設定の場合はデフォルト値を設定
+    if (!nextItem.reason) {
+      nextItem.reason = nextItem.type === 'mail' ? 'pending_mail_processed' : 'pending_letter_processed';
+    }
+    
+    return nextItem;
   } catch (error) {
     console.error('❌ processNextInQueue error:', error);
-    return false;
+    return null;
   }
 }
 
@@ -57,7 +63,7 @@ export function processNextInQueue(): boolean {
  * 手紙完了後の保留中メールをチェック
  * Check for pending mail after letter completion
  */
-export function checkForPendingMailAfterLetterCompletion(): void {
+export function checkForPendingMailAfterLetterCompletion(): boolean {
   try {
     console.log('📬 checkForPendingMailAfterLetterCompletion: Checking for pending mails...');
     
@@ -65,13 +71,13 @@ export function checkForPendingMailAfterLetterCompletion(): void {
     const pendingMails = localStorage.getItem('pendingMails');
     if (!pendingMails) {
       console.log('📬 checkForPendingMailAfterLetterCompletion: No pending mails');
-      return;
+      return false;
     }
     
     const mails = JSON.parse(pendingMails);
     if (!Array.isArray(mails) || mails.length === 0) {
       console.log('📬 checkForPendingMailAfterLetterCompletion: No pending mails in array');
-      return;
+      return false;
     }
     
     // 最初のメールを処理
@@ -82,8 +88,10 @@ export function checkForPendingMailAfterLetterCompletion(): void {
     localStorage.setItem('letterText', JSON.stringify(nextMail));
     console.log('📬 checkForPendingMailAfterLetterCompletion: Processed mail:', nextMail.fromCity, '→', nextMail.toCity);
     
+    return true;
   } catch (error) {
     console.error('❌ checkForPendingMailAfterLetterCompletion error:', error);
+    return false;
   }
 }
 

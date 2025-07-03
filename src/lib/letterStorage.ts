@@ -67,7 +67,7 @@ export function saveLetterToStorage(letter: LetterData) {
           const addToPendingQueue = async () => {
             try {
               const { saveWithPriority } = await import('./letterPriorityUtils');
-              saveWithPriority(undefined, letter); // letterを undefined にしてmailのみをキューに追加
+              saveWithPriority(letter); // mailをキューに追加
               console.log('📧 Mail added to pending queue due to existing letter priority');
             } catch (error) {
               console.error('📧 Failed to add mail to pending queue:', error);

@@ -2,8 +2,7 @@ import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 import { 
   getTravelPrompt, 
-  validateLevel3Vocabulary,
-  type TravelPromptConfig 
+  validateLevel3Vocabulary
 } from "@/utils/travelPromptTemplates";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });

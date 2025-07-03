@@ -4,8 +4,7 @@ import {
   generateStoryPrompt, 
   parseStoryResponse, 
   validateStoryParameters,
-  STORY_SYSTEM_MESSAGE,
-  type StoryParameters 
+  STORY_SYSTEM_MESSAGE
 } from "@/lib/storyPrompt";
 import { vocabularyData } from "@/data/vocabularyData";
 

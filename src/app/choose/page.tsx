@@ -116,20 +116,20 @@ export default function ChoosePage() {
   };
 
   return (
-    <main className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-xl font-bold mb-6">
+    <main className="mx-auto max-w-4xl p-4">
+      <h1 className="mb-6 text-xl font-bold">
         {text.title[displayLang]}（{getGenerationLevelName(generationLevel)}）
       </h1>
       
       {/* コンテンツタイプ選択カード */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <button
           onClick={() => handleCardClick('reading')}
-          className="w-full bg-[#FFB86C] text-[#1E1E1E] rounded-xl px-6 py-4 hover:bg-[#e5a561] transition-colors text-left"
+          className="w-full rounded-xl bg-primary-active px-6 py-4 text-left text-text-primary transition-colors hover:bg-[#e5a561]"
         >
           <div>
-            <h3 className="text-lg font-semibold mb-1">{text.readCard.title[displayLang]}</h3>
-            <p className="text-sm text-[#1E1E1E] mt-1">{text.readCard.desc[displayLang]}</p>
+            <h3 className="mb-1 text-lg font-semibold">{text.readCard.title[displayLang]}</h3>
+            <p className="mt-1 text-sm text-text-primary">{text.readCard.desc[displayLang]}</p>
           </div>
         </button>
         

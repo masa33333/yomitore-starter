@@ -45,7 +45,7 @@ export default function StartPage() {
           <img
             src="/images/cat-icon.png"
             alt="Cat Traveler"
-            className="w-32 h-32 object-contain drop-shadow-lg"
+            className="size-32 object-contain drop-shadow-lg"
           />
         </div>
 

@@ -1430,10 +1430,10 @@ Your Cat`;
                 {clickedWords.length > 0 && (
                   <div className="bg-[#FFF9F4] border border-[#C9A86C] rounded-xl p-6 mt-8">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-[#1E1E1E] text-lg">📝 今日のマイノート</h3>
+                      <h3 className="text-lg font-bold text-text-primary">📝 今日のマイノート</h3>
                     </div>
                     
-                    <p className="text-sm text-[#1E1E1E] mb-4">
+                    <p className="mb-4 text-sm text-text-primary">
                       クリックした単語 {clickedWords.length}個
                     </p>
                     
@@ -1444,7 +1444,7 @@ Your Cat`;
                             <div className="flex-1">
                               <div className="space-y-2">
                                 <div className="flex items-center space-x-2">
-                                  <span className="font-bold text-lg text-[#1E1E1E]">{word.word}</span>
+                                  <span className="text-lg font-bold text-text-primary">{word.word}</span>
                                   {word.pos && (
                                     <span className="text-xs bg-[#FFE1B5] text-[#7E6944] px-2 py-1 rounded-full">
                                       {posMap[word.pos] || "不明"}
@@ -1452,13 +1452,13 @@ Your Cat`;
                                   )}
                                 </div>
                                 
-                                <div className="text-sm text-[#1E1E1E]">
+                                <div className="text-sm text-text-primary">
                                   <p className="font-medium">意味：</p>
                                   <p>{word.jaDefinition || '定義が見つかりません'}</p>
                                 </div>
                                 
                                 {word.enExample && (
-                                  <div className="text-sm text-[#1E1E1E]">
+                                  <div className="text-sm text-text-primary">
                                     <p className="font-medium">例文：</p>
                                     <p className="italic">{word.enExample}</p>
                                     {word.jaExample && (
@@ -1475,7 +1475,7 @@ Your Cat`;
                     
                     <button
                       onClick={() => window.location.href = '/notebook'}
-                      className="w-full bg-[#FFE1B5] text-[#1E1E1E] px-6 py-3 rounded-md font-medium hover:bg-[#E5C590] transition-colors"
+                      className="w-full rounded-md bg-[#FFE1B5] px-6 py-3 font-medium text-text-primary transition-colors hover:bg-[#E5C590]"
                     >
                       📚 マイノートを見る
                     </button>
@@ -1488,7 +1488,7 @@ Your Cat`;
 
         {/* Dictionary Modal - Only show when not reading */}
         {showDictionaryModal && wordInfo && !hasStarted && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 p-4 z-50">
             <div className="bg-white rounded-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
               <div className="p-6">
                 {/* Header */}
@@ -1505,7 +1505,7 @@ Your Cat`;
                 {/* Loading state */}
                 {loadingWordInfo && (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-400 mx-auto mb-2"></div>
+                    <div className="mx-auto mb-2 size-8 animate-spin rounded-full border-b-2 border-orange-400"></div>
                     <p className="text-gray-600">定義を取得中...</p>
                   </div>
                 )}
@@ -1548,12 +1548,12 @@ Your Cat`;
                         <div className="space-y-2">
                           {wordInfo.sentence && (
                             <p className="text-gray-800 italic">
-                              "{wordInfo.sentence}"
+                              &quot;{wordInfo.sentence}&quot;
                             </p>
                           )}
                           {wordInfo.sentenceJapanese && (
                             <p className="text-gray-600 text-sm">
-                              "{wordInfo.sentenceJapanese}"
+                              &quot;{wordInfo.sentenceJapanese}&quot;
                             </p>
                           )}
                         </div>

@@ -1,9 +1,7 @@
 // 📄 /components/MailNotification.tsx
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { generateInFlightMail } from '@/lib/generateInFlightMail';
-import { saveLetterToStorage, getLetterFromStorage } from '@/lib/letterStorage';
-import { saveToHistory } from '@/lib/saveToHistory';
+import { getLetterFromStorage } from '@/lib/letterStorage';
 
 export default function MailNotification({ show }: { show: boolean }) {
   const [visible, setVisible] = useState(false);

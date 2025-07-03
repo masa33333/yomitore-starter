@@ -116,7 +116,7 @@ export default function TTSButton({
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+              <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-current"></div>
               生成中...
             </>
           ) : (
@@ -137,7 +137,7 @@ export default function TTSButton({
 
       {/* Error Display */}
       {error && (
-        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+        <div className="mt-2 rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
           {error}
         </div>
       )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
 
 export type VocabularyLevel = 'easy' | 'normal' | 'hard';
 
@@ -47,14 +47,14 @@ export default function VocabularyLevelSelector({ currentLevel, onChange }: Voca
             <button
               key={level.value}
               onClick={() => onChange(level.value)}
-              className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
+              className={`rounded-lg border-2 p-4 text-left transition-all duration-200 ${
                 isSelected
-                  ? 'bg-[#FFF9F4] border-[#FFB86C] shadow-md'
-                  : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                  ? 'border-primary-active bg-page-bg shadow-md'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
-              <div className="flex items-center mb-2">
-                <span className="text-xl mr-3">{level.icon}</span>
+              <div className="mb-2 flex items-center">
+                <span className="mr-3 text-xl">{level.icon}</span>
                 <div>
                   <span className={`text-lg font-semibold ${
                     isSelected ? 'text-blue-800' : 'text-gray-800'

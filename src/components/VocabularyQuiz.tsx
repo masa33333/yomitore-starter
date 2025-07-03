@@ -1,7 +1,7 @@
 'use client';
 console.log("VocabularyQuiz loaded");
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { vocabularyData, VocabularyItem, AdaptiveTestState } from '../data/vocabularyData';
 import { useRouter } from 'next/navigation';
 
@@ -46,8 +46,28 @@ export function VocabularyQuiz() {
     return 5;                          // Quiz 9-10 → Lv.5 (上級 C1+)
   };
 
+  // 安定して正解した最高レベルを計算
+  const calculateMaxStableLevel = useCallback(() => {
+    let maxStable = 1;
+    
+    // レベル履歴から連続で正解したレベルを見つける
+    for (let level = 1; level <= 10; level++) {
+      const levelResults = testState.levelHistory.filter(h => h.level === level);
+      if (levelResults.length >= 2) {
+        const correctCount = levelResults.filter(h => h.correct).length;
+        const accuracy = correctCount / levelResults.length;
+        
+        if (accuracy >= 0.7) { // 70%以上の正答率
+          maxStable = level;
+        }
+      }
+    }
+    
+    return Math.max(maxStable, testState.maxStableLevel);
+  }, [testState.levelHistory, testState.maxStableLevel]);
+
   // テストを終了する関数
-  const finishTest = () => {
+  const finishTest = useCallback(() => {
     try {
       // 安定して正解した最高レベルを計算
       const stableLevel = calculateMaxStableLevel();
@@ -81,30 +101,10 @@ export function VocabularyQuiz() {
       setFinalLevel(5); // デフォルト値
       setFinished(true);
     }
-  };
-
-  // 安定して正解した最高レベルを計算
-  const calculateMaxStableLevel = () => {
-    let maxStable = 1;
-    
-    // レベル履歴から連続で正解したレベルを見つける
-    for (let level = 1; level <= 10; level++) {
-      const levelResults = testState.levelHistory.filter(h => h.level === level);
-      if (levelResults.length >= 2) {
-        const correctCount = levelResults.filter(h => h.correct).length;
-        const accuracy = correctCount / levelResults.length;
-        
-        if (accuracy >= 0.7) { // 70%以上の正答率
-          maxStable = level;
-        }
-      }
-    }
-    
-    return Math.max(maxStable, testState.maxStableLevel);
-  };
+  }, [calculateMaxStableLevel]);
 
   // 次の問題を生成する関数（最新の状態を取得）
-  const generateNextQuestion = (currentState?: AdaptiveTestState) => {
+  const generateNextQuestion = useCallback((currentState?: AdaptiveTestState) => {
     const state = currentState || testState;
     
     console.log('📝 generateNextQuestion 呼び出し:', { 
@@ -146,7 +146,7 @@ export function VocabularyQuiz() {
       const randomItem = availableWords[Math.floor(Math.random() * availableWords.length)];
       createQuestion(randomItem, false);
     }
-  };
+  }, [testState, finished, finishTest]);
 
   // 問題を作成する関数
   const createQuestion = (item: VocabularyItem, resetUsedWords: boolean = false) => {
@@ -182,7 +182,7 @@ export function VocabularyQuiz() {
         finishTest();
       }
     }
-  }, [showInstructions, isClient]);
+  }, [showInstructions, isClient, finishTest, generateNextQuestion]);
 
   const handleStartQuiz = () => {
     setShowInstructions(false);
@@ -291,10 +291,10 @@ export function VocabularyQuiz() {
   if (finished && finalLevel !== null) {
     return (
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-6 text-black">判定結果</h2>
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
+        <h2 className="mb-6 text-2xl font-bold text-black">判定結果</h2>
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="mb-2 text-black">正解数: {testState.correctAnswers} / {testState.questionCount}</p>
-          <p className="mb-2 text-lg text-black font-bold">
+          <p className="mb-2 text-lg font-bold text-black">
             あなたの語彙レベル: {mapQuizLevelToGenerationLevel(finalLevel)} （最高5）
           </p>
           <p className="text-sm text-gray-600">
@@ -303,16 +303,16 @@ export function VocabularyQuiz() {
         </div>
         
         
-        <div className="flex gap-4 justify-center">
+        <div className="flex justify-center gap-4">
           <button
             onClick={handleProceed}
-            className="bg-orange-400 hover:bg-orange-500 text-white rounded-xl text-lg px-6 py-2 transition-colors duration-200"
+            className="rounded-xl bg-orange-400 px-6 py-2 text-lg text-white transition-colors duration-200 hover:bg-orange-500"
           >
             読み物を生成する
           </button>
           <button
             onClick={handleRetry}
-            className="bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-xl text-lg px-6 py-2 transition-colors duration-200"
+            className="rounded-xl bg-orange-100 px-6 py-2 text-lg text-orange-700 transition-colors duration-200 hover:bg-orange-200"
           >
             再テスト
           </button>
@@ -367,7 +367,7 @@ export function VocabularyQuiz() {
         </div>
 
         {/* 説明ポップアップ */}
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4 text-center">
             <h3 className="text-2xl font-bold mb-6 text-gray-800">語彙レベル判定</h3>
             <p className="text-lg text-gray-700 mb-8 leading-relaxed">
@@ -434,10 +434,10 @@ export function VocabularyQuiz() {
                 className={`px-4 py-3 rounded-lg border transition-all duration-200
                   ${selectedAnswer === option
                     ? option === currentQuestion.correctAnswer
-                      ? 'bg-[#FFF9F4] border-[#FFB86C] text-[#1E1E1E]'
+                      ? 'bg-page-bg border-primary-active text-text-primary'
                       : 'bg-red-100 border-red-500 text-red-800'
                     : selectedAnswer && option === currentQuestion.correctAnswer
-                      ? 'bg-[#FFF9F4] border-[#FFB86C] text-[#1E1E1E]'
+                      ? 'bg-page-bg border-primary-active text-text-primary'
                       : 'bg-white hover:bg-gray-50 border-gray-300'}
                   ${selectedAnswer ? 'cursor-not-allowed' : 'cursor-pointer hover:border-[#FFE1B5]'}
                 `}

@@ -55,11 +55,16 @@ export default function MapPage() {
         // Convert old letter format to new letter storage format
         saveLetterToStorage({
           type: "letter",
+          fromCity: "Previous City",
+          toCity: lastCity,
+          level: userLevel,
           jp: "都市からの手紙です。", // You may want to generate Japanese content too
           en: {
             [userLevel]: letterText.body
           },
-          city: lastCity
+          wordCount: letterText.body.split(/\s+/).length,
+          duration: 0,
+          wpm: 0
         });
 
         // 都市画像がすでに生成済みなら読み込む（またはあとで実装）
@@ -94,9 +99,9 @@ export default function MapPage() {
     <div className="min-h-screen flex items-center justify-center relative">
 
       {/* 目的地表示ポップアップ */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-40">
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-40">
         <div className={`bg-white/90 backdrop-blur-sm rounded-xl shadow-lg px-6 py-3 border border-gray-200 transition-all duration-1000 ${
-          showDestination ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+          showDestination ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           <p className="text-xl font-bold text-gray-800 text-center">
             最初の目的地はソウルです
@@ -111,16 +116,16 @@ export default function MapPage() {
       </div>
 
       {/* 動的地図画像の表示 */}
-      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+      <div className="size-full flex items-center justify-center overflow-hidden">
         <Image
           src={currentMapImage}
           alt={`Current journey map - ${getCurrentCity(totalWords)}`}
           width={1200}
           height={800}
-          className="w-full h-full object-cover"
+          className="size-full object-cover"
           style={{
             objectPosition: 'center',
-            transform: 'scale(3)',
+            scale: '3',
           }}
           onError={() => {
             console.warn(`Failed to load ${currentMapImage}, using fallback`);
@@ -132,10 +137,10 @@ export default function MapPage() {
 
       {/* 次に進むボタン（初回のみ） */}
       {isFirstVisit && (
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-40">
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40">
           <button
             onClick={() => router.push('/quiz')}
-            className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 animate-pulse hover:animate-none"
+            className="animate-pulse rounded-xl bg-orange-400 px-8 py-4 text-lg font-semibold text-white transition-all duration-200 hover:animate-none hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
             レベル判定に進む
           </button>

@@ -49,7 +49,7 @@ export default function TokyoPage() {
         }}
       >
         {/* 半透明オーバーレイ */}
-        <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
       {/* コンテンツ */}
@@ -58,7 +58,7 @@ export default function TokyoPage() {
         <div className="min-h-[80px] flex flex-col justify-center space-y-4 mb-6">
           <p
             className={`text-lg text-white font-semibold leading-relaxed transition-all duration-1000 drop-shadow-lg ${
-              showMessage ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+              showMessage ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
             style={{ whiteSpace: 'pre-line' }}
           >
@@ -83,7 +83,7 @@ export default function TokyoPage() {
 
       {/* 成田空港の表示 */}
       <div className="absolute bottom-4 left-4 z-10">
-        <div className="bg-white bg-opacity-90 rounded-lg px-3 py-2 text-sm text-gray-700">
+        <div className="bg-white/90 rounded-lg px-3 py-2 text-sm text-gray-700">
           📍 成田空港 / Narita Airport
         </div>
       </div>
