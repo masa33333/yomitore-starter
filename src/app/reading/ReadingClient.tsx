@@ -167,6 +167,69 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     firstParagraphPreview: englishParagraphs[0]?.substring(0, 100) + '...'
   });
 
+  // 新しいコンテンツを生成する関数
+  const generateNewContent = async () => {
+    try {
+      setLoading(true);
+      console.log('🚀 Generating new content with params:', searchParams);
+
+      const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
+      
+      const requestBody = {
+        level: currentLevel,
+        mode: mode,
+        ...searchParams
+      };
+
+      console.log('📡 API request body:', requestBody);
+
+      const response = await fetch('/api/generate-reading', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ API response received:', data);
+
+      if (data.english && data.japanese) {
+        setEnglish(data.english);
+        setJapanese(data.japanese);
+        setStoryTitle(data.title || displayTitle);
+        
+        // 段落に分割
+        const englishParagraphs = data.english.split('\n\n').filter((p: string) => p.trim());
+        const japaneseParagraphs = data.japanese.split('\n\n').filter((p: string) => p.trim());
+        
+        setEnglishParagraphs(englishParagraphs);
+        setJapaneseParagraphs(japaneseParagraphs);
+        
+        // 語数を計算
+        const words = data.english.trim().split(/\s+/).filter((w: string) => w.length > 0);
+        setWordCount(words.length);
+
+        console.log('✅ Content successfully updated:', {
+          title: data.title,
+          englishLength: data.english.length,
+          japaneseLength: data.japanese.length,
+          wordCount: words.length,
+          paragraphs: englishParagraphs.length
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error generating content:', error);
+      // エラーの場合は初期データをそのまま使用
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // コンポーネントマウント時にテストログ出力とデータ統一
   React.useEffect(() => {
     console.log('🚀 ReadingClient mounted!');
@@ -187,6 +250,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       from: urlParams.get('from'),
       allParams: Object.fromEntries(urlParams.entries())
     });
+
+    // notebookから戻っていない場合は新しいコンテンツを生成
+    if (!fromNotebook && !isClientRestored) {
+      generateNewContent();
+    }
     
     // notebookから戻った場合の完全な状態復元処理
     if (fromNotebook) {
