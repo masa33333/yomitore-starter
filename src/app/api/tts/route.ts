@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceSupabaseClient } from '@/lib/supabase';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -15,12 +14,35 @@ export async function POST(request: NextRequest) {
 
     console.log('🎵 TTS request:', { contentId, textLength: text.length });
 
+    // 環境変数チェック
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey || !openaiApiKey) {
+      console.warn('⚠️ Missing environment variables for TTS service');
+      return NextResponse.json(
+        { 
+          error: 'TTS service temporarily unavailable - missing configuration',
+          audioUrl: '',
+          cached: false 
+        },
+        { status: 503 }
+      );
+    }
+
+    // Dynamic Supabase client creation with error handling
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+
     // コンテンツIDとテキストのハッシュでファイル名を生成
     const textHash = crypto.createHash('md5').update(text).digest('hex');
     const fileName = `${contentId}_${textHash}.mp3`;
-
-    // Supabaseクライアント作成
-    const supabase = createServiceSupabaseClient();
 
     // 既存のファイルをチェック
     const { data: existingFile } = await supabase.storage
@@ -44,7 +66,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
