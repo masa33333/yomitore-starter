@@ -123,18 +123,8 @@ export default function Header() {
           </Link>
         </div>
         
-        {/* 右側: ナビゲーションメニュー */}
-        <nav className="flex gap-2 sm:gap-4">
-          <Link href="/map" className="hover:opacity-70 text-sm sm:text-base">
-            {getText('map')}
-          </Link>
-          <Link href="/notebook" className="hover:opacity-70 text-sm sm:text-base">
-            {getText('notes')}
-          </Link>
-          <Link href="/history" className="hover:opacity-70 text-sm sm:text-base">
-            {getText('history')}
-          </Link>
-        </nav>
+        {/* 右側: 空のスペース */}
+        <div></div>
       </div>
     </header>
   );

@@ -91,7 +91,7 @@ export default function Home() {
       ) : (
         // 既存ユーザー向け - 読み物選択 + 再測定オプション
         <div className="text-center max-w-md">
-          <h1 className="text-3xl text-text-primary/70 mb-8 font-light">
+          <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
             {getText('subtitle')}
           </h1>
           <button
