@@ -199,19 +199,23 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log('✅ API response received:', data);
 
       if (data.english && data.japanese) {
-        setEnglish(data.english);
-        setJapanese(data.japanese);
+        // 配列形式のレスポンスに対応
+        const englishText = Array.isArray(data.english) ? data.english.join('\n\n') : data.english;
+        const japaneseText = Array.isArray(data.japanese) ? data.japanese.join('\n\n') : data.japanese;
+        
+        setEnglish(englishText);
+        setJapanese(japaneseText);
         setStoryTitle(data.title || displayTitle);
         
-        // 段落に分割
-        const englishParagraphs = data.english.split('\n\n').filter((p: string) => p.trim());
-        const japaneseParagraphs = data.japanese.split('\n\n').filter((p: string) => p.trim());
+        // 段落に分割（配列形式の場合はそのまま使用）
+        const englishParagraphs = Array.isArray(data.english) ? data.english : englishText.split('\n\n').filter((p: string) => p.trim());
+        const japaneseParagraphs = Array.isArray(data.japanese) ? data.japanese : japaneseText.split('\n\n').filter((p: string) => p.trim());
         
         setEnglishParagraphs(englishParagraphs);
         setJapaneseParagraphs(japaneseParagraphs);
         
         // 語数を計算
-        const words = data.english.trim().split(/\s+/).filter((w: string) => w.length > 0);
+        const words = englishText.trim().split(/\s+/).filter((w: string) => w.length > 0);
         setWordCount(words.length);
 
         console.log('✅ Content successfully updated:', {
