@@ -10,12 +10,18 @@ export default function TestTTSPage() {
     setLoading(true);
     
     // デバイス情報を表示
-    const hasWebkitAudioContext = typeof window !== 'undefined' && 'webkitAudioContext' in window;
+    let hasWebkitAudio = false;
+    try {
+      hasWebkitAudio = typeof window !== 'undefined' && typeof (window as any).webkitAudioContext !== 'undefined';
+    } catch (e) {
+      hasWebkitAudio = false;
+    }
+    
     const deviceInfo = {
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      hasAudioContext: typeof AudioContext !== 'undefined' || hasWebkitAudioContext,
+      hasAudioContext: typeof AudioContext !== 'undefined' || hasWebkitAudio,
       timestamp: new Date().toISOString()
     };
     
