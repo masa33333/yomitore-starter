@@ -152,7 +152,7 @@ export function getLetterFromStorage(): LetterData | null {
     }
     
     if (!parsed.hasOwnProperty('en') || typeof parsed.en !== "object") {
-      console.warn("⚠️ getLetterFromStorage: Missing or invalid en field in stored data");
+      console.log("📝 getLetterFromStorage: Initializing en field (normal for non-letter content)");
       parsed.en = {};
     }
     

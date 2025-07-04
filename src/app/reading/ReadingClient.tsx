@@ -629,44 +629,54 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         body: JSON.stringify({ 
           originalText: english,
           targetLevel: newLevel,
+          currentLevel: selectedLevel,
           title: storyTitle || displayTitle
         })
       });
       
+      console.log('🔍 Level conversion response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('🔍 Level conversion response data:', data);
         
-        // 新しいレベルのテキストで更新
-        setEnglish(data.rewrittenText);
-        setEnglishParagraphs(data.rewrittenText.split('\n\n').filter(p => p.trim()));
-        
-        // 日本語翻訳をリセット（必要に応じて再翻訳）
-        setJapanese('');
-        setJapaneseParagraphs([]);
-        setShowJapanese(false);
-        
-        // 語数を再計算
-        const words = data.rewrittenText.trim().split(/\s+/).filter(w => w.length > 0);
-        setWordCount(words.length);
-        
-        // 現在のレベルを更新
-        setSelectedLevel(newLevel);
-        
-        // localStorageの生成レベルも更新
-        localStorage.setItem('level', newLevel.toString());
-        localStorage.setItem('fixedLevel', newLevel.toString());
-        console.log('📊 localStorage updated: level =', newLevel);
-        
-        // 読書状態をリセット
-        setIsReadingStarted(false);
-        setStartTime(null);
-        setEndTime(null);
-        setWpm(null);
-        setSessionWords([]);
-        
-        console.log('✅ レベル変換完了:', { newLevel, newWordCount: words.length, selectedLevel: newLevel });
+        if (data.rewrittenText) {
+          // 新しいレベルのテキストで更新
+          setEnglish(data.rewrittenText);
+          setEnglishParagraphs(data.rewrittenText.split('\n\n').filter(p => p.trim()));
+          
+          // 日本語翻訳をリセット（必要に応じて再翻訳）
+          setJapanese('');
+          setJapaneseParagraphs([]);
+          setShowJapanese(false);
+          
+          // 語数を再計算
+          const words = data.rewrittenText.trim().split(/\s+/).filter(w => w.length > 0);
+          setWordCount(words.length);
+          
+          // 現在のレベルを更新
+          setSelectedLevel(newLevel);
+          
+          // localStorageの生成レベルも更新
+          localStorage.setItem('level', newLevel.toString());
+          localStorage.setItem('fixedLevel', newLevel.toString());
+          console.log('📊 localStorage updated: level =', newLevel);
+          
+          // 読書状態をリセット
+          setIsReadingStarted(false);
+          setStartTime(null);
+          setEndTime(null);
+          setWpm(null);
+          setSessionWords([]);
+          
+          console.log('✅ レベル変換完了:', { newLevel, newWordCount: words.length, selectedLevel: newLevel });
+        } else {
+          console.error('❌ rewrittenText not found in response:', data);
+          alert('レベル変換に失敗しました。もう一度お試しください。');
+        }
       } else {
-        console.error('❌ レベル変換エラー');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ レベル変換エラー:', response.status, errorData);
         alert('レベル変換に失敗しました。もう一度お試しください。');
       }
     } catch (error) {
