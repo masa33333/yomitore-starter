@@ -87,10 +87,29 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('❌ OpenAI TTS error:', errorData);
+      const errorText = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { message: errorText };
+      }
+      
+      console.error('❌ OpenAI TTS error:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorData: errorData,
+        voice: ttsVoice,
+        textLength: text.length
+      });
+      
       return NextResponse.json(
-        { error: 'Failed to generate audio' },
+        { 
+          error: 'Failed to generate audio',
+          details: errorData,
+          voice: ttsVoice,
+          status: response.status
+        },
         { status: 500 }
       );
     }

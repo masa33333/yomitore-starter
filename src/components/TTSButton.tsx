@@ -27,6 +27,15 @@ export default function TTSButton({
       return;
     }
 
+    // モバイル環境チェック
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('📱 Device info:', { 
+      isMobile, 
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      textLength: text.length
+    });
+
     setIsLoading(true);
     setError(null);
 
@@ -50,11 +59,20 @@ export default function TTSButton({
       const data = await response.json();
       setAudioUrl(data.audioUrl);
       
-      // 音声を自動再生
+      // 音声を自動再生（モバイル対応）
       if (audioRef.current) {
         audioRef.current.src = data.audioUrl;
-        await audioRef.current.play();
-        setIsPlaying(true);
+        
+        try {
+          // モバイルでは自動再生が制限される場合があるため、ユーザーアクションが必要
+          await audioRef.current.play();
+          setIsPlaying(true);
+          console.log('✅ Audio autoplay successful');
+        } catch (playError) {
+          console.warn('⚠️ Autoplay failed (expected on mobile):', playError);
+          // モバイルでは自動再生が失敗することが正常なので、エラーにはしない
+          console.log('📱 Please tap the play button to start audio');
+        }
       }
       
     } catch (err) {
