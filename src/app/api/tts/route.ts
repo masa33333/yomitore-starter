@@ -18,6 +18,14 @@ export async function POST(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
     const openaiApiKey = process.env.OPENAI_API_KEY;
+    const ttsVoice = process.env.TTS_VOICE || 'alloy'; // デフォルトはalloy
+
+    console.log('🔧 Environment variables:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseServiceKey: !!supabaseServiceKey,
+      hasOpenaiApiKey: !!openaiApiKey,
+      ttsVoice: ttsVoice
+    });
 
     if (!supabaseUrl || !supabaseServiceKey || !openaiApiKey) {
       console.warn('⚠️ Missing environment variables for TTS service');
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'tts-1', // より安価なモデル
         input: text,
-        voice: 'alloy', // 英語学習に適した声
+        voice: ttsVoice, // 環境変数から取得、デフォルトはalloy
         response_format: 'mp3',
         speed: 0.9 // 学習者向けに少し遅め
       }),

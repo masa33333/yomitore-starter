@@ -1,4 +1,12 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  env: {
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    CLAUDE_API_KEY: process.env.CLAUDE_API_KEY,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
+    TTS_VOICE: process.env.TTS_VOICE,
+  },
+};
 
 export default nextConfig;
