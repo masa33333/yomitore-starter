@@ -77,7 +77,7 @@ export default function Home() {
       
       {!hasVocabLevel ? (
         // 初回ユーザー向け - 語彙レベルチェックのみ
-        <div className="text-center max-w-md">
+        <div className="text-center max-w-md mt-8">
           <p className="text-lg text-text-primary mb-8">
             {getText('firstTime')}
           </p>
@@ -90,7 +90,7 @@ export default function Home() {
         </div>
       ) : (
         // 既存ユーザー向け - 読み物選択 + 再測定オプション
-        <div className="text-center max-w-md">
+        <div className="text-center max-w-md mt-8">
           <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
             {getText('subtitle')}
           </h1>

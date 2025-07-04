@@ -455,7 +455,7 @@ export function VocabularyQuiz() {
         {/* 説明ポップアップ */}
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4 text-center">
-            <h3 className="text-2xl font-bold mb-6 text-gray-800">語彙レベル判定</h3>
+            <h3 className="text-2xl font-bold mb-6 mt-4 text-gray-800">語彙レベル判定</h3>
             <p className="text-lg text-gray-700 mb-8 leading-relaxed">
               これから15問の単語の問題を出します。<br/>
               表示された単語の意味としてふさわしいものを選択肢から選んでください。

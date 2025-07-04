@@ -117,7 +117,7 @@ export default function ChoosePage() {
 
   return (
     <main className="mx-auto max-w-4xl p-4">
-      <h1 className="mb-6 text-xl font-bold">
+      <h1 className="mb-6 mt-8 text-xl font-bold">
         {text.title[displayLang]}（{getGenerationLevelName(generationLevel)}）
       </h1>
       
