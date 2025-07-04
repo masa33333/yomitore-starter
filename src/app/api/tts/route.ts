@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createServiceSupabaseClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,14 +28,24 @@ export async function POST(request: NextRequest) {
       ttsVoice: ttsVoice,
       supabaseUrlLength: supabaseUrl?.length || 0,
       serviceKeyLength: supabaseServiceKey?.length || 0,
-      openaiKeyLength: openaiApiKey?.length || 0
+      openaiKeyLength: openaiApiKey?.length || 0,
+      // 環境変数の実際の値の一部を表示（デバッグ用）
+      supabaseUrlPreview: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'undefined',
+      serviceKeyPreview: supabaseServiceKey ? `${supabaseServiceKey.substring(0, 10)}...` : 'undefined',
+      openaiKeyPreview: openaiApiKey ? `${openaiApiKey.substring(0, 10)}...` : 'undefined'
     });
 
     if (!supabaseUrl || !supabaseServiceKey || !openaiApiKey) {
-      console.warn('⚠️ Missing environment variables for TTS service');
+      const missingVars = [];
+      if (!supabaseUrl) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
+      if (!supabaseServiceKey) missingVars.push('SUPABASE_SERVICE_KEY');
+      if (!openaiApiKey) missingVars.push('OPENAI_API_KEY');
+      
+      console.warn('⚠️ Missing environment variables for TTS service:', missingVars);
       return NextResponse.json(
         { 
-          error: 'TTS service temporarily unavailable - missing configuration',
+          error: `TTS service temporarily unavailable - missing configuration: ${missingVars.join(', ')}`,
+          missingVariables: missingVars,
           audioUrl: '',
           cached: false 
         },
@@ -43,10 +53,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use the centralized Supabase client
+    // Create Supabase client directly in API route
     let supabase;
     try {
-      supabase = createServiceSupabaseClient();
+      supabase = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      });
       console.log('✅ Supabase client created successfully');
     } catch (supabaseError) {
       console.error('❌ Failed to create Supabase client:', supabaseError);
