@@ -19,6 +19,7 @@ export default function TTSButton({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const generateAndPlayAudio = async () => {
@@ -29,17 +30,33 @@ export default function TTSButton({
 
     // モバイル環境チェック
     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    console.log('📱 Device info:', { 
+    const deviceInfo = { 
       isMobile, 
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       textLength: text.length
-    });
+    };
+    
+    console.log('📱 Device info:', deviceInfo);
+    
+    // モバイル用デバッグ情報を追加
+    setDebugInfo([
+      `Device: ${isMobile ? 'Mobile' : 'Desktop'}`,
+      `Platform: ${navigator.platform}`,
+      `Text length: ${text.length}`,
+      `Starting TTS request...`
+    ]);
 
     setIsLoading(true);
     setError(null);
 
     try {
+      console.log('🎵 TTS API call starting:', { 
+        textLength: text.length, 
+        contentId, 
+        apiUrl: '/api/tts' 
+      });
+
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: {
@@ -51,9 +68,36 @@ export default function TTSButton({
         }),
       });
 
+      console.log('🎵 TTS API response:', { 
+        status: response.status, 
+        statusText: response.statusText,
+        ok: response.ok 
+      });
+
+      // モバイル用デバッグ情報を更新
+      setDebugInfo(prev => [...prev, 
+        `API Response: ${response.status} ${response.statusText}`,
+        `Success: ${response.ok}`
+      ]);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'TTS生成に失敗しました');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('🎵 TTS API error details:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData
+        });
+        
+        const errorMessage = errorData.error || 
+          `TTS生成に失敗しました (${response.status}: ${response.statusText})`;
+        
+        // モバイル用エラー情報を追加
+        setDebugInfo(prev => [...prev, 
+          `ERROR: ${errorMessage}`,
+          `Error details: ${JSON.stringify(errorData)}`
+        ]);
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -77,7 +121,11 @@ export default function TTSButton({
       
     } catch (err) {
       console.error('TTS Error:', err);
-      setError(err instanceof Error ? err.message : '音声生成でエラーが発生しました');
+      const errorMessage = err instanceof Error ? err.message : '音声生成でエラーが発生しました';
+      setError(errorMessage);
+      
+      // モバイル用最終エラー情報
+      setDebugInfo(prev => [...prev, `FINAL ERROR: ${errorMessage}`]);
     } finally {
       setIsLoading(false);
     }
@@ -158,6 +206,18 @@ export default function TTSButton({
         <div className="mt-2 rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
           {error}
         </div>
+      )}
+
+      {/* Debug Info Display (for mobile debugging) */}
+      {debugInfo.length > 0 && (
+        <details className="mt-2">
+          <summary className="cursor-pointer text-xs text-gray-500">Debug Info</summary>
+          <div className="mt-1 rounded border border-gray-200 bg-gray-50 p-2 text-xs text-gray-700">
+            {debugInfo.map((info, index) => (
+              <div key={index} className="mb-1">{info}</div>
+            ))}
+          </div>
+        </details>
       )}
 
       {/* Hidden Audio Element */}

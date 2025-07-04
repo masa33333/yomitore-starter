@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createServiceSupabaseClient } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +25,10 @@ export async function POST(request: NextRequest) {
       hasSupabaseUrl: !!supabaseUrl,
       hasSupabaseServiceKey: !!supabaseServiceKey,
       hasOpenaiApiKey: !!openaiApiKey,
-      ttsVoice: ttsVoice
+      ttsVoice: ttsVoice,
+      supabaseUrlLength: supabaseUrl?.length || 0,
+      serviceKeyLength: supabaseServiceKey?.length || 0,
+      openaiKeyLength: openaiApiKey?.length || 0
     });
 
     if (!supabaseUrl || !supabaseServiceKey || !openaiApiKey) {
@@ -39,14 +43,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Dynamic Supabase client creation with error handling
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    });
+    // Use the centralized Supabase client
+    let supabase;
+    try {
+      supabase = createServiceSupabaseClient();
+      console.log('✅ Supabase client created successfully');
+    } catch (supabaseError) {
+      console.error('❌ Failed to create Supabase client:', supabaseError);
+      return NextResponse.json(
+        { 
+          error: 'TTS service temporarily unavailable - Supabase connection failed',
+          details: supabaseError instanceof Error ? supabaseError.message : 'Unknown error',
+          audioUrl: '',
+          cached: false 
+        },
+        { status: 503 }
+      );
+    }
 
     // コンテンツIDとテキストのハッシュでファイル名を生成
     const textHash = crypto.createHash('md5').update(text).digest('hex');
