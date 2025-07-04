@@ -44,41 +44,6 @@ function addParagraphBreaks(englishText: string, japaneseText: string, level: nu
   };
 }
 
-// 動的なストーリー生成関数
-function generateStoryContent(level: number, genre: string, tone: string, feeling: string) {
-  const storyTemplates = {
-    adventure: {
-      exciting: {
-        thrilled: getAdventureStory(level, 'exciting', 'thrilled'),
-        amazed: getAdventureStory(level, 'exciting', 'amazed'),
-        inspired: getAdventureStory(level, 'exciting', 'inspired')
-      },
-      mysterious: {
-        curious: getAdventureStory(level, 'mysterious', 'curious'),
-        intrigued: getAdventureStory(level, 'mysterious', 'intrigued')
-      }
-    },
-    romance: {
-      warm: {
-        happy: getRomanceStory(level, 'warm', 'happy'),
-        hopeful: getRomanceStory(level, 'warm', 'hopeful')
-      }
-    },
-    mystery: {
-      suspenseful: {
-        curious: getMysteryStory(level, 'suspenseful', 'curious'),
-        puzzled: getMysteryStory(level, 'suspenseful', 'puzzled')
-      }
-    }
-  };
-
-  // 該当するストーリーを取得、なければ汎用ストーリー
-  if (storyTemplates[genre as keyof typeof storyTemplates]?.[tone as keyof any]?.[feeling as keyof any]) {
-    return storyTemplates[genre as keyof typeof storyTemplates][tone as keyof any][feeling as keyof any];
-  }
-  
-  return getGenericStory(level, genre, tone, feeling);
-}
 
 // カタカナから英語への変換辞書
 const katakanaToEnglish: { [key: string]: string } = {
