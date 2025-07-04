@@ -14,7 +14,7 @@ export default function TestTTSPage() {
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      hasAudioContext: typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined',
+      hasAudioContext: typeof AudioContext !== 'undefined' || typeof (window as any).webkitAudioContext !== 'undefined',
       timestamp: new Date().toISOString()
     };
     
