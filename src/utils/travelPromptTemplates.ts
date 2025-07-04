@@ -276,7 +276,7 @@ CRITICAL REQUIREMENTS:
 - Exactly 240-280 words
 - Exactly 3 paragraphs
 - Advanced vocabulary (C1+ level)
-- Sophisticated yet conversational tone
+- Sophisticated expert tone (no dialogue format)
 - Articulate and expressive
 
 WRITING STYLE:
