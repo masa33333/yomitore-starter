@@ -10,11 +10,12 @@ export default function TestTTSPage() {
     setLoading(true);
     
     // デバイス情報を表示
+    const hasWebkitAudioContext = typeof window !== 'undefined' && 'webkitAudioContext' in window;
     const deviceInfo = {
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      hasAudioContext: typeof AudioContext !== 'undefined' || typeof (window as any).webkitAudioContext !== 'undefined',
+      hasAudioContext: typeof AudioContext !== 'undefined' || hasWebkitAudioContext,
       timestamp: new Date().toISOString()
     };
     
