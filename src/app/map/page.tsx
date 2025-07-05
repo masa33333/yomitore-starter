@@ -104,11 +104,11 @@ export default function MapPage() {
           showDestination ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           <p className="text-xl font-bold text-gray-800 text-center">
-            最初の目的地はソウルです
+            {t('map_popup').split('\n')[0]}
           </p>
           <p className="text-base text-gray-700 text-center mt-1">
             {isFirstVisit 
-              ? 'まずは自分に合った語彙レベルを見つけましょう'
+              ? t('map_instruction')
               : `あと${(50000 - totalWords).toLocaleString()}語で到着します`
             }
           </p>
@@ -142,7 +142,7 @@ export default function MapPage() {
             onClick={() => router.push('/quiz')}
             className="animate-pulse rounded-xl bg-orange-400 px-8 py-4 text-lg font-semibold text-white transition-all duration-200 hover:animate-none hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
-            レベル判定に進む
+            {t('map_quiz_button').replace('📝 ', '')}
           </button>
         </div>
       )}
