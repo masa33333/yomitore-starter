@@ -29,10 +29,10 @@
   "start_placeholder": "ネコの名前（英語）",
   "start_example": "例：Lily, Tama...",
   "start_button": "この名前に決める",
-  "tokyo_message": "今から世界一周の旅に出ます。\nたくさん読むほど遠くの国に行けます。",
+  "tokyo_message": "今から旅を始めます。\n沢山読むほど遠くの国に行けます。",
   "tokyo_button": "次に進む",
   "map_popup": "最初の目的地はソウル\n5,000語読むと到着します",
   "map_welcome": "ようこそ！",
-  "map_instruction": "まずは語彙レベルを判定して、\n読み物を選びましょう！",
+  "map_instruction": "まずは下から自分に合った語彙レベルを見つけましょう",
   "map_quiz_button": "📝 語彙レベルを判定する"
 }

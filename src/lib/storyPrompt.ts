@@ -92,6 +92,8 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryPa
 7. 主人公は指定された性別（${randomGender}）で作成
 8. 語彙レベル${level}に適した英語で作成
 9. 内容が浅くならないよう、感情・状況・行動を具体的に描写
+10. 舞台と登場人物はアメリカ、イギリス、カナダ、オーストラリアなどの英語圏に設定
+11. 最後の段落（Resolution）で必ず読者が驚くようなドンデン返しを用意する
 
 出力は純粋なJSONオブジェクトのみ。
 `;

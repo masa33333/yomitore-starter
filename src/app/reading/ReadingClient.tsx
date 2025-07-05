@@ -739,7 +739,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   }
 
   return (
-    <main className="min-h-screen bg-page-bg p-4">
+    <main className="min-h-screen bg-page-bg p-2 sm:p-4">
       {/* ページタイトル */}
       <div className="mb-6">
         <h1 className="mb-2 text-2xl font-bold text-text-primary">
@@ -755,7 +755,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
       {/* コンテンツ表示 */}
       {!isReadingStarted ? (
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white p-3 sm:p-6 shadow-sm">
           <div className="mb-6 text-center">
             <h2 className="mb-2 text-lg font-semibold">読書を開始しますか？</h2>
             <p className="mb-4 text-gray-600">語数: {wordCount}語</p>
@@ -781,7 +781,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       ) : (
         <div className="space-y-6">
           {/* テキスト表示（段落ごと） */}
-          <div className="bg-white rounded-lg p-6 shadow-sm" style={{ pointerEvents: 'auto' }}>
+          <div className="bg-white rounded-lg p-3 sm:p-6 shadow-sm" style={{ pointerEvents: 'auto' }}>
             <div className="max-w-none" style={{ pointerEvents: 'auto' }}>
               {englishParagraphs.map((paragraph, index) => {
                 console.log(`📝 段落 ${index + 1}:`, paragraph.substring(0, 50) + '...');

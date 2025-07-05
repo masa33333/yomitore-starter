@@ -43,10 +43,10 @@
   "start_placeholder": "Your cat's name (English only)",
   "start_example": "e.g. Lily, Tama...",
   "start_button": "Choose this name",
-  "tokyo_message": "My journey around the world is about to begin.\nThe more you read, the farther I can go!",
+  "tokyo_message": "I'm starting my journey now.\nThe more you read, the farther I can go!",
   "tokyo_button": "Continue the journey",
   "map_popup": "Next destination: Seoul\nI'll arrive after reading 5,000 words",
   "map_welcome": "Welcome!",
-  "map_instruction": "First, let's test your vocabulary level\nand choose reading materials!",
+  "map_instruction": "First, find your vocabulary level from the options below",
   "map_quiz_button": "📝 Take vocabulary test"
 }
