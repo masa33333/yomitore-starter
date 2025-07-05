@@ -2,6 +2,7 @@ import "./globals.css";
 import PointsProvider from "@/context/PointsContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import Header from "@/components/Header";
+import ScrollController from "@/components/ScrollController";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body className="antialiased min-h-screen bg-page-bg">
         <LanguageProvider>
           <PointsProvider>
+            <ScrollController />
             <Header />
             <main className="min-h-screen">{children}</main>
           </PointsProvider>
