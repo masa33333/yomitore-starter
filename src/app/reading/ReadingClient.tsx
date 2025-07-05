@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useStory } from '@/lib/store/story';
 import MailNotification from '@/components/MailNotification';
 import TTSButton from '@/components/TTSButton';
+import CatLoader from '@/components/CatLoader';
 
 // 単語情報のインターフェース
 interface WordInfo {
@@ -734,12 +735,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-page-bg">
-        {/* ローディングアニメーション */}
-        <div className="size-16 animate-spin rounded-full border-4 border-primary-inactive border-t-primary-active"></div>
-      </div>
-    );
+    return <CatLoader />;
   }
 
   return (
