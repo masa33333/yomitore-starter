@@ -631,7 +631,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // レベル変更処理
   const handleLevelChange = () => {
+    console.log('🔄 レベル変更ボタンがクリックされました');
+    console.log('現在のshowLevelSelector:', showLevelSelector);
     setShowLevelSelector(!showLevelSelector);
+    console.log('変更後のshowLevelSelector:', !showLevelSelector);
   };
   
   // レベル再生成処理
@@ -1115,9 +1118,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 </div>
                 
                 {/* レベル選択UI */}
+                {console.log('🔍 showLevelSelector状態:', showLevelSelector)}
                 {showLevelSelector && (
-                  <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-4">
-                    <h4 className="mb-3 text-center font-medium">語彙レベルを選択</h4>
+                  <div className="rounded-lg border-2 border-orange-400 bg-white p-4 shadow-lg">
+                    <h4 className="mb-3 text-center font-bold text-lg text-orange-600">語彙レベルを選択</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5].map((level) => (
                         <button
