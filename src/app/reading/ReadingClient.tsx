@@ -547,6 +547,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           sentenceJapanese: data.sentenceJapanese || data.exampleJapanese || ''
         };
         
+        console.log('📝 作成されたnewSessionWord:', newSessionWord);
+        alert(`作成されたnewSessionWord: ${JSON.stringify(newSessionWord).substring(0, 100)}`); // デバッグ用
+        
         setSessionWords(prev => {
           const updated = [...prev, newSessionWord];
           console.log('📝 sessionWords更新:', {
@@ -555,6 +558,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             newWord: newSessionWord.word,
             allWords: updated.map(w => w.word)
           });
+          alert(`sessionWords更新: ${prev.length} → ${updated.length} (${newSessionWord.word})`); // デバッグ用
           return updated;
         });
         
