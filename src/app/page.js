@@ -1,11 +1,8 @@
 'use client';
 
-import { useEffect, useState } from "react";
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Home() {
-  const [hasVocabLevel, setHasVocabLevel] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const { displayLang } = useLanguage();
 
   // 表示テキストの定義
@@ -19,11 +16,11 @@ export default function Home() {
       en: 'What would you like to read today?',
     },
     choose: {
-      ja: '読み物を選ぶ',
-      en: 'Choose Reading',
+      ja: '今日の読み物を決める',
+      en: 'Choose Today\'s Reading',
     },
-    retest: {
-      ja: '多読の旅を新たに始める',
+    newJourney: {
+      ja: '新たに多読の旅を始める',
       en: 'Start a New Reading Journey',
     },
     firstTime: {
@@ -45,16 +42,6 @@ export default function Home() {
     return text[key][displayLang];
   };
 
-  useEffect(() => {
-    // localStorageから語彙レベルをチェック
-    const checkVocabLevel = () => {
-      const vocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
-      setHasVocabLevel(!!vocabLevel);
-      setIsLoading(false);
-    };
-
-    checkVocabLevel();
-  }, []);
 
   const handleQuizStart = () => {
     window.location.href = '/quiz';
@@ -100,56 +87,40 @@ export default function Home() {
   };
 
   const handleChooseReading = () => {
-    window.location.href = '/choose';
+    // 語彙レベルがない場合は先にquizに誘導
+    const vocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
+    if (!vocabLevel) {
+      window.location.href = '/quiz';
+    } else {
+      window.location.href = '/choose';
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-6 min-h-screen flex items-center justify-center">
-        <p className="text-lg text-text-primary animate-pulse">{getText('loading')}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 min-h-screen flex flex-col items-center justify-start pt-6">
-      
-      {!hasVocabLevel ? (
-        // 初回ユーザー向け - 語彙レベルチェックのみ
-        <div className="text-center max-w-md mt-8">
-          <p className="text-lg text-text-primary mb-8">
-            {getText('firstTime')}
-          </p>
-          <button
-            onClick={handleQuizStart}
-            className="bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"
-          >
-            {getText('checkLevel')}
-          </button>
-        </div>
-      ) : (
-        // 既存ユーザー向け - 読み物選択 + 再測定オプション
-        <div className="text-center max-w-md mt-8">
-          <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
-            {getText('subtitle')}
-          </h1>
-          <button
-            onClick={handleChooseReading}
-            className="bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"
-          >
-            {getText('choose')}
-          </button>
-          
-          <div className="mt-6">
-            <button
-              onClick={handleNewJourney}
-              className="bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-sm hover:opacity-80 transition-colors"
-            >
-              {getText('retest')}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* 常に2つのボタンを表示 */}
+      <div className="text-center max-w-md mt-8">
+        <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
+          {getText('subtitle')}
+        </h1>
+        
+        {/* メインボタン: 今日の読み物を決める */}
+        <button
+          onClick={handleChooseReading}
+          className="w-full mb-4 bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"
+        >
+          {getText('choose')}
+        </button>
+        
+        {/* サブボタン: 新たに多読の旅を始める */}
+        <button
+          onClick={handleNewJourney}
+          className="w-full bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-base hover:opacity-80 transition-colors"
+        >
+          {getText('newJourney')}
+        </button>
+      </div>
     </div>
   );
 }
