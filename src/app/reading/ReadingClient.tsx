@@ -509,6 +509,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleWordClick = async (word: string) => {
     console.log('🔍 handleWordClick called with:', word);
     console.log('📱 現在のsessionWords数:', sessionWords.length);
+    alert(`handleWordClick実行: ${word}`); // デバッグ用アラート
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
@@ -716,6 +717,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // タッチイベントで既に処理された場合はスキップ
     if ((target as any)._touchHandled) {
       console.log('🚫 タッチイベントで既に処理済み - クリックイベントをスキップ');
+      alert('クリックイベント: タッチで既に処理済み'); // デバッグ用
       return;
     }
     
@@ -723,9 +725,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
       console.log('🖱️ Event Delegation: 単語クリック検出:', word);
+      alert(`クリックイベントで単語検出: ${word}`); // デバッグ用アラート
       e.preventDefault();
       e.stopPropagation();
       handleWordClick(word);
+    } else {
+      alert(`クリックイベント: 単語要素ではない (${target.className})`); // デバッグ用
     }
   };
 
@@ -741,6 +746,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
       console.log('📱 Touch Event Delegation: 単語タッチ検出:', word);
+      alert(`タッチイベントで単語検出: ${word}`); // デバッグ用アラート
       e.preventDefault();
       e.stopPropagation();
       
@@ -751,6 +757,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }, 100);
       
       handleWordClick(word);
+    } else {
+      alert(`タッチイベント: 単語要素ではない (${target.className})`); // デバッグ用
     }
   };
 
