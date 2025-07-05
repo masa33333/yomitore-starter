@@ -77,6 +77,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // 基本状態
   const [loading, setLoading] = useState(false);
+  const [textSize, setTextSize] = useState<'small' | 'medium' | 'large'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('readingTextSize') as 'small' | 'medium' | 'large';
+      return saved || 'small'; // 現状を小とする
+    }
+    return 'small';
+  });
   const [english, setEnglish] = useState<string>(() => {
     // notebookから戻った場合はlocalStorageから復元、そうでなければinitialDataを使用
     if (isFromNotebook() && typeof window !== 'undefined') {
@@ -706,6 +713,22 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
+  // テキストサイズ変更
+  const handleTextSizeChange = (size: 'small' | 'medium' | 'large') => {
+    setTextSize(size);
+    localStorage.setItem('readingTextSize', size);
+  };
+
+  // テキストサイズのCSSクラス
+  const getTextSizeClass = () => {
+    switch (textSize) {
+      case 'small': return 'text-base'; // 16px (現状維持)
+      case 'medium': return 'text-lg';  // 18px
+      case 'large': return 'text-xl';   // 20px
+      default: return 'text-base';
+    }
+  };
+
   // 英語テキストをクリック可能な単語に分割
   const renderClickableText = (text: string) => {
     console.log('🎨 renderClickableText called with:', text.substring(0, 100) + '...');
@@ -789,7 +812,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div key={index} className="mb-6">
                   {/* 英語段落 */}
                   <p 
-                    className="mb-3 text-base leading-relaxed text-text-primary"
+                    className={`mb-3 ${getTextSizeClass()} leading-relaxed text-text-primary`}
                     onClick={handleTextClick}
                     style={{ 
                       pointerEvents: 'auto',
@@ -802,7 +825,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   {/* 対応する日本語段落 */}
                   {showJapanese && japaneseParagraphs[index] && (
                     <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-4">
-                      <p className="text-base italic text-text-primary">
+                      <p className={`${getTextSizeClass()} italic text-text-primary`}>
                         {japaneseParagraphs[index]}
                       </p>
                     </div>
@@ -822,11 +845,45 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               />
               
               <button
-                onClick={handleShowJapanese}
+                onClick={() => setShowJapanese(!showJapanese)}
                 className="rounded-md bg-primary-active px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
               >
                 {showJapanese ? '日本語を隠す' : '日本語を表示'}
               </button>
+              
+              {/* テキストサイズ変更ボタン */}
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleTextSizeChange('small')}
+                  className={`px-3 py-2 text-sm font-bold rounded-l-md transition-colors ${
+                    textSize === 'small' 
+                      ? 'bg-primary-active text-text-primary' 
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  小
+                </button>
+                <button
+                  onClick={() => handleTextSizeChange('medium')}
+                  className={`px-3 py-2 text-sm font-bold transition-colors ${
+                    textSize === 'medium' 
+                      ? 'bg-primary-active text-text-primary' 
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  中
+                </button>
+                <button
+                  onClick={() => handleTextSizeChange('large')}
+                  className={`px-3 py-2 text-sm font-bold rounded-r-md transition-colors ${
+                    textSize === 'large' 
+                      ? 'bg-primary-active text-text-primary' 
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  大
+                </button>
+              </div>
               
               {!endTime && (
                 <button
