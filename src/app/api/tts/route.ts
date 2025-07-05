@@ -35,17 +35,12 @@ export async function POST(request: NextRequest) {
       openaiKeyPreview: openaiApiKey ? `${openaiApiKey.substring(0, 10)}...` : 'undefined'
     });
 
-    if (!supabaseUrl || !supabaseServiceKey || !openaiApiKey) {
-      const missingVars = [];
-      if (!supabaseUrl) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
-      if (!supabaseServiceKey) missingVars.push('SUPABASE_SERVICE_KEY');
-      if (!openaiApiKey) missingVars.push('OPENAI_API_KEY');
-      
-      console.warn('⚠️ Missing environment variables for TTS service:', missingVars);
+    // OpenAI APIキーのみ必須、Supabaseは任意
+    if (!openaiApiKey) {
+      console.warn('⚠️ Missing OpenAI API key for TTS service');
       return NextResponse.json(
         { 
-          error: `TTS service temporarily unavailable - missing configuration: ${missingVars.join(', ')}`,
-          missingVariables: missingVars,
+          error: 'TTS service temporarily unavailable - missing OpenAI API key',
           audioUrl: '',
           cached: false 
         },
@@ -53,49 +48,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create Supabase client directly in API route
-    let supabase;
-    try {
-      supabase = createClient(supabaseUrl, supabaseServiceKey, {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
+    // Supabaseが利用できない場合は警告のみ
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.warn('⚠️ Supabase not available - TTS will work without caching');
+    }
+
+    // Supabaseが利用可能な場合のキャッシュ処理
+    let supabase = null;
+    let useCaching = false;
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      try {
+        supabase = createClient(supabaseUrl, supabaseServiceKey, {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        });
+        useCaching = true;
+        console.log('✅ Supabase client created - caching enabled');
+
+        // コンテンツIDとテキストのハッシュでファイル名を生成
+        const textHash = crypto.createHash('md5').update(text).digest('hex');
+        const fileName = `${contentId}_${textHash}.mp3`;
+
+        // 既存のファイルをチェック
+        const { data: existingFile } = await supabase.storage
+          .from('audio')
+          .list('', { search: fileName });
+
+        if (existingFile && existingFile.length > 0) {
+          // 既存ファイルがある場合はパブリックURLを返す
+          const { data: urlData } = supabase.storage
+            .from('audio')
+            .getPublicUrl(fileName);
+          
+          console.log('✅ Using cached audio file:', fileName);
+          return NextResponse.json({ 
+            audioUrl: urlData.publicUrl,
+            cached: true 
+          });
         }
-      });
-      console.log('✅ Supabase client created successfully');
-    } catch (supabaseError) {
-      console.error('❌ Failed to create Supabase client:', supabaseError);
-      return NextResponse.json(
-        { 
-          error: 'TTS service temporarily unavailable - Supabase connection failed',
-          details: supabaseError instanceof Error ? supabaseError.message : 'Unknown error',
-          audioUrl: '',
-          cached: false 
-        },
-        { status: 503 }
-      );
-    }
-
-    // コンテンツIDとテキストのハッシュでファイル名を生成
-    const textHash = crypto.createHash('md5').update(text).digest('hex');
-    const fileName = `${contentId}_${textHash}.mp3`;
-
-    // 既存のファイルをチェック
-    const { data: existingFile } = await supabase.storage
-      .from('audio')
-      .list('', { search: fileName });
-
-    if (existingFile && existingFile.length > 0) {
-      // 既存ファイルがある場合はパブリックURLを返す
-      const { data: urlData } = supabase.storage
-        .from('audio')
-        .getPublicUrl(fileName);
-      
-      console.log('✅ Using cached audio file:', fileName);
-      return NextResponse.json({ 
-        audioUrl: urlData.publicUrl,
-        cached: true 
-      });
+      } catch (supabaseError) {
+        console.warn('⚠️ Supabase setup failed, proceeding without caching:', supabaseError);
+        useCaching = false;
+      }
+    } else {
+      console.log('ℹ️ No Supabase config - proceeding without caching');
     }
 
     // OpenAI TTS APIを使用（コスト効率的な代替案）
@@ -145,31 +144,48 @@ export async function POST(request: NextRequest) {
     // 音声データを取得
     const audioBuffer = await response.arrayBuffer();
     
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('audio')
-      .upload(fileName, audioBuffer, {
-        contentType: 'audio/mpeg',
-        cacheControl: '3600'
-      });
+    // Supabaseが利用可能な場合はアップロード
+    if (useCaching && supabase) {
+      try {
+        const textHash = crypto.createHash('md5').update(text).digest('hex');
+        const fileName = `${contentId}_${textHash}.mp3`;
+        
+        // Upload to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('audio')
+          .upload(fileName, audioBuffer, {
+            contentType: 'audio/mpeg',
+            cacheControl: '3600'
+          });
 
-    if (uploadError) {
-      console.error('❌ Supabase upload error:', uploadError);
-      return NextResponse.json(
-        { error: 'Failed to save audio file' },
-        { status: 500 }
-      );
+        if (!uploadError) {
+          // Get public URL
+          const { data: urlData } = supabase.storage
+            .from('audio')
+            .getPublicUrl(fileName);
+
+          console.log('✅ TTS generated and cached successfully:', fileName);
+          
+          return NextResponse.json({
+            audioUrl: urlData.publicUrl,
+            cached: false
+          });
+        } else {
+          console.warn('⚠️ Supabase upload failed, returning direct audio:', uploadError);
+        }
+      } catch (supabaseError) {
+        console.warn('⚠️ Supabase operation failed, returning direct audio:', supabaseError);
+      }
     }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('audio')
-      .getPublicUrl(fileName);
+    // Supabaseが利用できない場合は直接音声データを返す
+    const audioBase64 = Buffer.from(audioBuffer).toString('base64');
+    const audioDataUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
-    console.log('✅ TTS generated successfully:', fileName);
+    console.log('✅ TTS generated successfully (no caching)');
     
     return NextResponse.json({
-      audioUrl: urlData.publicUrl,
+      audioUrl: audioDataUrl,
       cached: false
     });
 
