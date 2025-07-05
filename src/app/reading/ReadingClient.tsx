@@ -559,6 +559,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             allWords: updated.map(w => w.word)
           });
           alert(`sessionWords更新: ${prev.length} → ${updated.length} (${newSessionWord.word})`); // デバッグ用
+          
+          // 更新後にデバッグ情報をチェック
+          setTimeout(() => {
+            alert(`更新確認: 現在のsessionWords数 = ${updated.length}`);
+          }, 100);
+          
           return updated;
         });
         
@@ -1033,6 +1039,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 {sessionWords.length > 0 && (
                   <div>最新の単語: {sessionWords[sessionWords.length - 1]?.word}</div>
                 )}
+                {sessionWords.length > 0 && (
+                  <div>全単語: {sessionWords.map(w => w.word).join(', ')}</div>
+                )}
                 <button
                   onClick={() => {
                     const testWord = {
@@ -1050,6 +1059,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   className="mt-2 rounded bg-blue-500 px-3 py-1 text-white"
                 >
                   テスト単語追加
+                </button>
+                <button
+                  onClick={() => {
+                    alert(`現在のsessionWords詳細: ${JSON.stringify(sessionWords)}`);
+                  }}
+                  className="mt-2 ml-2 rounded bg-green-500 px-3 py-1 text-white"
+                >
+                  詳細確認
                 </button>
               </div>
               {sessionWords.length > 0 && (
