@@ -23,8 +23,8 @@ export default function Home() {
       en: 'Choose Reading',
     },
     retest: {
-      ja: '語彙レベルを再測定',
-      en: 'Retake Vocabulary Test',
+      ja: '多読の旅を新たに始める',
+      en: 'Start a New Reading Journey',
     },
     firstTime: {
       ja: 'まずはあなたの語彙レベルをチェックしましょう！',
@@ -58,6 +58,45 @@ export default function Home() {
 
   const handleQuizStart = () => {
     window.location.href = '/quiz';
+  };
+
+  const handleNewJourney = () => {
+    // 全てのlocalStorageデータをリセット
+    const keysToReset = [
+      'catName',
+      'vocabLevel', 
+      'vocabularyLevel',
+      'level',
+      'fixedLevel',
+      'totalWordsRead',
+      'totalReadingTime',
+      'completedReadings',
+      'currentCityIndex',
+      'mapIntroShown',
+      'letters',
+      'mails',
+      'clickedWords',
+      'myNotebook',
+      'readingHistory',
+      'currentReadingEnglish',
+      'currentReadingJapanese',
+      'currentReadingTitle',
+      'currentReadingWordCount',
+      'currentReadingStarted',
+      'currentReadingEndTime',
+      'currentReadingWpm',
+      'currentSessionWords',
+      'notified',
+      'newLetter',
+      'letterText'
+    ];
+    
+    keysToReset.forEach(key => {
+      localStorage.removeItem(key);
+    });
+    
+    console.log('🔄 All data reset - starting new journey');
+    window.location.href = '/start';
   };
 
   const handleChooseReading = () => {
@@ -103,7 +142,7 @@ export default function Home() {
           
           <div className="mt-6">
             <button
-              onClick={handleQuizStart}
+              onClick={handleNewJourney}
               className="bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-sm hover:opacity-80 transition-colors"
             >
               {getText('retest')}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -9,6 +9,44 @@ export default function StartPage() {
   const { t } = useTranslation();
   const [catName, setCatName] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // startページに来た時点でデータを完全リセット（念のため）
+    const keysToReset = [
+      'catName',
+      'vocabLevel', 
+      'vocabularyLevel',
+      'level',
+      'fixedLevel',
+      'totalWordsRead',
+      'totalReadingTime',
+      'completedReadings',
+      'currentCityIndex',
+      'mapIntroShown',
+      'letters',
+      'mails',
+      'clickedWords',
+      'myNotebook',
+      'readingHistory',
+      'currentReadingEnglish',
+      'currentReadingJapanese',
+      'currentReadingTitle',
+      'currentReadingWordCount',
+      'currentReadingStarted',
+      'currentReadingEndTime',
+      'currentReadingWpm',
+      'currentSessionWords',
+      'notified',
+      'newLetter',
+      'letterText'
+    ];
+    
+    keysToReset.forEach(key => {
+      localStorage.removeItem(key);
+    });
+    
+    console.log('🔄 Data reset on start page - fresh beginning');
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

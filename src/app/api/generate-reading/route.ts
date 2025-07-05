@@ -291,7 +291,7 @@ export async function POST(req: Request) {
     // 2段階生成フロー: 日本語生成 → 英訳
     if (topic && topic.trim()) {
       console.log('🆕 Using new JP→EN generation flow');
-      const generatedContent = await generateJapaneseFirstContent(normalizedLevel, topic);
+      const generatedContent = await generateJapaneseFirstContent(normalizedLevel, topic, mode, genre, tone, feeling);
       
       let title = `About ${convertJapaneseToEnglish(topic)}`;
       
@@ -334,7 +334,7 @@ export async function POST(req: Request) {
     }
 
     // フォールバック: トピックがない場合は汎用コンテンツ生成
-    const fallbackContent = await generateJapaneseFirstContent(normalizedLevel, "general reading");
+    const fallbackContent = await generateJapaneseFirstContent(normalizedLevel, "general reading", mode, genre, tone, feeling);
     
     let title = "General Reading";
 
@@ -391,11 +391,24 @@ export async function POST(req: Request) {
 // =============================================================================
 // 2段階生成システム（日本語生成 → 英訳）
 // =============================================================================
-async function generateJapaneseFirstContent(level: number, topic: string): Promise<{english: string[], japanese: string[]}> {
-  console.log(`🇯🇵 Generating Japanese content for topic: "${topic}"`);
+async function generateJapaneseFirstContent(
+  level: number, 
+  topic: string, 
+  mode: string = 'reading',
+  genre?: string,
+  tone?: string,
+  feeling?: string
+): Promise<{english: string[], japanese: string[]}> {
+  console.log(`🇯🇵 Generating ${mode} content for topic: "${topic}"`);
   
-  // 日本語コンテンツ生成
-  const japaneseContent = await generateJapaneseContent(topic);
+  // モードに応じて適切な生成関数を使用
+  let japaneseContent: string[];
+  
+  if (mode === 'story') {
+    japaneseContent = await generateStoryContent(topic, genre, tone, feeling);
+  } else {
+    japaneseContent = await generateJapaneseContent(topic);
+  }
   
   // 語彙レベル制御付き英訳
   const englishContent = await translateWithVocabularyControl(japaneseContent, level);
