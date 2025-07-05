@@ -1118,7 +1118,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 </div>
                 
                 {/* レベル選択UI */}
-                {console.log('🔍 showLevelSelector状態:', showLevelSelector)}
                 {showLevelSelector && (
                   <div className="rounded-lg border-2 border-orange-400 bg-white p-4 shadow-lg">
                     <h4 className="mb-3 text-center font-bold text-lg text-orange-600">語彙レベルを選択</h4>
