@@ -84,17 +84,41 @@ targetLevel === 2 ? `🚨 LEVEL 2 STRICT RESTRICTIONS 🚨
 - GRAMMAR: Simple sentences + basic compound sentences with "and/but/or". NO complex clauses. NO participles.
 - BANNED WORDS: fascinated, exploring, resonates, legacy, admiration, perspectives, comprehensive, sophisticated, elaborate, contemporary, significant, demonstrate, essential, particular
 - SENTENCE EXAMPLES: "Edison was a man." "He made many things." "People liked his work." "His ideas were good."` :
-targetLevel === 3 ? `- Level 3: Use words like "significant", "demonstrate", "essential", "particular"
-- Avoid: comprehensive, sophisticated, elaborate, contemporary` :
-targetLevel === 4 ? `- Level 4: Use words like "comprehensive", "sophisticated", "elaborate", "contemporary"
-- Can use: analysis, development, perspective, substantial` :
-`- Level 5: Use advanced words like "sophisticated", "comprehensive", "substantial", "contemporary"
-- Can use: intricate, elaborate, fundamental, paradigm`}
+targetLevel === 3 ? `🚨 LEVEL 3 STRICT VOCABULARY CONTROL 🚨
+- ALLOWED NGSL 1-1500 words: significant, demonstrate, essential, particular, understand, develop, create, important, different, example, education, science, knowledge, experience, research, study, learn, discover, explain, improve, increase, describe, compare, analyze, suggest, influence, effect, result, cause, reason, solution, method, process, system, structure, information, evidence, data, facts, details, relationship, connection, activity, function, role, purpose, advantage, benefit, problem, issue, challenge, opportunity, success, achievement, progress, development, movement, change, growth, expansion
+- BANNED Level 4+ words: comprehensive, sophisticated, elaborate, contemporary, substantial, perspective, framework, paradigm, phenomenon, implications, methodology, theoretical, conceptual, extensive, intensive, complexity, intricacy, synthesis, integration, implementation, optimization, enhancement, transformation, configuration, specification, validation, evaluation, assessment, interpretation, analysis (use "study" instead), manifestation, demonstration (use "show" instead), establishment, investigation, exploration, examination, consideration, determination, identification, classification, categorization, characterization, representation, illustration, documentation, formulation, articulation, elaboration, sophistication, comprehensiveness
+- GRAMMAR RESTRICTIONS: NO complex relative clauses, NO participle phrases as sentence starters, NO subjunctive mood, NO passive constructions with complex agents
+- SENTENCE STRUCTURE: Max 15 words per sentence, mostly compound sentences with "and/but/or", simple subordinate clauses with "because/when/if" only
+- EXAMPLES: "Scientists study this problem because it is important." "They found that water helps plants grow." "This method works well, but it takes time."` :
+targetLevel === 4 ? `🚨 LEVEL 4 ENHANCED VOCABULARY CONTROL 🚨  
+- ALLOWED NGSL 1-2500 words: comprehensive, sophisticated, elaborate, contemporary, substantial, perspective, framework, analysis, development, methodology, theoretical, conceptual, extensive, complexity, synthesis, implementation, enhancement, configuration, evaluation, interpretation, manifestation, establishment, investigation, exploration, examination, consideration, determination, identification, classification, representation, documentation, formulation, articulation, optimization, transformation, validation, assessment, characterization, illustration, categorization, specification, integration, intensive, demonstration, phenomenon, implications
+- BANNED Level 5+ words: paradigm, intricate, fundamental (use "basic" instead), elaborate theoretical frameworks, phenomenological, epistemological, ontological, methodological considerations, comprehensive theoretical synthesis, sophisticated analytical framework, intricate methodological approach, fundamental epistemological questions, paradigmatic shifts, theoretical underpinnings, conceptual foundations, analytical rigor, methodological sophistication, theoretical complexity, conceptual intricacy
+- ADVANCED GRAMMAR ALLOWED: Complex relative clauses, participle phrases, subjunctive mood, complex passive constructions, embedded clauses, conditional sentences with multiple conditions
+- SENTENCE STRUCTURE: 15-25 words per sentence, complex compound-complex sentences, multiple subordinate clauses
+- EXAMPLES: "The comprehensive analysis, which was conducted over several years, demonstrates that contemporary methods are more sophisticated than traditional approaches." "Having examined the extensive data, researchers determined that the implementation of this framework requires substantial methodological considerations."` :
+`🚨 LEVEL 5 ADVANCED VOCABULARY CONTROL 🚨
+- UNRESTRICTED NGSL: All academic and sophisticated vocabulary allowed
+- ENCOURAGED words: paradigm, intricate, fundamental, elaborate theoretical frameworks, phenomenological, epistemological, ontological, methodological considerations, comprehensive theoretical synthesis, sophisticated analytical framework, intricate methodological approach, fundamental epistemological questions, paradigmatic shifts, theoretical underpinnings, conceptual foundations, analytical rigor, methodological sophistication, theoretical complexity, conceptual intricacy, multifaceted, nuanced, sophisticated conceptualization, comprehensive examination, extensive investigation, rigorous analysis, systematic exploration, thorough evaluation, detailed assessment, critical interpretation, substantive discussion, profound implications, significant ramifications
+- ADVANCED GRAMMAR REQUIRED: Complex nested clauses, sophisticated syntactic structures, academic register, formal discourse markers, complex conditional constructions, subjunctive mood, intricate participial phrases
+- SENTENCE STRUCTURE: 20-35 words per sentence, sophisticated academic style with embedded clauses and complex nominalization
+- EXAMPLES: "The paradigmatic shift toward comprehensive theoretical frameworks necessitates a fundamental reconceptualization of methodological approaches, particularly those concerning the intricate relationships between epistemological foundations and analytical rigor." "This sophisticated examination, which encompasses both theoretical underpinnings and practical implications, demonstrates the profound complexity inherent in contemporary analytical paradigms."`}
 
 🚨 VOCABULARY VALIDATION (CRITICAL) 🚨
-${targetLevel <= 2 ? `- EVERY WORD will be checked against NGSL ${range.rangeEnd} limit
+${targetLevel === 1 ? `- EVERY WORD will be checked against the 200-word Level 1 list above
 - If ANY forbidden word is found, the text will be REJECTED
-- Use simple alternatives: "like" not "fascinated", "look at" not "exploring", "feels good" not "resonates", "what he left" not "legacy", "liked" not "admiration", "ideas" not "perspectives"` : ''}
+- Use simple alternatives: "like" not "fascinated", "look at" not "exploring", "feels good" not "resonates", "what he left" not "legacy", "liked" not "admiration", "ideas" not "perspectives"` : 
+targetLevel === 2 ? `- EVERY WORD will be checked against NGSL 1-1000 limit
+- BANNED words: fascinated, exploring, resonates, legacy, admiration, perspectives, comprehensive, sophisticated, elaborate, contemporary, significant, demonstrate, essential, particular
+- Use alternatives: "interested" not "fascinated", "study" not "exploring", "feels" not "resonates"` :
+targetLevel === 3 ? `- EVERY WORD will be checked against NGSL 1-1500 limit  
+- STRICTLY BANNED Level 4+ words: comprehensive, sophisticated, elaborate, contemporary, substantial, perspective, framework, paradigm, phenomenon, implications, methodology, theoretical, conceptual, extensive, intensive, complexity, synthesis, implementation, enhancement, evaluation, interpretation, manifestation, establishment, investigation, exploration, examination, consideration, determination, identification, classification, representation, documentation, formulation, articulation, optimization, transformation, validation, assessment, characterization, illustration, categorization, specification, integration
+- Use Level 3 alternatives: "complete" not "comprehensive", "advanced" not "sophisticated", "detailed" not "elaborate", "modern" not "contemporary", "large" not "substantial", "view" not "perspective", "system" not "framework"` :
+targetLevel === 4 ? `- EVERY WORD will be checked against NGSL 1-2500 limit
+- STRICTLY BANNED Level 5+ words: paradigm, intricate, fundamental, elaborate theoretical frameworks, phenomenological, epistemological, ontological, methodological considerations, comprehensive theoretical synthesis, sophisticated analytical framework, paradigmatic shifts, theoretical underpinnings, conceptual foundations, analytical rigor, methodological sophistication, theoretical complexity, conceptual intricacy
+- Use Level 4 alternatives: "model" not "paradigm", "complex" not "intricate", "basic" not "fundamental"` :
+`- Level 5: NO vocabulary restrictions - use the most sophisticated academic language available
+- REQUIRED: Must use advanced academic vocabulary to demonstrate C1+ proficiency
+- AVOID simple alternatives: Use "paradigm" not "model", "intricate" not "complex", "fundamental" not "basic"`}
 
 🚨 CRITICAL WORD COUNT REQUIREMENTS 🚨
 - Level ${targetLevel} MUST have EXACTLY ${wordCountRequirements[targetLevel as keyof typeof wordCountRequirements]}
@@ -147,6 +171,26 @@ ${targetLevel === 2 ? `🚨 LEVEL 2 GRAMMAR RESTRICTIONS 🚨
 - NO relative clauses (who/which/that)
 - Maximum sentence length: 12 words
 - EXAMPLES: "Edison was a smart man. He lived in America. He made many inventions. People liked his work."` : ''}
+
+${targetLevel === 3 ? `🚨 LEVEL 3 GRAMMAR RESTRICTIONS 🚨
+- Basic compound and complex sentences allowed
+- Simple subordinate clauses with "because/when/if/that" ONLY
+- Basic relative clauses: "The man who..." "The book that..."
+- NO participle phrases as sentence starters
+- NO subjunctive mood or complex conditionals
+- NO passive voice with complex agents
+- Maximum sentence length: 15 words
+- EXAMPLES: "Scientists study this problem because it affects many people." "The method that they use works well." "When people understand the facts, they make better decisions."` : ''}
+
+${targetLevel === 4 ? `🚨 LEVEL 4 GRAMMAR REQUIREMENTS 🚨
+- Complex compound-complex sentences REQUIRED
+- Multiple subordinate clauses: "Although the research, which was conducted over five years, demonstrates significant improvements, further investigation is necessary."
+- Participle phrases as sentence starters: "Having analyzed the data extensively, researchers concluded..."
+- Advanced passive constructions: "The methodology was implemented by specialists who had been trained in advanced techniques."
+- Complex relative clauses with multiple embeddings
+- Subjunctive mood and complex conditionals: "Were the conditions different, the results would have been more conclusive."
+- Sentence length: 15-25 words (complex structures required)
+- EXAMPLES: "The comprehensive analysis, which incorporated data from multiple sources, demonstrates that contemporary methodological approaches, when properly implemented, yield substantially more reliable results than traditional methods."` : ''}
 
 🎯 FINAL VALIDATION CHECKLIST (MUST CHECK BEFORE OUTPUT):
 ✓ All vocabulary within NGSL ${range.rangeStart}–${range.rangeEnd}
