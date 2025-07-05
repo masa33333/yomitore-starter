@@ -80,9 +80,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // notebookから戻った場合はlocalStorageから復元、そうでなければinitialDataを使用
     if (isFromNotebook() && typeof window !== 'undefined') {
       const saved = localStorage.getItem('currentReadingEnglish');
-      return saved || 'コンテンツを読み込み中...';
+      return saved || '';
     }
-    return initialData?.story || 'コンテンツを読み込み中...';
+    return initialData?.story || '';
   });
   
   // クライアントサイドでの状態復元フラグ
@@ -735,8 +735,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg">読み込み中...</div>
+      <div className="flex min-h-screen items-center justify-center bg-page-bg">
+        {/* ローディングアニメーション */}
+        <div className="size-16 animate-spin rounded-full border-4 border-primary-inactive border-t-primary-active"></div>
       </div>
     );
   }
