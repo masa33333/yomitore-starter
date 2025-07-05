@@ -126,6 +126,9 @@ STYLE REQUIREMENTS:
 - NO dialogue format ("said", "asked", "replied")
 - Use educational, informative language
 - Keep the same meaning and message as original
+- MUST perform fact-checking: ensure all information is factually accurate
+- NO speculative content: only include scientifically verified information
+- Maintain factual accuracy while simplifying language
 
 ${targetLevel === 1 ? `🚨 LEVEL 1 GRAMMAR RESTRICTIONS 🚨
 - ONLY use simple present tense: "Edison is", "He makes", "People like"
