@@ -509,14 +509,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleWordClick = async (word: string) => {
     console.log('🔍 handleWordClick called with:', word);
     console.log('📱 現在のsessionWords数:', sessionWords.length);
-    alert(`handleWordClick実行: ${word}`); // デバッグ用アラート
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
     try {
-      console.log('🔍 API呼び出し開始:', word);
-      alert(`API呼び出し開始: ${word}`); // デバッグ用
-      
       const response = await fetch('/api/word-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -527,13 +523,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         })
       });
       
-      console.log('🔍 API レスポンス:', response.status, response.ok);
-      alert(`API レスポンス: ${response.status} ${response.ok}`); // デバッグ用
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('🔍 API データ:', data);
-        alert(`API データ取得成功: ${JSON.stringify(data).substring(0, 100)}`); // デバッグ用
         setWordInfo(data);
         
         // セッション単語に追加
@@ -547,9 +538,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           sentenceJapanese: data.sentenceJapanese || data.exampleJapanese || ''
         };
         
-        console.log('📝 作成されたnewSessionWord:', newSessionWord);
-        alert(`作成されたnewSessionWord: ${JSON.stringify(newSessionWord).substring(0, 100)}`); // デバッグ用
-        
         setSessionWords(prev => {
           const updated = [...prev, newSessionWord];
           console.log('📝 sessionWords更新:', {
@@ -558,13 +546,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             newWord: newSessionWord.word,
             allWords: updated.map(w => w.word)
           });
-          alert(`sessionWords更新: ${prev.length} → ${updated.length} (${newSessionWord.word})`); // デバッグ用
-          
-          // 更新後にデバッグ情報をチェック
-          setTimeout(() => {
-            alert(`更新確認: 現在のsessionWords数 = ${updated.length}`);
-          }, 100);
-          
           return updated;
         });
         
@@ -605,10 +586,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }
     } catch (error) {
       console.error('❌ 単語情報取得エラー:', error);
-      alert(`API 例外エラー: ${error}`); // デバッグ用
     } finally {
-      console.log('🔍 API処理終了');
-      alert('API処理終了'); // デバッグ用
       setLoadingWordInfo(false);
     }
   };
@@ -729,45 +707,29 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // 親要素のクリックハンドラー（Event Delegation）
   const handleTextClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
-    console.log('🖱️ 段落がクリックされました');
     const target = e.target as HTMLElement;
-    console.log('🎯 クリックされた要素:', target);
-    console.log('🎯 要素のクラス:', target.className);
-    console.log('🎯 要素のテキスト:', target.textContent);
     
     // タッチイベントで既に処理された場合はスキップ
     if ((target as any)._touchHandled) {
-      console.log('🚫 タッチイベントで既に処理済み - クリックイベントをスキップ');
-      alert('クリックイベント: タッチで既に処理済み'); // デバッグ用
       return;
     }
     
     // クリックされた要素が単語要素か確認
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
-      console.log('🖱️ Event Delegation: 単語クリック検出:', word);
-      alert(`クリックイベントで単語検出: ${word}`); // デバッグ用アラート
       e.preventDefault();
       e.stopPropagation();
       handleWordClick(word);
-    } else {
-      alert(`クリックイベント: 単語要素ではない (${target.className})`); // デバッグ用
     }
   };
 
   // モバイル対応のタッチハンドラー
   const handleTextTouch = (e: React.TouchEvent<HTMLParagraphElement>) => {
-    console.log('📱 タッチイベント検出');
     const target = e.target as HTMLElement;
-    console.log('🎯 タッチされた要素:', target);
-    console.log('🎯 要素のクラス:', target.className);
-    console.log('🎯 要素のテキスト:', target.textContent);
     
     // タッチされた要素が単語要素か確認
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
-      console.log('📱 Touch Event Delegation: 単語タッチ検出:', word);
-      alert(`タッチイベントで単語検出: ${word}`); // デバッグ用アラート
       e.preventDefault();
       e.stopPropagation();
       
@@ -778,8 +740,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }, 100);
       
       handleWordClick(word);
-    } else {
-      alert(`タッチイベント: 単語要素ではない (${target.className})`); // デバッグ用
     }
   };
 
@@ -1029,46 +989,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               </div>
               
               {/* 今日のマイノート */}
-              {/* デバッグ用: 詳細情報の表示 */}
-              <div className="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm">
-                <div><strong>🔍 デバッグ情報:</strong></div>
-                <div>sessionWords数: {sessionWords.length}</div>
-                <div>selectedWord: {selectedWord || 'なし'}</div>
-                <div>wordInfo: {wordInfo ? 'あり' : 'なし'}</div>
-                <div>loadingWordInfo: {loadingWordInfo ? 'true' : 'false'}</div>
-                {sessionWords.length > 0 && (
-                  <div>最新の単語: {sessionWords[sessionWords.length - 1]?.word}</div>
-                )}
-                {sessionWords.length > 0 && (
-                  <div>全単語: {sessionWords.map(w => w.word).join(', ')}</div>
-                )}
-                <button
-                  onClick={() => {
-                    const testWord = {
-                      word: 'test',
-                      originalForm: 'test',
-                      partOfSpeech: 'noun',
-                      meaning: 'a procedure for testing',
-                      japaneseMeaning: 'テスト',
-                      sentence: 'This is a test.',
-                      sentenceJapanese: 'これはテストです。'
-                    };
-                    setSessionWords(prev => [...prev, testWord]);
-                    console.log('🧪 テスト単語を追加しました');
-                  }}
-                  className="mt-2 rounded bg-blue-500 px-3 py-1 text-white"
-                >
-                  テスト単語追加
-                </button>
-                <button
-                  onClick={() => {
-                    alert(`現在のsessionWords詳細: ${JSON.stringify(sessionWords)}`);
-                  }}
-                  className="mt-2 ml-2 rounded bg-green-500 px-3 py-1 text-white"
-                >
-                  詳細確認
-                </button>
-              </div>
               {sessionWords.length > 0 && (
                 <div className="mb-4 rounded border border-[#C9A86C] bg-page-bg p-4">
                   <div className="mb-3 flex items-center justify-between">
