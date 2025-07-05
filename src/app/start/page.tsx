@@ -73,11 +73,19 @@ export default function StartPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-start pt-8 p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full mt-8">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+    <main className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-start pt-4 p-4">
+      <div className="bg-white rounded-2xl shadow-lg p-6 max-w-md w-full mt-4">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
           {t('start_title')}
         </h1>
+        
+        <div className="flex justify-center mb-6">
+          <img
+            src="/images/cat-icon.png"
+            alt="Cat Traveler"
+            className="size-24 object-contain drop-shadow-lg"
+          />
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -107,15 +115,7 @@ export default function StartPage() {
           </button>
         </form>
 
-        <div className="flex justify-center my-6">
-          <img
-            src="/images/cat-icon.png"
-            alt="Cat Traveler"
-            className="size-24 object-contain drop-shadow-lg"
-          />
-        </div>
-
-        <p className="text-xs text-gray-500 text-center">
+        <p className="text-xs text-gray-500 text-center mt-4">
           You can change this later
         </p>
       </div>
