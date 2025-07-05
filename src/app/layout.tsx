@@ -2,7 +2,6 @@ import "./globals.css";
 import PointsProvider from "@/context/PointsContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,7 +21,6 @@ export default function RootLayout({
           <PointsProvider>
             <Header />
             <main className="min-h-screen">{children}</main>
-            <Footer />
           </PointsProvider>
         </LanguageProvider>
       </body>

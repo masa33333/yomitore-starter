@@ -73,7 +73,7 @@ export default function StartPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-start pt-4 p-4">
+    <main className="min-h-screen bg-[#FFF9F0] flex flex-col items-center justify-start pt-4 p-4 overflow-hidden">
       <div className="bg-white rounded-2xl shadow-lg p-6 max-w-md w-full mt-4">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
           {t('start_title')}

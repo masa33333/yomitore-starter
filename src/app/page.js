@@ -98,7 +98,7 @@ export default function Home() {
 
 
   return (
-    <div className="p-6 min-h-screen flex flex-col items-center justify-start pt-6">
+    <div className="p-6 min-h-screen flex flex-col items-center justify-start pt-6 overflow-hidden">
       {/* 常に2つのボタンを表示 */}
       <div className="text-center max-w-md mt-8">
         <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
