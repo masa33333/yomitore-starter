@@ -509,7 +509,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleWordClick = async (word: string) => {
     console.log('🔍 handleWordClick called with:', word);
     console.log('📱 現在のsessionWords数:', sessionWords.length);
-    alert(`単語「${word}」をクリックしました！`); // モバイルデバッグ用
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
