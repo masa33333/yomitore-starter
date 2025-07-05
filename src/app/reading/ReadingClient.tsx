@@ -538,7 +538,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           sentenceJapanese: data.sentenceJapanese || data.exampleJapanese || ''
         };
         
-        setSessionWords(prev => [...prev, newSessionWord]);
+        setSessionWords(prev => {
+          const updated = [...prev, newSessionWord];
+          console.log('📝 sessionWords更新:', {
+            before: prev.length,
+            after: updated.length,
+            newWord: newSessionWord.word,
+            allWords: updated.map(w => w.word)
+          });
+          return updated;
+        });
         
         // localStorageにも保存してnotebookページで確認できるように
         try {
@@ -704,6 +713,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     console.log('🎯 要素のクラス:', target.className);
     console.log('🎯 要素のテキスト:', target.textContent);
     
+    // タッチイベントで既に処理された場合はスキップ
+    if ((target as any)._touchHandled) {
+      console.log('🚫 タッチイベントで既に処理済み - クリックイベントをスキップ');
+      return;
+    }
+    
     // クリックされた要素が単語要素か確認
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
@@ -728,6 +743,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log('📱 Touch Event Delegation: 単語タッチ検出:', word);
       e.preventDefault();
       e.stopPropagation();
+      
+      // タッチイベント専用のフラグを設定してクリックイベントとの重複を防ぐ
+      (target as any)._touchHandled = true;
+      setTimeout(() => {
+        delete (target as any)._touchHandled;
+      }, 100);
+      
       handleWordClick(word);
     }
   };
@@ -978,9 +1000,34 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               </div>
               
               {/* 今日のマイノート */}
-              {/* デバッグ用: sessionWords数の表示 */}
-              <div className="mb-2 text-sm text-gray-500">
-                デバッグ: sessionWords数 = {sessionWords.length}
+              {/* デバッグ用: 詳細情報の表示 */}
+              <div className="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm">
+                <div><strong>🔍 デバッグ情報:</strong></div>
+                <div>sessionWords数: {sessionWords.length}</div>
+                <div>selectedWord: {selectedWord || 'なし'}</div>
+                <div>wordInfo: {wordInfo ? 'あり' : 'なし'}</div>
+                <div>loadingWordInfo: {loadingWordInfo ? 'true' : 'false'}</div>
+                {sessionWords.length > 0 && (
+                  <div>最新の単語: {sessionWords[sessionWords.length - 1]?.word}</div>
+                )}
+                <button
+                  onClick={() => {
+                    const testWord = {
+                      word: 'test',
+                      originalForm: 'test',
+                      partOfSpeech: 'noun',
+                      meaning: 'a procedure for testing',
+                      japaneseMeaning: 'テスト',
+                      sentence: 'This is a test.',
+                      sentenceJapanese: 'これはテストです。'
+                    };
+                    setSessionWords(prev => [...prev, testWord]);
+                    console.log('🧪 テスト単語を追加しました');
+                  }}
+                  className="mt-2 rounded bg-blue-500 px-3 py-1 text-white"
+                >
+                  テスト単語追加
+                </button>
               </div>
               {sessionWords.length > 0 && (
                 <div className="mb-4 rounded border border-[#C9A86C] bg-page-bg p-4">
