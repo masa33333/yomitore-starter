@@ -514,6 +514,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setLoadingWordInfo(true);
     
     try {
+      console.log('🔍 API呼び出し開始:', word);
+      alert(`API呼び出し開始: ${word}`); // デバッグ用
+      
       const response = await fetch('/api/word-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -524,8 +527,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         })
       });
       
+      console.log('🔍 API レスポンス:', response.status, response.ok);
+      alert(`API レスポンス: ${response.status} ${response.ok}`); // デバッグ用
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('🔍 API データ:', data);
+        alert(`API データ取得成功: ${JSON.stringify(data).substring(0, 100)}`); // デバッグ用
         setWordInfo(data);
         
         // セッション単語に追加
@@ -587,7 +595,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }
     } catch (error) {
       console.error('❌ 単語情報取得エラー:', error);
+      alert(`API 例外エラー: ${error}`); // デバッグ用
     } finally {
+      console.log('🔍 API処理終了');
+      alert('API処理終了'); // デバッグ用
       setLoadingWordInfo(false);
     }
   };
