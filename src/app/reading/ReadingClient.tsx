@@ -508,6 +508,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // 単語クリック処理
   const handleWordClick = async (word: string) => {
     console.log('🔍 handleWordClick called with:', word);
+    console.log('📱 現在のsessionWords数:', sessionWords.length);
+    alert(`単語「${word}」をクリックしました！`); // モバイルデバッグ用
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
@@ -713,6 +715,24 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
+  // モバイル対応のタッチハンドラー
+  const handleTextTouch = (e: React.TouchEvent<HTMLParagraphElement>) => {
+    console.log('📱 タッチイベント検出');
+    const target = e.target as HTMLElement;
+    console.log('🎯 タッチされた要素:', target);
+    console.log('🎯 要素のクラス:', target.className);
+    console.log('🎯 要素のテキスト:', target.textContent);
+    
+    // タッチされた要素が単語要素か確認
+    if (target.classList.contains('clickable-word')) {
+      const word = target.textContent || '';
+      console.log('📱 Touch Event Delegation: 単語タッチ検出:', word);
+      e.preventDefault();
+      e.stopPropagation();
+      handleWordClick(word);
+    }
+  };
+
   // テキストサイズ変更
   const handleTextSizeChange = (size: 'small' | 'medium' | 'large') => {
     setTextSize(size);
@@ -742,9 +762,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         return (
           <span
             key={index}
-            className="clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200"
+            className="clickable-word cursor-pointer hover:bg-yellow-200/50 active:bg-yellow-300 transition-colors duration-200 select-none"
             title="クリックして意味を調べる"
             data-word={part}
+            style={{
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              touchAction: 'manipulation'
+            }}
           >
             {part}
           </span>
@@ -814,9 +839,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p 
                     className={`mb-3 ${getTextSizeClass()} leading-relaxed text-text-primary`}
                     onClick={handleTextClick}
+                    onTouchEnd={handleTextTouch}
                     style={{ 
                       pointerEvents: 'auto',
-                      userSelect: 'auto'
+                      userSelect: 'auto',
+                      touchAction: 'manipulation'
                     }}
                   >
                     {renderClickableText(paragraph)}
@@ -952,6 +979,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               </div>
               
               {/* 今日のマイノート */}
+              {/* デバッグ用: sessionWords数の表示 */}
+              <div className="mb-2 text-sm text-gray-500">
+                デバッグ: sessionWords数 = {sessionWords.length}
+              </div>
               {sessionWords.length > 0 && (
                 <div className="mb-4 rounded border border-[#C9A86C] bg-page-bg p-4">
                   <div className="mb-3 flex items-center justify-between">
