@@ -528,6 +528,136 @@ function generateSampleJapaneseContent(topic: string): string[] {
   ];
 }
 
+// ストーリー用日本語コンテンツ生成関数
+async function generateStoryContent(
+  topic: string, 
+  genre?: string, 
+  tone?: string, 
+  feeling?: string
+): Promise<string[]> {
+  const storyPrompt = `以下の条件に沿って、魅力的な物語を3段落で生成してください。
+
+■ 基本設定:
+- テーマ/トピック: ${topic}
+- ジャンル: ${genre || '一般的な物語'}
+- トーン: ${tone || '興味深い'}
+- 感情: ${feeling || '楽しい'}
+
+■ 物語の構成:
+- 1段落目：主人公の紹介と状況設定（日常から非日常への転換）
+- 2段落目：困難や挑戦の発生（ドラマチックな展開）
+- 3段落目：解決や発見（学びや成長のある結末）
+
+■ ストーリーの特徴:
+- 具体的なキャラクター（名前と特徴）を登場させる
+- 対話や会話を含める（「〜と言いました」「〜と答えました」形式OK）
+- 読者が感情移入できるような人間味のある描写
+- ${topic}が物語の中核となるような展開
+- 読み終わった後に何か学びや気づきがある内容
+
+■ 文体:
+- ですます調で統一
+- 中学生〜高校生が理解できる日本語
+- 物語らしい表現を使用（「その時」「すると」「やがて」等）
+
+出力フォーマット：
+{
+  "jp_paragraphs": ["...", "...", "..."]
+}`;
+
+  console.log('📖 Generating story content with OpenAI API for topic:', topic);
+  
+  // API key チェック
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn('⚠️ OPENAI_API_KEY not found, using fallback');
+    const sampleStory = generateSampleStoryContent(topic, genre, tone, feeling);
+    return sampleStory;
+  }
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        max_tokens: 1500,
+        messages: [
+          {
+            role: 'user',
+            content: storyPrompt
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📖 OpenAI story response received');
+    
+    const content = data.choices[0].message.content.trim();
+    
+    // JSONレスポンスをパース
+    try {
+      const parsed = JSON.parse(content);
+      if (parsed.jp_paragraphs && Array.isArray(parsed.jp_paragraphs)) {
+        console.log('✅ Story content generated via OpenAI:', parsed.jp_paragraphs);
+        return parsed.jp_paragraphs;
+      }
+    } catch (parseError) {
+      console.warn('⚠️ OpenAI story response parsing failed, using fallback');
+    }
+    
+    // フォールバック: サンプルストーリーを使用
+    const sampleStory = generateSampleStoryContent(topic, genre, tone, feeling);
+    console.log('✅ Story content generated (fallback):', sampleStory);
+    return sampleStory;
+    
+  } catch (error) {
+    console.error('❌ OpenAI API error for story:', error);
+    
+    // エラー時はサンプルストーリーを使用
+    const sampleStory = generateSampleStoryContent(topic, genre, tone, feeling);
+    console.log('✅ Story content generated (error fallback):', sampleStory);
+    return sampleStory;
+  }
+}
+
+// サンプルストーリーコンテンツ生成
+function generateSampleStoryContent(
+  topic: string,
+  genre?: string, 
+  tone?: string, 
+  feeling?: string
+): string[] {
+  const englishTopic = convertJapaneseToEnglish(topic);
+  
+  // トピック別のサンプルストーリー
+  const sampleStories: {[key: string]: string[]} = {
+    'cats': [
+      '小さな町に住む少女ユイは、毎朝学校に向かう途中で一匹の野良猫に出会っていました。その猫は人懐っこく、いつもユイの後をついてきます。「この子にミルクをあげたいな」とユイは思いましたが、両親は「野良猫にエサをあげてはいけない」と言っていました。',
+      'ある雨の日、その猫が道端で震えているのを見つけたユイは、迷わず自分の傘で猫を守りました。「大丈夫だよ、一緒にいるからね」と声をかけると、猫は安心したように鳴きました。その時、近くのペットショップの店主が現れて「この子は昨日迷子になった子猫です。飼い主さんが探しています」と教えてくれました。',
+      'ユイは飼い主のおばあさんと猫を再会させることができました。おばあさんは涙を流して感謝し、「優しい心を持った子ですね。よかったら時々この子に会いに来てください」と言いました。それからユイは週末になると猫に会いに行くようになり、動物の大切さと思いやりの心の大切さを学びました。'
+    ],
+    'adventure': [
+      '冒険好きの少年タクマは、祖父から古い地図を受け取りました。「この地図に描かれた場所には、昔の探検家が隠した宝物があるらしい」と祖父は言いました。タクマは親友のリナと一緒に、夏休みを使ってその場所を探すことにしました。',
+      '地図を頼りに山奥を歩いていると、大きな岩で道が塞がれていました。「どうしよう、進めないよ」とリナが言うと、タクマは「みんなで力を合わせれば動かせるかもしれない」と提案しました。二人は諦めずに岩を押し続け、ついにそれを動かすことができました。その先には美しい湖が広がっていました。',
+      '湖のほとりで宝箱を発見した二人でしたが、中に入っていたのは金銀財宝ではありませんでした。それは探検家が書いた手紙で、「真の宝物は冒険を通じて得られる友情と勇気である」と書かれていました。タクマとリナは顔を見合わせて笑い、この冒険で得た絆こそが最高の宝物だと実感しました。'
+    ]
+  };
+  
+  return sampleStories[englishTopic] || [
+    `${topic}をテーマにした物語が始まります。主人公は新しい発見をしようとしていました。`,
+    `困難に直面した主人公でしたが、諦めずに挑戦を続けました。`,
+    `最終的に主人公は大切なことを学び、成長することができました。`
+  ];
+}
+
 // Step 2: 語彙レベル制御付き英訳
 async function translateWithVocabularyControl(japaneseContent: string[], level: number): Promise<string[]> {
   console.log(`🔤 Translating to English with Level ${level} vocabulary control`);
