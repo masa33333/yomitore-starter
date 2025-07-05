@@ -723,15 +723,46 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // モバイル対応のタッチハンドラー
+  // タッチ開始時間を記録するためのstate
+  const [touchStartTime, setTouchStartTime] = useState<number>(0);
+  const [touchStartPosition, setTouchStartPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+
+  // タッチ開始ハンドラー
+  const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
+    const touch = e.touches[0];
+    setTouchStartTime(Date.now());
+    setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
+  };
+
+  // モバイル対応のタッチハンドラー（タッチ終了時）
   const handleTextTouch = (e: React.TouchEvent<HTMLParagraphElement>) => {
     const target = e.target as HTMLElement;
+    const touchEndTime = Date.now();
+    const touchDuration = touchEndTime - touchStartTime;
+    
+    // タッチ終了位置を取得
+    const touch = e.changedTouches[0];
+    const touchEndPosition = { x: touch.clientX, y: touch.clientY };
+    
+    // 移動距離を計算
+    const moveDistance = Math.sqrt(
+      Math.pow(touchEndPosition.x - touchStartPosition.x, 2) + 
+      Math.pow(touchEndPosition.y - touchStartPosition.y, 2)
+    );
+    
+    // タッチ時間が短すぎる（100ms未満）または移動距離が大きい（10px以上）場合は無視
+    if (touchDuration < 100 || moveDistance > 10) {
+      console.log(`タッチ無視: 時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px`);
+      return;
+    }
     
     // タッチされた要素が単語要素か確認
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
       e.preventDefault();
       e.stopPropagation();
+      
+      console.log(`有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
       
       // タッチイベント専用のフラグを設定してクリックイベントとの重複を防ぐ
       (target as any)._touchHandled = true;
@@ -849,6 +880,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p 
                     className={`mb-3 ${getTextSizeClass()} leading-relaxed text-text-primary`}
                     onClick={handleTextClick}
+                    onTouchStart={handleTextTouchStart}
                     onTouchEnd={handleTextTouch}
                     style={{ 
                       pointerEvents: 'auto',
