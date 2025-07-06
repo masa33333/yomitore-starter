@@ -512,6 +512,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
+    // 単語をハイライト
+    setHighlightedWord(word);
+    
+    // 1秒後にハイライトを消す
+    setTimeout(() => {
+      setHighlightedWord('');
+    }, 1000);
+    
     try {
       const response = await fetch('/api/word-info', {
         method: 'POST',
@@ -729,6 +737,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // タッチ開始時間を記録するためのstate
   const [touchStartTime, setTouchStartTime] = useState<number>(0);
   const [touchStartPosition, setTouchStartPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+  
+  // 単語ハイライト状態を管理
+  const [highlightedWord, setHighlightedWord] = useState<string>('');
 
   // タッチ開始ハンドラー
   const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
@@ -806,7 +817,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         return (
           <span
             key={index}
-            className="clickable-word cursor-pointer hover:bg-yellow-200/50 active:bg-yellow-300 transition-colors duration-200 select-none"
+            className={`clickable-word cursor-pointer hover:bg-yellow-200/50 active:bg-yellow-300 transition-colors duration-200 select-none ${
+              highlightedWord === part ? 'bg-yellow-300' : ''
+            }`}
             title="クリックして意味を調べる"
             data-word={part}
             style={{
