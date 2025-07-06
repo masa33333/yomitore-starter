@@ -965,7 +965,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div className="w-full flex justify-center">
                   <button
                     onClick={handleCompleteReading}
-                    className="rounded-md bg-orange-400 px-6 py-3 font-bold text-white transition-colors hover:bg-orange-500 text-lg"
+                    className="rounded-md bg-orange-400 px-6 py-3 font-bold text-black transition-colors hover:bg-orange-500 text-lg"
                   >
                     読書完了
                   </button>
@@ -1143,7 +1143,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 {/* レベル選択UI */}
                 {showLevelSelector && (
                   <div className="rounded-lg border-2 border-orange-400 bg-white p-4 shadow-lg">
-                    <h4 className="mb-3 text-center font-bold text-lg text-orange-600">語彙レベルを選択</h4>
+                    <h4 className="mb-3 text-center font-bold text-lg text-black">語彙レベルを選択</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5].map((level) => (
                         <button
