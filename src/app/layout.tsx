@@ -1,7 +1,7 @@
 import "./globals.css";
 import PointsProvider from "@/context/PointsContext";
 import { LanguageProvider } from "@/context/LanguageContext";
-import Header from "@/components/Header";
+import ConditionalHeader from "@/components/ConditionalHeader";
 import ScrollController from "@/components/ScrollController";
 import type { Metadata } from "next";
 
@@ -21,7 +21,7 @@ export default function RootLayout({
         <LanguageProvider>
           <PointsProvider>
             <ScrollController />
-            <Header />
+            <ConditionalHeader />
             <main className="min-h-screen">{children}</main>
           </PointsProvider>
         </LanguageProvider>
