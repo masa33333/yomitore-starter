@@ -834,9 +834,49 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     <main className="min-h-screen bg-page-bg p-2 sm:p-4">
       {/* ページタイトル */}
       <div className="mb-6">
-        <h1 className="mb-2 text-2xl font-bold text-text-primary">
-          {mode === 'story' ? (initialData?.title || displayTitle) : displayTitle}
-        </h1>
+        <div className="flex items-start justify-between mb-2">
+          <h1 className="text-2xl font-bold text-text-primary">
+            {mode === 'story' ? (initialData?.title || displayTitle) : displayTitle}
+          </h1>
+          
+          {/* 文字サイズ変更コントロール */}
+          <div className="flex flex-col items-end">
+            <div className="text-sm text-gray-600 mb-1">文字サイズ</div>
+            <div className="flex gap-1">
+              <button
+                onClick={() => handleTextSizeChange('small')}
+                className={`px-3 py-1 text-sm font-bold rounded-l-md transition-colors ${
+                  textSize === 'small' 
+                    ? 'bg-primary-active text-text-primary' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                }`}
+              >
+                小
+              </button>
+              <button
+                onClick={() => handleTextSizeChange('medium')}
+                className={`px-3 py-1 text-sm font-bold transition-colors ${
+                  textSize === 'medium' 
+                    ? 'bg-primary-active text-text-primary' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                }`}
+              >
+                中
+              </button>
+              <button
+                onClick={() => handleTextSizeChange('large')}
+                className={`px-3 py-1 text-sm font-bold rounded-r-md transition-colors ${
+                  textSize === 'large' 
+                    ? 'bg-primary-active text-text-primary' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                }`}
+              >
+                大
+              </button>
+            </div>
+          </div>
+        </div>
+        
         {mode === 'story' && searchParams.genre && (
           <p className="text-sm text-gray-600">ジャンル: {searchParams.genre}</p>
         )}
@@ -922,40 +962,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               >
                 {showJapanese ? '日本語を隠す' : '日本語を表示'}
               </button>
-              
-              {/* テキストサイズ変更ボタン */}
-              <div className="flex gap-1">
-                <button
-                  onClick={() => handleTextSizeChange('small')}
-                  className={`px-3 py-2 text-sm font-bold rounded-l-md transition-colors ${
-                    textSize === 'small' 
-                      ? 'bg-primary-active text-text-primary' 
-                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  小
-                </button>
-                <button
-                  onClick={() => handleTextSizeChange('medium')}
-                  className={`px-3 py-2 text-sm font-bold transition-colors ${
-                    textSize === 'medium' 
-                      ? 'bg-primary-active text-text-primary' 
-                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  中
-                </button>
-                <button
-                  onClick={() => handleTextSizeChange('large')}
-                  className={`px-3 py-2 text-sm font-bold rounded-r-md transition-colors ${
-                    textSize === 'large' 
-                      ? 'bg-primary-active text-text-primary' 
-                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  大
-                </button>
-              </div>
               
               {!endTime && (
                 <button
