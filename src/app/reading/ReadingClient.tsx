@@ -839,41 +839,53 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             {mode === 'story' ? (initialData?.title || displayTitle) : displayTitle}
           </h1>
           
-          {/* 文字サイズ変更コントロール */}
-          <div className="flex flex-col items-end">
-            <div className="text-sm text-gray-600 mb-1">文字サイズ</div>
-            <div className="flex gap-1">
-              <button
-                onClick={() => handleTextSizeChange('small')}
-                className={`px-3 py-1 text-sm font-bold rounded-l-md transition-colors ${
-                  textSize === 'small' 
-                    ? 'bg-primary-active text-text-primary' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                }`}
-              >
-                小
-              </button>
-              <button
-                onClick={() => handleTextSizeChange('medium')}
-                className={`px-3 py-1 text-sm font-bold transition-colors ${
-                  textSize === 'medium' 
-                    ? 'bg-primary-active text-text-primary' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                }`}
-              >
-                中
-              </button>
-              <button
-                onClick={() => handleTextSizeChange('large')}
-                className={`px-3 py-1 text-sm font-bold rounded-r-md transition-colors ${
-                  textSize === 'large' 
-                    ? 'bg-primary-active text-text-primary' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                }`}
-              >
-                大
-              </button>
+          {/* 文字サイズ変更コントロール & 音声再生 */}
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-end">
+              <div className="text-sm text-gray-600 mb-1">文字サイズ</div>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => handleTextSizeChange('small')}
+                  className={`px-3 py-1 text-sm font-bold rounded-l-md transition-colors ${
+                    textSize === 'small' 
+                      ? 'bg-primary-active text-text-primary' 
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  小
+                </button>
+                <button
+                  onClick={() => handleTextSizeChange('medium')}
+                  className={`px-3 py-1 text-sm font-bold transition-colors ${
+                    textSize === 'medium' 
+                      ? 'bg-primary-active text-text-primary' 
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  中
+                </button>
+                <button
+                  onClick={() => handleTextSizeChange('large')}
+                  className={`px-3 py-1 text-sm font-bold rounded-r-md transition-colors ${
+                    textSize === 'large' 
+                      ? 'bg-primary-active text-text-primary' 
+                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  大
+                </button>
+              </div>
             </div>
+            
+            {/* 音声再生ボタン */}
+            {english && english.trim() && (
+              <TTSButton
+                text={english}
+                contentId="reading-title-audio"
+                variant="secondary"
+                className="text-sm px-3 py-1"
+              />
+            )}
           </div>
         </div>
         
@@ -948,28 +960,31 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             </div>
             
             <div className="mt-6 flex flex-wrap gap-3">
-              {/* 全体音声再生ボタン */}
-              <TTSButton
-                text={english}
-                contentId="reading-full-content"
-                variant="secondary"
-                className="px-4 py-2"
-              />
-              
-              <button
-                onClick={() => setShowJapanese(!showJapanese)}
-                className="rounded-md bg-primary-active px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
-              >
-                {showJapanese ? '日本語を隠す' : '日本語を表示'}
-              </button>
-              
-              {!endTime && (
+              {!endTime ? (
+                // 読書完了前：読書完了ボタンのみ表示
                 <button
                   onClick={handleCompleteReading}
                   className="rounded-md bg-[#FFE1B5] px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#f0d1a0]"
                 >
                   読書完了
                 </button>
+              ) : (
+                // 読書完了後：日本語表示と音声再生ボタンを表示
+                <>
+                  <button
+                    onClick={() => setShowJapanese(!showJapanese)}
+                    className="rounded-md bg-primary-active px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
+                  >
+                    {showJapanese ? '日本語を隠す' : '日本語を表示'}
+                  </button>
+                  
+                  <TTSButton
+                    text={english}
+                    contentId="reading-full-content"
+                    variant="secondary"
+                    className="px-4 py-2"
+                  />
+                </>
               )}
             </div>
           </div>

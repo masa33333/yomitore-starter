@@ -21,7 +21,6 @@ export default function TTSButton({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>('normal');
   const [showSpeedSelector, setShowSpeedSelector] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -80,14 +79,6 @@ export default function TTSButton({
     };
     
     console.log('📱 Device info:', deviceInfo);
-    
-    // モバイル用デバッグ情報を追加
-    setDebugInfo([
-      `Device: ${isMobile ? 'Mobile' : 'Desktop'}`,
-      `Platform: ${navigator.platform}`,
-      `Text length: ${text.length}`,
-      `Starting TTS request...`
-    ]);
 
     setIsLoading(true);
     setError(null);
@@ -116,12 +107,6 @@ export default function TTSButton({
         ok: response.ok 
       });
 
-      // モバイル用デバッグ情報を更新
-      setDebugInfo(prev => [...prev, 
-        `API Response: ${response.status} ${response.statusText}`,
-        `Success: ${response.ok}`
-      ]);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('🎵 TTS API error details:', {
@@ -132,12 +117,6 @@ export default function TTSButton({
         
         const errorMessage = errorData.error || 
           `TTS生成に失敗しました (${response.status}: ${response.statusText})`;
-        
-        // モバイル用エラー情報を追加
-        setDebugInfo(prev => [...prev, 
-          `ERROR: ${errorMessage}`,
-          `Error details: ${JSON.stringify(errorData)}`
-        ]);
         
         throw new Error(errorMessage);
       }
@@ -167,9 +146,6 @@ export default function TTSButton({
       console.error('TTS Error:', err);
       const errorMessage = err instanceof Error ? err.message : '音声生成でエラーが発生しました';
       setError(errorMessage);
-      
-      // モバイル用最終エラー情報
-      setDebugInfo(prev => [...prev, `FINAL ERROR: ${errorMessage}`]);
     } finally {
       setIsLoading(false);
     }
@@ -301,17 +277,6 @@ export default function TTSButton({
         </div>
       )}
 
-      {/* Debug Info Display (for mobile debugging) */}
-      {debugInfo.length > 0 && (
-        <details className="mt-2">
-          <summary className="cursor-pointer text-xs text-gray-500">Debug Info</summary>
-          <div className="mt-1 rounded border border-gray-200 bg-gray-50 p-2 text-xs text-gray-700">
-            {debugInfo.map((info, index) => (
-              <div key={index} className="mb-1">{info}</div>
-            ))}
-          </div>
-        </details>
-      )}
 
       {/* Hidden Audio Element */}
       <audio
