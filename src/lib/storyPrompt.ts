@@ -49,12 +49,22 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryPa
   const genders = ['男性', '女性'];
   const randomGender = genders[Math.floor(Math.random() * genders.length)];
   
+  // アメリカンネームのリスト
+  const americanNames = {
+    男性: ['Michael', 'David', 'James', 'Robert', 'John', 'William', 'Christopher', 'Matthew', 'Joshua', 'Andrew', 'Daniel', 'Anthony', 'Mark', 'Paul', 'Steven', 'Kenneth', 'Brian', 'Kevin', 'Timothy', 'Ronald'],
+    女性: ['Jessica', 'Ashley', 'Emily', 'Sarah', 'Samantha', 'Amanda', 'Brittany', 'Elizabeth', 'Taylor', 'Megan', 'Hannah', 'Kayla', 'Lauren', 'Stephanie', 'Rachel', 'Jennifer', 'Nicole', 'Alexis', 'Victoria', 'Amber']
+  };
+  
+  const randomName = americanNames[randomGender as keyof typeof americanNames][Math.floor(Math.random() * americanNames[randomGender as keyof typeof americanNames].length)];
+  
   return `
 語彙レベル: ${level}
 テーマ: ${genre}
 得たい感情: ${feeling}
 表現スタイル: ${tone}
 主人公の性別: ${randomGender}
+主人公の名前: ${randomName}
+舞台: アメリカ
 
 この条件に基づいて英語の読み物を1つ作成し、以下のstrict JSON形式で出力してください：
 
@@ -89,11 +99,13 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryPa
 4. HTMLタグや構造用語（Setup, Climax等）の表記は一切使用しない
 5. 太字（**）や番号（1. 2.）などの構造表現も使用しない
 6. 普通の文章のみで構成（必ず5段落）
-7. 主人公は指定された性別（${randomGender}）で作成
+7. 主人公は指定された性別（${randomGender}）・名前（${randomName}）で作成
 8. 語彙レベル${level}に適した英語で作成
 9. 内容が浅くならないよう、感情・状況・行動を具体的に描写
-10. 舞台と登場人物はアメリカ、イギリス、カナダ、オーストラリアなどの英語圏に設定
-11. 最後の段落（Resolution）で必ず読者が驚くようなドンデン返しを用意する
+10. 舞台は必ずアメリカ（都市・州・地域を具体的に設定）
+11. 登場人物は全て英語圏の一般的な名前を使用（Michael, Sarah, Johnson, Smith等）
+12. アメリカの文化・習慣・地理を反映した設定にする
+13. 最後の段落（Resolution）で必ず読者が驚くようなドンデン返しを用意する
 
 出力は純粋なJSONオブジェクトのみ。
 `;
@@ -102,7 +114,7 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryPa
 /**
  * ストーリー生成システムメッセージ
  */
-export const STORY_SYSTEM_MESSAGE = "You are a professional English creative writer specializing in educational content for intermediate English learners (CEFR B1-B2). You create engaging, well-structured stories that help students improve their reading comprehension while enjoying compelling narratives. CRITICAL: Output ONLY pure JSON object as specified. No code blocks, no explanations, no additional text before or after the JSON. The output will be directly parsed by JSON.parse().";
+export const STORY_SYSTEM_MESSAGE = "You are a professional American English creative writer specializing in educational content for intermediate English learners (CEFR B1-B2). You create engaging, well-structured stories set in America with American characters, culture, and settings. All stories must feature American places (specific cities, states, landmarks) and characters with typical American names. You help students improve their reading comprehension while enjoying compelling narratives about American life and culture. CRITICAL: Output ONLY pure JSON object as specified. No code blocks, no explanations, no additional text before or after the JSON. The output will be directly parsed by JSON.parse().";
 
 /**
  * レスポンスからストーリー、タイトル、テーマを抽出（エラーハンドリング強化版）
