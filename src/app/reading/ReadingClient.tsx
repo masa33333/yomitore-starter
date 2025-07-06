@@ -961,13 +961,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             
             <div className="mt-6 flex flex-wrap gap-3">
               {!endTime ? (
-                // 読書完了前：読書完了ボタンのみ表示
-                <button
-                  onClick={handleCompleteReading}
-                  className="rounded-md bg-[#FFE1B5] px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#f0d1a0]"
-                >
-                  読書完了
-                </button>
+                // 読書完了前：読書完了ボタンのみ表示（中央配置・オレンジ色）
+                <div className="w-full flex justify-center">
+                  <button
+                    onClick={handleCompleteReading}
+                    className="rounded-md bg-orange-400 px-6 py-3 font-bold text-white transition-colors hover:bg-orange-500 text-lg"
+                  >
+                    読書完了
+                  </button>
+                </div>
               ) : (
                 // 読書完了後：日本語表示と音声再生ボタンを表示
                 <>
