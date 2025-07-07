@@ -11,6 +11,7 @@ import { notifyNewStampCardUpdate } from '@/components/NewStampCard';
 import NewStampCard from '@/components/NewStampCard';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
+import StampFlash from '@/components/StampFlash';
 
 // 単語情報のインターフェース
 interface WordInfo {
@@ -161,6 +162,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   });
   
   // 通知状態
+  const [showStampFlash, setShowStampFlash] = useState(false);
   
   // レベル変更状態
   const [showLevelSelector, setShowLevelSelector] = useState(false);
@@ -404,6 +406,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // 読書完了処理（スタンプカード統合版）
   const handleCompleteReading = () => {
     if (!startTime) return;
+    
+    // まずスタンプフラッシュを表示
+    setShowStampFlash(true);
     
     const endTimeValue = Date.now();
     setEndTime(endTimeValue);
@@ -1213,6 +1218,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           )}
         </div>
       )}
+
+      {/* スタンプフラッシュ表示 */}
+      <StampFlash 
+        show={showStampFlash} 
+        onComplete={() => setShowStampFlash(false)} 
+      />
 
     </main>
   );
