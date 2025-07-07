@@ -55,7 +55,7 @@ const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete }) => {
         
         {/* 「スタンプ獲得！」テキスト */}
         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-center z-20">
-          <div className="bg-white text-black px-6 py-3 rounded-lg font-bold shadow-lg text-xl" style={{ writingMode: 'horizontal-tb' }}>
+          <div className="bg-white text-black px-8 py-3 rounded-lg font-bold shadow-lg text-xl whitespace-nowrap" style={{ writingMode: 'horizontal-tb', minWidth: '200px' }}>
             スタンプ獲得！
           </div>
         </div>
