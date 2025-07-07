@@ -1,0 +1,6 @@
+# Force Vercel rebuild - resolving cache issues
+# This file forces Vercel to rebuild from scratch
+
+Build timestamp: 2025-07-07T15:30:00Z
+Reason: Vercel cache issues with deleted modules
+Status: All imports have been fixed locally
