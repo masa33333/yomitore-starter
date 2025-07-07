@@ -1,9 +1,18 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useEffect } from 'react';
 
 export default function Home() {
   const { displayLang } = useLanguage();
+
+  // ページマウント時の状態確認
+  useEffect(() => {
+    console.log('🏠 トップページがマウントされました');
+    const vocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
+    const catName = localStorage.getItem('catName');
+    console.log('📊 現在の状態:', { vocabLevel, catName, displayLang });
+  }, [displayLang]);
 
   // 表示テキストの定義
   const text = {
@@ -48,6 +57,7 @@ export default function Home() {
   };
 
   const handleNewJourney = () => {
+    console.log('🆕 「新たに多読の旅を始める」ボタンがクリックされました');
     // 全てのlocalStorageデータをリセット
     const keysToReset = [
       'catName',
@@ -78,29 +88,36 @@ export default function Home() {
       'letterText'
     ];
     
+    console.log('🗑️ リセット対象のキー:', keysToReset);
     keysToReset.forEach(key => {
       localStorage.removeItem(key);
     });
     
     console.log('🔄 All data reset - starting new journey');
+    console.log('➡️ /start ページに遷移します');
     window.location.href = '/start';
   };
 
   const handleChooseReading = () => {
+    console.log('🔽 「今日の読み物を決める」ボタンがクリックされました');
     // 語彙レベルがない場合は先にquizに誘導
     const vocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
+    console.log('📊 語彙レベル確認:', { vocabLevel });
+    
     if (!vocabLevel) {
+      console.log('➡️ 語彙レベル未設定 - /quiz に誘導');
       window.location.href = '/quiz';
     } else {
+      console.log('➡️ 語彙レベル設定済み - /choose に誘導');
       window.location.href = '/choose';
     }
   };
 
 
   return (
-    <div className="p-6 min-h-screen flex flex-col items-center justify-start pt-6">
+    <div className="p-6 min-h-screen flex flex-col items-center justify-start pt-6" style={{ position: 'relative', zIndex: 1 }}>
       {/* 常に2つのボタンを表示 */}
-      <div className="text-center max-w-md mt-8">
+      <div className="text-center max-w-md mt-8" style={{ position: 'relative', zIndex: 2 }}>
         <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
           {getText('subtitle')}
         </h1>
@@ -108,7 +125,10 @@ export default function Home() {
         {/* メインボタン: 今日の読み物を決める */}
         <button
           onClick={handleChooseReading}
-          className="w-full mb-4 bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg"
+          onMouseDown={() => console.log('👆 読み物ボタンがマウスダウンされました')}
+          onMouseUp={() => console.log('👆 読み物ボタンがマウスアップされました')}
+          className="w-full mb-4 bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg cursor-pointer"
+          style={{ pointerEvents: 'auto' }}
         >
           {getText('choose')}
         </button>
@@ -116,7 +136,10 @@ export default function Home() {
         {/* サブボタン: 新たに多読の旅を始める */}
         <button
           onClick={handleNewJourney}
-          className="w-full bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-base hover:opacity-80 transition-colors"
+          onMouseDown={() => console.log('👆 新たな旅ボタンがマウスダウンされました')}
+          onMouseUp={() => console.log('👆 新たな旅ボタンがマウスアップされました')}
+          className="w-full bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-base hover:opacity-80 transition-colors cursor-pointer"
+          style={{ pointerEvents: 'auto' }}
         >
           {getText('newJourney')}
         </button>
