@@ -12,6 +12,7 @@ import NewStampCard from '@/components/NewStampCard';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 import StampFlash from '@/components/StampFlash';
+import { analyzeVocabulary } from '@/constants/ngslData';
 
 // 単語情報のインターフェース
 interface WordInfo {
@@ -167,6 +168,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // レベル変更状態
   const [showLevelSelector, setShowLevelSelector] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(3);
+  const [actualLevel, setActualLevel] = useState<number | null>(null);
 
   console.log('🎨 ReadingClient rendered with:', {
     mode,
@@ -375,6 +377,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.error('❌ Data sync error:', error);
     }
   }, [englishParagraphs, wordCount]);
+
+  // 英語テキストが変更されたら語彙レベルを自動判定
+  useEffect(() => {
+    if (english && english.trim().length > 50) { // 50文字以上の場合のみ判定
+      const detectedLevel = analyzeTextLevel(english);
+      setActualLevel(detectedLevel);
+      console.log('📊 Auto-detected vocabulary level:', detectedLevel, 'Selected level:', selectedLevel);
+    }
+  }, [english, selectedLevel]);
 
   // 読書状態をlocalStorageに保存する関数
   const saveCurrentReadingState = () => {
@@ -665,6 +676,30 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   };
 
   // レベル変更処理
+  // 語彙レベル自動判定関数
+  const analyzeTextLevel = (text: string): number => {
+    if (!text || text.trim().length === 0) return 3; // デフォルト
+    
+    const analysis = analyzeVocabulary(text);
+    console.log('📊 Vocabulary Analysis:', analysis);
+    
+    // レベル判定ロジック（厳格）
+    if (analysis.isLevel1Compliant) return 1;
+    if (analysis.isLevel2Compliant) return 2;
+    if (analysis.isLevel3Compliant) return 3;
+    
+    // Level 4/5の判定
+    const { percentages } = analysis;
+    const level4Plus = percentages[4] + percentages[5];
+    const level3Minus = percentages[1] + percentages[2] + percentages[3];
+    
+    if (level4Plus >= 20) return 5; // Level 4-5語彙が20%以上
+    if (level4Plus >= 10) return 4; // Level 4-5語彙が10%以上
+    if (level3Minus >= 90) return 3; // Level 1-3語彙が90%以上
+    
+    return 4; // その他はLevel 4と判定
+  };
+
   const handleLevelChange = () => {
     console.log('🔄 レベル変更ボタンがクリックされました');
     console.log('現在のshowLevelSelector:', showLevelSelector);
@@ -1053,7 +1088,20 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div>
                   <p className="text-sm text-gray-600">語彙レベル</p>
                   <p className="text-lg font-bold">
-                    Lv.{selectedLevel}
+                    {actualLevel !== null ? (
+                      actualLevel === selectedLevel ? (
+                        `Lv.${selectedLevel}`
+                      ) : (
+                        <span>
+                          Lv.{selectedLevel} 
+                          <span className="text-sm text-red-600 ml-1">
+                            (実際: Lv.{actualLevel})
+                          </span>
+                        </span>
+                      )
+                    ) : (
+                      `Lv.${selectedLevel}`
+                    )}
                   </p>
                 </div>
                 <div>
