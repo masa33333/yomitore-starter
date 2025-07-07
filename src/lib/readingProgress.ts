@@ -78,8 +78,8 @@ function migrateFromLegacySystem(): UserProgress {
   
   progress.totalWords = legacyWords;
   progress.totalStamps = legacyReadings; // 1読了 = 1スタンプ
-  progress.currentCardStamps = legacyReadings % 50;
-  progress.completedCards = Math.floor(legacyReadings / 50);
+  progress.currentCardStamps = legacyReadings % 20;
+  progress.completedCards = Math.floor(legacyReadings / 20);
   
   // コインとトロフィーを計算
   progress.bronzeCoins = Math.floor(legacyReadings / 10);
@@ -138,29 +138,67 @@ export function saveStampCardData(stamps: StampData[]): void {
 }
 
 /**
+ * 連続読書達成メッセージの記録（セッション終了時に表示用）
+ */
+function recordConsecutiveReadingMessage(progress: UserProgress): void {
+  const consecutiveDays = progress.consecutiveLoginDays;
+  
+  if (consecutiveDays > 0) {
+    const message = `今日で${consecutiveDays}日連続読書達成！`;
+    localStorage.setItem('consecutiveReadingMessage', message);
+    console.log(`📚 ${message}`);
+  }
+}
+
+
+/**
  * デイリーデータの管理
  */
-export function checkAndResetDailyData(): UserProgress {
+export function checkAndResetDailyData(testDate?: string): UserProgress {
   const progress = getUserProgress();
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const today = testDate || new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   
   // 日付が変わっていたらデイリーデータをリセット
   if (progress.lastLoginDate !== today) {
     // 連続ログイン日数の更新
-    const yesterday = new Date();
+    const todayDate = testDate ? new Date(testDate) : new Date();
+    const yesterday = new Date(todayDate);
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
     
+    console.log('🔍 Checking login continuity...');
+    console.log('  Current lastLoginDate:', progress.lastLoginDate);
+    console.log('  Expected yesterday:', yesterdayStr);
+    console.log('  Today:', today);
+    
     if (progress.lastLoginDate === yesterdayStr) {
       // 連続ログイン継続
+      console.log('✅ Consecutive login continued!');
       progress.consecutiveLoginDays += 1;
     } else if (progress.lastLoginDate === '') {
       // 初回ログイン
+      console.log('🆕 First time login!');
       progress.consecutiveLoginDays = 1;
     } else {
       // 連続ログインが途切れた
+      console.log('💔 Consecutive login broken!');
+      const lastLoginDate = new Date(progress.lastLoginDate);
+      const currentDate = testDate ? new Date(testDate) : new Date();
+      const daysDifference = Math.floor((currentDate.getTime() - lastLoginDate.getTime()) / (1000 * 60 * 60 * 24));
+      console.log('  Days difference:', daysDifference);
+      
+      if (daysDifference >= 3) {
+        // 3日以上空いている場合は復帰メッセージ
+        showWelcomeBackMessage(daysDifference);
+        console.log(`🤗 おかえりなさい！${daysDifference}日ぶりのログイン`);
+      }
+      
       progress.consecutiveLoginDays = 1;
     }
+    
+    console.log('📅 Daily data reset for new day:', today);
+    console.log('📊 Previous lastLoginDate:', progress.lastLoginDate, 'yesterday should be:', yesterdayStr);
+    console.log('🔥 Consecutive login days updated to:', progress.consecutiveLoginDays);
     
     // デイリーデータリセット
     progress.dailyStoriesRead = 0;
@@ -168,8 +206,8 @@ export function checkAndResetDailyData(): UserProgress {
     progress.dailyGoalAchieved = false;
     progress.lastLoginDate = today;
     
-    console.log('📅 Daily data reset for new day:', today);
-    console.log('🔥 Consecutive login days:', progress.consecutiveLoginDays);
+    // 連続読書達成メッセージの記録
+    recordConsecutiveReadingMessage(progress);
     
     saveUserProgress(progress);
   }
@@ -183,13 +221,13 @@ export function checkAndResetDailyData(): UserProgress {
 export function completeReading(data: ReadingCompletionData): UserProgress {
   console.log('📖 Starting reading completion process:', data);
   
-  // 1. デイリーデータチェック・リセット
-  let progress = checkAndResetDailyData();
+  // 1. 既存進捗データを取得（日付チェックは行わない）
+  let progress = getUserProgress();
   
   // 2. 基本進捗更新
   progress.totalWords += data.wordCount;
   progress.totalStamps += 1;
-  progress.currentCardStamps = progress.totalStamps % 50;
+  progress.currentCardStamps = progress.totalStamps % 20;
   progress.dailyStoriesRead += 1;
   
   // 3. カード完成チェック
@@ -204,7 +242,10 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   // 5. デイリーボーナス処理
   processeDailyBonuses(progress);
   
-  // 6. スタンプデータ作成・保存
+  // 6. 連続読書達成メッセージの記録（読書完了時）
+  recordConsecutiveReadingMessage(progress);
+  
+  // 7. スタンプデータ作成・保存
   const stamp: StampData = {
     id: generateStampId(),
     completionDate: data.completionDate || new Date().toISOString(),
@@ -226,7 +267,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   stamps.push(stamp);
   saveStampCardData(stamps);
   
-  // 7. 履歴保存（既存システム）
+  // 8. 履歴保存（既存システム）
   saveToHistory({
     type: data.contentType,
     title: data.title,
@@ -238,7 +279,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
     wpm: data.wpm
   });
   
-  // 8. 進捗データ保存
+  // 9. 進捗データ保存
   saveUserProgress(progress);
   
   console.log('✅ Reading completion process finished:', progress);
@@ -267,21 +308,81 @@ function updateAchievements(progress: UserProgress): void {
 }
 
 /**
- * デイリーボーナス処理
+ * デイリー進捗記録（日付チェックなし）
  */
 function processeDailyBonuses(progress: UserProgress): void {
-  // 今日の最初の話ボーナス
+  // 今日が変わっているかチェック
+  const today = new Date().toISOString().split('T')[0];
+  if (progress.lastLoginDate !== today) {
+    // 日付が変わっている場合は読書カウントをリセット
+    progress.dailyStoriesRead = 1; // 現在の読書が今日の最初
+    progress.dailyFirstStoryBonus = false;
+    progress.dailyGoalAchieved = false;
+    progress.lastLoginDate = today;
+  }
+
+  // 今日の最初の1話の記録
   if (progress.dailyStoriesRead === 1 && !progress.dailyFirstStoryBonus) {
     progress.dailyFirstStoryBonus = true;
-    console.log('🌅 First story of the day bonus awarded!');
+    console.log('🌟 今日の最初の1話達成！');
   }
   
-  // デイリー目標達成（3話）
+  // デイリー目標達成（3話）の記録
   if (progress.dailyStoriesRead >= 3 && !progress.dailyGoalAchieved) {
     progress.dailyGoalAchieved = true;
-    progress.totalStamps += 1; // ボーナススタンプ
-    console.log('🎯 Daily goal achieved! Bonus stamp awarded!');
+    console.log('🎯 デイリー目標3話達成！');
   }
+}
+
+
+/**
+ * おかえりメッセージの表示
+ */
+function showWelcomeBackMessage(daysDifference: number): void {
+  const messages = [
+    'また会えて嬉しいです！',
+    'お帰りなさい！待っていました',
+    'また一緒に読書の旅を始めましょう',
+    'あなたのことを想っていました',
+    '新しい冒険の準備はできています'
+  ];
+  
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  
+  // おかえりメッセージをlocalStorageに記録（UI表示用）
+  localStorage.setItem('welcomeBackMessage', JSON.stringify({
+    daysDifference,
+    message: randomMessage
+  }));
+}
+
+/**
+ * 連続読書達成メッセージを取得・クリア
+ */
+export function getAndClearConsecutiveReadingMessage(): string | null {
+  const message = localStorage.getItem('consecutiveReadingMessage');
+  if (message) {
+    localStorage.removeItem('consecutiveReadingMessage');
+    return message;
+  }
+  return null;
+}
+
+/**
+ * おかえりメッセージを取得・クリア
+ */
+export function getAndClearWelcomeBackMessage(): { daysDifference: number; message: string } | null {
+  const stored = localStorage.getItem('welcomeBackMessage');
+  if (stored) {
+    localStorage.removeItem('welcomeBackMessage');
+    try {
+      return JSON.parse(stored);
+    } catch (error) {
+      console.error('Failed to parse welcome back message:', error);
+      return null;
+    }
+  }
+  return null;
 }
 
 /**
@@ -327,12 +428,12 @@ export function getStampCardDisplay(): StampCardDisplay {
   const progress = getUserProgress();
   const stamps = getStampCardData();
   
-  // 現在のカード内のスタンプ（最新50個）
-  const currentCardStamps = stamps.slice(-50);
+  // 現在のカード内のスタンプ（最新20個）
+  const currentCardStamps = stamps.slice(-20);
   
   // 次のマイルストーン計算
   const nextCoin = (Math.floor(progress.totalStamps / 10) + 1) * 10;
-  const nextCard = (Math.floor(progress.totalStamps / 50) + 1) * 50;
+  const nextCard = (Math.floor(progress.totalStamps / 20) + 1) * 20;
   const stampsToNextCoin = nextCoin - progress.totalStamps;
   const stampsToNextCard = nextCard - progress.totalStamps;
   
@@ -355,8 +456,8 @@ export function getStampCardDisplay(): StampCardDisplay {
     currentStamps: currentCardStamps,
     progress: {
       current: progress.currentCardStamps,
-      total: 50,
-      percentage: (progress.currentCardStamps / 50) * 100
+      total: 20,
+      percentage: (progress.currentCardStamps / 20) * 100
     },
     nextMilestone
   };

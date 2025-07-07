@@ -7,6 +7,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useStory } from '@/lib/store/story';
 import { completeReading } from '@/lib/readingProgress';
 import type { ReadingCompletionData } from '@/types/stampCard';
+import { notifyNewStampCardUpdate } from '@/components/NewStampCard';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 
@@ -432,6 +433,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     try {
       const updatedProgress = completeReading(completionData);
       console.log('🎆 スタンプカード更新完了:', updatedProgress);
+      
+      // 新しいスタンプカードに更新通知
+      notifyNewStampCardUpdate();
       
       // 2回目の読了完了時に一通目の手紙を送信（既存ロジック維持）
       if (updatedProgress.totalStamps === 2) {

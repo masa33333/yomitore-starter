@@ -8,7 +8,7 @@ export interface UserProgress {
   // 基本データ
   totalStamps: number;          // 累計スタンプ数
   totalWords: number;           // 累計読了語数 (既存のtotalWordsReadと統合)
-  currentCardStamps: number;    // 現在のカード内スタンプ数（0-49）
+  currentCardStamps: number;    // 現在のカード内スタンプ数（0-19）
   completedCards: number;       // 完成したカード枚数
   
   // コイン・トロフィー
