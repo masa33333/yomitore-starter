@@ -273,32 +273,32 @@ export function VocabularyQuiz() {
   const handleDevSkip = (level: number) => {
     console.log(`🚀 開発用スキップ: クイズレベル ${level} に設定`);
     
-    // 生成用レベル（1-5）を計算
-    const generationLevel = mapQuizLevelToGenerationLevel(level);
+    // 開発用クイックスタートでは、選択したレベル（1-5）をそのまま使用
+    // level が 1-5 の範囲内であることを確認
+    const generationLevel = Math.min(Math.max(level, 1), 5);
     
     // ローカルストレージに保存
-    // クイズレベル（1-10）を保存
-    localStorage.setItem('vocabularyLevel', level.toString());
-    localStorage.setItem('vocabLevel', level.toString());
-    
-    // 生成レベル（1-5）を保存
+    // 開発用では生成レベルをそのまま保存
+    localStorage.setItem('vocabularyLevel', generationLevel.toString());
+    localStorage.setItem('vocabLevel', generationLevel.toString());
     localStorage.setItem('level', generationLevel.toString());
     localStorage.setItem('fixedLevel', generationLevel.toString());
     
     localStorage.setItem('quizCompleted', 'true');
     
     // CEFR レベルも設定
-    const cefrLevel = level <= 2 ? 'A1' : level <= 4 ? 'A2' : 'B1';
+    const cefrLevel = generationLevel <= 2 ? 'A1' : generationLevel <= 3 ? 'A2' : generationLevel <= 4 ? 'B2' : 'C1';
     localStorage.setItem('userLevel', cefrLevel);
     
     // 完了状態に設定
-    setFinalLevel(level);
+    setFinalLevel(generationLevel);
     setFinished(true);
     
     console.log(`📊 開発用設定完了:`);
-    console.log(`  内部クイズレベル (1-10): ${level}`);
-    console.log(`  表示用生成レベル (1-5): ${generationLevel}`);
+    console.log(`  選択レベル: ${level}`);
+    console.log(`  生成レベル (1-5): ${generationLevel}`);
     console.log(`  CEFR レベル: ${cefrLevel}`);
+    console.log(`  🎯 選択したレベルがそのまま適用されます`);
   };
 
   
@@ -381,7 +381,7 @@ export function VocabularyQuiz() {
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="mb-2 text-black">正解数: {testState.correctAnswers} / {testState.questionCount}</p>
           <p className="mb-2 text-lg font-bold text-black">
-            あなたの語彙レベル: {mapQuizLevelToGenerationLevel(finalLevel)} （最高5）
+            あなたの語彙レベル: {finalLevel} （最高5）
           </p>
           <p className="text-sm text-gray-600">
             このレベルで読み物を生成します
