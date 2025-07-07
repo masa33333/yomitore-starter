@@ -1098,10 +1098,13 @@ Your Cat`;
         stateWordCount: wordCount 
       });
       
-      if (storedLetter.type === 'mail') {
-        // Save mail to history
+      // メール機能はスタンプカード統合で一時停止
+      // if (storedLetter.type === 'mail') {
+      //   saveToHistory({
+      //     type: "mail",
+      if (false) { // メール機能停止中
         saveToHistory({
-          type: "mail",
+          type: "letter", // 一時的にletterとして保存
           title: `In-flight from ${storedLetter.fromCity || 'Tokyo'} to ${storedLetter.toCity || 'Seoul'}`,
           contentJP: storedLetter.jp,
           contentEN: actualContent,

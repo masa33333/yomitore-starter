@@ -40,7 +40,7 @@ ${catName}`
   const estimatedWPM = Math.round(wordCount / (estimatedDuration / 60000));
 
   const mailData = {
-    type: "mail" as const,
+    type: "letter" as const, // スタンプカード統合でmailタイプ廃止
     jp: testMailContent.jp,
     en: {
       [userLevel]: testMailContent.en
@@ -73,7 +73,7 @@ ${catName}`
 export function createQuickTestMail(fromCity: string = "Tokyo", toCity: string = "Seoul", milestone: number = 30) {
   // 📧 実際の保存構造に合わせたテストメール
   const testMail = {
-    type: "mail",
+    type: "letter", // スタンプカード統合でmailタイプ廃止
     fromCity: fromCity,
     toCity: toCity,
     milestone: milestone,

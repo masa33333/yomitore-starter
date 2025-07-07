@@ -425,7 +425,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       duration: duration,
       wpm: calculatedWpm,
       level: currentLevel,
-      title: title || '読み物',
+      title: storyTitle || displayTitle || '読み物',
       contentType: 'reading'
     };
     
