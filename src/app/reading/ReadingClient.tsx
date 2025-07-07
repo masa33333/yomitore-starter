@@ -8,6 +8,7 @@ import { useStory } from '@/lib/store/story';
 import { completeReading } from '@/lib/readingProgress';
 import type { ReadingCompletionData } from '@/types/stampCard';
 import { notifyNewStampCardUpdate } from '@/components/NewStampCard';
+import NewStampCard from '@/components/NewStampCard';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 
@@ -1156,6 +1157,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   </div>
                 </div>
               )}
+              
+              {/* スタンプカード表示 */}
+              <div className="my-6 flex justify-center">
+                <NewStampCard 
+                  onComplete={() => {
+                    console.log('🎉 スタンプカード20個完成！');
+                  }}
+                />
+              </div>
               
               <div className="space-y-3">
                 <div className="flex gap-3">
