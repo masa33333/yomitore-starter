@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useStory } from '@/lib/store/story';
-import MailNotification from '@/components/MailNotification';
+import { completeReading } from '@/lib/readingProgress';
+import type { ReadingCompletionData } from '@/types/stampCard';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 
@@ -158,7 +159,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   });
   
   // 通知状態
-  const [showMailNotification, setShowMailNotification] = useState(false);
   
   // レベル変更状態
   const [showLevelSelector, setShowLevelSelector] = useState(false);
@@ -399,33 +399,56 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     saveCurrentReadingState();
   };
 
-  // 読書完了処理
+  // 読書完了処理（スタンプカード統合版）
   const handleCompleteReading = () => {
     if (!startTime) return;
     
     const endTimeValue = Date.now();
     setEndTime(endTimeValue);
     
-    const timeInMinutes = (endTimeValue - startTime) / 60000;
+    const duration = endTimeValue - startTime; // ミリ秒
+    const timeInMinutes = duration / 60000;
     const calculatedWpm = Math.round(wordCount / timeInMinutes);
     setWpm(calculatedWpm);
     
     console.log('✅ 読書完了:', {
       wordCount,
       timeInMinutes: timeInMinutes.toFixed(1),
-      wpm: calculatedWpm
+      wpm: calculatedWpm,
+      duration
     });
     
-    // 読了回数をカウント
-    const completedReadings = parseInt(localStorage.getItem('completedReadings') || '0', 10);
-    const newCompletedReadings = completedReadings + 1;
-    localStorage.setItem('completedReadings', newCompletedReadings.toString());
+    // スタンプカード統合システムで進捗更新
+    const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
+    const completionData: ReadingCompletionData = {
+      wordCount: wordCount,
+      duration: duration,
+      wpm: calculatedWpm,
+      level: currentLevel,
+      title: title || '読み物',
+      contentType: 'reading'
+    };
     
-    console.log('📚 読了回数:', newCompletedReadings);
-    
-    // 2回目の読了完了時に一通目の手紙を送信
-    if (newCompletedReadings === 2) {
-      sendFirstLetter();
+    try {
+      const updatedProgress = completeReading(completionData);
+      console.log('🎆 スタンプカード更新完了:', updatedProgress);
+      
+      // 2回目の読了完了時に一通目の手紙を送信（既存ロジック維持）
+      if (updatedProgress.totalStamps === 2) {
+        sendFirstLetter();
+      }
+      
+    } catch (error) {
+      console.error('❌ スタンプカード更新エラー:', error);
+      
+      // フォールバック: 既存システムで更新
+      const completedReadings = parseInt(localStorage.getItem('completedReadings') || '0', 10);
+      const newCompletedReadings = completedReadings + 1;
+      localStorage.setItem('completedReadings', newCompletedReadings.toString());
+      
+      if (newCompletedReadings === 2) {
+        sendFirstLetter();
+      }
     }
     
     // 読書完了状態を保存
@@ -438,6 +461,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const sendFirstLetter = async () => {
     try {
       console.log('📮 一通目の手紙を生成中...');
+    console.log('🎆 スタンプカード統合: 初回手紙送信トリガー');
       
       // ユーザーの生成レベル（1-5）を取得
       const userVocabLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
@@ -490,13 +514,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         
         console.log('✅ 一通目の手紙送信完了');
         
-        // 通知を表示
-        setShowMailNotification(true);
-        
-        // 3秒後に通知を非表示
-        setTimeout(() => {
-          setShowMailNotification(false);
-        }, 3000);
       } else {
         console.error('❌ 手紙生成エラー:', response.statusText);
       }
@@ -1183,8 +1200,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         </div>
       )}
 
-      {/* メール通知 */}
-      <MailNotification show={showMailNotification} />
     </main>
   );
 }

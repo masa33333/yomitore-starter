@@ -1,5 +1,5 @@
 type LetterData = {
-  type: "letter" | "mail";
+  type: "letter";
   fromCity: string;      // 出発都市（必須）
   toCity: string;        // 到着都市（必須）
   level: number;         // ユーザーレベル（必須）
@@ -8,7 +8,7 @@ type LetterData = {
   wordCount: number;     // 語数（必須）
   duration: number;      // 読書時間ミリ秒（必須）
   wpm: number;           // WPM（必須）
-  catName?: string;      // メールタイトル用（オプション）
+  catName?: string;      // 手紙タイトル用（オプション）
   cityImage?: string;    // 都市画像（オプション）
 };
 
@@ -59,34 +59,12 @@ export function saveLetterToStorage(letter: LetterData) {
           newToCity: letter.toCity
         });
         
-        // 手紙が既に存在する場合、新しいメールは保存しない（手紙優先）
-        if (existing.type === 'letter' && letter.type === 'mail') {
-          console.log('📧 ⚠️ PRIORITY CONFLICT: Letter already exists, mail will be queued instead');
-          
-          // メールをペンディングキューに追加（動的インポートで循環依存を回避）
-          const addToPendingQueue = async () => {
-            try {
-              const { saveWithPriority } = await import('./letterPriorityUtils');
-              saveWithPriority(letter); // mailをキューに追加
-              console.log('📧 Mail added to pending queue due to existing letter priority');
-            } catch (error) {
-              console.error('📧 Failed to add mail to pending queue:', error);
-            }
-          };
-          
-          addToPendingQueue();
-          return; // 既存の手紙を維持、新しいメールは保存しない
-        }
         
         // 同じタイプの場合は新しいもので上書き（通常の更新）
         if (existing.type === letter.type) {
           console.log(`📧 Updating existing ${letter.type} with new content`);
         }
         
-        // メールが既に存在して新しい手紙が来た場合は手紙を優先（正常な更新）
-        if (existing.type === 'mail' && letter.type === 'letter') {
-          console.log('📧 ✅ PRIORITY UPDATE: Replacing mail with letter (letter priority)');
-        }
         
       } catch (parseError) {
         console.error('📧 Failed to parse existing letterText, proceeding with save:', parseError);
@@ -188,12 +166,6 @@ export function getCurrentRouteLetter(): LetterData | null {
     enKeys: Object.keys(storedLetter.en || {})
   });
   
-  // 📧 mailタイプが入っている場合はnullを返す（letterページには表示しない）
-  if (storedLetter.type === 'mail') {
-    console.log(`📧 getCurrentRouteLetter: Found mail type, use getInFlightMail() instead`);
-    return null;
-  }
-  
   // 📮 letterタイプの場合、語数条件と重複チェックを実施
   if (storedLetter.type === 'letter') {
     // 語数条件チェック
@@ -224,32 +196,3 @@ export function getCurrentRouteLetter(): LetterData | null {
   return null;
 }
 
-/**
- * 道中メール専用の取得関数
- * 条件チェックと重複防止を実施
- */
-export function getInFlightMail(): LetterData | null {
-  const storedLetter = getLetterFromStorage();
-  
-  if (!storedLetter || storedLetter.type !== 'mail') {
-    console.log('📧 getInFlightMail: No mail type content found');
-    return null;
-  }
-  
-  // 機内メール表示条件をチェック
-  const { canShowInFlightMail } = require('./letterDisplayHelpers');
-  
-  if (!storedLetter.fromCity || !storedLetter.toCity) {
-    console.warn('⚠️ getInFlightMail: Mail missing route information');
-    return null;
-  }
-  
-  // 機内メール表示条件を満たしているかチェック
-  if (!canShowInFlightMail(storedLetter.fromCity, storedLetter.toCity)) {
-    console.log(`❌ getInFlightMail: Conditions not met for ${storedLetter.fromCity}-${storedLetter.toCity}`);
-    return null;
-  }
-  
-  console.log(`✅ getInFlightMail: RETURNING mail for ${storedLetter.fromCity}-${storedLetter.toCity}`);
-  return storedLetter;
-}
