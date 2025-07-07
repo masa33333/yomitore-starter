@@ -3,8 +3,33 @@
  * 条件判定を明確に分離し、重複表示を防ぐ
  */
 
-import { ARRIVAL_WORDS } from '@/constants/progress';
-import { getWordCountForDev, getReadingTimeForDev, getDevModeConfig } from './devMode';
+// 到着判定用語数しきい値（旧constants/progressから移行）
+const ARRIVAL_WORDS: Record<string, number> = {
+  'Tokyo': 0,        // 初期位置
+  'Seoul': 1000,     // 1000語で到達
+  'Beijing': 2000,   // 2000語で到達
+  'London': 3500,    // 3500語で到達
+  'NewYork': 5000,   // 5000語で到達
+  'Nairobi': 7000,   // 7000語で到達
+  'Sydney': 10000,   // 10000語で到達
+};
+// DevMode機能を簡略化（旧devModeファイルから移行）
+function getWordCountForDev(): number {
+  return parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+}
+
+function getReadingTimeForDev(): number {
+  return parseInt(localStorage.getItem('totalReadingTime') || '0', 10);
+}
+
+function getDevModeConfig(): { enabled: boolean; forceLetter?: string; forceMail?: string } {
+  try {
+    const config = localStorage.getItem('devModeConfig');
+    return config ? JSON.parse(config) : { enabled: false };
+  } catch {
+    return { enabled: false };
+  }
+}
 
 interface HistoryItem {
   type?: string;
@@ -139,14 +164,15 @@ export function determineContentToShow(): {
     const [fromCity, toCity] = devConfig.forceMail.split('-');
     console.log(`🛠️ DEV MODE: Forcing mail for ${devConfig.forceMail}`);
     
-    // Dev modeの場合、メールコンテンツが存在しなければ生成する
-    const { generateTestMailForRoute } = require('./testMailGeneration');
-    try {
-      generateTestMailForRoute(fromCity, toCity);
-      console.log(`🛠️ DEV MODE: Generated test mail for ${fromCity}-${toCity}`);
-    } catch (error) {
-      console.error('🛠️ DEV MODE: Failed to generate test mail:', error);
-    }
+    // Dev modeの場合、メールコンテンツが存在しなければ生成する（スタンプカード統合で一時停止）
+    // try {
+    //   const { generateTestMailForRoute } = require('./testMailGeneration');
+    //   generateTestMailForRoute(fromCity, toCity);
+    //   console.log(`🛠️ DEV MODE: Generated test mail for ${fromCity}-${toCity}`);
+    // } catch (error) {
+    //   console.error('🛠️ DEV MODE: Failed to generate test mail:', error);
+    // }
+    console.log(`🛠️ DEV MODE: Test mail generation disabled for stamp card integration`);
     
     return {
       type: 'mail',

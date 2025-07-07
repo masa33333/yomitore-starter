@@ -4,7 +4,7 @@
  */
 
 import { UserProgress, StampData, ReadingCompletionData, StampCardDisplay } from '@/types/stampCard';
-import { saveToHistory } from '@/lib/store/history';
+import { saveToHistory } from '@/lib/saveToHistory';
 
 // localStorage キー定数
 const STORAGE_KEYS = {

@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getNextCity, getNextUnreachedCity } from '@/lib/getNextCity';
 import { letters } from '@/app/data/letterData';
 import { getEnglishText } from '@/utils/getEnglishText';
-import { getCurrentRouteLetter, getInFlightMail, saveLetterToStorage } from '@/lib/letterStorage';
+import { getCurrentRouteLetter, saveLetterToStorage } from '@/lib/letterStorage';
 import { saveToHistory } from '@/lib/saveToHistory';
-import { processNextInQueue, checkForPendingMailAfterLetterCompletion } from '@/lib/letterPriorityUtils';
+// import { processNextInQueue, checkForPendingMailAfterLetterCompletion } from '@/lib/letterPriorityUtils'; // スタンプカード統合で一時停止
 import '@/lib/testMailGeneration'; // テスト用ユーティリティを読み込み
-import '@/lib/forceMailDisplay'; // 緊急メール表示テスト
+// import '@/lib/forceMailDisplay'; // 緊急メール表示テスト（スタンプカード統合で一時停止）
 import TTSButton from '@/components/TTSButton';
 
 function LetterPageContent() {
@@ -219,7 +219,7 @@ ${catName}`
       const estimatedWPM = Math.round(wordCount / (estimatedDuration / 60000));
 
       const mailData = {
-        type: "mail" as const,
+        type: "letter" as const, // スタンプカード統合でmailタイプ廃止
         jp: testMailContent.jp,
         en: {
           [userLevel]: testMailContent.en
@@ -561,8 +561,11 @@ ${catName}`
     }
     
     // 📧 /letter ページに遷移したら全ての通知フラグをクリア（同期）
-    const { clearNotification } = require('@/lib/notificationUtils');
-    clearNotification();
+    // 通知クリア（旧notificationUtilsから移行）
+    localStorage.removeItem('hasNewLetter');
+    localStorage.setItem('notified', 'false');
+    localStorage.setItem('mailNotified', 'false');
+    console.log('📬 Letter page notification cleared');
     console.log('📧 Letter page visited, all notification flags cleared synchronously');
   }, [searchParams]);
 
@@ -607,13 +610,10 @@ ${catName}`
         storedLetter = getCurrentRouteLetter();
         console.log('📮 Priority 1 - Letter content:', storedLetter);
       } else if (decision.type === 'mail') {
-        inFlightMail = getInFlightMail();
-        console.log('📧 Priority 2 - Mail content (stored only):', inFlightMail);
-        
-        // 📧 mailは保存されているもののみ表示（新規生成はしない）
-        if (!inFlightMail) {
-          console.log('📧 No stored mail found for display');
-        }
+        // 📧 メール機能はスタンプカード統合で一時停止
+        // inFlightMail = getInFlightMail();
+        console.log('📧 Mail functionality disabled for stamp card integration');
+        inFlightMail = null;
       } else {
         console.log('❌ No content available to show:', decision.reason);
       }
@@ -1140,52 +1140,52 @@ Your Cat`;
         console.log('📧 WPM saved to history:', actualWPM);
       }
       
-      // ✅ 手紙読了後：ペンディングメールがあるかチェック
-      console.log('📧 Letter completion - checking for pending mail...');
-      const hasPendingMail = checkForPendingMailAfterLetterCompletion();
+      // ✅ 手紙読了後：ペンディングメールがあるかチェック（スタンプカード統合で一時停止）
+      // console.log('📧 Letter completion - checking for pending mail...');
+      // const hasPendingMail = checkForPendingMailAfterLetterCompletion();
+      
+      // if (hasPendingMail) {
+      //   console.log('📧 Found pending mail after letter completion, processing...');
+      const hasPendingMail = false; // スタンプカード統合で一時無効化
       
       if (hasPendingMail) {
-        console.log('📧 Found pending mail after letter completion, processing...');
         
-        // ペンディングキューから次のメールを処理
-        setTimeout(() => {
-          const nextItem = processNextInQueue();
-          if (nextItem) {
-            console.log(`📧 ✅ Processed pending ${nextItem.type} after letter completion`);
-            
-            // 通知表示（ページ遷移なしで通知のみ）
-            const event = new CustomEvent('pendingMailProcessed', {
-              detail: { type: nextItem.type, reason: nextItem.reason }
-            });
-            window.dispatchEvent(event);
-          }
-        }, 1000); // 1秒後に処理（手紙読了のフィードバック後）
+        // ペンディングキューから次のメールを処理（スタンプカード統合で一時停止）
+        // setTimeout(() => {
+        //   const nextItem = processNextInQueue();
+        //   if (nextItem) {
+        //     console.log(`📧 ✅ Processed pending ${nextItem.type} after letter completion`);
+        //     const event = new CustomEvent('pendingMailProcessed', {
+        //       detail: { type: nextItem.type, reason: nextItem.reason }
+        //     });
+        //     window.dispatchEvent(event);
+        //   }
+        // }, 1000); // 1秒後に処理（手紙読了のフィードバック後）
+        console.log('📧 Pending mail processing disabled for stamp card integration');
       } else {
         console.log('📧 No pending mail found after letter completion');
       }
     }
     
-    // ペンディングInFlightメールもチェック
-    const pendingInFlightMails = JSON.parse(localStorage.getItem('pendingInFlightMails') || '[]');
-    if (pendingInFlightMails.length > 0) {
-      console.log('📧 Found pending in-flight mails, processing after letter completion...');
-      
-      setTimeout(async () => {
-        for (const mailInfo of pendingInFlightMails) {
-          try {
-            const { sendInFlightMail } = await import('@/lib/sendInFlightMail');
-            await sendInFlightMail(mailInfo.leg, mailInfo.minute);
-            console.log(`📧 ✅ Processed pending in-flight mail: ${mailInfo.leg} at ${mailInfo.minute} minutes`);
-          } catch (error) {
-            console.error('📧 Failed to process pending in-flight mail:', error);
-          }
-        }
-        
-        // ペンディングリストをクリア
-        localStorage.removeItem('pendingInFlightMails');
-        console.log('📧 Cleared pending in-flight mails list');
-      }, 1500); // 1.5秒後に処理
-    }
+    // ペンディングInFlightメールもチェック（スタンプカード統合で一時停止）
+    // const pendingInFlightMails = JSON.parse(localStorage.getItem('pendingInFlightMails') || '[]');
+    // if (pendingInFlightMails.length > 0) {
+    //   console.log('📧 Found pending in-flight mails, processing after letter completion...');
+    //   setTimeout(async () => {
+    //     for (const mailInfo of pendingInFlightMails) {
+    //       try {
+    //         const { sendInFlightMail } = await import('@/lib/sendInFlightMail');
+    //         await sendInFlightMail(mailInfo.leg, mailInfo.minute);
+    //         console.log(`📧 ✅ Processed pending in-flight mail: ${mailInfo.leg} at ${mailInfo.minute} minutes`);
+    //       } catch (error) {
+    //         console.error('📧 Failed to process pending in-flight mail:', error);
+    //       }
+    //     }
+    //     localStorage.removeItem('pendingInFlightMails');
+    //     console.log('📧 Cleared pending in-flight mails list');
+    //   }, 1500);
+    // }
+    console.log('📧 In-flight mail processing disabled for stamp card integration');
   };
 
   const handleToggleTranslation = () => {

@@ -58,8 +58,11 @@ ${catName}`
   saveLetterToStorage(mailData);
   
   // 通知を表示
-  const { showNotification } = require('./notificationUtils');
-  showNotification();
+  // 通知表示（旧notificationUtilsから移行）
+  localStorage.setItem('hasNewLetter', 'true');
+  localStorage.setItem('notified', 'true');
+  localStorage.setItem('mailNotified', 'true');
+  console.log('📧 Test mail notification set');
   
   return mailData;
 }
@@ -97,8 +100,11 @@ Your traveling companion`
   localStorage.setItem("letterText", JSON.stringify(testMail));
   
   // 通知も設定
-  const { showNotification } = require('./notificationUtils');
-  showNotification();
+  // 通知表示（旧notificationUtilsから移行）
+  localStorage.setItem('hasNewLetter', 'true');
+  localStorage.setItem('notified', 'true');
+  localStorage.setItem('mailNotified', 'true');
+  console.log('📧 Test mail notification set');
   
   console.log('✅ Quick test mail saved to localStorage');
   return testMail;
