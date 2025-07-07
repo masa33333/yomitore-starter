@@ -496,7 +496,12 @@ async function generateJapaneseContent(topic: string): Promise<string[]> {
     return sampleContent;
     
   } catch (error) {
-    console.error('❌ OpenAI API error:', error);
+    console.error('❌ OpenAI API error for Japanese generation:', error);
+    console.error('❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      topic
+    });
     
     // エラー時はサンプルコンテンツを使用
     const sampleContent = generateSampleJapaneseContent(topic);
@@ -758,6 +763,10 @@ ${japaneseContent[2]}
     
   } catch (error) {
     console.error('❌ OpenAI translation API error:', error);
+    console.error('❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
     
     // エラー時はサンプル翻訳を使用
     const sampleTranslation = generateSampleEnglishTranslation(japaneseContent, level);
@@ -786,8 +795,12 @@ function generateSampleEnglishTranslation(japaneseContent: string[], level: numb
     ];
   }
   
-  // Default translation
-  return japaneseContent.map((paragraph, index) => 
-    `This is paragraph ${index + 1} about the topic. It contains interesting information that readers will find engaging and educational.`
-  );
+  // Default translation with proper length
+  const defaultTranslations = [
+    `Today we will explore an interesting topic that many people find fascinating. Learning about different subjects helps us understand the world around us better. This particular topic has many surprising facts that most people don't know about. When we study these details carefully, we can discover amazing connections between different ideas and concepts.`,
+    `There are many important aspects to consider when discussing this subject. Scientists and researchers have spent years studying these phenomena to understand how they work. The results of their investigations have revealed unexpected patterns and relationships. These discoveries have changed the way we think about many things in our daily lives.`,
+    `Understanding this topic can help us make better decisions in our personal and professional lives. The knowledge we gain from studying these concepts applies to many different situations. By learning about these ideas, we become more informed citizens and better problem solvers. This kind of education is valuable for people of all ages and backgrounds.`
+  ];
+  
+  return defaultTranslations;
 }
