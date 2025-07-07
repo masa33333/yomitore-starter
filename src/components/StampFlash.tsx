@@ -51,30 +51,30 @@ const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete }) => {
       >
         {/* 背景の白い円 */}
         <div className="absolute inset-0 rounded-full bg-white shadow-2xl opacity-90" 
-             style={{ width: '200px', height: '200px', left: '-50px', top: '-50px' }} />
+             style={{ width: '300px', height: '300px', left: '-75px', top: '-75px' }} />
+        
+        {/* 「スタンプ獲得！」テキスト */}
+        <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-center z-20">
+          <div className="bg-orange-400 text-white px-6 py-3 rounded-lg font-bold shadow-lg text-xl">
+            スタンプ獲得！
+          </div>
+        </div>
         
         {/* スタンプ画像 */}
         <Image
           src="/images/stamp.png"
           alt="スタンプ"
-          width={100}
-          height={100}
+          width={150}
+          height={150}
           className="relative z-10 drop-shadow-lg"
         />
         
         {/* キラキラエフェクト */}
         <div className="absolute inset-0 animate-pulse">
-          <div className="absolute top-2 left-2 text-yellow-400 text-2xl animate-bounce">✨</div>
-          <div className="absolute top-2 right-2 text-yellow-400 text-2xl animate-bounce delay-200">✨</div>
-          <div className="absolute bottom-2 left-2 text-yellow-400 text-2xl animate-bounce delay-400">✨</div>
-          <div className="absolute bottom-2 right-2 text-yellow-400 text-2xl animate-bounce delay-600">✨</div>
-        </div>
-        
-        {/* 「スタンプ獲得！」テキスト */}
-        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
-          <div className="bg-orange-400 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
-            スタンプ獲得！
-          </div>
+          <div className="absolute -top-4 -left-4 text-yellow-400 text-3xl animate-bounce">✨</div>
+          <div className="absolute -top-4 -right-4 text-yellow-400 text-3xl animate-bounce delay-200">✨</div>
+          <div className="absolute -bottom-4 -left-4 text-yellow-400 text-3xl animate-bounce delay-400">✨</div>
+          <div className="absolute -bottom-4 -right-4 text-yellow-400 text-3xl animate-bounce delay-600">✨</div>
         </div>
       </div>
     </div>
