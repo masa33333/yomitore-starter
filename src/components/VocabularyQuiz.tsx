@@ -269,37 +269,6 @@ export function VocabularyQuiz() {
     setShowInstructions(false);
   };
 
-  // 開発用スキップ機能
-  const handleDevSkip = (level: number) => {
-    console.log(`🚀 開発用スキップ: クイズレベル ${level} に設定`);
-    
-    // 開発用クイックスタートでは、選択したレベル（1-5）をそのまま使用
-    // level が 1-5 の範囲内であることを確認
-    const generationLevel = Math.min(Math.max(level, 1), 5);
-    
-    // ローカルストレージに保存
-    // 開発用では生成レベルをそのまま保存
-    localStorage.setItem('vocabularyLevel', generationLevel.toString());
-    localStorage.setItem('vocabLevel', generationLevel.toString());
-    localStorage.setItem('level', generationLevel.toString());
-    localStorage.setItem('fixedLevel', generationLevel.toString());
-    
-    localStorage.setItem('quizCompleted', 'true');
-    
-    // CEFR レベルも設定
-    const cefrLevel = generationLevel <= 2 ? 'A1' : generationLevel <= 3 ? 'A2' : generationLevel <= 4 ? 'B2' : 'C1';
-    localStorage.setItem('userLevel', cefrLevel);
-    
-    // 完了状態に設定
-    setFinalLevel(generationLevel);
-    setFinished(true);
-    
-    console.log(`📊 開発用設定完了:`);
-    console.log(`  選択レベル: ${level}`);
-    console.log(`  生成レベル (1-5): ${generationLevel}`);
-    console.log(`  CEFR レベル: ${cefrLevel}`);
-    console.log(`  🎯 選択したレベルがそのまま適用されます`);
-  };
 
   
 
@@ -376,8 +345,9 @@ export function VocabularyQuiz() {
 
   if (finished && finalLevel !== null) {
     return (
-      <div className="text-center">
-        <h2 className="mb-6 text-2xl font-bold text-black">判定結果</h2>
+      <div className="max-w-2xl mx-auto p-4">
+        <div className="text-center">
+          <h2 className="mb-6 text-2xl font-bold text-black">判定結果</h2>
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="mb-2 text-black">正解数: {testState.correctAnswers} / {testState.questionCount}</p>
           <p className="mb-2 text-lg font-bold text-black">
@@ -402,6 +372,7 @@ export function VocabularyQuiz() {
           >
             再テスト
           </button>
+        </div>
         </div>
       </div>
     );
@@ -468,21 +439,6 @@ export function VocabularyQuiz() {
                 テストを始める
               </button>
               
-              {/* 開発用スキップボタン */}
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600">開発用クイックスタート:</p>
-                <div className="flex gap-2 justify-center">
-                  {[1, 2, 3, 4, 5].map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => handleDevSkip(level)}
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-3 py-2 rounded text-sm transition-colors"
-                    >
-                      Lv.{level}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -492,7 +448,7 @@ export function VocabularyQuiz() {
 
   if (currentQuestion) {
     return (
-      <div className="max-w-2xl mx-auto p-4">
+      <div className="max-w-2xl mx-auto p-4 min-h-screen">
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-lg font-semibold">
