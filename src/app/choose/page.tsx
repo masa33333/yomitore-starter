@@ -156,12 +156,12 @@ export default function ChoosePage() {
         {/* 語彙レベル表示・変更セクション */}
         <div className="bg-white rounded-lg p-4 border border-gray-200 mb-6">
           <div className="flex items-center justify-between">
-            <span className="text-gray-700">
-              現在：{getGenerationLevelName(generationLevel)}
+            <span className="text-gray-700 font-bold">
+              語彙レベル：{getGenerationLevelName(generationLevel)}
             </span>
             <button
               onClick={() => setShowLevelSelector(!showLevelSelector)}
-              className="text-blue-600 hover:text-blue-800 underline text-sm"
+              className="text-gray-800 hover:text-gray-600 underline text-sm"
             >
               レベル変更
             </button>
