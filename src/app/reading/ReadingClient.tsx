@@ -563,9 +563,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const allWords = document.querySelectorAll('.clickable-word');
       allWords.forEach(element => {
         const el = element as HTMLElement;
-        el.classList.remove('active');
+        // CSSクラスを除去
+        el.classList.remove('active', 'bg-yellow-300', 'bg-yellow-200', 'bg-yellow-100');
+        // インラインスタイルを除去
         el.style.backgroundColor = '';
+        el.style.background = '';
         el.style.removeProperty('background-color');
+        el.style.removeProperty('background');
+        // 追加でCSSリセット
+        el.style.cssText = el.style.cssText.replace(/background[^;]*;?/g, '');
       });
     }, 1000);
     
@@ -857,6 +863,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         delete (target as any)._touchHandled;
       }, 100);
       
+      // タッチ直後に即座にアクティブ状態をクリア（モバイル対応）
+      setTimeout(() => {
+        target.classList.remove('active', 'bg-yellow-300', 'bg-yellow-200', 'bg-yellow-100');
+        target.style.backgroundColor = '';
+        target.style.background = '';
+      }, 50);
+      
       handleWordClick(word);
     }
   };
@@ -890,7 +903,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         return (
           <span
             key={index}
-            className={`clickable-word cursor-pointer hover:bg-yellow-200/50 active:bg-yellow-300 transition-colors duration-200 select-none ${
+            className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
               highlightedWord === part ? 'bg-yellow-300' : ''
             }`}
             title="クリックして意味を調べる"
