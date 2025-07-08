@@ -552,10 +552,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     // 単語をハイライト
     setHighlightedWord(word);
+    console.log('🟡 ハイライト開始:', word);
     
     // 1秒後にハイライトを消す
     setTimeout(() => {
       setHighlightedWord('');
+      console.log('⚫ ハイライト解除:', word);
+      
+      // 全ての単語要素から強制的にアクティブ状態を除去（モバイル対応）
+      const allWords = document.querySelectorAll('.clickable-word');
+      allWords.forEach(element => {
+        const el = element as HTMLElement;
+        el.classList.remove('active');
+        el.style.backgroundColor = '';
+        el.style.removeProperty('background-color');
+      });
     }, 1000);
     
     try {
