@@ -8,6 +8,7 @@ import { saveLetterToStorage } from '@/lib/letterStorage';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getCurrentMapImage, getFallbackMapImage, getCurrentCity } from '@/utils/mapImageUtils';
 import { mapQuizLevelToGenerationLevel } from '@/utils/getEnglishText';
+import { MiniReadingCalendar } from '@/components/ReadingCalendar';
 
 export default function MapPage() {
   const router = useRouter();
@@ -143,6 +144,25 @@ export default function MapPage() {
             className="animate-pulse rounded-xl bg-orange-400 px-8 py-4 text-lg font-semibold text-white transition-all duration-200 hover:animate-none hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
             {t('map_quiz_button').replace('📝 ', '')}
+          </button>
+        </div>
+      )}
+
+      {/* ミニカレンダー（初回訪問時は非表示） */}
+      {!isFirstVisit && (
+        <div className="absolute bottom-4 left-4 z-40">
+          <MiniReadingCalendar />
+        </div>
+      )}
+
+      {/* カレンダーページへのリンク（初回訪問時は非表示） */}
+      {!isFirstVisit && (
+        <div className="absolute bottom-4 right-4 z-40">
+          <button
+            onClick={() => router.push('/calendar')}
+            className="bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 hover:bg-white transition-colors"
+          >
+            今週の歩みを見る
           </button>
         </div>
       )}

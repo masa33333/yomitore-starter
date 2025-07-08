@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import ConditionalHeader from "@/components/ConditionalHeader";
 import ScrollController from "@/components/ScrollController";
 import AnimationPreloader from "@/components/AnimationPreloader";
+import ExitCalendarHandler from "@/components/ExitCalendarHandler";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
             <AnimationPreloader />
             <ScrollController />
             <ConditionalHeader />
+            <ExitCalendarHandler />
             <main className="min-h-screen">{children}</main>
           </PointsProvider>
         </LanguageProvider>

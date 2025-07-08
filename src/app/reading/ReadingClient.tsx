@@ -13,6 +13,8 @@ import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 import StampFlash from '@/components/StampFlash';
 import { analyzeVocabulary } from '@/constants/ngslData';
+import { playStampFanfare, playCardCompleteFanfare } from '@/lib/stampSounds';
+import { updateTodayRecord } from '@/lib/calendarData';
 
 // 単語情報のインターフェース
 interface WordInfo {
@@ -448,8 +450,39 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     };
     
     try {
+      // スタンプ獲得数を事前計算（ファンファーレ用）
+      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+      const newTotal = currentTotal + wordCount;
+      const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
+      
       const updatedProgress = completeReading(completionData);
       console.log('🎆 スタンプカード更新完了:', updatedProgress);
+      
+      // カレンダーデータを更新
+      updateTodayRecord(
+        1, // 1話読了
+        wordCount,
+        endTime && startTime ? (endTime - startTime) : 0,
+        wpm || 0,
+        selectedLevel
+      );
+      console.log('📅 カレンダーデータ更新完了');
+      
+      // スタンプ獲得時のファンファーレ再生
+      if (stampsEarned > 0) {
+        setTimeout(() => {
+          playStampFanfare(stampsEarned);
+          console.log(`🎵 ${stampsEarned}個スタンプファンファーレ再生`);
+        }, 500); // スタンプフラッシュ後に再生
+      }
+      
+      // 20個完成時の特別ファンファーレ
+      if (updatedProgress.currentCardStamps === 0 && updatedProgress.totalStamps > 0 && stampsEarned > 0) {
+        setTimeout(() => {
+          playCardCompleteFanfare();
+          console.log('🎊 カード完成ファンファーレ再生');
+        }, 1500); // スタンプファンファーレ後に再生
+      }
       
       // 新しいスタンプカードに更新通知
       notifyNewStampCardUpdate();

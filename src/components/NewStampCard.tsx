@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserProgress } from '@/lib/readingProgress';
+import { playCardCompleteFanfare } from '@/lib/stampSounds';
 import type { UserProgress } from '@/types/stampCard';
 
 interface NewStampCardProps {
@@ -47,8 +48,10 @@ export default function NewStampCard({
           }, 600);
           
           // 20個完了時のコールバック
-          if (userProgress.currentCardStamps === 20 && onComplete) {
+          if (userProgress.currentCardStamps === 0 && userProgress.totalStamps > 0 && onComplete) {
             setTimeout(() => {
+              playCardCompleteFanfare();
+              console.log('🎊 NewStampCard: カード完成ファンファーレ再生');
               onComplete();
             }, 1000);
           }
