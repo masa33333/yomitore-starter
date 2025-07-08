@@ -1385,12 +1385,76 @@ src/app/reading/ReadingClient.tsx         - スタンプカード表示追加
 * [x] **読了後スタンプカード表示修正 (2025-07-07 COMPLETED)**
 * [x] **エラーログ強化・診断機能向上 (2025-07-07 COMPLETED)**
 * [x] **アニメーションキャッシュシステム実装 (2025-07-07 COMPLETED)**
+* [x] **モバイル版単語ハイライト持続問題修正 (2025-07-08 COMPLETED)**
 * [ ] TTS Phase 2: 段階的生成・音声圧縮（コスト最適化）
 * [ ] TTS Phase 3: 再生速度調整・スクロール同期（UX向上）
 * [ ] Adjust cat/flag positions on map so Tokyo & Seoul markers do not overlap popup
 * [ ] Replace static map with react‑leaflet + dynamic zoom
 * [ ] Ensure `vocabLevel` propagates to generateReading()
 * [ ] Remove legacy cat emoji overlay
+
+---
+
+## 📋 Work Session Summary (2025-07-08)
+
+### ✅ Completed Today
+
+**モバイル版単語ハイライト持続問題完全修正** - タップ後の黄色ハイライトが残り続ける問題を根本解決
+
+#### Task 1: モバイル単語ハイライト持続問題の修正
+- **File**: `src/app/reading/ReadingClient.tsx`
+- **Problem**: モバイル版で単語をタップすると黄色いハイライトがずっと残り続ける
+- **Root Cause**: タッチイベント後のCSS状態が完全にクリアされていなかった
+- **Solution**: 
+  - ハイライト解除時に全ての`clickable-word`要素から強制的にアクティブ状態を除去
+  - `removeProperty('background-color')`でCSS完全リセット
+  - 重複タイムアウト処理を統一化
+
+#### 修正内容
+```typescript
+// 1秒後にハイライトを消す
+setTimeout(() => {
+  setHighlightedWord('');
+  console.log('⚫ ハイライト解除:', word);
+  
+  // 全ての単語要素から強制的にアクティブ状態を除去（モバイル対応）
+  const allWords = document.querySelectorAll('.clickable-word');
+  allWords.forEach(element => {
+    const el = element as HTMLElement;
+    el.classList.remove('active');
+    el.style.backgroundColor = '';
+    el.style.removeProperty('background-color');
+  });
+}, 1000);
+```
+
+### 🎯 Technical Achievements
+
+1. **統一されたハイライト解除**: 全highlight除去処理を`handleWordClick`に集約
+2. **完全なCSS状態リセット**: `removeProperty`使用で確実なスタイルクリア
+3. **重複処理除去**: タッチハンドラーの冗長タイムアウトを削除
+4. **モバイル最適化**: DOM操作によるハードウェア固有の問題解決
+
+### 🎯 Current System Status
+
+- **モバイル単語タップ**: ✅ 1秒後に確実にハイライト除去
+- **タッチ感度**: ✅ 誤タップ防止システム（100ms・10px判定）
+- **マイノート機能**: ✅ 完全動作（APIエンドポイント復元済み）
+- **読書体験**: ✅ スムーズなスクロール・タップ操作
+
+### 🎉 Major Achievement
+
+**モバイル版読書アプリの完全最適化完了**: 
+- ✅ 単語タップ → 1秒黄色ハイライト → 確実に通常色復帰
+- ✅ 誤タップ防止でスクロール快適性確保
+- ✅ マイノート機能完全動作
+- ✅ 全UI要素でレスポンシブ対応
+
+### 📁 Modified Files Today
+
+```
+src/app/reading/ReadingClient.tsx - モバイルハイライト持続問題修正
+```
 
 ---
 
