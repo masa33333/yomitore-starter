@@ -46,7 +46,7 @@ export function VocabularyQuiz() {
     return 5;                          // Quiz 9-10 → Lv.5 (上級 C1+)
   };
 
-  // 最終的な語彙レベルを計算する関数
+  // 最終的な語彙レベルを計算する関数（1-5段階制）
   const calculateFinalLevel = useCallback((levelHistory: any[], correctAnswers: number, questionCount: number) => {
     // 全体の正答率ベースの判定
     const overallAccuracy = correctAnswers / questionCount;
@@ -66,13 +66,15 @@ export function VocabularyQuiz() {
       }
     }
     
-    // 各レベルで70%以上の正答率があるかチェック
+    // 各レベルで70%以上の正答率があるかチェック（1-10レベル → 1-5レベルにマップ）
     for (let level = 1; level <= 10; level++) {
       const stats = levelStats[level];
       if (stats && stats.total >= 1) { // 最低1問はそのレベルを経験
         const accuracy = stats.correct / stats.total;
         if (accuracy >= 0.7) { // 70%以上の正答率
-          stableLevel = level;
+          // 10段階 → 5段階にマッピング
+          const mappedLevel = mapQuizLevelToGenerationLevel(level);
+          stableLevel = Math.max(stableLevel, mappedLevel);
         }
       }
     }
@@ -82,7 +84,7 @@ export function VocabularyQuiz() {
     
     if (overallAccuracy >= 0.85) {
       // 85%以上: 安定レベル + 1
-      finalLevel = Math.min(10, stableLevel + 1);
+      finalLevel = Math.min(5, stableLevel + 1);
     } else if (overallAccuracy >= 0.75) {
       // 75%以上: 安定レベル
       finalLevel = stableLevel;
@@ -94,25 +96,25 @@ export function VocabularyQuiz() {
       finalLevel = Math.max(1, stableLevel - 2);
     } else {
       // 50%未満: 大幅減点
-      finalLevel = Math.max(1, Math.min(2, stableLevel - 3));
+      finalLevel = Math.max(1, Math.min(2, stableLevel - 2));
     }
     
-    // 正解数による下限制限（より厳格に）
+    // 正解数による下限制限（1-5段階制に修正）
     let minLevel = 1;
     if (correctAnswers >= 13) {
-      minLevel = 8; // 13問以上で生成Lv.4
+      minLevel = 4; // 13問以上で最低Lv.4
     } else if (correctAnswers >= 11) {
-      minLevel = 6; // 11問以上で生成Lv.3
+      minLevel = 3; // 11問以上で最低Lv.3
     } else if (correctAnswers >= 9) {
-      minLevel = 4; // 9問以上で生成Lv.2
+      minLevel = 2; // 9問以上で最低Lv.2
     } else if (correctAnswers >= 6) {
-      minLevel = 2; // 6問以上で生成Lv.1
+      minLevel = 1; // 6問以上で最低Lv.1
     }
     
     finalLevel = Math.max(minLevel, finalLevel);
-    finalLevel = Math.min(10, finalLevel);
+    finalLevel = Math.min(5, finalLevel); // 最大5に制限
     
-    console.log('📊 レベル計算詳細:', {
+    console.log('📊 レベル計算詳細 (1-5段階制):', {
       correctAnswers,
       questionCount,
       overallAccuracy: (overallAccuracy * 100).toFixed(1) + '%',
