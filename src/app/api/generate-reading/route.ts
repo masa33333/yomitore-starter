@@ -674,10 +674,10 @@ function generateSampleStoryContent(
 async function translateWithVocabularyControl(japaneseContent: string[], level: number): Promise<string[]> {
   console.log(`🔤 Translating to English with Level ${level} vocabulary control`);
   
-  // NGSL語彙レベル範囲の設定
+  // NGSL語彙レベル範囲の設定（レベル1-2は非常に厳格）
   const vocabularyRanges = {
-    1: { rangeStart: 1, rangeMid: 500, rangeEnd: 800 },
-    2: { rangeStart: 1, rangeMid: 750, rangeEnd: 1200 },
+    1: { rangeStart: 1, rangeMid: 300, rangeEnd: 500 },    // 超基本語彙のみ
+    2: { rangeStart: 1, rangeMid: 500, rangeEnd: 800 },    // 基本語彙のみ（厳格）
     3: { rangeStart: 1, rangeMid: 1000, rangeEnd: 1500 },
     4: { rangeStart: 1, rangeMid: 1500, rangeEnd: 2500 },
     5: { rangeStart: 1, rangeMid: 2000, rangeEnd: 4000 }
@@ -695,7 +695,7 @@ ${japaneseContent[2]}
 ■ 語彙レベル: Level ${level}（NGSL ${range.rangeStart}–${range.rangeEnd}）
 
 ■ 指示:
-- 使用語彙の80%以上を ${range.rangeStart}–${range.rangeMid} の範囲から選ぶこと
+- 使用語彙の95%以上を ${range.rangeStart}–${range.rangeMid} の範囲から選ぶこと
 - 難語の多用を避け、自然な英文にすること
 - 各段落の長さ・雰囲気を保持
 - 専門家がわかりやすく説明しているスタイルを維持
@@ -703,6 +703,11 @@ ${japaneseContent[2]}
 - "said", "asked", "replied", "A told B"等の会話表現禁止
 - 翻訳時も必ずファクトチェックを行い、事実に基づいた正確な情報のみを使用する
 - 科学的根拠がない情報や推測に基づく内容は含めない
+${level <= 2 ? `
+■ Level ${level} 禁止語彙（絶対に使用しない）:
+evolve, evolution, prevalence, essential, expand, indispensable, emphasize, crucial, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor
+■ Level ${level} 推奨語彙（積極的に使用）:
+is, are, was, were, have, has, had, do, does, did, can, could, will, would, may, might, must, should, get, got, go, went, come, came, see, saw, know, knew, think, thought, want, wanted, like, liked, need, needed, help, helped, work, worked, play, played, live, lived, look, looked, feel, felt, make, made, take, took, give, gave, find, found, tell, told, ask, asked, try, tried, use, used, put, put, run, ran, move, moved, turn, turned, start, started, stop, stopped, open, opened, close, closed, read, read, write, wrote, listen, listened, speak, spoke, learn, learned, teach, taught, study, studied, eat, ate, drink, drank, sleep, slept, walk, walked, sit, sat, stand, stood, buy, bought, sell, sold, pay, paid, cost, cost, spend, spent` : ''}
 - 出力は JSON 形式で、各段落を配列に：
 
 出力例：
