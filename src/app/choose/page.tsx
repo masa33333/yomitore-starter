@@ -78,17 +78,32 @@ export default function ChoosePage() {
 
   useEffect(() => {
     try {
-      // localStorageからクイズレベル（1-10）を取得
-      const savedVocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || localStorage.getItem('level');
-      if (savedVocabLevel) {
+      // 現在の語彙システムは1-5レベル直接使用
+      // まず生成レベル（1-5）を優先して取得
+      const savedLevel = localStorage.getItem('level') || localStorage.getItem('fixedLevel');
+      const savedVocabLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel');
+      
+      if (savedLevel) {
+        const levelNumber = Number(savedLevel);
+        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 5) {
+          // 1-5レベルをそのまま使用（マッピング不要）
+          setGenerationLevel(levelNumber);
+          setQuizLevel(levelNumber); // 表示用も同じに
+          console.log(`📊 Choose画面: 生成レベル Lv.${levelNumber} (直接使用)`);
+        }
+      } else if (savedVocabLevel) {
         const levelNumber = Number(savedVocabLevel);
-        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 10) {
-          // クイズレベルを設定
+        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 5) {
+          // 1-5の範囲内ならそのまま使用
+          setGenerationLevel(levelNumber);
           setQuizLevel(levelNumber);
-          // 生成レベルにマッピング
+          console.log(`📊 Choose画面: 語彙レベル Lv.${levelNumber} (直接使用)`);
+        } else if (levelNumber >= 6 && levelNumber <= 10) {
+          // 6-10の場合のみマッピング（古いデータ対応）
           const mappedLevel = mapQuizLevelToGenerationLevel(levelNumber);
           setGenerationLevel(mappedLevel);
-          console.log(`📊 Choose画面: クイズLv.${levelNumber} → 生成Lv.${mappedLevel}`);
+          setQuizLevel(levelNumber);
+          console.log(`📊 Choose画面: 旧クイズLv.${levelNumber} → 生成Lv.${mappedLevel} (互換性)`);
         }
       }
     } catch (error) {

@@ -137,26 +137,24 @@ export function VocabularyQuiz() {
       setFinalLevel(finalQuizLevel);
       setFinished(true);
       
-      // 生成用レベル（1-5）を計算
-      const generationLevel = mapQuizLevelToGenerationLevel(finalQuizLevel);
+      // 現在のクイズシステムは1-5レベル直接なので、マッピング不要
+      const generationLevel = finalQuizLevel; // そのまま使用
       
-      // ローカルストレージに保存
-      // クイズレベル（1-10）を保存
-      localStorage.setItem('vocabularyLevel', finalQuizLevel.toString());
-      localStorage.setItem('vocabLevel', finalQuizLevel.toString());
-      
-      // 生成レベル（1-5）を保存
+      // ローカルストレージに保存（すべて同じレベル値で統一）
+      localStorage.setItem('vocabularyLevel', generationLevel.toString());
+      localStorage.setItem('vocabLevel', generationLevel.toString());
       localStorage.setItem('level', generationLevel.toString());
       localStorage.setItem('fixedLevel', generationLevel.toString());
       
       localStorage.setItem('userLevel', cefrLevel); // CEFR レベルを保存
       localStorage.setItem('quizCompleted', 'true'); // クイズ完了フラグ
       
-      // 開発用: レベル履歴をコンソールに出力
-      console.log('📊 レベルマッピング結果:');
-      console.log('  内部クイズレベル (1-10):', finalQuizLevel);
-      console.log('  表示用生成レベル (1-5):', generationLevel);
+      // 開発用: レベル結果をコンソールに出力
+      console.log('📊 語彙レベル判定結果:');
+      console.log('  判定レベル (1-5):', finalQuizLevel);
+      console.log('  生成レベル (1-5):', generationLevel);
       console.log('  CEFR レベル:', cefrLevel);
+      console.log('  🎯 判定レベルがそのまま適用されます');
       console.log('レベル変化履歴:', state.levelHistory);
     } catch (error) {
       console.error('テスト終了処理エラー:', error);
