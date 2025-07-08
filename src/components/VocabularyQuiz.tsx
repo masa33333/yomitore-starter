@@ -273,9 +273,39 @@ export function VocabularyQuiz() {
     setShowInstructions(false);
   };
 
-
-  
-
+  // 音を鳴らす関数
+  const playSound = (type: 'correct' | 'incorrect') => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      if (type === 'correct') {
+        // 正解音：明るい上昇音（ド→ミ→ソ）
+        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+        oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.4);
+      } else {
+        // 不正解音：低い下降音（ソ→ミ→ド）
+        oscillator.frequency.setValueAtTime(392.00, audioContext.currentTime); // G4
+        oscillator.frequency.setValueAtTime(329.63, audioContext.currentTime + 0.15); // E4
+        oscillator.frequency.setValueAtTime(261.63, audioContext.currentTime + 0.3); // C4
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+      }
+    } catch (error) {
+      console.log('Audio playback not supported or failed:', error);
+    }
+  };
 
   const handleAnswer = (choice: string) => {
     if (selectedAnswer || !currentQuestion) return;
@@ -284,6 +314,9 @@ export function VocabularyQuiz() {
     setSelectedAnswer(choice);
 
     console.log(`📝 回答: ${currentQuestion.word} -> ${choice} (${isCorrect ? '正解' : '不正解'})`);
+
+    // 正解・不正解の音を鳴らす
+    playSound(isCorrect ? 'correct' : 'incorrect');
 
     // テスト状態を更新
     const newTestState = {
