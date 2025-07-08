@@ -43,6 +43,7 @@ export default function ChoosePage() {
   // クイズレベル（1-10）と生成レベル（1-5）を分けて管理
   const [quizLevel, setQuizLevel] = useState<number>(5);
   const [generationLevel, setGenerationLevel] = useState<number>(3);
+  const [showLevelSelector, setShowLevelSelector] = useState<boolean>(false);
 
   // 表示テキストの定義
   const text = {
@@ -112,6 +113,21 @@ export default function ChoosePage() {
     }
   }, []);
 
+  // レベル変更処理
+  const handleLevelChange = (newLevel: number) => {
+    setGenerationLevel(newLevel);
+    setQuizLevel(newLevel); // 表示用も同じに
+    
+    // localStorageに即座に保存
+    localStorage.setItem('level', newLevel.toString());
+    localStorage.setItem('fixedLevel', newLevel.toString());
+    localStorage.setItem('vocabLevel', newLevel.toString());
+    localStorage.setItem('vocabularyLevel', newLevel.toString());
+    
+    console.log(`📊 レベル変更: Lv.${newLevel}に設定`);
+    setShowLevelSelector(false); // 選択後は閉じる
+  };
+
   // カードクリック時の遷移処理
   const handleCardClick = (type: 'reading' | 'story') => {
     // 生成レベル（1-5）を保存 - APIがこれを使用
@@ -132,9 +148,50 @@ export default function ChoosePage() {
 
   return (
     <main className="mx-auto max-w-4xl p-4 min-h-screen">
-      <h1 className="mb-6 mt-8 text-xl font-bold">
-        {text.title[displayLang]}（{getGenerationLevelName(generationLevel)}）
-      </h1>
+      <div className="mb-6 mt-8">
+        <h1 className="text-xl font-bold mb-4">
+          {text.title[displayLang]}
+        </h1>
+        
+        {/* 語彙レベル表示・変更セクション */}
+        <div className="bg-white rounded-lg p-4 border border-gray-200 mb-6">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-700">
+              現在：{getGenerationLevelName(generationLevel)}
+            </span>
+            <button
+              onClick={() => setShowLevelSelector(!showLevelSelector)}
+              className="text-blue-600 hover:text-blue-800 underline text-sm"
+            >
+              レベル変更
+            </button>
+          </div>
+          
+          {/* レベル選択UI */}
+          {showLevelSelector && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-sm text-gray-600 mb-3">語彙レベルを選択してください：</p>
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map(level => (
+                  <label key={level} className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="vocabularyLevel"
+                      value={level}
+                      checked={generationLevel === level}
+                      onChange={() => handleLevelChange(level)}
+                      className="mr-3"
+                    />
+                    <span className={`${generationLevel === level ? 'font-semibold text-blue-600' : 'text-gray-700'}`}>
+                      {getGenerationLevelName(level)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       
       {/* コンテンツタイプ選択カード */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
