@@ -720,8 +720,50 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleLevelChange = () => {
     console.log('🔄 レベル変更ボタンがクリックされました');
     console.log('現在のshowLevelSelector:', showLevelSelector);
-    setShowLevelSelector(!showLevelSelector);
-    console.log('変更後のshowLevelSelector:', !showLevelSelector);
+    const newShowState = !showLevelSelector;
+    setShowLevelSelector(newShowState);
+    console.log('変更後のshowLevelSelector:', newShowState);
+    
+    // レベル選択UIが表示される場合のみスクロール
+    if (newShowState) {
+      setTimeout(() => {
+        // レベル選択UIまでスムーズにスクロール
+        const levelSelectorElement = document.querySelector('[data-level-selector]');
+        if (levelSelectorElement) {
+          levelSelectorElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 100); // DOMの更新を待つため少し遅延
+    }
+  };
+
+  // もう一度読む処理（読書状態をリセットして読み始める画面に戻る）
+  const handleReadAgain = () => {
+    console.log('🔄 もう一度読むボタンがクリックされました');
+    
+    // 読書状態をリセット
+    setIsReadingStarted(false);
+    setStartTime(null);
+    setEndTime(null);
+    setWpm(null);
+    setSessionWords([]);
+    setWordInfo(null);
+    setSelectedWord('');
+    setLoadingWordInfo(false);
+    setHighlightedWord('');
+    setShowJapanese(false);
+    setShowLevelSelector(false);
+    
+    // 状態保存をクリア
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('currentReadingStarted');
+      localStorage.removeItem('currentSessionWords');
+      localStorage.removeItem('currentReadingState');
+    }
+    
+    console.log('✅ 読書状態リセット完了 - 読み始める画面に戻りました');
   };
   
   // レベル再生成処理
@@ -991,9 +1033,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         {mode === 'story' && searchParams.genre && (
           <p className="text-sm text-gray-600">ジャンル: {searchParams.genre}</p>
         )}
-        {mode !== 'story' && searchParams.topic && (
-          <p className="text-sm text-gray-600">テーマ: {searchParams.topic}</p>
-        )}
       </div>
 
       {/* コンテンツ表示 */}
@@ -1095,7 +1134,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           {endTime && (
             <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-6 shadow-sm">
               <h3 className="mb-3 font-semibold text-text-primary">読書完了！</h3>
-              <div className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-3">
+              <div className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 <div>
                   <p className="text-sm text-gray-600">語数</p>
                   <p className="text-lg font-bold">{wordCount} 語</p>
@@ -1118,8 +1157,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                       ) : (
                         <span>
                           Lv.{selectedLevel} 
-                          <span className="text-sm text-red-600 ml-1">
-                            (実際: Lv.{actualLevel})
+                          <span className="text-sm text-black ml-1">
+                            (判定レベル: Lv.{actualLevel})
                           </span>
                         </span>
                       )
@@ -1152,6 +1191,35 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                         return `${hours}時間${minutes}分`;
                       } else {
                         return `${minutes}分`;
+                      }
+                    })()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">累計語数</p>
+                  <p className="text-lg font-bold">
+                    {(() => {
+                      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+                      const newTotal = currentTotal + wordCount;
+                      localStorage.setItem('totalWordsRead', newTotal.toString());
+                      return `${newTotal.toLocaleString()} 語`;
+                    })()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">スタンプ進捗</p>
+                  <p className="text-lg font-bold">
+                    {(() => {
+                      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+                      const newTotal = currentTotal + wordCount;
+                      const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
+                      const totalStamps = Math.floor(newTotal / 100);
+                      const nextStampAt = ((Math.floor(newTotal / 100) + 1) * 100) - newTotal;
+                      
+                      if (stampsEarned > 0) {
+                        return `+${stampsEarned}個獲得！（${totalStamps}個）`;
+                      } else {
+                        return `あと${nextStampAt}語で+1個`;
                       }
                     })()}
                   </p>
@@ -1245,17 +1313,24 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               </div>
               
               <div className="space-y-3">
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={handleReadAgain}
+                    className="rounded-md bg-green-500 px-4 py-2 font-medium text-white transition-colors hover:bg-green-600"
+                  >
+                    もう一度読む
+                  </button>
+                  
                   <button
                     onClick={handleLevelChange}
-                    className="flex-1 rounded-md bg-primary-active px-4 py-2 font-medium text-text-primary transition-colors hover:bg-[#e5a561]"
+                    className="rounded-md bg-primary-active px-4 py-2 font-medium text-text-primary transition-colors hover:bg-[#e5a561]"
                   >
                     レベル変更
                   </button>
                   
                   <button
                     onClick={() => router.push('/choose')}
-                    className="flex-1 rounded-md bg-[#FFE1B5] px-4 py-2 font-medium text-text-primary transition-colors hover:bg-[#f0d1a0]"
+                    className="rounded-md bg-[#FFE1B5] px-4 py-2 font-medium text-text-primary transition-colors hover:bg-[#f0d1a0]"
                   >
                     他のものを読む
                   </button>
@@ -1263,7 +1338,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 
                 {/* レベル選択UI */}
                 {showLevelSelector && (
-                  <div className="rounded-lg border-2 border-orange-400 bg-white p-4 shadow-lg">
+                  <div 
+                    data-level-selector
+                    className="rounded-lg border-2 border-orange-400 bg-white p-4 shadow-lg"
+                  >
                     <h4 className="mb-3 text-center font-bold text-lg text-black">語彙レベルを選択</h4>
                     <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5].map((level) => (

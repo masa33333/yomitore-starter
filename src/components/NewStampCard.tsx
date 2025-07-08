@@ -98,7 +98,7 @@ export default function NewStampCard({
         style={{ backgroundColor: '#fcd8a8' }}
       >
         <div className="flex-1 text-xs text-black leading-relaxed pr-3">
-          一つ読むごとにスタンプ進呈。<br/>
+          100語読むごとにスタンプ進呈。<br/>
           20個たまると{catName}からメールが届きます。
         </div>
         

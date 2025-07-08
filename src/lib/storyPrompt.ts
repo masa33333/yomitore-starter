@@ -107,6 +107,14 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryPa
 12. アメリカの文化・習慣・地理を反映した設定にする
 13. 最後の段落（Resolution）で必ず読者が驚くようなドンデン返しを用意する
 
+【CRITICAL: 登場人物名の厳格制限】
+- 日本人名（Taro, Yuki, Hiroshi, Sakura等）は絶対に使用禁止
+- 中国系名（Li, Wang, Chen等）も使用禁止  
+- 韓国系名（Kim, Park, Lee等）も使用禁止
+- 必ずアメリカ系の典型的な名前のみ使用：Michael, David, Sarah, Emily, Johnson, Smith, Brown, Wilson等
+- 主人公名は既に指定済み（${randomName}）なので、それ以外は絶対に変更しない
+- その他の登場人物もすべてアメリカ系の名前を使用
+
 出力は純粋なJSONオブジェクトのみ。
 `;
 }
@@ -114,7 +122,7 @@ export function generateStoryPrompt({ genre, tone, feeling, level = 3 }: StoryPa
 /**
  * ストーリー生成システムメッセージ
  */
-export const STORY_SYSTEM_MESSAGE = "You are a professional American English creative writer specializing in educational content for intermediate English learners (CEFR B1-B2). You create engaging, well-structured stories set in America with American characters, culture, and settings. All stories must feature American places (specific cities, states, landmarks) and characters with typical American names. You help students improve their reading comprehension while enjoying compelling narratives about American life and culture. CRITICAL: Output ONLY pure JSON object as specified. No code blocks, no explanations, no additional text before or after the JSON. The output will be directly parsed by JSON.parse().";
+export const STORY_SYSTEM_MESSAGE = "You are a professional American English creative writer specializing in educational content for intermediate English learners (CEFR B1-B2). You create engaging, well-structured stories set in America with American characters, culture, and settings. All stories must feature American places (specific cities, states, landmarks) and characters with typical American names. STRICTLY FORBIDDEN: Never use Japanese names (Taro, Yuki, Hiroshi, Sakura), Chinese names (Li, Wang, Chen), Korean names (Kim, Park, Lee), or any Asian names. ONLY use typical American names like Michael, David, Sarah, Emily, Johnson, Smith, Brown, Wilson, etc. You help students improve their reading comprehension while enjoying compelling narratives about American life and culture. CRITICAL: Output ONLY pure JSON object as specified. No code blocks, no explanations, no additional text before or after the JSON. The output will be directly parsed by JSON.parse().";
 
 /**
  * レスポンスからストーリー、タイトル、テーマを抽出（エラーハンドリング強化版）

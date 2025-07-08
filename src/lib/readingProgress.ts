@@ -77,12 +77,13 @@ function migrateFromLegacySystem(): UserProgress {
   const legacyReadings = parseInt(localStorage.getItem(STORAGE_KEYS.COMPLETED_READINGS) || '0', 10);
   
   progress.totalWords = legacyWords;
-  progress.totalStamps = legacyReadings; // 1読了 = 1スタンプ
-  progress.currentCardStamps = legacyReadings % 20;
-  progress.completedCards = Math.floor(legacyReadings / 20);
+  // 100語毎にスタンプ1個の新システムに変更
+  progress.totalStamps = Math.floor(legacyWords / 100);
+  progress.currentCardStamps = progress.totalStamps % 20;
+  progress.completedCards = Math.floor(progress.totalStamps / 20);
   
-  // コインとトロフィーを計算
-  progress.bronzeCoins = Math.floor(legacyReadings / 10);
+  // コインとトロフィーを計算（新しいスタンプ数ベース）
+  progress.bronzeCoins = Math.floor(progress.totalStamps / 10);
   progress.bronzeTrophies = Math.floor(progress.completedCards / 5);
   progress.silverTrophies = Math.floor(progress.bronzeTrophies / 5);
   progress.goldTrophies = Math.floor(progress.silverTrophies / 5);
@@ -224,11 +225,30 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   // 1. 既存進捗データを取得（日付チェックは行わない）
   let progress = getUserProgress();
   
-  // 2. 基本進捗更新
+  // 2. 読書前の累計語数を記録
+  const previousTotalWords = progress.totalWords;
+  
+  // 3. 基本進捗更新
   progress.totalWords += data.wordCount;
-  progress.totalStamps += 1;
-  progress.currentCardStamps = progress.totalStamps % 20;
   progress.dailyStoriesRead += 1;
+  
+  // 4. 100語毎のスタンプ計算
+  const previousStampCount = Math.floor(previousTotalWords / 100);
+  const newStampCount = Math.floor(progress.totalWords / 100);
+  const newStampsEarned = newStampCount - previousStampCount;
+  
+  console.log('📊 Stamp calculation:', {
+    previousWords: previousTotalWords,
+    newWords: progress.totalWords,
+    addedWords: data.wordCount,
+    previousStamps: previousStampCount,
+    newStampTotal: newStampCount,
+    stampsEarned: newStampsEarned
+  });
+  
+  // 5. スタンプ数更新
+  progress.totalStamps = newStampCount;
+  progress.currentCardStamps = progress.totalStamps % 20;
   
   // 3. カード完成チェック
   if (progress.currentCardStamps === 0 && progress.totalStamps > 0) {
@@ -245,27 +265,37 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   // 6. 連続読書達成メッセージの記録（読書完了時）
   recordConsecutiveReadingMessage(progress);
   
-  // 7. スタンプデータ作成・保存
-  const stamp: StampData = {
-    id: generateStampId(),
-    completionDate: data.completionDate || new Date().toISOString(),
-    wordCount: data.wordCount,
-    level: data.level,
-    sessionDuration: data.duration,
-    wpm: data.wpm,
-    title: data.title,
-    contentType: data.contentType,
-  };
+  // 7. スタンプデータ作成・保存（獲得した数だけ作成）
+  const stamps = getStampCardData();
   
-  // ボーナススタンプかチェック
-  if (shouldAwardBonusStamp(progress)) {
-    stamp.isBonusStamp = true;
-    stamp.bonusType = getBonusType(progress);
+  // 獲得したスタンプ数分だけスタンプデータを作成
+  for (let i = 0; i < newStampsEarned; i++) {
+    const stamp: StampData = {
+      id: generateStampId(),
+      completionDate: data.completionDate || new Date().toISOString(),
+      wordCount: data.wordCount, // 今回読了した語数
+      level: data.level,
+      sessionDuration: data.duration,
+      wpm: data.wpm,
+      title: data.title,
+      contentType: data.contentType,
+    };
+    
+    // ボーナススタンプかチェック
+    if (shouldAwardBonusStamp(progress)) {
+      stamp.isBonusStamp = true;
+      stamp.bonusType = getBonusType(progress);
+    }
+    
+    stamps.push(stamp);
   }
   
-  const stamps = getStampCardData();
-  stamps.push(stamp);
   saveStampCardData(stamps);
+  
+  // 獲得したスタンプ数をログ出力
+  if (newStampsEarned > 0) {
+    console.log(`🌟 ${newStampsEarned}個のスタンプを獲得！（${data.wordCount}語読了）`);
+  }
   
   // 8. 履歴保存（既存システム）
   saveToHistory({
