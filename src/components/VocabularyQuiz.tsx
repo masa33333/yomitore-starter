@@ -99,29 +99,31 @@ export function VocabularyQuiz() {
       finalLevel = Math.max(1, Math.min(2, stableLevel - 2));
     }
     
-    // 正解数による下限制限（1-5段階制に修正）
-    let minLevel = 1;
+    // 正解数による厳格な制限（1-5段階制、レベル5は非常に厳しく）
+    let finalLevelByCorrectAnswers = 1;
     if (correctAnswers >= 14) {
-      minLevel = 5; // 14問以上で最低Lv.5（1問不正解まで）
+      finalLevelByCorrectAnswers = 5; // 14問以上で最低Lv.5（1問不正解まで）
     } else if (correctAnswers >= 13) {
-      minLevel = 4; // 13問で最低Lv.4
+      finalLevelByCorrectAnswers = 4; // 13問で最低Lv.4
     } else if (correctAnswers >= 11) {
-      minLevel = 3; // 11-12問で最低Lv.3
+      finalLevelByCorrectAnswers = 3; // 11-12問で最低Lv.3
     } else if (correctAnswers >= 9) {
-      minLevel = 2; // 9-10問で最低Lv.2
+      finalLevelByCorrectAnswers = 2; // 9-10問で最低Lv.2
     } else if (correctAnswers >= 6) {
-      minLevel = 1; // 6-8問で最低Lv.1
+      finalLevelByCorrectAnswers = 1; // 6-8問で最低Lv.1
     }
     
-    finalLevel = Math.max(minLevel, finalLevel);
+    // 正解数基準と計算結果のうち、低い方を採用（厳格化）
+    finalLevel = Math.min(finalLevel, finalLevelByCorrectAnswers);
     finalLevel = Math.min(5, finalLevel); // 最大5に制限
     
-    console.log('📊 レベル計算詳細 (1-5段階制):', {
+    console.log('📊 レベル計算詳細 (1-5段階制・厳格版):', {
       correctAnswers,
       questionCount,
       overallAccuracy: (overallAccuracy * 100).toFixed(1) + '%',
       stableLevel,
-      minLevel,
+      calculatedLevel: finalLevel,
+      correctAnswersLevel: finalLevelByCorrectAnswers,
       finalLevel,
       levelStats,
       levelHistory: levelHistory.map(h => `L${h.level}:${h.correct ? '○' : '×'}`).join(' ')
