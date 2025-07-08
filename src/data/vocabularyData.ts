@@ -114,7 +114,6 @@ export const vocabularyData = {
     { word: "culminate", meaning: "頂点に達する", options: ["開始する", "頂点に達する", "衰退する", "停滞する"] },
     { word: "exemplify", meaning: "例示する", options: ["隠す", "例示する", "否定する", "混乱させる"] },
     { word: "intrinsic", meaning: "本質的な", options: ["外的な", "本質的な", "表面的な", "偶発的な"] },
-    { word: "paradigm", meaning: "パラダイム", options: ["例外", "パラダイム", "偶然", "異常"] },
     { word: "pervasive", meaning: "広がった", options: ["限定的な", "広がった", "局所的な", "希少な"] },
     { word: "synthesize", meaning: "統合する", options: ["分析する", "統合する", "分解する", "分離する"] },
     { word: "ubiquitous", meaning: "遍在する", options: ["稀な", "遍在する", "限定的な", "偶発的な"] }

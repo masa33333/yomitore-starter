@@ -101,14 +101,16 @@ export function VocabularyQuiz() {
     
     // 正解数による下限制限（1-5段階制に修正）
     let minLevel = 1;
-    if (correctAnswers >= 13) {
-      minLevel = 4; // 13問以上で最低Lv.4
+    if (correctAnswers >= 14) {
+      minLevel = 5; // 14問以上で最低Lv.5（1問不正解まで）
+    } else if (correctAnswers >= 13) {
+      minLevel = 4; // 13問で最低Lv.4
     } else if (correctAnswers >= 11) {
-      minLevel = 3; // 11問以上で最低Lv.3
+      minLevel = 3; // 11-12問で最低Lv.3
     } else if (correctAnswers >= 9) {
-      minLevel = 2; // 9問以上で最低Lv.2
+      minLevel = 2; // 9-10問で最低Lv.2
     } else if (correctAnswers >= 6) {
-      minLevel = 1; // 6問以上で最低Lv.1
+      minLevel = 1; // 6-8問で最低Lv.1
     }
     
     finalLevel = Math.max(minLevel, finalLevel);
