@@ -99,18 +99,18 @@ export function VocabularyQuiz() {
       finalLevel = Math.max(1, Math.min(2, stableLevel - 2));
     }
     
-    // 正解数による厳格な制限（1-5段階制、レベル5は非常に厳しく）
+    // 正解数による制限（1-5段階制、レベル5は厳しく、他は適度に）
     let finalLevelByCorrectAnswers = 1;
     if (correctAnswers >= 14) {
-      finalLevelByCorrectAnswers = 5; // 14問以上で最低Lv.5（1問不正解まで）
-    } else if (correctAnswers >= 13) {
-      finalLevelByCorrectAnswers = 4; // 13問で最低Lv.4
-    } else if (correctAnswers >= 11) {
-      finalLevelByCorrectAnswers = 3; // 11-12問で最低Lv.3
-    } else if (correctAnswers >= 9) {
-      finalLevelByCorrectAnswers = 2; // 9-10問で最低Lv.2
-    } else if (correctAnswers >= 6) {
-      finalLevelByCorrectAnswers = 1; // 6-8問で最低Lv.1
+      finalLevelByCorrectAnswers = 5; // 14問以上でLv.5（1問不正解まで）
+    } else if (correctAnswers >= 12) {
+      finalLevelByCorrectAnswers = 4; // 12-13問でLv.4
+    } else if (correctAnswers >= 10) {
+      finalLevelByCorrectAnswers = 3; // 10-11問でLv.3
+    } else if (correctAnswers >= 8) {
+      finalLevelByCorrectAnswers = 2; // 8-9問でLv.2
+    } else if (correctAnswers >= 5) {
+      finalLevelByCorrectAnswers = 1; // 5-7問でLv.1
     }
     
     // 正解数基準と計算結果のうち、低い方を採用（厳格化）
