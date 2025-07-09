@@ -14,23 +14,23 @@ export default function VocabularyLevelSelector({ currentLevel, onChange }: Voca
     {
       value: 'easy' as VocabularyLevel,
       icon: '🟢',
-      title: '簡単',
-      description: 'A1〜A2',
-      detail: '基本的な語彙、短い文'
+      title: 'レベル1',
+      description: 'A1+A2',
+      detail: '基本語彙（0-1800語）'
     },
     {
       value: 'normal' as VocabularyLevel,
-      icon: '🟨',
-      title: '中くらい',
-      description: 'B1〜B2',
-      detail: '日常語彙、中程度の文'
+      icon: '🟠',
+      title: 'レベル2',
+      description: 'B1',
+      detail: '中級語彙（1801-3000語）'
     },
     {
       value: 'hard' as VocabularyLevel,
-      icon: '🟦',
-      title: '難しい',
-      description: 'C1〜',
-      detail: '高度語彙、複雑な文'
+      icon: '🔵',
+      title: 'レベル3',
+      description: 'B2',
+      detail: '上級語彙（3001-3500語）'
     }
   ];
 
@@ -81,19 +81,22 @@ export default function VocabularyLevelSelector({ currentLevel, onChange }: Voca
   );
 }
 
-// ヘルパー関数：UI値を数値レベルに変換
+// ヘルパー関数：UI値を数値レベルに変換（新3段階システム）
 export function levelToNumber(level: VocabularyLevel): number {
   switch (level) {
-    case 'easy': return 3;
-    case 'normal': return 6;
-    case 'hard': return 9;
-    default: return 6;
+    case 'easy': return 1;   // レベル1: A1+A2
+    case 'normal': return 2; // レベル2: B1
+    case 'hard': return 3;   // レベル3: B2
+    default: return 2;
   }
 }
 
-// ヘルパー関数：数値レベルをUI値に変換
+// ヘルパー関数：数値レベルをUI値に変換（新3段階システム）
 export function numberToLevel(num: number): VocabularyLevel {
-  if (num <= 3) return 'easy';
-  if (num <= 6) return 'normal';
+  // 旧レベル4/5は新レベル3に丸める
+  const normalizedNum = num > 3 ? 3 : num < 1 ? 1 : num;
+  
+  if (normalizedNum <= 1) return 'easy';
+  if (normalizedNum <= 2) return 'normal';
   return 'hard';
 }

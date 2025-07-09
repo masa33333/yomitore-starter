@@ -32,20 +32,7 @@ Thank you for making this wonderful trip possible. I promise to write to you fro
 With love and thanks,
 Your Cat`,
 
-      3: `Hello from Tokyo airport! I am sitting in the waiting area, looking at the big airplanes outside the large windows.
-
-My feelings are mixed right now - I am very excited about this trip, but also nervous about flying for the first time. The airport is full of people from many different countries, speaking different languages and going to far places. It is really interesting!
-
-I keep thinking that this special journey is only possible because you love reading so much. Every page you read, every story you finish, gives me the power and courage to visit new places. Your reading has given me the ability to travel!
-
-They just said my airplane will leave soon. My heart is beating fast because I am so excited! I cannot wait to see what amazing things are waiting for me in the next city and tell you about all my adventures.
-
-Thank you for being such a wonderful reading friend. This is just the start of our amazing journey together!
-
-With lots of excitement and love,
-Your Cat`,
-
-      4: `Dear friend, greetings from the impressive Narita International Airport in Tokyo! As I write this letter from the departure terminal, I find myself filled with mixed emotions - excitement, anticipation, and yes, some nervousness about starting this remarkable journey.
+      3: `Dear friend, greetings from the impressive Narita International Airport in Tokyo! As I write this letter from the departure terminal, I find myself filled with mixed emotions - excitement, anticipation, and yes, some nervousness about starting this remarkable journey.
 
 The airport itself is a wonder of modern design and organization. Crowds of international travelers move through the hallways like streams flowing into a great river, each carrying dreams and destinations from every continent. The advanced systems and careful attention to detail show Japan's famous dedication to quality.
 
@@ -58,21 +45,6 @@ The boarding announcement sounds through the terminal, and my heart beats faster
 Thank you for being such a wonderful reading companion. Our shared journey through the world of words has just begun!
 
 With deep appreciation and endless enthusiasm,
-Your Cat`,
-
-      5: `My dearest literary friend, I write to you from the impressive surroundings of Narita International Airport, where I find myself experiencing an exciting combination of expectation, nervousness, and deep gratitude as I prepare to begin this remarkable journey across the world.
-
-This architectural achievement that serves as one of the world's busiest aviation centers demonstrates the essential Japanese philosophy of combining advanced technology with beautiful design. The smooth coordination of thousands of passengers from different cultures meeting and separating through these hallways creates a fascinating pattern of human movement and dreams.
-
-From my position in the departure area, I think about the philosophical meaning of flight itself - this challenge to gravity that allows consciousness to move beyond geographical boundaries. The aircraft positioned across the runway represent more than simple mechanical vehicles; they show humanity's constant desire to explore, understand, and connect across vast distances of space and cultural differences.
-
-What fills me with the greatest sense of respect is the awareness that this extraordinary expedition exists as a direct result of your intellectual dedication and commitment to linguistic excellence. Your scholarly work with complex stories, your mastery of detailed vocabulary, and your appreciation for sentence beauty have combined to create the literary energy that enables my transformative journey.
-
-The clear voice announcing approaching boarding procedures sends waves of excitement through my mind. Soon, I will be rising through high altitudes, traveling toward unknown territories full of cultural insights and vocabulary discoveries.
-
-I am forever grateful to you for being such an intellectually inspiring and book-loving partner. Our cooperative exploration of literary worlds has only just begun!
-
-With endless appreciation and unlimited intellectual passion,
 Your Cat`
     }
   },
@@ -107,20 +79,7 @@ I wish I could tell you more about what I found in Seoul, but another trip is wa
 With love and excitement,
 Your Cat`,
 
-      3: `Hello from the busy city of Seoul! I have arrived in this amazing city, and it is even better than I expected. The beautiful mix of old temples and shiny new tall buildings creates an interesting view that shows both tradition and modern life.
-
-The Korean culture is really fascinating, and the local people have welcomed me with great warmth and kindness. I have found busy markets full of delicious street food, quiet gardens hidden between busy areas, and neighborhoods that are full of energy all day and night. The difference between peaceful old buildings and exciting modern life is really wonderful.
-
-Your strong love for reading has made this special journey possible. Each book you finish, every page you read, gives me the power to visit these great places. I can feel the good energy from your reading helping me move forward on this adventure.
-
-Seoul has taught me that every city has its own special feeling and character. The mix of old wisdom and new ideas here shows me that growth and tradition can work together very well.
-
-I am already excited about our next place to visit, but I wanted to stop and share these wonderful times with you!
-
-With lots of thanks and love,
-Your Cat`,
-
-      4: `My dear reading companion, I write to you from the exciting and culturally rich city of Seoul, where East meets West in the most amazing way possible. This remarkable city has shown itself to be a beautiful combination of ancient Korean heritage and modern innovation.
+      3: `My dear reading companion, I write to you from the exciting and culturally rich city of Seoul, where East meets West in the most amazing way possible. This remarkable city has shown itself to be a beautiful combination of ancient Korean heritage and modern innovation.
 
 The architectural landscape presents a fascinating contrast - centuries-old palaces and temples stand proudly alongside shining glass towers that reach the sky. I've walked through traditional markets where vendors sell everything from handmade ceramics to the most excellent fresh seafood, while modern shopping districts buzz with technological wonders that seem to come from science fiction.
 
@@ -133,21 +92,6 @@ Seoul has taught me that true beauty lies in the balance between preservation an
 Until our paths meet again through the written word!
 
 With great appreciation and travel excitement,
-Your Cat`,
-
-      5: `My most esteemed bibliophilic collaborator, I compose this missive from the intellectually stimulating and culturally sophisticated metropolis of Seoul, where I find myself immersed in a fascinating confluence of millennia-old Confucian traditions and audacious technological innovation that exemplifies humanity's capacity for harmonious cultural evolution.
-
-This extraordinary urban ecosystem presents a compelling paradigm of temporal coexistence - palatial complexes from the Joseon Dynasty maintain their dignified presence while serving as counterpoints to architectural marvels that seem to defy conventional engineering principles. The city's morphology reflects a philosophical approach to development that respects ancestral wisdom while embracing progressive ideologies.
-
-My ethnographic observations have revealed the Korean concept of "nunchi" - an intuitive understanding of social dynamics that transcends mere emotional intelligence. This sophisticated cultural phenomenon manifests in every interpersonal exchange, creating a social fabric that seamlessly integrates individual expression with collective harmony. The culinary landscape alone represents a microcosm of this complexity, where traditional fermentation techniques produce flavors that both honor heritage and challenge contemporary palatal expectations.
-
-Your relentless pursuit of lexicographic mastery and syntactic sophistication continues to generate the intellectual energy that propels this transcontinental odyssey. The semantic depth you've cultivated through extensive reading, combined with your appreciation for narrative complexity, has created a literary momentum that transforms abstract vocabulary into tangible geographical experiences.
-
-Seoul has illuminated the profound truth that authentic progress emerges not from abandoning tradition, but from creating innovative syntheses that honor the past while embracing future possibilities. As I prepare to traverse toward our subsequent destination, I carry with me the epistemological insights this remarkable city has provided.
-
-May our continued literary partnership yield ever more extraordinary adventures!
-
-With profound intellectual kinship and anticipatory excitement,
 Your Cat`
     }
   },
@@ -184,20 +128,7 @@ This trip continues to surprise me, but I wanted to share this special moment wi
 With love and wonder,
 Your Cat`,
 
-      3: `Hello from the great city of Beijing! I am in this amazing capital where thousands of years of Chinese history meet with fast modern development, creating a city view that is both beautiful and makes me think.
-
-Walking through the Forbidden City felt like going into a living museum - the detailed buildings, beautiful decorations, and huge size of the royal palace made me very surprised. The Great Wall going on and on across the mountains reminded me of people's amazing strength and clever thinking. At the same time, modern Beijing is busy with shopping areas, new technology, and an exciting cultural life.
-
-The Chinese idea of balance between tradition and progress can be seen everywhere. Old hutongs exist together with shiny tall buildings, while traditional tea ceremonies happen just streets away from modern art galleries. The local food has been a wonderful adventure - from real Peking duck to street food that has flavors I have never tasted.
-
-Your love for reading has been the main power behind this special journey. Each book is like a bridge between cultures, each vocabulary word becomes a key that opens new understanding. The happiness of learning and the excitement of experiencing different cultures is something I am happy to share with you.
-
-Beijing has taught me that wisdom comes from respecting the past while welcoming the future. I take these lessons with me as our adventure continues!
-
-With lots of thanks and cultural interest,
-Your Cat`,
-
-      4: `My dear reading friend, I write to you from the historic and culturally rich city of Beijing, where I find myself thinking about the amazing meeting of imperial history and modern development that defines this impressive Chinese capital.
+      3: `My dear reading friend, I write to you from the historic and culturally rich city of Beijing, where I find myself thinking about the amazing meeting of imperial history and modern development that defines this impressive Chinese capital.
 
 The building story of this city reads like an epic novel covering thousands of years. The Forbidden City stands as proof of the advanced beauty and complex political systems of imperial China, its red walls and golden rooftops creating a visual display that speaks to the artistic success of many generations. The Great Wall, visible from various points throughout the city, serves as a powerful symbol for human determination and the lasting nature of human goals.
 
@@ -210,28 +141,13 @@ Beijing has strengthened my belief that true wisdom comes from the respectful co
 Until our next letter through the medium of shared reading adventure!
 
 With deep cultural appreciation and continued travel spirit,
-Your Cat`,
-
-      5: `My most distinguished intellectual collaborator, I compose this correspondence from the culturally sublime and historically momentous city of Beijing, where I find myself engaged in profound contemplation of the sophisticated dialectical relationship between millennial Chinese philosophical traditions and the audacious technological aspirations that characterize contemporary urban Chinese civilization.
-
-This extraordinary metropolis functions as a living palimpsest, where successive layers of cultural development create a complex textual landscape that demands careful hermeneutical analysis. The architectural morphology reflects a nuanced understanding of temporal continuity - the Forbidden City's intricate spatial organization embodies Confucian hierarchical principles while simultaneously serving as a counterpoint to the innovative structural engineering that defines Beijing's expanding urban periphery.
-
-My phenomenological investigation of the city's cultural ecosystems has revealed the profound Chinese concept of "zhongyong" - the doctrine of the mean that seeks harmony through balanced synthesis rather than binary opposition. This philosophical framework manifests in everything from urban planning strategies that preserve historical districts while accommodating demographic expansion, to culinary traditions that maintain ancestral preparation methods while incorporating contemporary nutritional understanding.
-
-The epistemological implications of your sustained engagement with literary complexity continue to generate the intellectual momentum that transforms abstract linguistic competency into tangible intercultural experience. Your mastery of semantic subtlety, appreciation for syntactic sophistication, and development of narrative sensitivity have coalesced to create a form of literary currency that enables profound cross-cultural transaction and understanding.
-
-Beijing has illuminated the fundamental truth that authentic wisdom emerges not from the rejection of traditional knowledge systems, but from their creative integration with innovative methodologies that address contemporary challenges while honoring ancestral insights. As I prepare to traverse toward subsequent geographical and intellectual territories, I carry with me the profound epistemological gifts this remarkable city has bestowed.
-
-May our continued bibliophilic partnership yield ever more transformative adventures in the landscape of human knowledge and cultural understanding!
-
-With profound philosophical kinship and anticipatory intellectual excitement,
 Your Cat`
     }
   }
 };
 
 /**
- * ユーザーの語彙レベルに応じた手紙を取得
+ * ユーザーの語彙レベルに応じた手紙を取得（新3段階システム対応）
  */
 export function getStaticLetter(city: string, level: number): any | null {
   const cityLower = city.toLowerCase();
@@ -243,8 +159,11 @@ export function getStaticLetter(city: string, level: number): any | null {
   
   const letterData = staticLetters[cityLower as keyof typeof staticLetters];
   
+  // レベルを1-3の範囲に正規化（旧レベル4/5は新レベル3に丸める）
+  const normalizedLevel = level > 3 ? 3 : level < 1 ? 1 : level;
+  
   // レベルに対応する英語コンテンツを取得
-  const englishContent = letterData.en[level] || letterData.en[1]; // フォールバック: Level 1
+  const englishContent = letterData.en[normalizedLevel] || letterData.en[1]; // フォールバック: Level 1
   
   return {
     type: letterData.type,
@@ -252,7 +171,7 @@ export function getStaticLetter(city: string, level: number): any | null {
     cityImage: letterData.cityImage,
     jp: letterData.jp,
     en: englishContent,
-    level: level
+    level: normalizedLevel
   };
 }
 

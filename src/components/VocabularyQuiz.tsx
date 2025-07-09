@@ -29,24 +29,21 @@ export function VocabularyQuiz() {
   const [showInstructions, setShowInstructions] = useState(true);
   const [isClient, setIsClient] = useState(false);
 
-  // 語彙レベルをCEFRレベルに変換
-  const mapToCEFRLevel = (vocabLevel: number): 'A1' | 'A2' | 'B1' | 'B2' => {
-    if (vocabLevel <= 2) return 'A1';
-    if (vocabLevel <= 4) return 'A2';
-    if (vocabLevel <= 7) return 'B1';
+  // 語彙レベルをCEFRレベルに変換（新3段階システム）
+  const mapToCEFRLevel = (vocabLevel: number): 'A1+A2' | 'B1' | 'B2' => {
+    if (vocabLevel <= 1) return 'A1+A2';
+    if (vocabLevel <= 2) return 'B1';
     return 'B2';
   };
 
-  // クイズレベル（1-10）を生成レベル（1-5）にマップ
+  // クイズレベル（1-10）を生成レベル（1-3）にマップ
   const mapQuizLevelToGenerationLevel = (quizLevel: number): number => {
-    if (quizLevel <= 2) return 1;      // Quiz 1-2  → Lv.1 (初級 A1)
-    if (quizLevel <= 4) return 2;      // Quiz 3-4  → Lv.2 (初中級 A2) 
-    if (quizLevel <= 6) return 3;      // Quiz 5-6  → Lv.3 (中級 B1)
-    if (quizLevel <= 8) return 4;      // Quiz 7-8  → Lv.4 (中上級 B2)
-    return 5;                          // Quiz 9-10 → Lv.5 (上級 C1+)
+    if (quizLevel <= 3) return 1;      // Quiz 1-3  → Lv.1 (A1+A2)
+    if (quizLevel <= 6) return 2;      // Quiz 4-6  → Lv.2 (B1) 
+    return 3;                          // Quiz 7-10 → Lv.3 (B2)
   };
 
-  // 最終的な語彙レベルを計算する関数（1-5段階制）
+  // 最終的な語彙レベルを計算する関数（新3段階システム）
   const calculateFinalLevel = useCallback((levelHistory: any[], correctAnswers: number, questionCount: number) => {
     // 全体の正答率ベースの判定
     const overallAccuracy = correctAnswers / questionCount;
@@ -66,13 +63,13 @@ export function VocabularyQuiz() {
       }
     }
     
-    // 各レベルで70%以上の正答率があるかチェック（1-10レベル → 1-5レベルにマップ）
+    // 各レベルで70%以上の正答率があるかチェック（1-10レベル → 1-3レベルにマップ）
     for (let level = 1; level <= 10; level++) {
       const stats = levelStats[level];
       if (stats && stats.total >= 1) { // 最低1問はそのレベルを経験
         const accuracy = stats.correct / stats.total;
         if (accuracy >= 0.7) { // 70%以上の正答率
-          // 10段階 → 5段階にマッピング
+          // 10段階 → 3段階にマッピング
           const mappedLevel = mapQuizLevelToGenerationLevel(level);
           stableLevel = Math.max(stableLevel, mappedLevel);
         }
@@ -84,7 +81,7 @@ export function VocabularyQuiz() {
     
     if (overallAccuracy >= 0.85) {
       // 85%以上: 安定レベル + 1
-      finalLevel = Math.min(5, stableLevel + 1);
+      finalLevel = Math.min(3, stableLevel + 1);
     } else if (overallAccuracy >= 0.75) {
       // 75%以上: 安定レベル
       finalLevel = stableLevel;
@@ -99,25 +96,21 @@ export function VocabularyQuiz() {
       finalLevel = Math.max(1, Math.min(2, stableLevel - 2));
     }
     
-    // 正解数による制限（1-5段階制、レベル5は厳しく、他は適度に）
+    // 正解数による制限（新3段階システム）
     let finalLevelByCorrectAnswers = 1;
-    if (correctAnswers >= 14) {
-      finalLevelByCorrectAnswers = 5; // 14問以上でLv.5（1問不正解まで）
-    } else if (correctAnswers >= 12) {
-      finalLevelByCorrectAnswers = 4; // 12-13問でLv.4
-    } else if (correctAnswers >= 10) {
-      finalLevelByCorrectAnswers = 3; // 10-11問でLv.3
-    } else if (correctAnswers >= 8) {
-      finalLevelByCorrectAnswers = 2; // 8-9問でLv.2
-    } else if (correctAnswers >= 5) {
-      finalLevelByCorrectAnswers = 1; // 5-7問でLv.1
+    if (correctAnswers >= 12) {
+      finalLevelByCorrectAnswers = 3; // 12問以上でLv.3（3問不正解まで）
+    } else if (correctAnswers >= 9) {
+      finalLevelByCorrectAnswers = 2; // 9-11問でLv.2
+    } else if (correctAnswers >= 6) {
+      finalLevelByCorrectAnswers = 1; // 6-8問でLv.1
     }
     
     // 正解数基準と計算結果のうち、低い方を採用（厳格化）
     finalLevel = Math.min(finalLevel, finalLevelByCorrectAnswers);
-    finalLevel = Math.min(5, finalLevel); // 最大5に制限
+    finalLevel = Math.min(3, finalLevel); // 最大3に制限
     
-    console.log('📊 レベル計算詳細 (1-5段階制・厳格版):', {
+    console.log('📊 レベル計算詳細 (新3段階システム):', {
       correctAnswers,
       questionCount,
       overallAccuracy: (overallAccuracy * 100).toFixed(1) + '%',

@@ -21,12 +21,12 @@ function addParagraphBreaks(englishText: string, japaneseText: string, level: nu
       japaneseParagraphs.push(japaneseSentences.slice(i, i + sentencesPerParagraph).join(''));
     }
   }
-  // レベル3-5: より長い文章なので3-4段落に分割
+  // レベル3: より長い文章なので3段落に分割
   else {
     const englishSentences = englishText.split(/(?<=[.!?])\s+/);
     const japaneseSentences = japaneseText.split(/(?<=[。！？])\s*/);
     
-    const paragraphCount = level >= 4 ? 4 : 3;
+    const paragraphCount = 3; // 新3段階システムではレベル3が最上位
     const sentencesPerParagraph = Math.ceil(englishSentences.length / paragraphCount);
     
     for (let i = 0; i < englishSentences.length; i += sentencesPerParagraph) {
@@ -281,8 +281,8 @@ export async function POST(req: Request) {
       useNewFlow = true  // 新フローのフラグ
     } = requestData;
     
-    // レベルを1-5の範囲に正規化
-    const normalizedLevel = Math.max(1, Math.min(5, parseInt(level.toString())));
+    // レベルを1-3の範囲に正規化（新3段階システム）
+    const normalizedLevel = Math.max(1, Math.min(3, parseInt(level.toString())));
     
     console.log(`📝 Generating content for level ${normalizedLevel}`, {
       mode, topic, theme, genre, tone, feeling, useNewFlow
@@ -674,13 +674,11 @@ function generateSampleStoryContent(
 async function translateWithVocabularyControl(japaneseContent: string[], level: number): Promise<string[]> {
   console.log(`🔤 Translating to English with Level ${level} vocabulary control`);
   
-  // NGSL語彙レベル範囲の設定（レベル1-2は非常に厳格）
+  // NGSL語彙レベル範囲の設定（新3段階システム）
   const vocabularyRanges = {
-    1: { rangeStart: 1, rangeMid: 300, rangeEnd: 500 },    // 超基本語彙のみ
-    2: { rangeStart: 1, rangeMid: 500, rangeEnd: 800 },    // 基本語彙のみ（厳格）
-    3: { rangeStart: 1, rangeMid: 1000, rangeEnd: 1500 },
-    4: { rangeStart: 1, rangeMid: 1500, rangeEnd: 2500 },
-    5: { rangeStart: 1, rangeMid: 2000, rangeEnd: 4000 }
+    1: { rangeStart: 1, rangeMid: 900, rangeEnd: 1800 },   // Level 1: 0-1800 (A1+A2)
+    2: { rangeStart: 1, rangeMid: 2000, rangeEnd: 3000 },  // Level 2: 1801-3000 (B1) 
+    3: { rangeStart: 1, rangeMid: 3000, rangeEnd: 3500 }   // Level 3: 3001-3500 (B2)
   };
   
   const range = vocabularyRanges[level as keyof typeof vocabularyRanges];
