@@ -85,7 +85,7 @@ interface StoryData {
 }
 
 type PageProps = {
-  searchParams?: Promise<{
+  searchParams?: {
     slug?: string;      // プリセットストーリー用
     mode?: string;
     genre?: string;
@@ -96,12 +96,12 @@ type PageProps = {
     theme?: string;
     emotion?: string;
     style?: string;
-  }>;
+  };
 };
 
 export default async function ReadingPage({ searchParams }: PageProps) {
-  // searchParamsはPromiseなのでawaitで解決
-  const params = (await searchParams) || {};
+  // searchParamsは同期的にアクセス
+  const params = searchParams || {};
   console.log('🏗️ Server Component executing with params:', params);
   
   const { slug } = params;
