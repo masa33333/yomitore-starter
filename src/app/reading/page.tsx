@@ -55,19 +55,19 @@ function formatChapterContent(content: string): string {
       continue;
     }
     
-    // 「数字. タイトル 本文」の形式を検出
-    const chapterMatch = trimmedLine.match(/^(\d+\.\s+[^.!?]*?)(\s+[A-Z].*)/);
-    
-    if (chapterMatch) {
-      const chapterTitle = chapterMatch[1].trim();
-      const chapterContent = chapterMatch[2].trim();
-      
-      // チャプタータイトルを太字で、本文と行分け
-      formattedLines.push(`**${chapterTitle}**`);
-      formattedLines.push('');
+    // **マーカーでチャプタータイトルを検出
+    if (trimmedLine.startsWith('**')) {
+      const chapterTitle = trimmedLine.substring(2); // **を削除
+      formattedLines.push(`**${chapterTitle}**`); // 太字用のマークダウンとして保持
+    }
+    // --マーカーで本文を検出
+    else if (trimmedLine.startsWith('--')) {
+      const chapterContent = trimmedLine.substring(2); // --を削除
+      formattedLines.push(''); // チャプタータイトルとの間に空行
       formattedLines.push(chapterContent);
-    } else {
-      // 通常の行はそのまま
+    }
+    // その他の行（継続する本文など）
+    else {
       formattedLines.push(trimmedLine);
     }
   }
