@@ -118,53 +118,59 @@ export default async function ReadingPage({ searchParams }: PageProps) {
 
   // プリセットストーリーの場合
   if (isPresetMode && slug) {
-    try {
-      // ユーザーのレベルを取得（デフォルト: 1）
-      const userLevel = parseInt(params.level || '1');
-      
-      console.log(`📚 プリセットストーリー取得: ${slug}, Level: ${userLevel}`);
-      
-      const { data, error } = await supabase
-        .from('stories')
-        .select('*')
-        .eq('slug', slug)
-        .eq('level', userLevel)
-        .single();
+    // ユーザーのレベルを取得（デフォルト: 1）
+    const userLevel = parseInt(params.level || '1');
+    
+    console.log(`📚 プリセットストーリー要求: ${slug}, Level: ${userLevel}`);
+    
+    // Supabaseが未設定のため、直接フォールバックストーリーを使用
+    if (slug === 'notting-hill') {
+      console.log('📖 Notting Hill フォールバックストーリーを使用');
+      const fallbackStory = getFallbackNotingHillStory(userLevel);
+      initialData = fallbackStory;
+    } else {
+      // 他のストーリーの場合は将来的にSupabaseから取得
+      try {
+        console.log('🔍 Supabaseからストーリー取得を試行中...');
+        const { data, error } = await supabase
+          .from('stories')
+          .select('*')
+          .eq('slug', slug)
+          .eq('level', userLevel)
+          .single();
 
-      if (error) {
-        console.error('❌ プリセットストーリー取得エラー:', error);
-        console.log('📖 フォールバックストーリーを使用します');
+        if (error || !data) {
+          console.warn('❌ Supabase取得失敗、フォールバック使用:', error?.message);
+          const fallbackStory = getFallbackNotingHillStory(userLevel);
+          initialData = fallbackStory;
+        } else {
+          // tokensを文字列に結合してstoryとして使用
+          const storyText = data.tokens.join('');
+          
+          initialData = {
+            title: data.title,
+            story: storyText,
+            tokens: data.tokens,
+            glossary: data.glossary || [],
+            isPreset: true,
+            themes: [`Level ${data.level}`]
+          };
+          
+          console.log('✅ プリセットストーリー取得成功:', {
+            title: data.title,
+            level: data.level,
+            wordCount: data.word_count,
+            tokensLength: data.tokens.length
+          });
+        }
+      } catch (error) {
+        console.error('❌ プリセットストーリー取得失敗:', error);
+        console.log('📖 catchブロックからフォールバックストーリーを使用');
         
-        // フォールバックストーリーを生成
+        // 例外発生時もフォールバックストーリーを使用
         const fallbackStory = getFallbackNotingHillStory(userLevel);
         initialData = fallbackStory;
-      } else if (data) {
-        // tokensを文字列に結合してstoryとして使用
-        const storyText = data.tokens.join('');
-        
-        initialData = {
-          title: data.title,
-          story: storyText,
-          tokens: data.tokens,
-          glossary: data.glossary || [],
-          isPreset: true,
-          themes: [`Level ${data.level}`]
-        };
-        
-        console.log('✅ プリセットストーリー取得成功:', {
-          title: data.title,
-          level: data.level,
-          wordCount: data.word_count,
-          tokensLength: data.tokens.length
-        });
       }
-    } catch (error) {
-      console.error('❌ プリセットストーリー取得失敗:', error);
-      console.log('📖 catchブロックからフォールバックストーリーを使用します');
-      
-      // 例外発生時もフォールバックストーリーを使用
-      const fallbackStory = getFallbackNotingHillStory(parseInt(params.level || '1'));
-      initialData = fallbackStory;
     }
   }
   
