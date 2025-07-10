@@ -19,7 +19,7 @@ interface Story {
 export default function StoriesPage() {
   // 直接フォールバックストーリーで初期化
   const [stories] = useState<Story[]>([
-    { slug: 'notting-hill', title: 'Notting Hill' }
+    { slug: 'notting-hill', title: 'ノッティングヒルの恋人' }
   ]);
   const [loading] = useState(false);
   const [error] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export default function StoriesPage() {
           {/* ヘッダー */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-text-primary mb-4">
-              📚 ストーリー一覧
+              📚 タイトル一覧
             </h1>
             <p className="text-text-secondary">
               お好きなストーリーを選んで読書を始めましょう
@@ -178,7 +178,7 @@ export default function StoriesPage() {
                   className="group"
                 >
                   <div className="bg-white rounded-lg shadow-md p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 border border-gray-200">
-                    <div className="flex items-center mb-4">
+                    <div className="flex items-center">
                       <div className="w-12 h-12 bg-primary-inactive rounded-full flex items-center justify-center mr-4">
                         <span className="text-2xl">📖</span>
                       </div>
@@ -186,25 +186,6 @@ export default function StoriesPage() {
                         <h3 className="text-lg font-semibold text-text-primary group-hover:text-primary-active transition-colors">
                           {story.title}
                         </h3>
-                        <p className="text-text-secondary text-sm">
-                          レベル別対応
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-primary-active font-medium">
-                        読む →
-                      </span>
-                      <div className="flex space-x-1">
-                        {[1, 2, 3].map((level) => (
-                          <span
-                            key={level}
-                            className={`w-2 h-2 rounded-full ${
-                              level <= 3 ? 'bg-primary-active' : 'bg-gray-300'
-                            }`}
-                          />
-                        ))}
                       </div>
                     </div>
                   </div>
