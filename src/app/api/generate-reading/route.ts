@@ -95,10 +95,6 @@ const katakanaToEnglish: { [key: string]: string } = {
   'ベートーヴェン': 'Beethoven',
   'ピカソ': 'Picasso',
   'シェイクスピア': 'Shakespeare',
-  'スティーブ・ジョブズ': 'Steve Jobs',
-  'スティーブジョブズ': 'Steve Jobs',
-  'ビル・ゲイツ': 'Bill Gates',
-  'ビルゲイツ': 'Bill Gates',
   '織田信長': 'Oda Nobunaga',
   'おだのぶなが': 'Oda Nobunaga',
   '豊臣秀吉': 'Toyotomi Hideyoshi',
@@ -168,7 +164,6 @@ const katakanaToEnglish: { [key: string]: string } = {
   'ギター': 'guitar',
   'バイオリン': 'violin',
   'ドラム': 'drums',
-  'ビートルズ': 'The Beatles',
   
   // 技術
   'コンピューター': 'computers',
