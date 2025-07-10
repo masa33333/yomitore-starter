@@ -18,11 +18,11 @@ interface Story {
 
 export default function StoriesPage() {
   // 直接フォールバックストーリーで初期化
-  const [stories] = useState<Story[]>([
+  const [stories, setStories] = useState<Story[]>([
     { slug: 'notting-hill', title: 'ノッティングヒルの恋人 (Notting Hill)' }
   ]);
-  const [loading] = useState(false);
-  const [error] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<number>(3);
   const [showLevelSelector, setShowLevelSelector] = useState<boolean>(false);
   const { t } = useTranslation();
@@ -56,37 +56,7 @@ export default function StoriesPage() {
     setShowLevelSelector(false);
   };
 
-  // useEffectを使わずに直接表示
-  // useEffect は現在不要
-
-  async function fetchStories() {
-    const fallbackStories = [
-      { slug: 'notting-hill', title: 'Notting Hill' }
-    ];
-
-    try {
-      console.log('📚 Supabase ストーリー取得試行...');
-      
-      const { data, error } = await supabase
-        .from('stories')
-        .select('slug, title')
-        .eq('level', 1)
-        .order('created_at', { ascending: true });
-
-      if (error || !data || data.length === 0) {
-        console.log('📖 Supabase利用不可またはデータなし、フォールバック使用');
-        setStories(fallbackStories);
-      } else {
-        console.log('✅ Supabase成功:', data.length, 'stories');
-        setStories(data);
-      }
-    } catch (err) {
-      console.log('🔄 Supabaseエラー、フォールバック使用:', err);
-      setStories(fallbackStories);
-    } finally {
-      setLoading(false);
-    }
-  }
+  // 現在は静的データを使用しているためfetchStories関数は不要
 
   if (loading) {
     return (
@@ -105,7 +75,7 @@ export default function StoriesPage() {
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button 
-            onClick={fetchStories}
+            onClick={() => window.location.reload()}
             className="bg-primary-active text-white px-4 py-2 rounded-md hover:bg-primary-hover"
           >
             再試行
