@@ -4,10 +4,18 @@ import ReadingClient from './ReadingClient';
 import CatLoader from '@/components/CatLoader';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Supabaseクライアントの初期化は実際に必要な時だけ行う
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase環境変数が設定されていません - フォールバック使用');
+    return null;
+  }
+  
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
 
 // 実際のNotting Hillストーリーファイルを読み込む関数
 async function getNotingHillStory(level: number): Promise<StoryData> {
@@ -126,46 +134,54 @@ export default async function ReadingPage({ searchParams }: PageProps) {
       initialData = storyFromFile;
     } else {
       // 他のストーリーの場合は将来的にSupabaseから取得
-      try {
-        console.log('🔍 Supabaseからストーリー取得を試行中...');
-        const { data, error } = await supabase
-          .from('stories')
-          .select('*')
-          .eq('slug', slug)
-          .eq('level', userLevel)
-          .single();
-
-        if (error || !data) {
-          console.warn('❌ Supabase取得失敗、フォールバック使用:', error?.message);
-          const fallbackStory = await getNotingHillStory(userLevel);
-          initialData = fallbackStory;
-        } else {
-          // tokensを文字列に結合してstoryとして使用
-          const storyText = data.tokens.join('');
-          
-          initialData = {
-            title: data.title,
-            story: storyText,
-            tokens: data.tokens,
-            glossary: data.glossary || [],
-            isPreset: true,
-            themes: [`Level ${data.level}`]
-          };
-          
-          console.log('✅ プリセットストーリー取得成功:', {
-            title: data.title,
-            level: data.level,
-            wordCount: data.word_count,
-            tokensLength: data.tokens.length
-          });
-        }
-      } catch (error) {
-        console.error('❌ プリセットストーリー取得失敗:', error);
-        console.log('📖 catchブロックからフォールバックストーリーを使用');
-        
-        // 例外発生時もフォールバックストーリーを使用
+      const supabase = getSupabaseClient();
+      
+      if (!supabase) {
+        console.log('📖 Supabase利用不可 - 直接フォールバック使用');
         const fallbackStory = await getNotingHillStory(userLevel);
         initialData = fallbackStory;
+      } else {
+        try {
+          console.log('🔍 Supabaseからストーリー取得を試行中...');
+          const { data, error } = await supabase
+            .from('stories')
+            .select('*')
+            .eq('slug', slug)
+            .eq('level', userLevel)
+            .single();
+
+          if (error || !data) {
+            console.warn('❌ Supabase取得失敗、フォールバック使用:', error?.message);
+            const fallbackStory = await getNotingHillStory(userLevel);
+            initialData = fallbackStory;
+          } else {
+            // tokensを文字列に結合してstoryとして使用
+            const storyText = data.tokens.join('');
+            
+            initialData = {
+              title: data.title,
+              story: storyText,
+              tokens: data.tokens,
+              glossary: data.glossary || [],
+              isPreset: true,
+              themes: [`Level ${data.level}`]
+            };
+            
+            console.log('✅ プリセットストーリー取得成功:', {
+              title: data.title,
+              level: data.level,
+              wordCount: data.word_count,
+              tokensLength: data.tokens.length
+            });
+          }
+        } catch (error) {
+          console.error('❌ プリセットストーリー取得失敗:', error);
+          console.log('📖 catchブロックからフォールバックストーリーを使用');
+          
+          // 例外発生時もフォールバックストーリーを使用
+          const fallbackStory = await getNotingHillStory(userLevel);
+          initialData = fallbackStory;
+        }
       }
     }
   }
