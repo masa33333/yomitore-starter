@@ -1,16 +1,26 @@
-// ✅ Server Component - まずはシンプルな構造でテスト
+// ✅ Server Component - プリセットストーリー対応
 import { Suspense } from 'react';
 import ReadingClient from './ReadingClient';
 import CatLoader from '@/components/CatLoader';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface StoryData {
   title: string;
   story: string;
   themes?: string[];
+  tokens?: string[];
+  glossary?: any[];
+  isPreset?: boolean;
 }
 
 type PageProps = {
   searchParams?: Promise<{
+    slug?: string;      // プリセットストーリー用
     mode?: string;
     genre?: string;
     tone?: string;
@@ -28,11 +38,55 @@ export default async function ReadingPage({ searchParams }: PageProps) {
   const params = (await searchParams) || {};
   console.log('🏗️ Server Component executing with params:', params);
   
+  const { slug } = params;
   const mode = params.mode || 'reading';
   const isStoryMode = mode === 'story';
+  const isPresetMode = !!slug;
   
-  // サーバーサイドでは静的データのみ使用、API呼び出しはクライアントサイドで実行
+  // サーバーサイドでデータを取得
   let initialData: StoryData | null = null;
+
+  // プリセットストーリーの場合
+  if (isPresetMode && slug) {
+    try {
+      // ユーザーのレベルを取得（デフォルト: 1）
+      const userLevel = parseInt(params.level || '1');
+      
+      console.log(`📚 プリセットストーリー取得: ${slug}, Level: ${userLevel}`);
+      
+      const { data, error } = await supabase
+        .from('stories')
+        .select('*')
+        .eq('slug', slug)
+        .eq('level', userLevel)
+        .single();
+
+      if (error) {
+        console.error('❌ プリセットストーリー取得エラー:', error);
+      } else if (data) {
+        // tokensを文字列に結合してstoryとして使用
+        const storyText = data.tokens.join('');
+        
+        initialData = {
+          title: data.title,
+          story: storyText,
+          tokens: data.tokens,
+          glossary: data.glossary || [],
+          isPreset: true,
+          themes: [`Level ${data.level}`]
+        };
+        
+        console.log('✅ プリセットストーリー取得成功:', {
+          title: data.title,
+          level: data.level,
+          wordCount: data.word_count,
+          tokensLength: data.tokens.length
+        });
+      }
+    } catch (error) {
+      console.error('❌ プリセットストーリー取得失敗:', error);
+    }
+  }
   
   if (isStoryMode) {
     const { genre, tone, feeling } = params;

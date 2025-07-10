@@ -193,6 +193,19 @@ export default function ChoosePage() {
         </div>
       </div>
       
+      {/* プリセットストーリー選択ボタン */}
+      <div className="mb-6">
+        <button
+          onClick={() => router.push('/stories')}
+          className="w-full bg-[#9B59B6] text-white rounded-xl px-6 py-4 hover:bg-[#8E44AD] transition-colors text-left"
+        >
+          <div>
+            <h3 className="text-lg font-semibold mb-1">📚 プリセットストーリーを読む</h3>
+            <p className="text-sm text-white/90 mt-1">用意されたストーリーから選んで読む</p>
+          </div>
+        </button>
+      </div>
+      
       {/* コンテンツタイプ選択カード */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <button
