@@ -6,10 +6,18 @@ import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getGenerationLevelName } from '@/utils/getEnglishText';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Supabaseクライアントの初期化は実際に必要な時だけ行う
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase環境変数が設定されていません - 静的データ使用');
+    return null;
+  }
+  
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
 
 interface Story {
   slug: string;

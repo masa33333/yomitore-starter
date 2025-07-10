@@ -4,6 +4,9 @@ import ReadingClient from './ReadingClient';
 import CatLoader from '@/components/CatLoader';
 import { createClient } from '@supabase/supabase-js';
 
+// 動的ページとして設定（searchParamsを使用するため）
+export const dynamic = 'force-dynamic';
+
 // Supabaseクライアントの初期化は実際に必要な時だけ行う
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
