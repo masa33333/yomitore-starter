@@ -142,7 +142,7 @@ export default function ChoosePage() {
     if (type === 'reading') {
       router.push('/reading-form');
     } else {
-      router.push('/story-form');
+      router.push('/stories');
     }
   };
 
@@ -191,19 +191,6 @@ export default function ChoosePage() {
             </div>
           )}
         </div>
-      </div>
-      
-      {/* プリセットストーリー選択ボタン */}
-      <div className="mb-6">
-        <button
-          onClick={() => router.push('/stories')}
-          className="w-full bg-[#9B59B6] text-white rounded-xl px-6 py-4 hover:bg-[#8E44AD] transition-colors text-left"
-        >
-          <div>
-            <h3 className="text-lg font-semibold mb-1">📚 プリセットストーリーを読む</h3>
-            <p className="text-sm text-white/90 mt-1">用意されたストーリーから選んで読む</p>
-          </div>
-        </button>
       </div>
       
       {/* コンテンツタイプ選択カード */}
