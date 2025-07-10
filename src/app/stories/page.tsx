@@ -37,13 +37,32 @@ export default function StoriesPage() {
         .order('created_at', { ascending: true });
 
       if (error) {
-        throw error;
+        console.warn('Supabaseからの取得に失敗、フォールバックストーリーを使用:', error);
+        // Supabaseが利用できない場合のフォールバックストーリー
+        const fallbackStories = [
+          {
+            slug: 'notting-hill',
+            title: 'Notting Hill'
+          }
+        ];
+        setStories(fallbackStories);
+        setLoading(false);
+        return;
       }
 
       setStories(data || []);
     } catch (err) {
       console.error('ストーリー取得エラー:', err);
-      setError('ストーリーの読み込みに失敗しました');
+      console.log('フォールバックストーリーを使用します');
+      
+      // エラー時もフォールバックストーリーを表示
+      const fallbackStories = [
+        {
+          slug: 'notting-hill',
+          title: 'Notting Hill'
+        }
+      ];
+      setStories(fallbackStories);
     } finally {
       setLoading(false);
     }
