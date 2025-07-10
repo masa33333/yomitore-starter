@@ -969,39 +969,59 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // 英語テキストをクリック可能な単語に分割
+  // 英語テキストをクリック可能な単語に分割（マークダウン太字対応）
   const renderClickableText = (text: string) => {
     console.log('🎨 renderClickableText called with:', text.substring(0, 100) + '...');
-    const words = text.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
     
-    let clickableWordCount = 0;
-    const result = words.map((part, index) => {
-      if (/^[a-zA-Z]+$/.test(part)) {
-        clickableWordCount++;
-        console.log(`✨ クリック可能な単語 ${clickableWordCount}:`, part);
+    // マークダウンの太字(**text**)を最初に処理
+    const parts = text.split(/(\*\*[^*]+\*\*)/);
+    
+    return parts.map((part, partIndex) => {
+      // 太字部分の処理
+      if (part.startsWith('**') && part.endsWith('**')) {
+        const boldText = part.slice(2, -2); // **を削除
+        console.log('📖 チャプタータイトル検出:', boldText);
         return (
-          <span
-            key={index}
-            className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
-              highlightedWord === part ? 'bg-yellow-300' : ''
-            }`}
-            title="クリックして意味を調べる"
-            data-word={part}
-            style={{
-              WebkitTouchCallout: 'none',
-              WebkitUserSelect: 'none',
-              touchAction: 'manipulation'
-            }}
-          >
-            {part}
-          </span>
+          <strong key={partIndex} className="font-bold text-text-primary block mb-3 text-lg">
+            {boldText}
+          </strong>
         );
       }
-      return <span key={index}>{part}</span>;
+      
+      // 通常テキストの単語分割とクリック可能処理
+      const words = part.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
+      
+      let clickableWordCount = 0;
+      const result = words.map((word, wordIndex) => {
+        if (/^[a-zA-Z]+$/.test(word)) {
+          clickableWordCount++;
+          return (
+            <span
+              key={`${partIndex}-${wordIndex}`}
+              className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
+                highlightedWord === word ? 'bg-yellow-300' : ''
+              }`}
+              title="クリックして意味を調べる"
+              data-word={word}
+              style={{
+                WebkitTouchCallout: 'none',
+                WebkitUserSelect: 'none',
+                touchAction: 'manipulation'
+              }}
+            >
+              {word}
+            </span>
+          );
+        } else {
+          return <span key={`${partIndex}-${wordIndex}`}>{word}</span>;
+        }
+      });
+      
+      if (clickableWordCount > 0) {
+        console.log(`🎯 パート ${partIndex}: ${clickableWordCount}個の単語を検出`);
+      }
+      return result;
     });
-    
-    console.log(`🎯 この段落のクリック可能単語数: ${clickableWordCount}`);
-    return result;
   };
 
   if (loading) {

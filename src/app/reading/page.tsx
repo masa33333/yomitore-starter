@@ -19,12 +19,14 @@ async function getNotingHillStory(level: number): Promise<StoryData> {
     console.log(`📖 Reading Notting Hill file: ${filePath}`);
     
     const content = await fs.readFile(filePath, 'utf-8');
-    const lines = content.split('\n').filter(line => line.trim());
+    
+    // チャプタータイトルと本文を分けてフォーマット
+    const formattedContent = formatChapterContent(content);
     const wordCount = content.split(/\s+/).filter(word => word.trim()).length;
     
     return {
       title: `Notting Hill (Level ${level})`,
-      story: content.trim(),
+      story: formattedContent,
       themes: [`Level ${level}`, `${wordCount} words`, 'Preset Story from File'],
       isPreset: true
     };
@@ -39,6 +41,38 @@ async function getNotingHillStory(level: number): Promise<StoryData> {
       isPreset: true
     };
   }
+}
+
+// チャプタータイトルをフォーマットする関数
+function formatChapterContent(content: string): string {
+  const lines = content.split('\n');
+  const formattedLines: string[] = [];
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) {
+      formattedLines.push(''); // 空行は保持
+      continue;
+    }
+    
+    // 「数字. タイトル 本文」の形式を検出
+    const chapterMatch = trimmedLine.match(/^(\d+\.\s+[^.!?]*?)(\s+[A-Z].*)/);
+    
+    if (chapterMatch) {
+      const chapterTitle = chapterMatch[1].trim();
+      const chapterContent = chapterMatch[2].trim();
+      
+      // チャプタータイトルを太字で、本文と行分け
+      formattedLines.push(`**${chapterTitle}**`);
+      formattedLines.push('');
+      formattedLines.push(chapterContent);
+    } else {
+      // 通常の行はそのまま
+      formattedLines.push(trimmedLine);
+    }
+  }
+  
+  return formattedLines.join('\n');
 }
 
 interface StoryData {
