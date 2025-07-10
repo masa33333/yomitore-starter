@@ -304,7 +304,7 @@ export default function NotebookPage() {
             読み物ページで単語をクリックすると、ここに保存されます
           </p>
           <button
-            onClick={() => window.location.href = '/choose'}
+            onClick={() => router.push('/choose')}
             className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-semibold hover:bg-[#e5a561] transition-colors"
           >
             読み物を始める

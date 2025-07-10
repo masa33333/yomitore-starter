@@ -1477,7 +1477,7 @@ Your Cat`;
                     </div>
                     
                     <button
-                      onClick={() => window.location.href = '/notebook'}
+                      onClick={() => router.push('/notebook')}
                       className="w-full rounded-md bg-[#FFE1B5] px-6 py-3 font-medium text-text-primary transition-colors hover:bg-[#E5C590]"
                     >
                       📚 マイノートを見る
@@ -1573,7 +1573,7 @@ Your Cat`;
                           ✅ OK
                         </button>
                         <button
-                          onClick={() => window.location.href = '/notebook'}
+                          onClick={() => router.push('/notebook')}
                           className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
                         >
                           📚 ノートを見る

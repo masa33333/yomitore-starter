@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { mapQuizLevelToGenerationLevel, getGenerationLevelName } from '@/utils/getEnglishText';
 
 interface ReadingHistoryItem {
@@ -26,6 +27,7 @@ interface ReadingHistoryItem {
 }
 
 export default function HistoryPage() {
+  const router = useRouter();
   const [history, setHistory] = useState<ReadingHistoryItem[]>([]);
 
   useEffect(() => {
@@ -126,7 +128,7 @@ export default function HistoryPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">{formatDate(item.date)}</span>
                   <button
-                    onClick={() => window.location.href = `/reading?id=${item.id}`}
+                    onClick={() => router.push(`/reading?id=${item.id}`)}
                     className="bg-[#FFB86C] text-[#1E1E1E] px-3 py-1 rounded text-sm hover:bg-[#e5a561] whitespace-nowrap"
                   >
                     もう一度読む
@@ -168,7 +170,7 @@ export default function HistoryPage() {
 
       <div className="mt-8 text-center">
         <button
-          onClick={() => window.location.href = '/choose'}
+          onClick={() => router.push('/choose')}
           className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-2 rounded hover:bg-[#e5a561]"
         >
           新しい読み物を生成

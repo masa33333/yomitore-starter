@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { STORY_OPTIONS } from '@/lib/storyPrompt';
 import { useLanguage } from '@/context/LanguageContext';
 import CatLoader from '@/components/CatLoader';
 
 export default function StoryFormPage() {
+  const router = useRouter();
   const { displayLang } = useLanguage();
   const [genre, setGenre] = useState('');
   const [tone, setTone] = useState('');
@@ -63,7 +65,7 @@ export default function StoryFormPage() {
     console.log('🎭 【ストーリーフォーム】遷移URL:', `/reading?${queryParams.toString()}`);
     
     // URLパラメータ付きで遷移
-    window.location.href = `/reading?${queryParams.toString()}`;
+    router.push(`/reading?${queryParams.toString()}`);
   };
 
   // 表示言語に応じたラベル生成関数
@@ -108,7 +110,7 @@ export default function StoryFormPage() {
         {/* 戻るボタンを上に移動 */}
         <div className="text-center mb-6">
           <button
-            onClick={() => window.location.href = '/choose'}
+            onClick={() => router.push('/choose')}
             className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-semibold hover:bg-[#e5a561] transition-colors"
           >
             ← 選択画面に戻る
@@ -206,7 +208,7 @@ export default function StoryFormPage() {
           {/* Back Button */}
           <div className="text-center">
             <button
-              onClick={() => window.location.href = '/choose'}
+              onClick={() => router.push('/choose')}
               disabled={isGenerating}
               className="text-[#1E1E1E] hover:opacity-70 text-sm underline"
             >

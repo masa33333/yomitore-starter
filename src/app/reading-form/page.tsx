@@ -78,7 +78,7 @@ export default function ReadingFormPage() {
       {/* 戻るボタン */}
       <div className="text-center mb-6">
         <button
-          onClick={() => window.location.href = '/choose'}
+          onClick={() => router.push('/choose')}
           className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-semibold hover:bg-[#e5a561] transition-colors"
         >
           ← 選択画面に戻る

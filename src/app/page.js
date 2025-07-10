@@ -1,10 +1,12 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function Home() {
   const { displayLang } = useLanguage();
+  const router = useRouter();
 
   // ページマウント時の状態確認
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function Home() {
 
 
   const handleQuizStart = () => {
-    window.location.href = '/quiz';
+    router.push('/quiz');
   };
 
   const handleNewJourney = () => {
@@ -95,7 +97,7 @@ export default function Home() {
     
     console.log('🔄 All data reset - starting new journey');
     console.log('➡️ /start ページに遷移します');
-    window.location.href = '/start';
+    router.push('/start');
   };
 
   const handleChooseReading = () => {
@@ -106,10 +108,10 @@ export default function Home() {
     
     if (!vocabLevel) {
       console.log('➡️ 語彙レベル未設定 - /quiz に誘導');
-      window.location.href = '/quiz';
+      router.push('/quiz');
     } else {
       console.log('➡️ 語彙レベル設定済み - /choose に誘導');
-      window.location.href = '/choose';
+      router.push('/choose');
     }
   };
 
