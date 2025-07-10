@@ -6,7 +6,7 @@ function addParagraphBreaks(englishText: string, japaneseText: string, level: nu
   let englishParagraphs: string[] = [];
   let japaneseParagraphs: string[] = [];
   
-  // レベル1-2: 短い文章なので2-3段落に分割
+  // レベル1-2: 短い文章なので2段落に分割
   if (level <= 2) {
     const englishSentences = englishText.split(/(?<=[.!?])\s+/);
     const japaneseSentences = japaneseText.split(/(?<=[。！？])\s*/);
@@ -21,12 +21,28 @@ function addParagraphBreaks(englishText: string, japaneseText: string, level: nu
       japaneseParagraphs.push(japaneseSentences.slice(i, i + sentencesPerParagraph).join(''));
     }
   }
-  // レベル3: より長い文章なので3段落に分割
+  // レベル3-4: 中程度の文章なので3段落に分割
+  else if (level <= 4) {
+    const englishSentences = englishText.split(/(?<=[.!?])\s+/);
+    const japaneseSentences = japaneseText.split(/(?<=[。！？])\s*/);
+    
+    const paragraphCount = 3;
+    const sentencesPerParagraph = Math.ceil(englishSentences.length / paragraphCount);
+    
+    for (let i = 0; i < englishSentences.length; i += sentencesPerParagraph) {
+      englishParagraphs.push(englishSentences.slice(i, i + sentencesPerParagraph).join(' '));
+    }
+    
+    for (let i = 0; i < japaneseSentences.length; i += sentencesPerParagraph) {
+      japaneseParagraphs.push(japaneseSentences.slice(i, i + sentencesPerParagraph).join(''));
+    }
+  }
+  // レベル5: より長い文章なので4段落に分割
   else {
     const englishSentences = englishText.split(/(?<=[.!?])\s+/);
     const japaneseSentences = japaneseText.split(/(?<=[。！？])\s*/);
     
-    const paragraphCount = 3; // 新3段階システムではレベル3が最上位
+    const paragraphCount = 4;
     const sentencesPerParagraph = Math.ceil(englishSentences.length / paragraphCount);
     
     for (let i = 0; i < englishSentences.length; i += sentencesPerParagraph) {
@@ -281,8 +297,8 @@ export async function POST(req: Request) {
       useNewFlow = true  // 新フローのフラグ
     } = requestData;
     
-    // レベルを1-3の範囲に正規化（新3段階システム）
-    const normalizedLevel = Math.max(1, Math.min(3, parseInt(level.toString())));
+    // レベルを1-5の範囲に正規化（5段階システム）
+    const normalizedLevel = Math.max(1, Math.min(5, parseInt(level.toString())));
     
     console.log(`📝 Generating content for level ${normalizedLevel}`, {
       mode, topic, theme, genre, tone, feeling, useNewFlow
@@ -674,11 +690,13 @@ function generateSampleStoryContent(
 async function translateWithVocabularyControl(japaneseContent: string[], level: number): Promise<string[]> {
   console.log(`🔤 Translating to English with Level ${level} vocabulary control`);
   
-  // NGSL語彙レベル範囲の設定（新3段階システム）
+  // NGSL語彙レベル範囲の設定（5段階システム）
   const vocabularyRanges = {
-    1: { rangeStart: 1, rangeMid: 900, rangeEnd: 1800 },   // Level 1: 0-1800 (A1+A2)
-    2: { rangeStart: 1, rangeMid: 2000, rangeEnd: 3000 },  // Level 2: 1801-3000 (B1) 
-    3: { rangeStart: 1, rangeMid: 3000, rangeEnd: 3500 }   // Level 3: 3001-3500 (B2)
+    1: { rangeStart: 1, rangeMid: 500, rangeEnd: 1000 },   // Level 1: 1-1000 (A1)
+    2: { rangeStart: 1, rangeMid: 1000, rangeEnd: 1500 },  // Level 2: 1-1500 (A2)
+    3: { rangeStart: 1, rangeMid: 1500, rangeEnd: 2000 },  // Level 3: 1-2000 (B1)
+    4: { rangeStart: 1, rangeMid: 2000, rangeEnd: 2500 },  // Level 4: 1-2500 (B2)
+    5: { rangeStart: 1, rangeMid: 2500, rangeEnd: 3500 }   // Level 5: 1-3500 (C1+)
   };
   
   const range = vocabularyRanges[level as keyof typeof vocabularyRanges];
@@ -705,7 +723,22 @@ ${level <= 2 ? `
 ■ Level ${level} 禁止語彙（絶対に使用しない）:
 evolve, evolution, prevalence, essential, expand, indispensable, emphasize, crucial, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor
 ■ Level ${level} 推奨語彙（積極的に使用）:
-is, are, was, were, have, has, had, do, does, did, can, could, will, would, may, might, must, should, get, got, go, went, come, came, see, saw, know, knew, think, thought, want, wanted, like, liked, need, needed, help, helped, work, worked, play, played, live, lived, look, looked, feel, felt, make, made, take, took, give, gave, find, found, tell, told, ask, asked, try, tried, use, used, put, put, run, ran, move, moved, turn, turned, start, started, stop, stopped, open, opened, close, closed, read, read, write, wrote, listen, listened, speak, spoke, learn, learned, teach, taught, study, studied, eat, ate, drink, drank, sleep, slept, walk, walked, sit, sat, stand, stood, buy, bought, sell, sold, pay, paid, cost, cost, spend, spent` : ''}
+is, are, was, were, have, has, had, do, does, did, can, could, will, would, may, might, must, should, get, got, go, went, come, came, see, saw, know, knew, think, thought, want, wanted, like, liked, need, needed, help, helped, work, worked, play, played, live, lived, look, looked, feel, felt, make, made, take, took, give, gave, find, found, tell, told, ask, asked, try, tried, use, used, put, put, run, ran, move, moved, turn, turned, start, started, stop, stopped, open, opened, close, closed, read, read, write, wrote, listen, listened, speak, spoke, learn, learned, teach, taught, study, studied, eat, ate, drink, drank, sleep, slept, walk, walked, sit, sat, stand, stood, buy, bought, sell, sold, pay, paid, cost, cost, spend, spent` : level === 3 ? `
+■ Level 3 制約:
+- 基本的な関係代名詞（who, which, that）の使用OK
+- 過去完了形・現在完了形の使用OK
+- 複文の使用OK、ただし複雑すぎる構造は避ける
+- NGSL 1-2000語彙を中心に使用` : level === 4 ? `
+■ Level 4 制約:
+- 幅広い語彙の使用OK（NGSL 1-2500語彙範囲）
+- 複雑な時制・仮定法の使用OK
+- 分詞構文の使用OK
+- 抽象的概念の表現OK` : level === 5 ? `
+■ Level 5 制約:
+- 学術的・専門的語彙の使用OK（NGSL 1-3500語彙範囲）
+- 高度な構文・修辞技法の使用OK
+- 複雑な文構造・従属節の使用OK
+- 専門的な概念の説明OK` : ''}
 - 出力は JSON 形式で、各段落を配列に：
 
 出力例：
@@ -798,12 +831,34 @@ function generateSampleEnglishTranslation(japaneseContent: string[], level: numb
     ];
   }
   
-  // Default translation with proper length
-  const defaultTranslations = [
-    `Today we will explore an interesting topic that many people find fascinating. Learning about different subjects helps us understand the world around us better. This particular topic has many surprising facts that most people don't know about. When we study these details carefully, we can discover amazing connections between different ideas and concepts.`,
-    `There are many important aspects to consider when discussing this subject. Scientists and researchers have spent years studying these phenomena to understand how they work. The results of their investigations have revealed unexpected patterns and relationships. These discoveries have changed the way we think about many things in our daily lives.`,
-    `Understanding this topic can help us make better decisions in our personal and professional lives. The knowledge we gain from studying these concepts applies to many different situations. By learning about these ideas, we become more informed citizens and better problem solvers. This kind of education is valuable for people of all ages and backgrounds.`
-  ];
+  // Default translation with level-appropriate vocabulary and length
+  const defaultTranslations = {
+    1: [
+      `Today we will learn about something new. Many people like to learn new things. This topic is fun and easy to understand. We will see some good facts about it.`,
+      `There are many good things to know about this topic. People study it to learn more. They find new things all the time. These things help us in our daily life.`,
+      `When we learn about this topic, we can use it in many ways. It helps us make good choices. Learning is always good for us. We can share what we learn with others.`
+    ],
+    2: [
+      `Today we will explore a topic that many people find interesting. Learning about different subjects helps us understand the world better. This topic has many surprising facts that most people don't know about. When we study these details, we can discover amazing connections.`,
+      `There are many important things to consider when discussing this subject. Scientists have spent years studying these things to understand how they work. Their research has shown unexpected patterns. These discoveries have changed how we think about many things in our daily lives.`,
+      `Understanding this topic can help us make better decisions in our personal and work lives. The knowledge we gain from studying these ideas applies to many different situations. By learning about these concepts, we become more informed and better problem solvers.`
+    ],
+    3: [
+      `Today we will explore an interesting topic that many people find fascinating. Learning about different subjects helps us understand the world around us better. This particular topic has many surprising facts that most people don't know about. When we study these details carefully, we can discover amazing connections between different ideas and concepts.`,
+      `There are many important aspects to consider when discussing this subject. Scientists and researchers have spent years studying these phenomena to understand how they work. The results of their investigations have revealed unexpected patterns and relationships. These discoveries have changed the way we think about many things in our daily lives.`,
+      `Understanding this topic can help us make better decisions in our personal and professional lives. The knowledge we gain from studying these concepts applies to many different situations. By learning about these ideas, we become more informed citizens and better problem solvers. This kind of education is valuable for people of all ages and backgrounds.`
+    ],
+    4: [
+      `Today we will explore a sophisticated topic that demonstrates the complexity of modern understanding. Contemporary research has revealed numerous fascinating aspects that challenge conventional wisdom. This particular subject encompasses multiple disciplines and requires careful analysis to fully comprehend its implications. When we examine these intricate details systematically, we can uncover profound connections between seemingly unrelated phenomena.`,
+      `There are various significant dimensions to consider when analyzing this multifaceted subject. Leading academics and researchers have dedicated considerable effort to investigating these complex phenomena, employing advanced methodologies to understand their underlying mechanisms. The outcomes of their comprehensive studies have illuminated unexpected patterns and intricate relationships that were previously unrecognized. These groundbreaking discoveries have fundamentally transformed our perspective on numerous aspects of contemporary life.`,
+      `Mastering this sophisticated topic enables us to make more informed decisions in both our personal and professional endeavors. The comprehensive knowledge we acquire through studying these advanced concepts proves applicable across diverse contexts and situations. By developing expertise in these areas, we evolve into more discerning individuals capable of critical analysis and innovative problem-solving approaches.`
+    ],
+    5: [
+      `Today we shall embark upon an intellectual exploration of a sophisticated topic that exemplifies the intricate nature of contemporary scholarly discourse. Advanced research methodologies have unveiled numerous fascinating dimensions that fundamentally challenge established paradigms and conventional theoretical frameworks. This particular subject encompasses multiple interdisciplinary domains and necessitates rigorous analytical approaches to fully comprehend its far-reaching implications and theoretical underpinnings. When we scrutinize these complex phenomena through systematic examination, we can illuminate profound interconnections between ostensibly disparate conceptual frameworks.`,
+      `There exist numerous significant epistemological dimensions that warrant careful consideration when conducting comprehensive analysis of this multifaceted scholarly domain. Distinguished academics and preeminent researchers have dedicated substantial intellectual resources to investigating these sophisticated phenomena, employing cutting-edge methodological approaches to elucidate their underlying mechanisms and theoretical foundations. The outcomes of their exhaustive empirical studies have illuminated previously unrecognized patterns and intricate relationships that possess profound implications for our understanding of contemporary theoretical discourse.`,
+      `Achieving mastery of this sophisticated academic discipline enables practitioners to formulate more nuanced and theoretically grounded decisions across diverse professional and intellectual contexts. The comprehensive theoretical knowledge we acquire through rigorous study of these advanced conceptual frameworks proves invaluable across numerous specialized domains and complex analytical situations. By developing expertise in these sophisticated areas of inquiry, we evolve into more discerning intellectual practitioners capable of conducting advanced critical analysis and formulating innovative theoretical contributions to contemporary scholarship.`
+    ]
+  };
   
-  return defaultTranslations;
+  return defaultTranslations[level as keyof typeof defaultTranslations] || defaultTranslations[3];
 }
