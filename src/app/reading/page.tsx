@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import ReadingClient from './ReadingClient';
 import CatLoader from '@/components/CatLoader';
 import { createClient } from '@supabase/supabase-js';
+import { getNotingHillStory as getStaticStory } from '@/data/nottingHillStories';
 
 // 動的ページとして設定（searchParamsを使用するため）
 export const dynamic = 'force-dynamic';
@@ -20,18 +21,18 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseAnonKey);
 }
 
-// Vercel対応：ファイルシステムまたはHTTP経由でNotting Hillストーリーを読み込む関数
+// 静的データからNotting Hillストーリーを取得する関数
 async function getNotingHillStory(level: number): Promise<StoryData> {
-  // まずローカルファイルシステムを試行
   try {
-    const fs = await import('fs/promises');
-    const path = await import('path');
+    console.log(`📖 Loading static Notting Hill story for level ${level}`);
     
-    // ローカル開発環境用パス
-    const localPath = path.join(process.cwd(), 'stories', 'notting-hill', `level${level}.txt`);
-    const content = await fs.readFile(localPath, 'utf-8');
+    const content = getStaticStory(level);
     
-    console.log(`📖 Successfully read local file: ${localPath} (${content.length} chars)`);
+    if (!content) {
+      throw new Error(`No story content found for level ${level}`);
+    }
+    
+    console.log(`✅ Static story loaded successfully (${content.length} chars)`);
     
     const formattedContent = formatChapterContent(content);
     const wordCount = content.split(/\s+/).filter(word => word.trim()).length;
@@ -39,43 +40,18 @@ async function getNotingHillStory(level: number): Promise<StoryData> {
     return {
       title: `Notting Hill (Level ${level})`,
       story: formattedContent,
-      themes: [`Level ${level}`, `${wordCount} words`, 'Preset Story from File'],
+      themes: [`Level ${level}`, `${wordCount} words`, 'Static Story Data'],
       isPreset: true
     };
-  } catch (localError) {
-    console.log(`📂 Local file not found, trying public path...`);
+  } catch (error) {
+    console.error(`❌ Failed to load static story:`, error);
     
-    // ローカルファイルが失敗した場合、publicフォルダから試行
-    try {
-      const fs = await import('fs/promises');
-      const path = await import('path');
-      
-      const publicPath = path.join(process.cwd(), 'public', 'stories', 'notting-hill', `level${level}.txt`);
-      const content = await fs.readFile(publicPath, 'utf-8');
-      
-      console.log(`📖 Successfully read public file: ${publicPath} (${content.length} chars)`);
-      
-      const formattedContent = formatChapterContent(content);
-      const wordCount = content.split(/\s+/).filter(word => word.trim()).length;
-      
-      return {
-        title: `Notting Hill (Level ${level})`,
-        story: formattedContent,
-        themes: [`Level ${level}`, `${wordCount} words`, 'Preset Story from File'],
-        isPreset: true
-      };
-    } catch (publicError) {
-      console.error(`❌ Failed to read files. Local error:`, localError);
-      console.error(`❌ Failed to read files. Public error:`, publicError);
-      
-      // すべて失敗した場合のフォールバック
-      return {
-        title: `Notting Hill (Level ${level}) - Loading Error`,
-        story: `Unable to load story content. The story file could not be found in the expected locations. This may be a deployment issue.`,
-        themes: [`Level ${level}`, 'File System Error'],
-        isPreset: true
-      };
-    }
+    return {
+      title: `Notting Hill (Level ${level}) - Load Error`,
+      story: `Unable to load story content. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      themes: [`Level ${level}`, 'Load Error'],
+      isPreset: true
+    };
   }
 }
 
