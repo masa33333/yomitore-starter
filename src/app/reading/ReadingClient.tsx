@@ -253,6 +253,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // コンポーネントマウント時にテストログ出力とデータ統一
   React.useEffect(() => {
     console.log('🚀 ReadingClient mounted!');
+    console.log('📋 Initial data:', initialData);
     console.log('📋 English paragraphs:', englishParagraphs);
     console.log('📊 Word count:', wordCount);
     
@@ -271,9 +272,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       allParams: Object.fromEntries(urlParams.entries())
     });
 
-    // notebookから戻っていない場合は新しいコンテンツを生成
-    if (!fromNotebook && !isClientRestored) {
+    // notebookから戻っていない場合、かつプリセットストーリーでない場合のみ新しいコンテンツを生成
+    if (!fromNotebook && !isClientRestored && !initialData) {
+      console.log('🔧 No initial data, generating new content...');
       generateNewContent();
+    } else if (initialData) {
+      console.log('📖 Initial data exists (preset story), skipping generation');
     }
     
     // notebookから戻った場合の完全な状態復元処理
