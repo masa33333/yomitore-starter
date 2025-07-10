@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { getGenerationLevelName } from '@/utils/getEnglishText';
 import CatLoader from '@/components/CatLoader';
 
 export default function ReadingFormPage() {
@@ -10,6 +11,37 @@ export default function ReadingFormPage() {
   const { displayLang } = useLanguage();
   const [topic, setTopic] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<number>(3);
+  const [showLevelSelector, setShowLevelSelector] = useState<boolean>(false);
+
+  useEffect(() => {
+    // 保存されたレベルを読み込み
+    try {
+      const savedLevel = localStorage.getItem('level') || localStorage.getItem('fixedLevel');
+      if (savedLevel) {
+        const levelNumber = Number(savedLevel);
+        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 5) {
+          setSelectedLevel(levelNumber);
+        }
+      }
+    } catch (error) {
+      console.error('語彙レベル読み込みエラー:', error);
+    }
+  }, []);
+
+  // レベル変更処理
+  const handleLevelChange = (newLevel: number) => {
+    setSelectedLevel(newLevel);
+    
+    // localStorageに保存
+    localStorage.setItem('level', newLevel.toString());
+    localStorage.setItem('fixedLevel', newLevel.toString());
+    localStorage.setItem('vocabLevel', newLevel.toString());
+    localStorage.setItem('vocabularyLevel', newLevel.toString());
+    
+    console.log(`📊 読み物フォーム: レベル${newLevel}に設定`);
+    setShowLevelSelector(false);
+  };
 
   // 表示テキストの定義
   const text = {
@@ -58,6 +90,46 @@ export default function ReadingFormPage() {
     <div className="flex min-h-screen flex-col items-center justify-start pt-6 bg-page-bg px-4">
       <h1 className="mb-6 mt-8 text-2xl font-bold text-text-primary">{text.title[displayLang]}</h1>
       
+      {/* 語彙レベル選択セクション */}
+      <div className="bg-white rounded-lg p-4 border border-gray-200 mb-6 w-full max-w-md">
+        <div className="flex items-center justify-between">
+          <span className="text-gray-700 font-bold">
+            語彙レベル：{getGenerationLevelName(selectedLevel)}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowLevelSelector(!showLevelSelector)}
+            className="text-gray-800 hover:text-gray-600 underline text-sm"
+          >
+            レベル変更
+          </button>
+        </div>
+        
+        {/* レベル選択UI */}
+        {showLevelSelector && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-600 mb-3">語彙レベルを選択してください：</p>
+            <div className="space-y-2">
+              {[1, 2, 3, 4, 5].map(level => (
+                <label key={level} className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="vocabularyLevel"
+                    value={level}
+                    checked={selectedLevel === level}
+                    onChange={() => handleLevelChange(level)}
+                    className="mr-3"
+                  />
+                  <span className={`${selectedLevel === level ? 'font-semibold text-blue-600' : 'text-gray-700'}`}>
+                    {getGenerationLevelName(level)}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* 機能無効化の通知 */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6 w-full max-w-md">
         <div className="flex items-center">

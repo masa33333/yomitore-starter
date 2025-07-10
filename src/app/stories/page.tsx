@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getGenerationLevelName } from '@/utils/getEnglishText';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,7 +23,38 @@ export default function StoriesPage() {
   ]);
   const [loading] = useState(false);
   const [error] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<number>(3);
+  const [showLevelSelector, setShowLevelSelector] = useState<boolean>(false);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    // 保存されたレベルを読み込み
+    try {
+      const savedLevel = localStorage.getItem('level') || localStorage.getItem('fixedLevel');
+      if (savedLevel) {
+        const levelNumber = Number(savedLevel);
+        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 5) {
+          setSelectedLevel(levelNumber);
+        }
+      }
+    } catch (error) {
+      console.error('語彙レベル読み込みエラー:', error);
+    }
+  }, []);
+
+  // レベル変更処理
+  const handleLevelChange = (newLevel: number) => {
+    setSelectedLevel(newLevel);
+    
+    // localStorageに保存
+    localStorage.setItem('level', newLevel.toString());
+    localStorage.setItem('fixedLevel', newLevel.toString());
+    localStorage.setItem('vocabLevel', newLevel.toString());
+    localStorage.setItem('vocabularyLevel', newLevel.toString());
+    
+    console.log(`📊 ストーリーページ: レベル${newLevel}に設定`);
+    setShowLevelSelector(false);
+  };
 
   // useEffectを使わずに直接表示
   // useEffect は現在不要
@@ -97,13 +129,52 @@ export default function StoriesPage() {
             </p>
           </div>
 
+          {/* 語彙レベル選択セクション */}
+          <div className="bg-white rounded-lg p-4 border border-gray-200 mb-6">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700 font-bold">
+                語彙レベル：{getGenerationLevelName(selectedLevel)}
+              </span>
+              <button
+                onClick={() => setShowLevelSelector(!showLevelSelector)}
+                className="text-gray-800 hover:text-gray-600 underline text-sm"
+              >
+                レベル変更
+              </button>
+            </div>
+            
+            {/* レベル選択UI */}
+            {showLevelSelector && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-sm text-gray-600 mb-3">語彙レベルを選択してください：</p>
+                <div className="space-y-2">
+                  {[1, 2, 3, 4, 5].map(level => (
+                    <label key={level} className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="vocabularyLevel"
+                        value={level}
+                        checked={selectedLevel === level}
+                        onChange={() => handleLevelChange(level)}
+                        className="mr-3"
+                      />
+                      <span className={`${selectedLevel === level ? 'font-semibold text-blue-600' : 'text-gray-700'}`}>
+                        {getGenerationLevelName(level)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* ストーリーカード */}
           {stories.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {stories.map((story) => (
                 <Link
                   key={story.slug}
-                  href={`/reading?slug=${story.slug}&level=1`}
+                  href={`/reading?slug=${story.slug}&level=${selectedLevel}`}
                   className="group"
                 >
                   <div className="bg-white rounded-lg shadow-md p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 border border-gray-200">
