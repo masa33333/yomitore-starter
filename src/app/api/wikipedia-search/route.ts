@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  let query = '';
+  let language = 'en';
+  
   try {
-    const { query, language = 'en' } = await request.json();
+    const requestData = await request.json();
+    query = requestData.query || '';
+    language = requestData.language || 'en';
     
     if (!query || typeof query !== 'string') {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });

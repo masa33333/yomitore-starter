@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  let text = '';
+  let sourceLang = 'ja';
+  let targetLang = 'en';
+  
   try {
-    const { text, sourceLang = 'ja', targetLang = 'en' } = await request.json();
+    const requestData = await request.json();
+    text = requestData.text || '';
+    sourceLang = requestData.sourceLang || 'ja';
+    targetLang = requestData.targetLang || 'en';
     
     if (!text || typeof text !== 'string') {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
@@ -71,10 +78,10 @@ export async function POST(request: Request) {
     console.error('❌ Translation error:', error);
     
     // フォールバック翻訳
-    const fallbackTranslation = performFallbackTranslation(text);
+    const fallbackTranslation = performFallbackTranslation(text || '');
     return NextResponse.json({
       translatedText: fallbackTranslation,
-      originalText: text,
+      originalText: text || '',
       method: 'fallback',
       error: error instanceof Error ? error.message : 'Translation failed'
     });

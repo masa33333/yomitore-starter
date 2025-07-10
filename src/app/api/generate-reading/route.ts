@@ -127,8 +127,14 @@ async function searchWikipedia(query: string): Promise<any> {
 }
 
 export async function POST(request: Request) {
+  let topic = '';
+  let level = 3;
+  
   try {
-    const { topic, level, isMailGeneration } = await request.json();
+    const requestData = await request.json();
+    topic = requestData.topic || '';
+    level = requestData.level || 3;
+    const isMailGeneration = requestData.isMailGeneration;
     
     console.log(`📝 生成開始: "${topic}" (Level ${level})`);
     
@@ -301,8 +307,8 @@ ${englishContent}`;
       english: fallbackContent,
       japanese: fallbackJapanese,
       wordCount: fallbackContent.split(' ').length,
-      level: 3,
-      topic: topic,
+      level: level || 3,
+      topic: topic || 'Unknown topic',
       error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
