@@ -60,8 +60,8 @@ export default function ChoosePage() {
     },
     storyCard: {
       title: {
-        ja: 'ストーリーを読む',
-        en: 'Read a Story',
+        ja: '映画のストーリーを読む',
+        en: 'Read a Movie Story',
       },
       desc: {
         ja: '物語形式',
