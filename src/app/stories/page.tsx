@@ -16,52 +16,40 @@ interface Story {
 }
 
 export default function StoriesPage() {
-  const [stories, setStories] = useState<Story[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // 直接フォールバックストーリーで初期化
+  const [stories] = useState<Story[]>([
+    { slug: 'notting-hill', title: 'Notting Hill' }
+  ]);
+  const [loading] = useState(false);
+  const [error] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    fetchStories();
-  }, []);
+  // useEffectを使わずに直接表示
+  // useEffect は現在不要
 
   async function fetchStories() {
+    const fallbackStories = [
+      { slug: 'notting-hill', title: 'Notting Hill' }
+    ];
+
     try {
-      setLoading(true);
+      console.log('📚 Supabase ストーリー取得試行...');
       
-      // Level 1で代表取得（タイトル一覧のため）
       const { data, error } = await supabase
         .from('stories')
         .select('slug, title')
         .eq('level', 1)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.warn('Supabaseからの取得に失敗、フォールバックストーリーを使用:', error);
-        // Supabaseが利用できない場合のフォールバックストーリー
-        const fallbackStories = [
-          {
-            slug: 'notting-hill',
-            title: 'Notting Hill'
-          }
-        ];
+      if (error || !data || data.length === 0) {
+        console.log('📖 Supabase利用不可またはデータなし、フォールバック使用');
         setStories(fallbackStories);
-        setLoading(false);
-        return;
+      } else {
+        console.log('✅ Supabase成功:', data.length, 'stories');
+        setStories(data);
       }
-
-      setStories(data || []);
     } catch (err) {
-      console.error('ストーリー取得エラー:', err);
-      console.log('フォールバックストーリーを使用します');
-      
-      // エラー時もフォールバックストーリーを表示
-      const fallbackStories = [
-        {
-          slug: 'notting-hill',
-          title: 'Notting Hill'
-        }
-      ];
+      console.log('🔄 Supabaseエラー、フォールバック使用:', err);
       setStories(fallbackStories);
     } finally {
       setLoading(false);
@@ -115,7 +103,7 @@ export default function StoriesPage() {
               {stories.map((story) => (
                 <Link
                   key={story.slug}
-                  href={`/reading?slug=${story.slug}`}
+                  href={`/reading?slug=${story.slug}&level=1`}
                   className="group"
                 >
                   <div className="bg-white rounded-lg shadow-md p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 border border-gray-200">
