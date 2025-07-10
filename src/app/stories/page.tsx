@@ -19,7 +19,7 @@ interface Story {
 export default function StoriesPage() {
   // 直接フォールバックストーリーで初期化
   const [stories] = useState<Story[]>([
-    { slug: 'notting-hill', title: 'ノッティングヒルの恋人' }
+    { slug: 'notting-hill', title: 'ノッティングヒルの恋人 (Notting Hill)' }
   ]);
   const [loading] = useState(false);
   const [error] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export default function StoriesPage() {
           {/* ヘッダー */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-text-primary mb-4">
-              📚 タイトル一覧
+              タイトル一覧
             </h1>
             <p className="text-text-secondary">
               お好きなストーリーを選んで読書を始めましょう
