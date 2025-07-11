@@ -804,6 +804,12 @@ OUTPUT FORMAT:
         max_tokens: 2000,
         messages: [
           {
+            role: 'system',
+            content: level === 1 ? 
+              'You are an English teacher for absolute beginners. You MUST use only the most basic English vocabulary (NGSL 1-500) and simple sentences. NEVER use complex words or grammar. Think of 6th grade level English.' :
+              'You are an English teacher creating content for language learners. Follow vocabulary level constraints carefully.'
+          },
+          {
             role: 'user',
             content: translationPrompt
           }
