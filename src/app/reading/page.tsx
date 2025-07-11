@@ -112,8 +112,8 @@ type PageProps = {
 };
 
 export default async function ReadingPage({ searchParams }: PageProps) {
-  // searchParamsは同期的にアクセス
-  const params = searchParams || {};
+  // Next.js 15: searchParamsをawaitしてから使用
+  const params = await searchParams || {};
   console.log('🏗️ Server Component executing with params:', params);
   
   const { slug } = params;
