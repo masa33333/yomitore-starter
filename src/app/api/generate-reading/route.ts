@@ -690,13 +690,13 @@ function generateSampleStoryContent(
 async function translateWithVocabularyControl(japaneseContent: string[], level: number): Promise<string[]> {
   console.log(`🔤 Translating to English with Level ${level} vocabulary control`);
   
-  // NGSL語彙レベル範囲の設定（5段階システム）
+  // NGSL語彙レベル範囲の設定（5段階システム）- 厳格化
   const vocabularyRanges = {
-    1: { rangeStart: 1, rangeMid: 500, rangeEnd: 1000 },   // Level 1: 1-1000 (A1)
-    2: { rangeStart: 1, rangeMid: 1000, rangeEnd: 1500 },  // Level 2: 1-1500 (A2)
-    3: { rangeStart: 1, rangeMid: 1500, rangeEnd: 2000 },  // Level 3: 1-2000 (B1)
-    4: { rangeStart: 1, rangeMid: 2000, rangeEnd: 2500 },  // Level 4: 1-2500 (B2)
-    5: { rangeStart: 1, rangeMid: 2500, rangeEnd: 3500 }   // Level 5: 1-3500 (C1+)
+    1: { rangeStart: 1, rangeMid: 300, rangeEnd: 500 },    // Level 1: 1-500 (超初級 A1)
+    2: { rangeStart: 1, rangeMid: 700, rangeEnd: 1000 },   // Level 2: 1-1000 (初級 A2)
+    3: { rangeStart: 1, rangeMid: 1200, rangeEnd: 1500 },  // Level 3: 1-1500 (中級 B1)
+    4: { rangeStart: 1, rangeMid: 1800, rangeEnd: 2500 },  // Level 4: 1-2500 (中上級 B2)
+    5: { rangeStart: 1, rangeMid: 2500, rangeEnd: 3500 }   // Level 5: 1-3500 (上級 C1+)
   };
   
   const range = vocabularyRanges[level as keyof typeof vocabularyRanges];
@@ -710,9 +710,22 @@ ${japaneseContent[2]}
 
 ■ 語彙レベル: Level ${level}（NGSL ${range.rangeStart}–${range.rangeEnd}）
 
+■ 語彙制約:
+- 使用語彙の100%を NGSL ${range.rangeStart}–${range.rangeEnd} の範囲から選ぶこと
+- 特にLevel 1では超基本語彙のみ使用（be, have, do, go, come, get, make, take, see, know, think, say, want, like, good, big, small, new, old, etc.）
+
+■ 文法制約（Level ${level}）:
+${level === 1 ? 
+  `- 絶対に単文のみ使用（複文・重文禁止）
+- 関係代名詞、分詞構文、後置修飾を絶対に使用しない
+- 現在形・過去形のみ（完了形・進行形・受動態禁止）
+- 助動詞は can, will のみ
+- 前置詞句は基本的なもののみ（in, on, at, with, for）
+- "When it comes to", "limited edition items offered only in Japan"等の複雑な表現は絶対禁止` :
+  `- 基本的な複文は可能だが、複雑な構文は避ける
+- 語彙制約を最優先に考慮`}
+
 ■ 指示:
-- 使用語彙の95%以上を ${range.rangeStart}–${range.rangeMid} の範囲から選ぶこと
-- 難語の多用を避け、自然な英文にすること
 - 各段落の長さ・雰囲気を保持
 - 専門家がわかりやすく説明しているスタイルを維持
 - 絶対に対話形式・会話形式にしない
@@ -721,7 +734,7 @@ ${japaneseContent[2]}
 - 科学的根拠がない情報や推測に基づく内容は含めない
 ${level <= 2 ? `
 ■ Level ${level} 禁止語彙（絶対に使用しない）:
-evolve, evolution, prevalence, essential, expand, indispensable, emphasize, crucial, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor
+evolve, evolution, prevalence, essential, expand, indispensable, emphasize, crucial, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor, petal, deploy, initiative, edition, item, offered, among, well-known, menu, limited, petals, deploy, initiative, comes, when
 ■ Level ${level} 推奨語彙（積極的に使用）:
 is, are, was, were, have, has, had, do, does, did, can, could, will, would, may, might, must, should, get, got, go, went, come, came, see, saw, know, knew, think, thought, want, wanted, like, liked, need, needed, help, helped, work, worked, play, played, live, lived, look, looked, feel, felt, make, made, take, took, give, gave, find, found, tell, told, ask, asked, try, tried, use, used, put, put, run, ran, move, moved, turn, turned, start, started, stop, stopped, open, opened, close, closed, read, read, write, wrote, listen, listened, speak, spoke, learn, learned, teach, taught, study, studied, eat, ate, drink, drank, sleep, slept, walk, walked, sit, sat, stand, stood, buy, bought, sell, sold, pay, paid, cost, cost, spend, spent` : level === 3 ? `
 ■ Level 3 制約:
@@ -739,9 +752,13 @@ is, are, was, were, have, has, had, do, does, did, can, could, will, would, may,
 - 高度な構文・修辞技法の使用OK
 - 複雑な文構造・従属節の使用OK
 - 専門的な概念の説明OK` : ''}
-- 出力は JSON 形式で、各段落を配列に：
 
-出力例：
+■ 絶対的要求:
+- 翻訳前に必ず自己チェックを行い、Level ${level} の語彙・文法制約を100%遵守すること
+- 一つでも制約違反があれば最初からやり直すこと
+- 特にLevel 1では「誰でもわかる中学1年生レベル」を厳格に維持すること
+
+出力フォーマット：
 {
   "en_paragraphs": ["...", "...", "..."]
 }`;
