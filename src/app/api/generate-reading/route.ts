@@ -727,17 +727,19 @@ ${japaneseContent[2]}
 
 ■ GRAMMAR CONSTRAINTS (Level ${level}):
 ${level === 1 ? 
-  `- ONLY use simple sentences (NO compound/complex sentences)
-- NO relative pronouns, participles, or post-modification
-- ONLY present/past tense (NO perfect/progressive/passive)
+  `- PREFER simple sentences (Subject + Verb + Object)
+- ABSOLUTELY NO relative pronouns: who, which, that, where, when
+- ABSOLUTELY NO participles: -ing, -ed forms used as adjectives
+- AVOID passive voice: "is written" → "someone writes"
+- Basic conjunctions OK: and, but, or, so
+- ONLY present/past tense: "is", "was", "goes", "went"
+- NO perfect tenses: "has written", "had gone"
+- NO progressive: "is writing", "was going"
 - Modal verbs: can, will ONLY
-- Basic prepositions ONLY (in, on, at, with, for)
-- ABSOLUTELY FORBIDDEN: "When it comes to", complex expressions
-- NO passive voice (are influenced by → people like)
-- NO present/past participles (expanding → and expand)
-- Basic infinitives ONLY (to go, to see, to make)
-- NO complex prepositional phrases
-- WRITE LIKE: "He is a writer. He writes books. People read his books."` :
+- NO complex prepositions: "according to", "because of"
+- MINIMIZE subordinate clauses: avoid "when he...", "if she...", "because..."
+- SENTENCE STRUCTURE: "He is a writer. He writes books and stories. People buy his books."
+- EXAMPLES: "He is a writer. He writes books. People read his books and like them."` :
   `- Basic compound sentences allowed but avoid complex structures
 - Vocabulary constraints take priority`}
 
@@ -773,10 +775,11 @@ is, are, was, were, have, has, had, do, does, did, can, will, get, got, go, went
 ■ ABSOLUTE REQUIREMENTS:
 - SELF-CHECK: Verify 100% compliance with Level ${level} vocabulary/grammar constraints
 - ONE violation = START OVER completely
-- Level 1: Must be "junior high school grade 1" level English
-- Level 1: ONE forbidden word = RETRANSLATE
-- Level 1: ONE complex sentence = RETRANSLATE  
-- Level 1: AIM for "This is a pen." simplicity
+- Level 1: Must be "elementary school" level English
+- Level 1: ONE relative pronoun (who/which/that) = RETRANSLATE
+- Level 1: ONE participle (-ing/-ed as adjective) = RETRANSLATE
+- Level 1: ONE passive voice = RETRANSLATE
+- Level 1: AIM for "This is a pen. I like cats." simplicity
 
 OUTPUT FORMAT:
 {
@@ -806,7 +809,7 @@ OUTPUT FORMAT:
           {
             role: 'system',
             content: level === 1 ? 
-              'You are an English teacher for absolute beginners. You MUST use only the most basic English vocabulary (NGSL 1-500) and simple sentences. NEVER use complex words or grammar. Think of 6th grade level English.' :
+              'You are an English teacher for absolute beginners. CRITICAL: Use ONLY basic vocabulary (NGSL 1-500) and simple sentences. NEVER use relative pronouns (who/which/that), participles (-ing/-ed as adjectives), or passive voice. Write like: "He is a writer. He writes books. People read his books." Think elementary school level.' :
               'You are an English teacher creating content for language learners. Follow vocabulary level constraints carefully.'
           },
           {
