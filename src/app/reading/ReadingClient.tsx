@@ -147,6 +147,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     return 0;
   });
   
+  // 読書開始時の総語数を記録（スタンプ進捗表示用）
+  const [readingStartWordsRead, setReadingStartWordsRead] = useState<number | null>(null);
+  
   // 単語処理状態
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
@@ -414,7 +417,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleStartReading = () => {
     setIsReadingStarted(true);
     setStartTime(Date.now());
-    console.log('📖 読書開始');
+    
+    // 読書開始時の総語数を記録（スタンプ進捗表示用）
+    const currentWordsRead = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+    setReadingStartWordsRead(currentWordsRead);
+    
+    console.log('📖 読書開始', { readingStartWordsRead: currentWordsRead });
     
     // 読書状態をlocalStorageに保存
     saveCurrentReadingState();
@@ -1267,14 +1275,24 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p className="text-sm text-gray-600">スタンプ進捗</p>
                   <p className="text-lg font-bold">
                     {(() => {
-                      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+                      // 読書開始時の語数を使用（読書完了処理前の値）
+                      const currentTotal = readingStartWordsRead || 0;
                       const newTotal = currentTotal + wordCount;
                       const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
                       const totalStamps = Math.floor(newTotal / 100);
                       const nextStampAt = ((Math.floor(newTotal / 100) + 1) * 100) - newTotal;
                       
+                      console.log('📊 スタンプ進捗計算:', {
+                        readingStartWordsRead,
+                        currentTotal,
+                        wordCount,
+                        newTotal,
+                        stampsEarned,
+                        totalStamps
+                      });
+                      
                       if (stampsEarned > 0) {
-                        return `+${stampsEarned}個獲得！（${totalStamps}個）`;
+                        return `+${stampsEarned}個獲得！（累計${totalStamps}個）`;
                       } else {
                         return `あと${nextStampAt}語で+1個`;
                       }
