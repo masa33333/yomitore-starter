@@ -92,9 +92,28 @@ export async function POST(request: Request) {
 function performFallbackTranslation(text: string): string {
   // 基本的な日本語→英語変換
   const basicTranslations: { [key: string]: string } = {
+    // ブランド・企業名
+    'ブルガリの歴史': 'history of Bulgari',
+    'ブルガリ': 'Bulgari',
+    'ルイヴィトンの歴史': 'history of Louis Vuitton',
+    'ルイヴィトン': 'Louis Vuitton',
+    'シャネルの歴史': 'history of Chanel',
+    'シャネル': 'Chanel',
+    'エルメスの歴史': 'history of Hermes',
+    'エルメス': 'Hermes',
+    'グッチの歴史': 'history of Gucci',
+    'グッチ': 'Gucci',
+    'プラダの歴史': 'history of Prada',
+    'プラダ': 'Prada',
+    
+    // 一般的なトピック
     'ワインの歴史': 'history of wine',
     'コーヒーの歴史': 'history of coffee',
     'お茶の歴史': 'history of tea',
+    'チョコレートの歴史': 'history of chocolate',
+    'パンの歴史': 'history of bread',
+    
+    // 基本語彙
     '歴史': 'history',
     '文化': 'culture',
     '技術': 'technology',
@@ -111,21 +130,30 @@ function performFallbackTranslation(text: string): string {
     '天気': 'weather',
     '季節': 'seasons',
     '地理': 'geography',
-    '言語': 'language'
+    '言語': 'language',
+    'エベレスト': 'Mount Everest',
+    '富士山': 'Mount Fuji'
   };
+
+  console.log(`🔄 Fallback translation lookup for: "${text}"`);
 
   // 完全一致を探す
   if (basicTranslations[text]) {
+    console.log(`✅ Fallback found exact match: "${text}" → "${basicTranslations[text]}"`);
     return basicTranslations[text];
   }
 
-  // 部分一致を探す
-  for (const [jp, en] of Object.entries(basicTranslations)) {
+  // 部分一致を探す（長いものから順番に）
+  const sortedKeys = Object.keys(basicTranslations).sort((a, b) => b.length - a.length);
+  for (const jp of sortedKeys) {
     if (text.includes(jp)) {
-      return text.replace(jp, en);
+      const result = text.replace(jp, basicTranslations[jp]);
+      console.log(`✅ Fallback found partial match: "${jp}" → "${basicTranslations[jp]}" in "${text}" → "${result}"`);
+      return result;
     }
   }
 
   // 何も見つからない場合はそのまま返す
+  console.log(`⚠️ Fallback: No translation found for "${text}", returning as-is`);
   return text;
 }
