@@ -5,7 +5,7 @@ import CatLoader from '@/components/CatLoader';
 import { createClient } from '@supabase/supabase-js';
 import { getNotingHillStory as getStaticStory } from '@/data/nottingHillStories';
 import { getStoryBySlugAndLevel } from '@/data/stories';
-import { loadStoryFromFile } from '@/lib/storyLoader';
+import { loadStoryFromFileServer } from '@/lib/serverStoryLoader';
 
 // 動的ページとして設定（searchParamsを使用するため）
 export const dynamic = 'force-dynamic';
@@ -162,8 +162,8 @@ export default async function ReadingPage({ searchParams }: PageProps) {
     
     // bucket-listの場合はファイルベースシステムを使用
     if (slug === 'bucket-list') {
-      console.log('📖 Bucket List ファイルベースシステムから読み込み');
-      const storyFromFile = await loadStoryFromFile(slug, userLevel);
+      console.log('📖 Bucket List サーバーサイドファイルシステムから読み込み');
+      const storyFromFile = await loadStoryFromFileServer(slug, userLevel);
       initialData = storyFromFile;
     }
     // notting-hillの場合は実際のファイルから読み込み

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>スタンプカード問題診断ツール</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .problem { background: #ffebee; border-color: #f44336; }
+        .normal { background: #e8f5e8; border-color: #4caf50; }
+        .debug { background: #f0f0f0; border-color: #666; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🐛 スタンプカード問題診断ツール</h1>
+    
+    <div class="section problem">
+        <h2>📋 問題の概要</h2>
+        <p><strong>ユーザー報告：</strong> 累計158語なのにスタンプカードが16個埋まっている</p>
+        <p><strong>期待値：</strong> 158語 ÷ 100 = 1個（もしくは2個）のスタンプ</p>
+        <p><strong>実際：</strong> 16個のスタンプが表示されている</p>
+    </div>
+
+    <div class="section debug">
+        <h2>🔍 診断結果</h2>
+        <div id="diagnosis">診断中...</div>
+    </div>
+
+    <div class="section">
+        <h2>🛠️ 手動診断</h2>
+        <button onclick="runDiagnosis()">診断開始</button>
+        <button onclick="showRawData()">生データ表示</button>
+        <button onclick="fixIssue()">問題修正</button>
+        <button onclick="clearData()">データクリア</button>
+    </div>
+
+    <div class="section">
+        <h2>📊 データ表示</h2>
+        <div id="dataDisplay"></div>
+    </div>
+
+    <script>
+        function runDiagnosis() {
+            const diagnosis = document.getElementById('diagnosis');
+            const dataDisplay = document.getElementById('dataDisplay');
+            
+            // localStorage データを取得
+            const totalWordsRead = localStorage.getItem('totalWordsRead') || '0';
+            const userProgressRaw = localStorage.getItem('userProgress');
+            const stampCardRaw = localStorage.getItem('stampCard');
+            
+            let userProgress = {};
+            let stampCard = [];
+            
+            try {
+                userProgress = JSON.parse(userProgressRaw || '{}');
+            } catch (e) {
+                userProgress = { error: e.message };
+            }
+            
+            try {
+                stampCard = JSON.parse(stampCardRaw || '[]');
+            } catch (e) {
+                stampCard = { error: e.message };
+            }
+            
+            // 診断ロジック
+            const totalWords = parseInt(totalWordsRead, 10);
+            const expectedStamps = Math.floor(totalWords / 100);
+            const actualStamps = userProgress.currentCardStamps || 0;
+            const totalStamps = userProgress.totalStamps || 0;
+            
+            let diagnosisText = '';
+            
+            diagnosisText += `<h3>🔍 診断結果</h3>`;
+            diagnosisText += `<p><strong>累計語数 (totalWordsRead):</strong> ${totalWords}語</p>`;
+            diagnosisText += `<p><strong>期待スタンプ数:</strong> ${expectedStamps}個 (${totalWords} ÷ 100)</p>`;
+            diagnosisText += `<p><strong>実際の現在カードスタンプ数:</strong> ${actualStamps}個</p>`;
+            diagnosisText += `<p><strong>実際の累計スタンプ数:</strong> ${totalStamps}個</p>`;
+            
+            if (actualStamps > expectedStamps) {
+                diagnosisText += `<p class="problem">❌ 問題発見：スタンプ数が期待値より多い</p>`;
+                diagnosisText += `<p><strong>原因推測：</strong></p>`;
+                diagnosisText += `<ul>`;
+                diagnosisText += `<li>旧システムから新システムへのマイグレーション時の問題</li>`;
+                diagnosisText += `<li>completedReadings の値が totalStamps として使用された可能性</li>`;
+                diagnosisText += `<li>スタンプ計算ロジックの問題</li>`;
+                diagnosisText += `</ul>`;
+            } else {
+                diagnosisText += `<p class="normal">✅ スタンプ数は正常</p>`;
+            }
+            
+            diagnosis.innerHTML = diagnosisText;
+            
+            // 詳細データ表示
+            dataDisplay.innerHTML = `
+                <h3>📋 詳細データ</h3>
+                <h4>totalWordsRead (localStorage)</h4>
+                <pre>${totalWordsRead}</pre>
+                
+                <h4>userProgress (localStorage)</h4>
+                <pre>${JSON.stringify(userProgress, null, 2)}</pre>
+                
+                <h4>stampCard (localStorage)</h4>
+                <pre>${JSON.stringify(stampCard, null, 2)}</pre>
+            `;
+        }
+        
+        function showRawData() {
+            const dataDisplay = document.getElementById('dataDisplay');
+            dataDisplay.innerHTML = `
+                <h3>🔍 生データ</h3>
+                <h4>totalWordsRead</h4>
+                <pre>${localStorage.getItem('totalWordsRead') || 'null'}</pre>
+                
+                <h4>userProgress</h4>
+                <pre>${localStorage.getItem('userProgress') || 'null'}</pre>
+                
+                <h4>stampCard</h4>
+                <pre>${localStorage.getItem('stampCard') || 'null'}</pre>
+                
+                <h4>completedReadings</h4>
+                <pre>${localStorage.getItem('completedReadings') || 'null'}</pre>
+            `;
+        }
+        
+        function fixIssue() {
+            const totalWords = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+            const expectedStamps = Math.floor(totalWords / 100);
+            const expectedCurrentCardStamps = expectedStamps % 20;
+            const expectedCompletedCards = Math.floor(expectedStamps / 20);
+            
+            const fixedProgress = {
+                totalStamps: expectedStamps,
+                totalWords: totalWords,
+                currentCardStamps: expectedCurrentCardStamps,
+                completedCards: expectedCompletedCards,
+                bronzeCoins: Math.floor(expectedStamps / 10),
+                bronzeTrophies: Math.floor(expectedCompletedCards / 5),
+                silverTrophies: Math.floor(Math.floor(expectedCompletedCards / 5) / 5),
+                goldTrophies: Math.floor(Math.floor(Math.floor(expectedCompletedCards / 5) / 5) / 5),
+                platinumTrophies: Math.floor(Math.floor(Math.floor(Math.floor(expectedCompletedCards / 5) / 5) / 5) / 4),
+                consecutiveLoginDays: 0,
+                lastLoginDate: '',
+                dailyStoriesRead: 0,
+                dailyFirstStoryBonus: false,
+                dailyGoalAchieved: false,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem('userProgress', JSON.stringify(fixedProgress));
+            
+            // スタンプカードデータも修正
+            const stampCardData = [];
+            for (let i = 0; i < expectedStamps; i++) {
+                stampCardData.push({
+                    id: `stamp_${Date.now()}_${i}`,
+                    completionDate: new Date().toISOString(),
+                    wordCount: 100,
+                    level: 1,
+                    sessionDuration: 60000,
+                    wpm: 120,
+                    title: '修正されたスタンプ',
+                    contentType: 'reading'
+                });
+            }
+            localStorage.setItem('stampCard', JSON.stringify(stampCardData));
+            
+            alert('問題を修正しました！ページをリロードしてください。');
+            location.reload();
+        }
+        
+        function clearData() {
+            if (confirm('すべてのスタンプデータをクリアしますか？')) {
+                localStorage.removeItem('userProgress');
+                localStorage.removeItem('stampCard');
+                localStorage.removeItem('totalWordsRead');
+                localStorage.removeItem('completedReadings');
+                alert('データをクリアしました！');
+                location.reload();
+            }
+        }
+        
+        // 自動診断
+        window.onload = function() {
+            runDiagnosis();
+        };
+    </script>
+</body>
+</html>

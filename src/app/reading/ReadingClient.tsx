@@ -12,6 +12,8 @@ import NewStampCard from '@/components/NewStampCard';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 import StampFlash from '@/components/StampFlash';
+import { BookmarkDialog } from '@/components/BookmarkDialog';
+import { ResumeDialog } from '@/components/ResumeDialog';
 import { analyzeVocabulary } from '@/constants/ngslData';
 import { playStampFanfare, playCardCompleteFanfare } from '@/lib/stampSounds';
 import { updateTodayRecord } from '@/lib/calendarData';
@@ -71,9 +73,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const { story, updateStory } = useStory();
 
   // タイトル表示用のテーマ/ジャンル取得
-  const displayTitle = mode === 'story' 
-    ? (initialData?.title || searchParams.genre || 'ストーリー')
-    : (searchParams.topic || searchParams.theme || '読み物');
+  const displayTitle = initialData?.title 
+    ? initialData.title  // プリセットストーリーのタイトルを優先
+    : mode === 'story' 
+      ? (searchParams.genre || 'ストーリー')
+      : (searchParams.topic || searchParams.theme || '読み物');
 
   // notebookからの戻りかどうかを初期化時に判定
   const isFromNotebook = () => {
@@ -154,6 +158,24 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
   const [loadingWordInfo, setLoadingWordInfo] = useState(false);
+  
+  // しおり機能用ステート
+  const [bookmarkTokenIndex, setBookmarkTokenIndex] = useState<number | null>(null);
+  const [lastTapTime, setLastTapTime] = useState<number>(0);
+  const [lastTapTarget, setLastTapTarget] = useState<HTMLElement | null>(null);
+  const [bookmarkDialog, setBookmarkDialog] = useState<{
+    isOpen: boolean;
+    word: string;
+    tokenIndex: number;
+    conflictLevel?: number;
+  }>({
+    isOpen: false,
+    word: '',
+    tokenIndex: 0
+  });
+  const [isResumeMode, setIsResumeMode] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  
   const [sessionWords, setSessionWords] = useState<WordInfo[]>(() => {
     if (isFromNotebook() && typeof window !== 'undefined') {
       try {
@@ -268,12 +290,40 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // URLパラメータをチェックしてnotebookからの戻りかどうかを判定
     const urlParams = new URLSearchParams(window.location.search);
     const fromNotebook = urlParams.get('fromNotebook') === 'true' || urlParams.get('from') === 'notebook';
+    const resumeMode = urlParams.get('resume') === '1';
     console.log('📚 From notebook?', fromNotebook);
+    console.log('📖 Resume mode?', resumeMode);
     console.log('📚 URL params:', {
       fromNotebook: urlParams.get('fromNotebook'),
       from: urlParams.get('from'),
+      resume: urlParams.get('resume'),
       allParams: Object.fromEntries(urlParams.entries())
     });
+
+    // しおり再開モードの処理
+    if (resumeMode) {
+      console.log('📖 Resume mode detected, setting up bookmark restoration...');
+      setIsResumeMode(true);
+      const bookmarkData = localStorage.getItem('reading_bookmark');
+      if (bookmarkData) {
+        try {
+          const bookmark = JSON.parse(bookmarkData);
+          setBookmarkTokenIndex(bookmark.tokenIndex);
+          console.log('📖 Bookmark restored:', bookmark);
+          // しおり位置へのスクロールとぼかし表示はコンテンツ読み込み後に実行
+          setTimeout(() => {
+            const targetElement = document.querySelector(`[data-idx="${bookmark.tokenIndex}"]`);
+            if (targetElement) {
+              targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              console.log('📖 Scrolled to bookmark position');
+            }
+            setShowResumeDialog(true);
+          }, 1000);
+        } catch (error) {
+          console.error('❌ Error parsing bookmark:', error);
+        }
+      }
+    }
 
     // notebookから戻っていない場合、かつプリセットストーリーでない場合のみ新しいコンテンツを生成
     if (!fromNotebook && !isClientRestored && !initialData) {
@@ -457,7 +507,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       duration: duration,
       wpm: calculatedWpm,
       level: currentLevel,
-      title: storyTitle || displayTitle || '読み物',
+      title: storyTitle || initialData?.title || displayTitle || '読み物',
       contentType: 'reading'
     };
     
@@ -586,6 +636,74 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     } catch (error) {
       console.error('❌ 手紙送信エラー:', error);
     }
+  };
+
+  // ダブルタップ処理（しおり機能）
+  const handleDoubleTap = (target: HTMLElement) => {
+    const tokenIndex = parseInt(target.dataset.idx || '0', 10);
+    const word = target.textContent || '';
+    
+    console.log('📖 ダブルタップ検知:', word, 'tokenIndex:', tokenIndex);
+    
+    // 既存のしおりチェック
+    const existingBookmark = localStorage.getItem('reading_bookmark');
+    if (existingBookmark) {
+      const bookmark = JSON.parse(existingBookmark);
+      if (bookmark.slug === params.slug && bookmark.level !== selectedLevel) {
+        // レベル競合確認ダイアログ表示
+        setBookmarkDialog({
+          isOpen: true,
+          word,
+          tokenIndex,
+          conflictLevel: bookmark.level
+        });
+        return;
+      }
+    }
+    
+    // 中断確認ダイアログ表示
+    setBookmarkDialog({
+      isOpen: true,
+      word,
+      tokenIndex
+    });
+  };
+
+  // しおり保存処理
+  const saveBookmark = (tokenIndex: number, word: string) => {
+    const bookmarkData = {
+      slug: params.slug,
+      level: selectedLevel,
+      tokenIndex: tokenIndex
+    };
+    
+    localStorage.setItem('reading_bookmark', JSON.stringify(bookmarkData));
+    setBookmarkTokenIndex(tokenIndex);
+    
+    console.log('📖 しおり保存:', bookmarkData);
+    
+    // 中断時の統計計算処理
+    const currentTime = Date.now();
+    const readingTime = currentTime - (startTime || currentTime);
+    
+    // tokenIndexまでの英単語数を計算
+    const allTokens = english.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
+    const wordsRead = allTokens.slice(0, tokenIndex).filter(token => /^[A-Za-z]+$/.test(token)).length;
+    const wpmCalculated = wordsRead / (readingTime / 60000);
+    
+    // 統計データを保存（中断でも進捗に反映）
+    const progressData = {
+      wordsRead,
+      readingTime,
+      wpm: wpmCalculated,
+      date: new Date().toISOString(),
+      interrupted: true
+    };
+    
+    console.log('📊 中断時統計:', progressData);
+    
+    // 選択ページに戻る
+    router.push('/choose');
   };
 
   // 単語クリック処理
@@ -961,6 +1079,33 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       console.log(`有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
       
+      // ダブルタップ検知
+      const timeSinceLastTap = touchEndTime - lastTapTime;
+      const isSameTarget = lastTapTarget === target;
+      const isDoubleTap = timeSinceLastTap < 300 && isSameTarget; // 300ms以内
+      
+      if (isDoubleTap) {
+        console.log('📖 ダブルタップ検知:', word);
+        // ダブルタップ処理
+        handleDoubleTap(target);
+        // ダブルタップ後はタップ状態をリセット
+        setLastTapTime(0);
+        setLastTapTarget(null);
+        return;
+      }
+      
+      // シングルタップの場合、300ms後に処理する（ダブルタップ待ち）
+      setLastTapTime(touchEndTime);
+      setLastTapTarget(target);
+      
+      setTimeout(() => {
+        // 300ms後にダブルタップが発生していなければシングルタップとして処理
+        if (lastTapTime === touchEndTime && lastTapTarget === target) {
+          console.log('📚 シングルタップ処理:', word);
+          handleWordClick(word);
+        }
+      }, 300);
+      
       // タッチイベント専用のフラグを設定してクリックイベントとの重複を防ぐ
       (target as any)._touchHandled = true;
       setTimeout(() => {
@@ -973,8 +1118,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         target.style.backgroundColor = '';
         target.style.background = '';
       }, 50);
-      
-      handleWordClick(word);
     }
   };
 
@@ -998,6 +1141,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const renderClickableText = (text: string) => {
     console.log('🎨 renderClickableText called with:', text.substring(0, 100) + '...');
     
+    // しおり機能用のglobalTokenIndex（全体を通した連番）
+    let globalTokenIndex = 0;
+    
     // マークダウンの太字(**text**)を最初に処理
     const parts = text.split(/(\*\*[^*]+\*\*)/);
     
@@ -1020,14 +1166,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const result = words.map((word, wordIndex) => {
         if (/^[a-zA-Z]+$/.test(word)) {
           clickableWordCount++;
+          const tokenIndex = globalTokenIndex++;
           return (
             <span
               key={`${partIndex}-${wordIndex}`}
               className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
-              }`}
+              } ${bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
               title="クリックして意味を調べる"
               data-word={word}
+              data-idx={tokenIndex}
               style={{
                 WebkitTouchCallout: 'none',
                 WebkitUserSelect: 'none',
@@ -1145,8 +1293,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       ) : (
         <div className="space-y-6">
           {/* テキスト表示（段落ごと） */}
-          <div className="bg-white rounded-lg p-3 sm:p-6 shadow-sm" style={{ pointerEvents: 'auto' }}>
-            <div className="max-w-none" style={{ pointerEvents: 'auto' }}>
+          <div 
+            className={`bg-white rounded-lg p-3 sm:p-6 shadow-sm ${
+              isResumeMode ? 'blur-reading' : ''
+            }`} 
+            style={{ pointerEvents: isResumeMode ? 'none' : 'auto' }}
+          >
+            <div className="max-w-none" style={{ pointerEvents: isResumeMode ? 'none' : 'auto' }}>
               {englishParagraphs.map((paragraph, index) => {
                 console.log(`📝 段落 ${index + 1}:`, paragraph.substring(0, 50) + '...');
                 return (
@@ -1474,6 +1627,25 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       <StampFlash 
         show={showStampFlash} 
         onComplete={() => setShowStampFlash(false)} 
+      />
+
+      {/* しおり機能のダイアログ */}
+      <BookmarkDialog
+        isOpen={bookmarkDialog.isOpen}
+        onClose={() => setBookmarkDialog({...bookmarkDialog, isOpen: false})}
+        onConfirm={() => saveBookmark(bookmarkDialog.tokenIndex, bookmarkDialog.word)}
+        word={bookmarkDialog.word}
+        conflictLevel={bookmarkDialog.conflictLevel}
+        currentLevel={selectedLevel}
+      />
+
+      {/* 読書再開ダイアログ */}
+      <ResumeDialog
+        isOpen={showResumeDialog}
+        onResume={() => {
+          setShowResumeDialog(false);
+          setIsResumeMode(false);
+        }}
       />
 
     </main>

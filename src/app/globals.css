@@ -18,6 +18,18 @@ body {
   }
 }
 
+/* しおり機能用スタイル */
+.bookmark-token {
+  color: #d00;
+  text-decoration: underline;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.blur-reading {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
 /* Story content styling */
 .story-content h3 {
   display: none;

@@ -3,6 +3,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { useEffect, useState } from 'react';
 
 // 語彙レベルから難易度ラベルとCEFRレベルを取得する関数
 function getDifficultyFromLevel(level: number, lang: 'ja' | 'en' = 'ja'): string {
@@ -37,12 +38,38 @@ function getLevelFromDifficulty(difficulty: string): number {
 export default function ChoosePage() {
   const router = useRouter();
   const { displayLang } = useLanguage();
+  const [bookmark, setBookmark] = useState<{
+    slug: string;
+    level: number;
+    tokenIndex: number;
+  } | null>(null);
+
+  // しおりの存在確認
+  useEffect(() => {
+    const bookmarkData = localStorage.getItem('reading_bookmark');
+    if (bookmarkData) {
+      try {
+        const parsed = JSON.parse(bookmarkData);
+        setBookmark(parsed);
+      } catch (error) {
+        console.error('Error parsing bookmark:', error);
+      }
+    }
+  }, []);
 
   // 表示テキストの定義
   const text = {
     title: {
       ja: '何を読みますか？',
       en: 'What would you like to read?',
+    },
+    resumeReading: {
+      ja: '前回の続きを読む',
+      en: 'Continue Previous Reading',
+    },
+    resumeDesc: {
+      ja: `Level ${bookmark?.level} のしおりから再開`,
+      en: `Resume from Level ${bookmark?.level} bookmark`,
     },
     level: {
       ja: (label: string) => `語彙レベル：${label}`,
@@ -79,12 +106,32 @@ export default function ChoosePage() {
     }
   };
 
+  // しおりから読書再開
+  const handleResumeReading = () => {
+    if (bookmark) {
+      router.push(`/reading?slug=${bookmark.slug}&level=${bookmark.level}&resume=1`);
+    }
+  };
+
   return (
     <main className="mx-auto max-w-4xl p-4 min-h-screen">
       <div className="mb-6 mt-8">
         <h1 className="text-xl font-bold mb-4">
           {text.title[displayLang]}
         </h1>
+        
+        {/* しおりから読書再開ボタン */}
+        {bookmark && (
+          <button
+            onClick={handleResumeReading}
+            className="w-full mb-6 rounded-xl bg-red-500 hover:bg-red-600 px-6 py-4 text-left text-white transition-colors"
+          >
+            <div>
+              <h3 className="mb-1 text-lg font-semibold">{text.resumeReading[displayLang]}</h3>
+              <p className="mt-1 text-sm text-red-100">{text.resumeDesc[displayLang]}</p>
+            </div>
+          </button>
+        )}
         
       </div>
       
