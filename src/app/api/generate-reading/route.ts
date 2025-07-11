@@ -297,8 +297,8 @@ export async function POST(req: Request) {
       useNewFlow = true  // 新フローのフラグ
     } = requestData;
     
-    // レベルを1-5の範囲に正規化（5段階システム）
-    const normalizedLevel = Math.max(1, Math.min(5, parseInt(level.toString())));
+    // レベルを1-3の範囲に正規化（3段階システム）
+    const normalizedLevel = Math.max(1, Math.min(3, parseInt(level.toString())));
     
     console.log(`📝 Generating content for level ${normalizedLevel}`, {
       mode, topic, theme, genre, tone, feeling, useNewFlow
@@ -393,13 +393,16 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Reading generation error:", error);
     
+    // エラー時はレベル1の超基本的なフォールバックを使用
+    const fallbackTranslation = generateSampleEnglishTranslation(["サンプル", "読み物", "練習"], 1);
+    
     return NextResponse.json({
       error: "Reading generation temporarily unavailable",
-      english: "This is a sample reading text. Reading generation is temporarily unavailable, but you can still practice with this sample content.",
-      japanese: "これはサンプルの読み物です。読み物生成は一時的に利用できませんが、このサンプルコンテンツで練習できます。",
+      english: fallbackTranslation,
+      japanese: ["これはサンプルの読み物です。", "読み物生成は一時的に利用できません。", "このサンプルコンテンツで練習できます。"],
       title: "Sample Reading",
-      level: 2,
-      wordCount: 20
+      level: 1,
+      wordCount: fallbackTranslation.join(' ').split(' ').length
     }, { status: 500 });
   }
 }
@@ -445,6 +448,10 @@ async function generateJapaneseContent(topic: string): Promise<string[]> {
 - 1段落目：興味を引く具体的な導入（驚き・共感）
 - 2段落目：意外な事実や展開
 - 3段落目：視点の転換や今に繋がる意義
+
+■ 語数要件:
+- 各段落は十分に詳しく書く（1段落あたり100-150字程度）
+- 全体で300-400字程度の充実した内容にする
 
 ■ ルール:
 - 主語・視点を統一（ですます調）
@@ -690,13 +697,11 @@ function generateSampleStoryContent(
 async function translateWithVocabularyControl(japaneseContent: string[], level: number): Promise<string[]> {
   console.log(`🔤 Translating to English with Level ${level} vocabulary control`);
   
-  // NGSL語彙レベル範囲の設定（5段階システム）- 厳格化
+  // NGSL語彙レベル範囲の設定（3段階システム）- 厳格化
   const vocabularyRanges = {
     1: { rangeStart: 1, rangeMid: 300, rangeEnd: 500 },    // Level 1: 1-500 (超初級 A1)
     2: { rangeStart: 1, rangeMid: 700, rangeEnd: 1000 },   // Level 2: 1-1000 (初級 A2)
-    3: { rangeStart: 1, rangeMid: 1200, rangeEnd: 1500 },  // Level 3: 1-1500 (中級 B1)
-    4: { rangeStart: 1, rangeMid: 1800, rangeEnd: 2500 },  // Level 4: 1-2500 (中上級 B2)
-    5: { rangeStart: 1, rangeMid: 2500, rangeEnd: 3500 }   // Level 5: 1-3500 (上級 C1+)
+    3: { rangeStart: 1, rangeMid: 1500, rangeEnd: 2000 }   // Level 3: 1-2000 (中級 B1)
   };
   
   const range = vocabularyRanges[level as keyof typeof vocabularyRanges];
@@ -725,6 +730,12 @@ ${japaneseContent[2]}
   * perspectives → ways to see
   * philosophy → ideas
 
+■ WORD COUNT REQUIREMENTS:
+- Level 1: EXACTLY 100-140 words (minimum 100 words, NO LESS)
+- Level 2: EXACTLY 140-180 words (minimum 140 words, NO LESS)  
+- Level 3: EXACTLY 170-220 words (minimum 170 words, NO LESS)
+- If word count is insufficient, ADD MORE CONTENT with level-appropriate vocabulary
+
 ■ GRAMMAR CONSTRAINTS (Level ${level}):
 ${level === 1 ? 
   `- PREFER simple sentences (Subject + Verb + Object)
@@ -752,7 +763,7 @@ ${level === 1 ?
 - NO speculation or unverified claims
 ${level <= 2 ? `
 ■ FORBIDDEN WORDS (Level ${level}) - NEVER USE:
-when, comes, literary, storytelling, resonates, versatility, creativity, inspire, perspectives, philosophy, brainstorm, refresh, impact, creative, versatile, charmed, captivated, influenced, expanding, possibilities, viewpoint, values, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor, mysterious, worldview, catalyst, sensibilities, novelist, captivating, unique, distinct, expressive, domestically, internationally, unable, merely, serve, immeasurable, critic, translator, career, connection, relate, society, courage, impossible
+fluffy, region, agility, charm, charming, making, friendly, smaller, made, were made, They were made, influence, significant, literary, storytelling, resonates, versatility, creativity, inspire, perspectives, philosophy, brainstorm, refresh, impact, creative, versatile, charmed, captivated, influenced, expanding, possibilities, viewpoint, values, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor, mysterious, worldview, catalyst, sensibilities, novelist, captivating, unique, distinct, expressive, domestically, internationally, unable, merely, serve, immeasurable, critic, translator, career, connection, relate, society, courage, impossible
 
 ■ REQUIRED WORDS (Level ${level}) - USE THESE:
 is, are, was, were, have, has, had, do, does, did, can, will, get, got, go, went, come, came, see, saw, know, knew, think, thought, want, wanted, like, liked, need, needed, help, helped, work, worked, play, played, live, lived, look, looked, feel, felt, make, made, take, took, give, gave, find, found, tell, told, ask, asked, try, tried, use, used, put, put, run, ran, move, moved, turn, turned, start, started, stop, stopped, open, opened, close, closed, read, read, write, wrote, listen, listened, speak, spoke, learn, learned, teach, taught, study, studied, eat, ate, drink, drank, sleep, slept, walk, walked, sit, sat, stand, stood, buy, bought, sell, sold, pay, paid, cost, cost, spend, spent` : level === 3 ? `
@@ -760,21 +771,13 @@ is, are, was, were, have, has, had, do, does, did, can, will, get, got, go, went
 - 基本的な関係代名詞（who, which, that）の使用OK
 - 過去完了形・現在完了形の使用OK
 - 複文の使用OK、ただし複雑すぎる構造は避ける
-- NGSL 1-2000語彙を中心に使用` : level === 4 ? `
-■ Level 4 制約:
-- 幅広い語彙の使用OK（NGSL 1-2500語彙範囲）
-- 複雑な時制・仮定法の使用OK
-- 分詞構文の使用OK
-- 抽象的概念の表現OK` : level === 5 ? `
-■ Level 5 制約:
-- 学術的・専門的語彙の使用OK（NGSL 1-3500語彙範囲）
-- 高度な構文・修辞技法の使用OK
-- 複雑な文構造・従属節の使用OK
-- 専門的な概念の説明OK` : ''}
+- NGSL 1-2000語彙を中心に使用` : ''}
 
 ■ ABSOLUTE REQUIREMENTS:
 - SELF-CHECK: Verify 100% compliance with Level ${level} vocabulary/grammar constraints
+- WORD COUNT CHECK: Level ${level} must be ${level === 1 ? '100-140 words' : level === 2 ? '140-180 words' : '170-220 words'}
 - ONE violation = START OVER completely
+- If word count is under minimum, ADD MORE CONTENT before finalizing
 - Level 1: Must be "elementary school" level English
 - Level 1: ONE relative pronoun (who/which/that) = RETRANSLATE
 - Level 1: ONE participle (-ing/-ed as adjective) = RETRANSLATE
@@ -809,7 +812,9 @@ OUTPUT FORMAT:
           {
             role: 'system',
             content: level === 1 ? 
-              'You are an English teacher for absolute beginners. CRITICAL: Use ONLY basic vocabulary (NGSL 1-500) and simple sentences. NEVER use relative pronouns (who/which/that), participles (-ing/-ed as adjectives), or passive voice. Write like: "He is a writer. He writes books. People read his books." Think elementary school level.' :
+              'You are an English teacher for absolute beginners (elementary school level). CRITICAL RULES: 1) Write EXACTLY 100-140 words (MINIMUM 100 words). 2) Use ONLY the most basic vocabulary like: is, are, have, go, come, see, like, good, big, small, etc. 3) NEVER use words like: fluffy, region, agility, charm, making, friendly, smaller, made, were made. 4) NEVER use relative pronouns (who/which/that). 5) NEVER use participles (-ing/-ed as adjectives). 6) NEVER use passive voice (was written, were made). 7) Write simple sentences only: "Dogs are animals. People have dogs. Dogs are good." Think kindergarten level English.' :
+              level === 2 ? 'You are an English teacher for beginners. CRITICAL: Write EXACTLY 140-180 words (MINIMUM 140 words). Use ONLY basic vocabulary. Follow vocabulary level constraints carefully.' :
+              level === 3 ? 'You are an English teacher for intermediate learners. CRITICAL: Write EXACTLY 170-220 words (MINIMUM 170 words). Use vocabulary up to NGSL 1-2000. Follow vocabulary level constraints carefully.' :
               'You are an English teacher creating content for language learners. Follow vocabulary level constraints carefully.'
           },
           {
@@ -880,9 +885,9 @@ function generateSampleEnglishTranslation(japaneseContent: string[], level: numb
   // Default translation with level-appropriate vocabulary and length
   const defaultTranslations = {
     1: [
-      `Today we will learn about something new. Many people like to learn new things. This topic is fun and easy to understand. We will see some good facts about it.`,
-      `There are many good things to know about this topic. People study it to learn more. They find new things all the time. These things help us in our daily life.`,
-      `When we learn about this topic, we can use it in many ways. It helps us make good choices. Learning is always good for us. We can share what we learn with others.`
+      `Dogs are animals. Many people have dogs. Dogs are good friends. They live with people in houses. Dogs are happy animals. They like to play with people.`,
+      `Dogs eat food every day. People give food to dogs. Dogs drink water too. Dogs like to walk outside. They run and play in parks. Dogs love to play with balls.`,
+      `Dogs help people. Some dogs work with police. Dogs can find things. They help people who cannot see well. Dogs are very good animals. People love dogs very much.`
     ],
     2: [
       `Today we will explore a topic that many people find interesting. Learning about different subjects helps us understand the world better. This topic has many surprising facts that most people don't know about. When we study these details, we can discover amazing connections.`,

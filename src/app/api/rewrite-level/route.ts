@@ -38,8 +38,10 @@ CRITICAL EXAMPLES OF WHAT TO DO:
 ✅ GOOD Level 1: "The Beatles were four men. They made music. People liked their songs. They were from England. They were very famous."
 ❌ BAD: "The Beatles members were not only into music but also interested in movies and art, excelling in different areas."
 
-CRITICAL TASK: Rewrite the following English text for absolute beginners (6-year-old level).` : 
-`CRITICAL TASK: Rewrite the following English text to match Level ${targetLevel} vocabulary constraints while maintaining the same meaning and expert explanatory style.`}
+CRITICAL TASK: Rewrite the following English text for absolute beginners (6-year-old level).
+REQUIRED WORD COUNT: EXACTLY 80-120 words (NO LESS, NO MORE)` : 
+`CRITICAL TASK: Rewrite the following English text to match Level ${targetLevel} vocabulary constraints while maintaining the same meaning and expert explanatory style.
+REQUIRED WORD COUNT: ${targetLevel === 2 ? 'EXACTLY 120-160 words' : 'EXACTLY 180-220 words'} (MUST BE LONGER THAN ORIGINAL)`}
 
 Original text:
 "${originalText}"
@@ -61,24 +63,26 @@ NOUNS: man, woman, boy, girl, child, baby, people, family, friend, mother, fathe
 
 ADJECTIVES: big, small, good, bad, new, old, right, wrong, easy, hard, long, short, hot, cold, fast, slow, happy, sad, nice, red, blue, white, black, first, last, young, famous
 
-OTHERS: the, a, an, and, but, or, in, on, at, to, for, with, from, of, about, he, she, it, they, them, we, us, I, you, my, your, his, her, their, this, that, these, those, one, two, three, four, very, so, too, also, only, just, here, there, now, then, today, tomorrow, yes, no, not
+OTHERS: the, a, an, and, but, or, in, on, at, to, for, with, from, of, about, he, she, it, they, them, we, us, I, you, my, your, his, her, their, this, that, these, those, one, two, three, four, very, so, here, there, now, then, today, tomorrow, yes, no, not
 
 🚨 ABSOLUTE GRAMMAR RULES 🚨
-- ONLY Subject + Verb + Object: "The Beatles were four men."
-- ONLY simple past/present: "They made music." "People liked them."
-- NO participles: NOT "excelling" - use "They were good at"
-- NO compound adjectives: NOT "well-known" - use "famous"
-- NO complex phrases: NOT "not only...but also" - use "They did this. They also did that."
-- Maximum 6 words per sentence
-- NO words ending in -ing at sentence start
-- NO words like: members, interested, areas, excelling, into, also
+- ONLY Subject + Verb + Object: "Google is a website." "People use Google." "It helps people."
+- ONLY simple past/present: "They made it." "People liked it."
+- NEVER use -ing words: NOT "saving time" → "it saves time"
+- NEVER use -ed after nouns: NOT "engine used" → "people use an engine"
+- NO participles: NOT "providing help" → "it gives help"
+- NO post-modification: NOT "a search engine used worldwide" → "Google is a search engine. People use it everywhere."
+- NO compound adjectives: NOT "well-known" → "famous"
+- NEVER start with -ing: NOT "Saving time..." → "It saves time."
+- Maximum 5 words per sentence: "Google is a website."
+- SPLIT LONG IDEAS: "Google helps people find things. It is fast. People like it."
 
 🚨 BANNED WORDS FOR LEVEL 1 🚨
-members, interested, areas, excelling, into, also, different, only, both, various, several, including, during, through, between, among, within, without, although, however, therefore, moreover, furthermore, especially, particularly, specifically, generally, usually, often, sometimes, always, never, really, actually, probably, perhaps, maybe, quite, rather, pretty, fairly, extremely, incredibly, absolutely, completely, totally, entirely, exactly, definitely, certainly, obviously, clearly, apparently, unfortunately, fortunately, surprisingly, interestingly, importantly, significantly` : 
+feature, additionally, search, engine, worldwide, saving, providing, used, become, through, after, between, within, around, during, while, before, since, until, unless, although, however, therefore, moreover, furthermore, especially, particularly, specifically, generally, usually, often, sometimes, always, never, really, actually, probably, perhaps, maybe, quite, rather, pretty, fairly, extremely, incredibly, absolutely, completely, totally, entirely, exactly, definitely, certainly, obviously, clearly, apparently, unfortunately, fortunately, surprisingly, interestingly, importantly, significantly, members, interested, areas, excelling, into, also, different, only, both, various, several, including` : 
 targetLevel === 2 ? `🚨 LEVEL 2 STRICT RESTRICTIONS 🚨  
 - Use ONLY NGSL 1-1000 words: important, different, study, example, problem, learn, school, student, teacher, education, science, history, nature, animal, plant, country, city, people, family, friend, work, job, business, money, buy, sell, food, eat, drink, house, home, live, place, travel, visit, beautiful, interesting, special, happy, sad, easy, difficult, big, small, good, bad, new, old, young, think, know, understand, remember, forget, like, love, want, need, help, show, tell, say, speak, read, write, listen, watch, look, see, find, get, give, take, make, do, go, come, start, stop, finish, open, close, turn, walk, run, sit, stand, play, work, rest, sleep
 - GRAMMAR: Simple sentences + basic compound sentences with "and/but/or". NO complex clauses. NO participles.
-- BANNED WORDS: fascinated, exploring, resonates, legacy, admiration, perspectives, comprehensive, sophisticated, elaborate, contemporary, significant, demonstrate, essential, particular
+- BANNED WORDS: captivate, enthusiastic, donation, active, involvement, participate, contribute, inspire, influence, impact, fascinated, exploring, resonates, legacy, admiration, perspectives, comprehensive, sophisticated, elaborate, contemporary, significant, demonstrate, essential, particular, create, achieve, develop, maintain, various, specific, certain
 - SENTENCE EXAMPLES: "Edison was a man." "He made many things." "People liked his work." "His ideas were good."` :
 targetLevel === 3 ? `🚨 LEVEL 3 STRICT VOCABULARY CONTROL 🚨
 - ALLOWED NGSL 1-1500 words: significant, demonstrate, essential, particular, understand, develop, create, important, different, example, education, science, knowledge, experience, research, study, learn, discover, explain, improve, increase, describe, compare, analyze, suggest, influence, effect, result, cause, reason, solution, method, process, system, structure, information, evidence, data, facts, details, relationship, connection, activity, function, role, purpose, advantage, benefit, problem, issue, challenge, opportunity, success, achievement, progress, development, movement, change, growth, expansion
@@ -180,8 +184,8 @@ ${targetLevel === 3 ? `🚨 LEVEL 3 GRAMMAR RESTRICTIONS 🚨
 
 🎯 FINAL VALIDATION CHECKLIST (MUST CHECK BEFORE OUTPUT):
 ✓ All vocabulary within NGSL ${range.rangeStart}–${range.rangeEnd}
-✓ Word count is ${targetLevel === 3 ? 'AT LEAST 180 words' : targetLevel === 2 ? 'AT LEAST 120 words' : 'AT LEAST 80 words'}
-${targetLevel <= 2 ? `✓ NO forbidden words: fascinated, exploring, resonates, legacy, admiration, perspectives, significant, demonstrate, essential, particular
+✓ Word count is ${targetLevel === 3 ? 'EXACTLY 180-220 words' : targetLevel === 2 ? 'EXACTLY 120-160 words' : 'EXACTLY 80-120 words'}
+${targetLevel <= 2 ? `✓ NO forbidden words: captivate, enthusiastic, donation, active, involvement, fascinated, exploring, resonates, legacy, admiration, perspectives, significant, demonstrate, essential, particular, participate, contribute, inspire, influence, impact, create, achieve, develop, maintain, various, specific, certain
 ✓ ALL sentences are simple structure: Subject + Verb + Object
 ✓ NO participles (-ing/-ed at start): "Working hard" → "He worked hard"
 ✓ NO complex grammar: because/although/while/who/which/that` : ''}
@@ -191,7 +195,8 @@ ${targetLevel <= 2 ? `✓ NO forbidden words: fascinated, exploring, resonates, 
 ✓ Content is sufficiently detailed and expanded
 
 ⚠️ CRITICAL: COUNT YOUR WORDS BEFORE OUTPUTTING ⚠️
-If word count is insufficient, ADD MORE CONTENT before finalizing.
+${targetLevel === 1 ? 'If under 80 words, ADD MORE SIMPLE SENTENCES' : targetLevel === 2 ? 'If under 120 words, ADD MORE EXPLANATIONS' : 'If under 180 words, ADD MORE DETAILED CONTENT'}
+REMEMBER: Higher levels = MORE words, MORE details, MORE examples
 
 ${targetLevel === 1 ? `🚨🚨🚨 LEVEL 1 FINAL WARNING 🚨🚨🚨
 BEFORE YOU OUTPUT, CHECK EVERY SINGLE WORD:
@@ -232,6 +237,13 @@ Output the rewritten text only (no JSON, no formatting, just the text):`;
           max_tokens: 1500,
           messages: [
             {
+              role: 'system',
+              content: targetLevel === 1 ? 
+                `You are an English teacher for kindergarten children (5-year-olds). CRITICAL RULES: 1) Use ONLY these 200 basic words: be, is, are, have, go, come, see, like, good, big, small, man, woman, boy, girl, home, school, etc. 2) NEVER use: feature, additionally, search, engine, worldwide, saving, providing, used, become. 3) NEVER use -ing words: NOT "saving time" → "it saves time". 4) NEVER use -ed after nouns: NOT "engine used" → "people use engine". 5) ONLY write simple sentences: "Google is a website. People use Google. It helps people." 6) Maximum 5 words per sentence. 7) Think like explaining to a 5-year-old child.` :
+                targetLevel === 2 ? `You are an English teacher for beginners. CRITICAL: For Level ${targetLevel}, you MUST write EXACTLY 120-160 words (LONGER than the original). Use ONLY basic vocabulary. NEVER use words like: captivate, enthusiastic, donation, active, involvement, participate, contribute, inspire, influence, impact, create, achieve, develop, maintain, various, specific, certain. Replace with simple words like: catch, excited, gift, busy, taking part, join, give, help, change, make, keep, many, one, some. Every sentence must be simple: Subject + Verb + Object. ADD MORE EXPLANATIONS to reach word count.` :
+                'You are an English teacher creating level-appropriate content. Follow all vocabulary constraints strictly.'
+            },
+            {
               role: 'user',
               content: rewritePrompt
             }
@@ -257,13 +269,22 @@ Output the rewritten text only (no JSON, no formatting, just the text):`;
         success: true
       });
 
-      return NextResponse.json({
+      const responseData = {
         rewrittenText,
         targetLevel,
         wordCount,
         title: title || `Level ${targetLevel} Reading`,
         success: true
+      };
+      
+      console.log('📤 Sending response:', {
+        hasRewrittenText: !!responseData.rewrittenText,
+        rewrittenTextLength: responseData.rewrittenText?.length,
+        rewrittenTextType: typeof responseData.rewrittenText,
+        keys: Object.keys(responseData)
       });
+
+      return NextResponse.json(responseData);
 
     } catch (apiError) {
       console.error('❌ OpenAI API error:', apiError);

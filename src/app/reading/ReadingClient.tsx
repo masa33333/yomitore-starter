@@ -834,8 +834,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       if (response.ok) {
         const data = await response.json();
         console.log('🔍 Level conversion response data:', data);
+        console.log('🔍 data.rewrittenText exists:', !!data.rewrittenText);
+        console.log('🔍 data.rewrittenText type:', typeof data.rewrittenText);
+        console.log('🔍 data.rewrittenText length:', data.rewrittenText?.length);
+        console.log('🔍 data keys:', Object.keys(data));
+        console.log('🔍 Full response structure:', JSON.stringify(data, null, 2));
         
-        if (data.rewrittenText) {
+        if (data.rewrittenText && data.rewrittenText.trim()) {
           // 新しいレベルのテキストで更新
           setEnglish(data.rewrittenText);
           setEnglishParagraphs(data.rewrittenText.split('\n\n').filter(p => p.trim()));
@@ -849,15 +854,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           const words = data.rewrittenText.trim().split(/\s+/).filter(w => w.length > 0);
           setWordCount(words.length);
           
-          // 読書開始時の語数を現在の累計語数に更新（レベル変更時）
-          const currentWordsRead = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
-          setReadingStartWordsRead(currentWordsRead);
+          // レベル変更時は読書開始時の語数は変更しない（スタンプ計算の整合性を保つため）
+          // readingStartWordsRead は読書セッション開始時の累計語数を保持し続ける
           
           console.log('🔄 レベル変更時のスタンプ進捗リセット:', {
             oldWordCount: wordCount,
             newWordCount: words.length,
-            currentWordsRead,
-            readingStartWordsReadUpdated: currentWordsRead
+            readingStartWordsRead
           });
           
           // 現在のレベルを更新
@@ -877,13 +880,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           
           console.log('✅ レベル変換完了:', { newLevel, newWordCount: words.length, selectedLevel: newLevel });
         } else {
-          console.error('❌ rewrittenText not found in response:', data);
-          alert('レベル変換に失敗しました。もう一度お試しください。');
+          console.error('❌ rewrittenText not found or empty in response:', data);
+          console.error('❌ data.rewrittenText:', data.rewrittenText);
+          console.error('❌ Available keys:', Object.keys(data));
+          alert('レベル変換に失敗しました: レスポンスデータが不正です。もう一度お試しください。');
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('❌ レベル変換エラー:', response.status, errorData);
-        alert('レベル変換に失敗しました。もう一度お試しください。');
+        const errorMessage = errorData.error || `API エラー (${response.status})`;
+        alert(`レベル変換に失敗しました: ${errorMessage}\nもう一度お試しください。`);
       }
     } catch (error) {
       console.error('❌ レベル変換エラー:', error);
@@ -1277,7 +1283,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                     {(() => {
                       const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
                       const newTotal = currentTotal + wordCount;
-                      localStorage.setItem('totalWordsRead', newTotal.toString());
+                      // 表示のみ - localStorage は更新しない（読了処理で更新される）
                       return `${newTotal.toLocaleString()} 語`;
                     })()}
                   </p>
@@ -1286,20 +1292,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p className="text-sm text-gray-600">スタンプ進捗</p>
                   <p className="text-lg font-bold">
                     {(() => {
-                      // 読書開始時の語数を使用（読書完了処理前の値）
-                      const currentTotal = readingStartWordsRead || 0;
+                      // 現在の累計語数（読書完了処理前の値）
+                      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
                       const newTotal = currentTotal + wordCount;
                       const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
-                      const totalStamps = Math.floor(newTotal / 100);
+                      // 重要: totalStampsは現在の累計から計算（二重加算を防ぐ）
+                      const totalStamps = Math.floor(currentTotal / 100) + stampsEarned;
                       const nextStampAt = ((Math.floor(newTotal / 100) + 1) * 100) - newTotal;
                       
-                      console.log('📊 スタンプ進捗計算:', {
-                        readingStartWordsRead,
+                      console.log('📊 スタンプ進捗計算（修正版）:', {
                         currentTotal,
                         wordCount,
                         newTotal,
                         stampsEarned,
-                        totalStamps
+                        totalStamps,
+                        nextStampAt
                       });
                       
                       if (stampsEarned > 0) {
@@ -1440,7 +1447,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                           onClick={() => handleRegenerateWithLevel(level)}
                           className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                             selectedLevel === level 
-                              ? 'bg-primary-active text-text-primary' 
+                              ? 'bg-[#FFB86C] text-[#1E1E1E]' 
                               : 'border border-[#FFE1B5] bg-white text-text-primary hover:bg-page-bg'
                           }`}
                         >

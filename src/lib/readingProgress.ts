@@ -56,6 +56,18 @@ export function getUserProgress(): UserProgress {
         console.log('📊 Migrated totalWords from legacy system:', legacyWords);
       }
       
+      // データ整合性チェック - 語数とスタンプ数の論理的チェック
+      const expectedStamps = Math.floor(parsed.totalWords / 100);
+      if (parsed.totalStamps !== expectedStamps) {
+        console.warn(`⚠️ Stamp count mismatch detected! Expected: ${expectedStamps}, Got: ${parsed.totalStamps}`);
+        console.warn(`⚠️ Correcting stamp count based on word count: ${parsed.totalWords} words`);
+        parsed.totalStamps = expectedStamps;
+        parsed.currentCardStamps = expectedStamps % 20;
+        parsed.completedCards = Math.floor(expectedStamps / 20);
+        // 修正したデータを保存
+        saveUserProgress(parsed);
+      }
+      
       return parsed;
     }
   } catch (error) {
@@ -77,10 +89,23 @@ function migrateFromLegacySystem(): UserProgress {
   const legacyReadings = parseInt(localStorage.getItem(STORAGE_KEYS.COMPLETED_READINGS) || '0', 10);
   
   progress.totalWords = legacyWords;
-  // 100語毎にスタンプ1個の新システムに変更
+  // 100語毎にスタンプ1個の新システムに変更（語数ベースで計算）
   progress.totalStamps = Math.floor(legacyWords / 100);
   progress.currentCardStamps = progress.totalStamps % 20;
   progress.completedCards = Math.floor(progress.totalStamps / 20);
+  
+  // データ整合性チェック - 語数とスタンプ数の論理的チェック
+  const expectedStamps = Math.floor(legacyWords / 100);
+  if (progress.totalStamps !== expectedStamps) {
+    console.warn(`⚠️ Stamp count mismatch detected! Expected: ${expectedStamps}, Got: ${progress.totalStamps}`);
+    console.warn(`⚠️ Correcting stamp count based on word count: ${legacyWords} words`);
+    progress.totalStamps = expectedStamps;
+    progress.currentCardStamps = expectedStamps % 20;
+    progress.completedCards = Math.floor(expectedStamps / 20);
+  }
+  
+  // legacyReadings（読了回数）は参考値として記録するが、スタンプ計算には使用しない
+  console.log(`📊 Migration data - Words: ${legacyWords}, Legacy readings: ${legacyReadings}, Calculated stamps: ${progress.totalStamps}`);
   
   // コインとトロフィーを計算（新しいスタンプ数ベース）
   progress.bronzeCoins = Math.floor(progress.totalStamps / 10);

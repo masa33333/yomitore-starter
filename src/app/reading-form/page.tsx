@@ -120,7 +120,7 @@ export default function ReadingFormPage() {
                   onClick={() => handleLevelChange(level)}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                     selectedLevel === level 
-                      ? 'bg-blue-600 text-white' 
+                      ? 'bg-[#FFB86C] text-[#1E1E1E]' 
                       : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
