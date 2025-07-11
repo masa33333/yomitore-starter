@@ -211,25 +211,9 @@ The climax arrives when our hero faces their greatest challenge yet, a moment th
       });
     }
   } else {
-    // 読み物モード - 静的フォールバックデータ
-    const { topic } = params;
-    
-    if (topic) {
-      initialData = {
-        title: `About ${topic}`,
-        story: `This comprehensive reading material explores the fascinating world of ${topic}, offering insights that will significantly expand your understanding of this important subject. In today's rapidly evolving world, knowledge about ${topic} has become increasingly valuable for both personal growth and professional development. Researchers and experts have dedicated countless hours to studying various aspects of ${topic}, uncovering remarkable discoveries that continue to shape our understanding of this field.
-
-The historical development of ${topic} reveals a rich tapestry of innovation, breakthrough moments, and transformative changes that have influenced societies across the globe. From its early origins to modern applications, ${topic} has evolved dramatically, incorporating new technologies, methodologies, and perspectives that have revolutionized how we approach this subject. Scientists, scholars, and practitioners have contributed valuable research that has opened new possibilities and created exciting opportunities for future exploration.
-
-Understanding ${topic} provides numerous practical benefits that extend far beyond academic interest. This knowledge empowers individuals to make informed decisions, solve complex problems, and contribute meaningfully to their communities and professional environments. As we continue to advance in the 21st century, expertise in ${topic} will become even more crucial for navigating the challenges and opportunities that lie ahead, making this an essential area of study for learners of all ages and backgrounds.`,
-        themes: ['Learning', 'Knowledge', 'Education']
-      };
-      
-      console.log('✅ 読み物用静的データ準備:', {
-        title: initialData.title,
-        storyLength: initialData.story.length
-      });
-    }
+    // 読み物モード - 動的生成に任せるためinitialDataはnullのまま
+    console.log('📝 読み物モード: 動的生成システムを使用 (initialData = null)');
+    // initialDataをnullのままにして、ReadingClientで動的生成を促す
   }
   
   console.log('✅ Server Component data prepared:', {
