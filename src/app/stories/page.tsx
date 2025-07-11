@@ -25,9 +25,10 @@ interface Story {
 }
 
 export default function StoriesPage() {
-  // 直接フォールバックストーリーで初期化
+  // 利用可能なストーリー一覧
   const [stories, setStories] = useState<Story[]>([
-    { slug: 'notting-hill', title: 'ノッティングヒルの恋人 (Notting Hill)' }
+    { slug: 'notting-hill', title: 'ノッティングヒルの恋人 (Notting Hill)' },
+    { slug: 'bucket-list', title: '最高の人生の見つけ方 (The Bucket List)' }
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

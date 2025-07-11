@@ -4,6 +4,8 @@ import ReadingClient from './ReadingClient';
 import CatLoader from '@/components/CatLoader';
 import { createClient } from '@supabase/supabase-js';
 import { getNotingHillStory as getStaticStory } from '@/data/nottingHillStories';
+import { getStoryBySlugAndLevel } from '@/data/stories';
+import { loadStoryFromFile } from '@/lib/storyLoader';
 
 // 動的ページとして設定（searchParamsを使用するため）
 export const dynamic = 'force-dynamic';
@@ -19,6 +21,33 @@ function getSupabaseClient() {
   }
   
   return createClient(supabaseUrl, supabaseAnonKey);
+}
+
+// 新しいレベル対応ストーリーを取得する関数
+async function getLevelBasedStory(slug: string, level: number): Promise<StoryData> {
+  try {
+    console.log(`📖 Loading level-based story: ${slug}, level ${level}`);
+    
+    const storyContent = getStoryBySlugAndLevel(slug, level);
+    if (!storyContent) {
+      throw new Error(`Story not found: ${slug}, level ${level}`);
+    }
+    
+    return {
+      title: storyContent.title,
+      story: storyContent.content,
+      themes: [storyContent.vocabularyLevel, `Level ${level}`, slug],
+      isPreset: true
+    };
+  } catch (error) {
+    console.error(`❌ Failed to load story ${slug} level ${level}:`, error);
+    return {
+      title: `${slug} (Level ${level}) - Load Error`,
+      story: `Unable to load story content. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      themes: [`Level ${level}`, 'Load Error'],
+      isPreset: true
+    };
+  }
 }
 
 // 静的データからNotting Hillストーリーを取得する関数
@@ -131,8 +160,14 @@ export default async function ReadingPage({ searchParams }: PageProps) {
     
     console.log(`📚 プリセットストーリー要求: ${slug}, Level: ${userLevel}`);
     
+    // bucket-listの場合はファイルベースシステムを使用
+    if (slug === 'bucket-list') {
+      console.log('📖 Bucket List ファイルベースシステムから読み込み');
+      const storyFromFile = await loadStoryFromFile(slug, userLevel);
+      initialData = storyFromFile;
+    }
     // notting-hillの場合は実際のファイルから読み込み
-    if (slug === 'notting-hill') {
+    else if (slug === 'notting-hill') {
       console.log('📖 Notting Hill 実際のファイルから読み込み');
       const storyFromFile = await getNotingHillStory(userLevel);
       initialData = storyFromFile;
