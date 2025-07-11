@@ -849,6 +849,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           const words = data.rewrittenText.trim().split(/\s+/).filter(w => w.length > 0);
           setWordCount(words.length);
           
+          // 読書開始時の語数を現在の累計語数に更新（レベル変更時）
+          const currentWordsRead = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+          setReadingStartWordsRead(currentWordsRead);
+          
+          console.log('🔄 レベル変更時のスタンプ進捗リセット:', {
+            oldWordCount: wordCount,
+            newWordCount: words.length,
+            currentWordsRead,
+            readingStartWordsReadUpdated: currentWordsRead
+          });
+          
           // 現在のレベルを更新
           setSelectedLevel(newLevel);
           
