@@ -41,7 +41,7 @@ export default function StoriesPage() {
       const savedLevel = localStorage.getItem('level') || localStorage.getItem('fixedLevel');
       if (savedLevel) {
         const levelNumber = Number(savedLevel);
-        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 5) {
+        if (!isNaN(levelNumber) && levelNumber >= 1 && levelNumber <= 3) {
           setSelectedLevel(levelNumber);
         }
       }
@@ -125,21 +125,27 @@ export default function StoriesPage() {
             {showLevelSelector && (
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-600 mb-3">語彙レベルを選択してください：</p>
-                <div className="space-y-2">
-                  {[1, 2, 3, 4, 5].map(level => (
-                    <label key={level} className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="vocabularyLevel"
-                        value={level}
-                        checked={selectedLevel === level}
-                        onChange={() => handleLevelChange(level)}
-                        className="mr-3"
-                      />
-                      <span className={`${selectedLevel === level ? 'font-semibold text-blue-600' : 'text-gray-700'}`}>
-                        {getGenerationLevelName(level)}
-                      </span>
-                    </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { level: 1, label: '初級', description: '基本語彙のみ' },
+                    { level: 2, label: '中級', description: '日常語彙' },
+                    { level: 3, label: '上級', description: '幅広い語彙' }
+                  ].map(({ level, label, description }) => (
+                    <button
+                      key={level}
+                      onClick={() => handleLevelChange(level)}
+                      className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                        selectedLevel === level 
+                          ? 'bg-blue-600 text-white' 
+                          : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className="font-bold">Lv.{level}</div>
+                        <div className="text-xs">{label}</div>
+                        <div className="text-xs opacity-75">{description}</div>
+                      </div>
+                    </button>
                   ))}
                 </div>
               </div>
