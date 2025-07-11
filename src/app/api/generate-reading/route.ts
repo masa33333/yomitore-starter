@@ -268,8 +268,6 @@ Write as if you're sharing amazing secrets about this topic!`;
       throw new Error('No content generated');
     }
 
-    console.log(`✅ Generated content: ${englishContent.split(' ').length} words`);
-
     // 不要なラベル除去
     const labelPatterns = [
       /^(English|日本語|Japanese)\s*(Translation|翻訳)?\s*\d*:?\s*/gim,
@@ -281,6 +279,22 @@ Write as if you're sharing amazing secrets about this topic!`;
     labelPatterns.forEach(pattern => {
       englishContent = englishContent.replace(pattern, '');
     });
+
+    // Clean up and validate content
+    englishContent = englishContent.trim();
+    
+    if (!englishContent || englishContent.length < 10) {
+      console.error(`❌ Generated content too short: "${englishContent}"`);
+      throw new Error('Generated content is too short or empty');
+    }
+
+    const generatedWordCount = englishContent.split(' ').filter(word => word.trim()).length;
+    console.log(`✅ Generated content: ${generatedWordCount} words`);
+    
+    if (generatedWordCount < wordRange.min * 0.5) {
+      console.error(`❌ Generated word count too low: ${generatedWordCount} (expected minimum: ${wordRange.min})`);
+      throw new Error(`Generated content too short: ${generatedWordCount} words`);
+    }
 
     // Step 4: 日本語翻訳生成
     const japanesePrompt = `Translate the following educational English text to natural Japanese. 

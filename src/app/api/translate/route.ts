@@ -113,6 +113,13 @@ function performFallbackTranslation(text: string): string {
     'チョコレートの歴史': 'history of chocolate',
     'パンの歴史': 'history of bread',
     
+    // 歴史的イベント
+    'フランス革命': 'French Revolution',
+    'アメリカ独立戦争': 'American Revolutionary War',
+    '第二次世界大戦': 'World War II',
+    '第一次世界大戦': 'World War I',
+    '産業革命': 'Industrial Revolution',
+    
     // 基本語彙
     '歴史': 'history',
     '文化': 'culture',
