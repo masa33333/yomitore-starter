@@ -713,6 +713,17 @@ ${japaneseContent[2]}
 ■ 語彙制約:
 - 使用語彙の100%を NGSL ${range.rangeStart}–${range.rangeEnd} の範囲から選ぶこと
 - 特にLevel 1では超基本語彙のみ使用（be, have, do, go, come, get, make, take, see, know, think, say, want, like, good, big, small, new, old, etc.）
+- Level 1 では以下の語彙を必ず基本語彙に置き換える：
+  * influence → affect, change
+  * significant → important, big
+  * literary → book, story
+  * storytelling → tell stories
+  * resonates → touch, move
+  * versatility → many skills
+  * creativity → make new things
+  * inspire → help, encourage
+  * perspectives → ways to see
+  * philosophy → ideas, thoughts
 
 ■ 文法制約（Level ${level}）:
 ${level === 1 ? 
@@ -721,7 +732,11 @@ ${level === 1 ?
 - 現在形・過去形のみ（完了形・進行形・受動態禁止）
 - 助動詞は can, will のみ
 - 前置詞句は基本的なもののみ（in, on, at, with, for）
-- "When it comes to", "limited edition items offered only in Japan"等の複雑な表現は絶対禁止` :
+- "When it comes to", "limited edition items offered only in Japan"等の複雑な表現は絶対禁止
+- 受動態を絶対に使用しない（are influenced by → people like）
+- 現在分詞・過去分詞を絶対に使用しない（expanding → and expand）
+- 不定詞は基本的なもののみ（to go, to see, to make等）
+- 複雑な前置詞句を避ける（with a significant influence → and change many things）` :
   `- 基本的な複文は可能だが、複雑な構文は避ける
 - 語彙制約を最優先に考慮`}
 
@@ -734,7 +749,7 @@ ${level === 1 ?
 - 科学的根拠がない情報や推測に基づく内容は含めない
 ${level <= 2 ? `
 ■ Level ${level} 禁止語彙（絶対に使用しない）:
-evolve, evolution, prevalence, essential, expand, indispensable, emphasize, crucial, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor, petal, deploy, initiative, edition, item, offered, among, well-known, menu, limited, petals, deploy, initiative, comes, when
+evolve, evolution, prevalence, essential, expand, indispensable, emphasize, crucial, significant, fundamental, establish, constitute, enhance, acquire, comprehensive, facilitate, incorporate, investigate, demonstrate, participate, substantial, proportion, phenomenon, concept, perspective, environment, individual, community, technology, develop, maintain, create, achieve, various, particular, specific, certain, situation, information, experience, knowledge, consider, determine, identify, contribute, influence, approach, method, system, process, structure, function, research, analysis, effective, efficient, available, traditional, modern, social, cultural, economic, political, potential, possible, likely, primary, secondary, major, minor, petal, deploy, initiative, edition, item, offered, among, well-known, menu, limited, petals, deploy, initiative, comes, when, literary, storytelling, resonates, versatility, creativity, inspire, perspectives, philosophy, brainstorm, refresh, impact, creative, versatile, inspire, resonates, charmed, captivated, influenced, expanding, possibilities, viewpoint, values
 ■ Level ${level} 推奨語彙（積極的に使用）:
 is, are, was, were, have, has, had, do, does, did, can, could, will, would, may, might, must, should, get, got, go, went, come, came, see, saw, know, knew, think, thought, want, wanted, like, liked, need, needed, help, helped, work, worked, play, played, live, lived, look, looked, feel, felt, make, made, take, took, give, gave, find, found, tell, told, ask, asked, try, tried, use, used, put, put, run, ran, move, moved, turn, turned, start, started, stop, stopped, open, opened, close, closed, read, read, write, wrote, listen, listened, speak, spoke, learn, learned, teach, taught, study, studied, eat, ate, drink, drank, sleep, slept, walk, walked, sit, sat, stand, stood, buy, bought, sell, sold, pay, paid, cost, cost, spend, spent` : level === 3 ? `
 ■ Level 3 制約:
@@ -757,6 +772,9 @@ is, are, was, were, have, has, had, do, does, did, can, could, will, would, may,
 - 翻訳前に必ず自己チェックを行い、Level ${level} の語彙・文法制約を100%遵守すること
 - 一つでも制約違反があれば最初からやり直すこと
 - 特にLevel 1では「誰でもわかる中学1年生レベル」を厳格に維持すること
+- Level 1 では禁止語彙リストの単語が一つでも含まれていれば再翻訳すること
+- Level 1 では複文・受動態・分詞が一つでも使われていれば再翻訳すること
+- Level 1 では「This is a pen.」レベルの簡潔さを目指すこと
 
 出力フォーマット：
 {
