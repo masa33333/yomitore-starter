@@ -645,11 +645,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     console.log('📖 ダブルタップ検知:', word, 'tokenIndex:', tokenIndex);
     
+    // 現在の読み物を識別するためのslugを生成
+    const currentSlug = `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    
     // 既存のしおりチェック
     const existingBookmark = localStorage.getItem('reading_bookmark');
     if (existingBookmark) {
       const bookmark = JSON.parse(existingBookmark);
-      if (bookmark.slug === params.slug && bookmark.level !== selectedLevel) {
+      if (bookmark.slug === currentSlug && bookmark.level !== selectedLevel) {
         // レベル競合確認ダイアログ表示
         setBookmarkDialog({
           isOpen: true,
@@ -671,8 +674,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // しおり保存処理
   const saveBookmark = (tokenIndex: number, word: string) => {
+    // 現在の読み物を識別するためのslugを生成
+    const currentSlug = `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    
     const bookmarkData = {
-      slug: params.slug,
+      slug: currentSlug,
       level: selectedLevel,
       tokenIndex: tokenIndex
     };
