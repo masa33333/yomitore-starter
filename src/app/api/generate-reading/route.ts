@@ -87,20 +87,30 @@ const getVocabularyConstraints = (level: number): string => {
 // 翻訳機能（内部用）
 async function translateToEnglish(text: string): Promise<string> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/translate`, {
+    // Vercel環境での絶対URL構築
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    
+    console.log(`🌐 Translation API call: ${baseUrl}/api/translate`);
+    
+    const response = await fetch(`${baseUrl}/api/translate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, sourceLang: 'ja', targetLang: 'en' })
     });
 
     if (!response.ok) {
+      console.error(`❌ Translation API failed: ${response.status} ${response.statusText}`);
       throw new Error('Translation failed');
     }
 
     const data = await response.json();
+    console.log(`✅ Translation result: "${text}" → "${data.translatedText}"`);
     return data.translatedText || text;
   } catch (error) {
     console.error('❌ Translation error:', error);
+    console.log(`🔄 Translation fallback: using original text "${text}"`);
     return text; // フォールバック：そのまま返す
   }
 }
@@ -108,20 +118,30 @@ async function translateToEnglish(text: string): Promise<string> {
 // Wikipedia検索機能（内部用）
 async function searchWikipedia(query: string): Promise<any> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/wikipedia-search`, {
+    // Vercel環境での絶対URL構築
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    
+    console.log(`🔍 Wikipedia API call: ${baseUrl}/api/wikipedia-search`);
+    
+    const response = await fetch(`${baseUrl}/api/wikipedia-search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, language: 'en' })
     });
 
     if (!response.ok) {
+      console.error(`❌ Wikipedia API failed: ${response.status} ${response.statusText}`);
       throw new Error('Wikipedia search failed');
     }
 
     const data = await response.json();
+    console.log(`✅ Wikipedia result: Found "${data.title}" with ${data.content?.length || 0} chars`);
     return data;
   } catch (error) {
     console.error('❌ Wikipedia search error:', error);
+    console.log(`🔄 Wikipedia fallback: proceeding without source info`);
     return null;
   }
 }
@@ -129,6 +149,9 @@ async function searchWikipedia(query: string): Promise<any> {
 export async function POST(request: Request) {
   let topic = '';
   let level = 3;
+  let searchQuery = '';
+  let wikipediaData: any = null;
+  let wordRange = { min: 140, max: 200 };
   
   try {
     const requestData = await request.json();
@@ -140,11 +163,11 @@ export async function POST(request: Request) {
     
     // レベル正規化
     const normalizedLevel = Math.max(1, Math.min(5, parseInt(level?.toString() || '3')));
-    const wordRange = getWordCountRange(normalizedLevel);
+    wordRange = getWordCountRange(normalizedLevel);
     const vocabConstraints = getVocabularyConstraints(normalizedLevel);
     
     // Step 1: 日本語の場合は英語に翻訳
-    let searchQuery = topic;
+    searchQuery = topic;
     if (/[ひらがなカタカナ漢字]/.test(topic)) {
       console.log(`🌐 日本語検出: "${topic}" を英語に翻訳中...`);
       searchQuery = await translateToEnglish(topic);
@@ -153,7 +176,7 @@ export async function POST(request: Request) {
     
     // Step 2: Wikipedia検索
     console.log(`🔍 Wikipedia検索: "${searchQuery}"`);
-    const wikipediaData = await searchWikipedia(searchQuery);
+    wikipediaData = await searchWikipedia(searchQuery);
     
     let sourceInfo = '';
     let referenceUrl = '';
@@ -175,7 +198,21 @@ CRITICAL REQUIREMENTS:
 3. FACTUAL ACCURACY: Use only verified information
 4. EDUCATIONAL VALUE: Include interesting facts and insights
 5. ENGAGING STYLE: Make it interesting and readable
-6. NO TEMPLATES: Avoid generic phrases like "The history of..." or "The development of..."
+6. NO TEMPLATES: ABSOLUTELY FORBIDDEN phrases include:
+   - "The history of..."
+   - "The development of..."
+   - "The story of..."
+   - "[Topic] reveals..."
+   - "[Topic] shows..."
+   - "Throughout history..."
+   - "Over the years..."
+
+MANDATORY STYLE:
+- Start with specific, concrete details
+- Use active voice
+- Include surprising facts
+- Tell stories, not summaries
+- Make it feel like discovery
 
 ${sourceInfo ? `SOURCE INFORMATION (use as reference):
 ${sourceInfo}
@@ -189,15 +226,16 @@ Create an engaging, educational passage that teaches something meaningful about 
 
     const userPrompt = `Write an educational passage about "${searchQuery}" for Level ${normalizedLevel} English learners.
 
-Requirements:
+CRITICAL RULES:
 - ${wordRange.min}-${wordRange.max} words
 - ${vocabConstraints}
-- Include fascinating facts and insights
-- Make it engaging and memorable
-- Use information from reliable sources
-- Avoid generic introduction phrases
+- NEVER start with "The history of...", "The development of...", or any generic introduction
+- Start with a surprising fact, specific detail, or concrete example
+- Include fascinating insights that make readers curious
+- Use specific examples and stories
+- Make it feel like an exciting discovery
 
-Make this genuinely interesting and educational!`;
+Write as if you're sharing amazing secrets about this topic!`;
 
     // OpenAI API呼び出し
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -218,6 +256,7 @@ Make this genuinely interesting and educational!`;
     });
 
     if (!response.ok) {
+      console.error(`❌ OpenAI API error: ${response.status} ${response.statusText}`);
       throw new Error(`OpenAI API error: ${response.statusText}`);
     }
 
@@ -225,8 +264,11 @@ Make this genuinely interesting and educational!`;
     let englishContent = data.choices?.[0]?.message?.content?.trim();
 
     if (!englishContent) {
+      console.error('❌ No content generated from OpenAI');
       throw new Error('No content generated');
     }
+
+    console.log(`✅ Generated content: ${englishContent.split(' ').length} words`);
 
     // 不要なラベル除去
     const labelPatterns = [
@@ -299,9 +341,21 @@ ${englishContent}`;
   } catch (error) {
     console.error('❌ 生成エラー:', error);
     
-    // フォールバック
-    const fallbackContent = `I apologize, but I cannot generate content about this topic right now. Please try again with a different topic or check your internet connection.`;
-    const fallbackJapanese = `申し訳ございませんが、このトピックに関するコンテンツを現在生成できません。別のトピックでお試しいただくか、インターネット接続をご確認ください。`;
+    // Wikipedia情報があればそれを使ったフォールバック
+    let fallbackContent, fallbackJapanese;
+    
+    if (wikipediaData?.content) {
+      // Wikipedia情報を使った緊急フォールバック
+      const wikiSummary = wikipediaData.content.substring(0, wordRange.max * 5); // 適切な長さに切り詰め
+      fallbackContent = `Here are some interesting facts about ${searchQuery}: ${wikiSummary}`;
+      fallbackJapanese = `${topic}について興味深い事実をご紹介します：${wikipediaData.content.substring(0, 200)}...`;
+      console.log(`🔄 Using Wikipedia fallback for ${searchQuery}`);
+    } else {
+      // 完全フォールバック
+      fallbackContent = `I apologize, but I cannot generate content about "${topic}" right now. Please try again with a different topic or check your internet connection.`;
+      fallbackJapanese = `申し訳ございませんが、「${topic}」に関するコンテンツを現在生成できません。別のトピックでお試しいただくか、インターネット接続をご確認ください。`;
+      console.log(`🔄 Using complete fallback`);
+    }
     
     return NextResponse.json({
       english: fallbackContent,
@@ -309,6 +363,8 @@ ${englishContent}`;
       wordCount: fallbackContent.split(' ').length,
       level: level || 3,
       topic: topic || 'Unknown topic',
+      originalTopic: topic,
+      sourceUrl: wikipediaData?.url || null,
       error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
