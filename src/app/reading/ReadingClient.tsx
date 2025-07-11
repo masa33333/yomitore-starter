@@ -1418,18 +1418,26 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                     className="rounded-lg border-2 border-orange-400 bg-white p-4 shadow-lg"
                   >
                     <h4 className="mb-3 text-center font-bold text-lg text-black">語彙レベルを選択</h4>
-                    <div className="grid grid-cols-5 gap-2">
-                      {[1, 2, 3, 4, 5].map((level) => (
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { level: 1, label: '初級', description: '基本語彙のみ' },
+                        { level: 2, label: '中級', description: '日常語彙' },
+                        { level: 3, label: '上級', description: '幅広い語彙' }
+                      ].map(({ level, label, description }) => (
                         <button
                           key={level}
                           onClick={() => handleRegenerateWithLevel(level)}
-                          className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                          className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                             selectedLevel === level 
                               ? 'bg-primary-active text-text-primary' 
                               : 'border border-[#FFE1B5] bg-white text-text-primary hover:bg-page-bg'
                           }`}
                         >
-                          Lv.{level}
+                          <div className="text-center">
+                            <div className="font-bold">Lv.{level}</div>
+                            <div className="text-xs">{label}</div>
+                            <div className="text-xs text-gray-600">{description}</div>
+                          </div>
                         </button>
                       ))}
                     </div>

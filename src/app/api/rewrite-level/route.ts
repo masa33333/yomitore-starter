@@ -14,22 +14,18 @@ export async function POST(req: Request) {
       textLength: originalText.length 
     });
 
-    // NGSL語彙レベル範囲の設定
+    // NGSL語彙レベル範囲の設定（3段階システム）
     const vocabularyRanges = {
-      1: { rangeStart: 1, rangeMid: 500, rangeEnd: 800 },
-      2: { rangeStart: 1, rangeMid: 750, rangeEnd: 1200 },
-      3: { rangeStart: 1, rangeMid: 1000, rangeEnd: 1500 },
-      4: { rangeStart: 1, rangeMid: 1500, rangeEnd: 2500 },
-      5: { rangeStart: 1, rangeMid: 2000, rangeEnd: 4000 }
+      1: { rangeStart: 1, rangeMid: 300, rangeEnd: 500 },    // 初級：基本語彙のみ
+      2: { rangeStart: 1, rangeMid: 700, rangeEnd: 1000 },   // 中級：日常語彙
+      3: { rangeStart: 1, rangeMid: 1200, rangeEnd: 2000 }   // 上級：幅広い語彙
     };
 
     const range = vocabularyRanges[targetLevel as keyof typeof vocabularyRanges];
     const wordCountRequirements = {
       1: "80-120 words",
-      2: "110-150 words", 
-      3: "140-200 words",
-      4: "200-240 words",
-      5: "240-280 words"
+      2: "120-180 words", 
+      3: "180-250 words"
     };
 
     const rewritePrompt = `You are an expert English rewriter specializing in NGSL vocabulary control and educational content adaptation.
@@ -123,18 +119,18 @@ targetLevel === 4 ? `- EVERY WORD will be checked against NGSL 1-2500 limit
 🚨 CRITICAL WORD COUNT REQUIREMENTS 🚨
 - Level ${targetLevel} MUST have EXACTLY ${wordCountRequirements[targetLevel as keyof typeof wordCountRequirements]}
 - Current text has ${originalText.split(' ').length} words
-- TARGET: ${targetLevel === 4 ? 'MINIMUM 200 words, TARGET 220 words' : targetLevel === 5 ? 'MINIMUM 240 words, TARGET 260 words' : targetLevel === 3 ? 'MINIMUM 140 words, TARGET 170 words' : targetLevel === 2 ? 'MINIMUM 110 words, TARGET 130 words' : 'MINIMUM 80 words, TARGET 100 words'}
-- ${targetLevel >= 4 ? '⚠️ MUST EXPAND: Add detailed explanations, examples, context, and elaboration' : targetLevel <= 2 ? '⚠️ Keep concise but meet minimum word count' : '⚠️ Adjust content to meet target range'}
+- TARGET: ${targetLevel === 3 ? 'MINIMUM 180 words, TARGET 220 words' : targetLevel === 2 ? 'MINIMUM 120 words, TARGET 150 words' : 'MINIMUM 80 words, TARGET 100 words'}
+- ${targetLevel === 3 ? '⚠️ MUST EXPAND: Add detailed explanations, examples, context, and elaboration' : targetLevel === 2 ? '⚠️ Moderate detail with clear explanations' : '⚠️ Keep simple but meet minimum word count'}
 
-🔥 EXPANSION MANDATORY FOR LEVEL ${targetLevel >= 4 ? '4-5' : targetLevel >= 3 ? '3+' : '2+'} 🔥
+🔥 EXPANSION MANDATORY FOR LEVEL ${targetLevel === 3 ? '3 (Advanced)' : targetLevel === 2 ? '2 (Intermediate)' : '1 (Beginner)'} 🔥
 
-${targetLevel >= 4 ? `⚠️ LEVEL 4-5 SPECIAL INSTRUCTIONS ⚠️
-- MUST reach minimum ${targetLevel === 4 ? '200' : '240'} words
+${targetLevel === 3 ? `⚠️ LEVEL 3 ADVANCED INSTRUCTIONS ⚠️
+- MUST reach minimum 180 words
 - Add multiple paragraphs with detailed explanations
 - Include specific examples and case studies  
 - Elaborate on historical context and development
-- Discuss implications and future perspectives
-- Add technical details and comprehensive analysis` : ''}
+- Discuss implications and perspectives
+- Add comprehensive analysis with wide vocabulary` : ''}
 
 EXPANSION STRATEGIES (MANDATORY if word count is insufficient):
 - Add more detailed explanations of concepts and principles
@@ -182,19 +178,9 @@ ${targetLevel === 3 ? `🚨 LEVEL 3 GRAMMAR RESTRICTIONS 🚨
 - Maximum sentence length: 15 words
 - EXAMPLES: "Scientists study this problem because it affects many people." "The method that they use works well." "When people understand the facts, they make better decisions."` : ''}
 
-${targetLevel === 4 ? `🚨 LEVEL 4 GRAMMAR REQUIREMENTS 🚨
-- Complex compound-complex sentences REQUIRED
-- Multiple subordinate clauses: "Although the research, which was conducted over five years, demonstrates significant improvements, further investigation is necessary."
-- Participle phrases as sentence starters: "Having analyzed the data extensively, researchers concluded..."
-- Advanced passive constructions: "The methodology was implemented by specialists who had been trained in advanced techniques."
-- Complex relative clauses with multiple embeddings
-- Subjunctive mood and complex conditionals: "Were the conditions different, the results would have been more conclusive."
-- Sentence length: 15-25 words (complex structures required)
-- EXAMPLES: "The comprehensive analysis, which incorporated data from multiple sources, demonstrates that contemporary methodological approaches, when properly implemented, yield substantially more reliable results than traditional methods."` : ''}
-
 🎯 FINAL VALIDATION CHECKLIST (MUST CHECK BEFORE OUTPUT):
 ✓ All vocabulary within NGSL ${range.rangeStart}–${range.rangeEnd}
-✓ Word count is ${targetLevel === 4 ? 'AT LEAST 200 words' : targetLevel === 5 ? 'AT LEAST 240 words' : targetLevel === 3 ? 'AT LEAST 140 words' : targetLevel === 2 ? 'AT LEAST 110 words' : 'AT LEAST 80 words'}
+✓ Word count is ${targetLevel === 3 ? 'AT LEAST 180 words' : targetLevel === 2 ? 'AT LEAST 120 words' : 'AT LEAST 80 words'}
 ${targetLevel <= 2 ? `✓ NO forbidden words: fascinated, exploring, resonates, legacy, admiration, perspectives, significant, demonstrate, essential, particular
 ✓ ALL sentences are simple structure: Subject + Verb + Object
 ✓ NO participles (-ing/-ed at start): "Working hard" → "He worked hard"

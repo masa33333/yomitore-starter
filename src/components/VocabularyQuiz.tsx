@@ -151,13 +151,13 @@ export function VocabularyQuiz() {
       // 開発用: レベル結果をコンソールに出力
       console.log('📊 語彙レベル判定結果:');
       console.log('  判定レベル (1-5):', finalQuizLevel);
-      console.log('  生成レベル (1-5):', generationLevel);
+      console.log('  生成レベル (1-3):', generationLevel);
       console.log('  CEFR レベル:', cefrLevel);
       console.log('  🎯 判定レベルがそのまま適用されます');
       console.log('レベル変化履歴:', state.levelHistory);
     } catch (error) {
       console.error('テスト終了処理エラー:', error);
-      setFinalLevel(5); // デフォルト値
+      setFinalLevel(3); // デフォルト値（3段階システム）
       setFinished(true);
     }
   }, [calculateFinalLevel, mapToCEFRLevel, mapQuizLevelToGenerationLevel]);
@@ -381,7 +381,7 @@ export function VocabularyQuiz() {
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="mb-2 text-black">正解数: {testState.correctAnswers} / {testState.questionCount}</p>
           <p className="mb-2 text-lg font-bold text-black">
-            あなたの語彙レベル: {finalLevel} （最高5）
+            あなたの語彙レベル: {finalLevel} （最高3）
           </p>
           <p className="text-sm text-gray-600">
             このレベルで読み物を生成します
