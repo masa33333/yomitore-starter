@@ -1088,7 +1088,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       e.preventDefault();
       e.stopPropagation();
       
-      console.log(`有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
+      console.log(`📱 有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
+      console.log(`📱 タップ状態: 前回時間=${lastTapTimeRef.current}, 前回要素=${lastTapTargetRef.current?.textContent || 'なし'}`);
       
       // ダブルタップ検知（同じ要素かつ300ms以内）
       const timeSinceLastTap = touchEndTime - lastTapTimeRef.current;
@@ -1099,13 +1100,24 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         前回タップ時間: ${lastTapTimeRef.current}
         今回タップ時間: ${touchEndTime}
         時間差: ${timeSinceLastTap}ms
+        時間条件50ms超過: ${timeSinceLastTap > 50}
+        時間条件300ms未満: ${timeSinceLastTap < 300}
         同じ要素: ${isSameTarget}
         ダブルタップ: ${isDoubleTap}
         前回要素: ${lastTapTargetRef.current?.textContent}
         今回要素: ${target.textContent}`);
       
       if (isDoubleTap) {
-        console.log('📖 ダブルタップ検知:', word);
+        console.log('🎯🎯 ダブルタップ検知成功！:', word);
+        
+        // 視覚的フィードバック：赤色ハイライト
+        target.style.backgroundColor = '#ef4444';
+        target.style.color = 'white';
+        setTimeout(() => {
+          target.style.backgroundColor = '';
+          target.style.color = '';
+        }, 1500);
+        
         // 前回の要素のシングルタップタイムアウトをクリア
         if (lastTapTargetRef.current && (lastTapTargetRef.current as any)._singleTapTimeout) {
           clearTimeout((lastTapTargetRef.current as any)._singleTapTimeout);
@@ -1121,7 +1133,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         }
         
         // ダブルタップ処理を実行
-        console.log('🎯 ダブルタップ実行中...');
+        console.log('🎯 ダブルタップ処理実行中...');
         handleDoubleTap(target);
         
         // ダブルタップ後はタップ状態をリセット
@@ -1131,6 +1143,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }
       
       // シングルタップの場合、300ms後に処理する（ダブルタップ待ち）
+      console.log(`📝 シングルタップとして記録: ${word}`);
+      
       // 前回の異なる要素のタイムアウトをクリア（マイノート重複防止）
       if (lastTapTargetRef.current && lastTapTargetRef.current !== target && (lastTapTargetRef.current as any)._singleTapTimeout) {
         clearTimeout((lastTapTargetRef.current as any)._singleTapTimeout);
@@ -1141,6 +1155,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       lastTapTimeRef.current = touchEndTime;
       lastTapTargetRef.current = target;
       
+      console.log(`📝 新しい状態記録: 時間=${touchEndTime}, 要素=${word}`);
+      
       // 現在の要素の既存のタイムアウトをクリア
       if ((target as any)._singleTapTimeout) {
         clearTimeout((target as any)._singleTapTimeout);
@@ -1150,7 +1166,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const timeoutId = setTimeout(() => {
         // 300ms後に同じ要素がまだタップ対象なら単語クリック処理実行
         if (lastTapTargetRef.current === target && lastTapTimeRef.current === touchEndTime) {
-          console.log('📚 シングルタップタイムアウト実行:', word);
+          console.log('📚📚 シングルタップタイムアウト実行:', word);
+          
+          // 視覚的フィードバック：青色ハイライト（シングルタップ）
+          target.style.backgroundColor = '#3b82f6';
+          target.style.color = 'white';
+          setTimeout(() => {
+            target.style.backgroundColor = '';
+            target.style.color = '';
+          }, 500);
+          
           handleWordClick(word);
           lastTapTimeRef.current = 0;
           lastTapTargetRef.current = null;
