@@ -310,8 +310,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       if (bookmarkData) {
         try {
           const bookmark = JSON.parse(bookmarkData);
-          setBookmarkTokenIndex(bookmark.tokenIndex);
-          console.log('📖 Bookmark restored:', bookmark);
+          // 読書再開時はしおりマーカーは設定しない（視覚的混乱を防ぐため）
+          console.log('📖 Bookmark restored (no visual marker):', bookmark);
           // しおり位置へのスクロールとぼかし表示はコンテンツ読み込み後に実行
           setTimeout(() => {
             const targetElement = document.querySelector(`[data-idx="${bookmark.tokenIndex}"]`);
@@ -701,7 +701,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     };
     
     localStorage.setItem('reading_bookmark', JSON.stringify(bookmarkData));
-    setBookmarkTokenIndex(tokenIndex);
+    // しおりマーカーは表示しない（視覚的混乱を防ぐため）
+    // setBookmarkTokenIndex(tokenIndex);
     
     console.log('📖 しおり保存:', bookmarkData);
     
@@ -1213,7 +1214,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               key={`${partIndex}-${wordIndex}`}
               className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
-              } ${!isResumeMode && bookmarkTokenIndex !== null && bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
+              }`}
               title="タップ: 意味を調べる / 長押し: しおり作成"
               data-word={word}
               data-idx={tokenIndex}
@@ -1705,7 +1706,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           // 読書再開後はしおりマーカーとインデックスを完全にクリア
           setBookmarkTokenIndex(null);
           globalTokenIndexRef.current = 0;
-          console.log('🔄 読書再開: しおりマーカーとインデックスをリセット');
+          console.log('🔄 読書再開: ぼかし解除、通常の読書モードに移行');
         }}
       />
 
