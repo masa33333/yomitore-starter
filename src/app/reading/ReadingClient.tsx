@@ -163,8 +163,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // しおり機能用ステート
   const [bookmarkTokenIndex, setBookmarkTokenIndex] = useState<number | null>(null);
-  const lastTapTimeRef = useRef<number>(0);
-  const lastTapTargetRef = useRef<HTMLElement | null>(null);
+  const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isLongPressRef = useRef<boolean>(false);
   const [bookmarkDialog, setBookmarkDialog] = useState<{
     isOpen: boolean;
     word: string;
@@ -640,14 +640,26 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // ダブルタップ処理（しおり機能）
-  const handleDoubleTap = (target: HTMLElement) => {
+  // 長押し処理（しおり機能）
+  const handleLongPress = (target: HTMLElement) => {
     const tokenIndex = parseInt(target.dataset.idx || '0', 10);
     const word = target.textContent || '';
     
-    console.log('🎯 handleDoubleTap実行:', word, 'tokenIndex:', tokenIndex);
-    console.log('🎯 target:', target);
-    console.log('🎯 searchParams:', searchParams);
+    console.log('🎯 handleLongPress実行:', word, 'tokenIndex:', tokenIndex);
+    
+    // 長押しフラグを設定
+    isLongPressRef.current = true;
+    
+    // 視覚的フィードバック：紫色ハイライト（長押し）
+    target.style.backgroundColor = '#8b5cf6';
+    target.style.color = 'white';
+    setTimeout(() => {
+      target.style.backgroundColor = '';
+      target.style.color = '';
+    }, 1500);
+    
+    // モバイル表示：長押し成功メッセージ
+    setDebugInfo(prev => prev + `\n\n🎯 長押し成功！\nしおり作成中...`);
     
     // 現在の読み物を識別するためのslugを取得/生成
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
@@ -1057,18 +1069,52 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [debugInfo, setDebugInfo] = useState<string>('');
   const tapCountRef = useRef<number>(0);
 
-  // タッチ開始ハンドラー
+  // タッチ開始ハンドラー（長押し対応）
   const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
+    const target = e.target as HTMLElement;
     const touch = e.touches[0];
+    
     touchStartTimeRef.current = Date.now();
     touchStartPositionRef.current = { x: touch.clientX, y: touch.clientY };
+    isLongPressRef.current = false;
+    
+    // 単語要素の場合、長押しタイマーを開始
+    if (target.classList.contains('clickable-word')) {
+      const word = target.textContent || '';
+      
+      // デバッグ情報更新
+      tapCountRef.current += 1;
+      setDebugInfo(`【タップ #${tapCountRef.current}】\nタップ開始: ${word}\n長押し判定中...`);
+      
+      // 長押しタイマー（800ms）
+      longPressTimeoutRef.current = setTimeout(() => {
+        if (!isLongPressRef.current) {
+          console.log('🔗 長押し検出:', word);
+          setDebugInfo(prev => prev + `\n\n🔗 長押し検出！\n800ms経過`);
+          handleLongPress(target);
+        }
+      }, 800);
+    }
   };
 
-  // モバイル対応のタッチハンドラー（タッチ終了時）
+  // タッチ終了ハンドラー（長押し対応）
   const handleTextTouch = (e: React.TouchEvent<HTMLParagraphElement>) => {
     const target = e.target as HTMLElement;
     const touchEndTime = Date.now();
     const touchDuration = touchEndTime - touchStartTimeRef.current;
+    
+    // 長押しタイマーをクリア
+    if (longPressTimeoutRef.current) {
+      clearTimeout(longPressTimeoutRef.current);
+      longPressTimeoutRef.current = null;
+    }
+    
+    // 長押しが実行された場合は、通常のタップ処理をスキップ
+    if (isLongPressRef.current) {
+      console.log('長押しが実行済み、通常タップ処理をスキップ');
+      setDebugInfo(prev => prev + `\n\n📝 長押し実行済み\n通常タップはスキップ`);
+      return;
+    }
     
     // タッチ終了位置を取得
     const touch = e.changedTouches[0];
@@ -1083,6 +1129,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // タッチ時間が短すぎる（100ms未満）または移動距離が大きい（10px以上）場合は無視
     if (touchDuration < 100 || moveDistance > 10) {
       console.log(`タッチ無視: 時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px`);
+      setDebugInfo(prev => prev + `\n\nタッチ無視:\n時間=${touchDuration}ms\n移動=${moveDistance.toFixed(1)}px`);
       return;
     }
     
@@ -1092,132 +1139,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       e.preventDefault();
       e.stopPropagation();
       
-      console.log(`📱 有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
-      console.log(`📱 タップ状態: 前回時間=${lastTapTimeRef.current}, 前回要素=${lastTapTargetRef.current?.textContent || 'なし'}`);
+      console.log(`📱 通常タップ: ${word} (時間=${touchDuration}ms)`);
       
-      // タップカウント増加
-      tapCountRef.current += 1;
+      // デバッグ表示更新
+      setDebugInfo(prev => prev + `\n\n📱 通常タップ: ${word}\n時間: ${touchDuration}ms\n→ マイノート追加`);
       
-      // モバイル用デバッグ表示（毎回新しく表示）
-      setDebugInfo(`【タップ #${tapCountRef.current}】\nタップ: ${word}\n時間: ${touchDuration}ms\n移動: ${moveDistance.toFixed(1)}px\n前回: ${lastTapTargetRef.current?.textContent || 'なし'}`);
-      
-      // ダブルタップ検知（同じ要素かつ300ms以内）
-      const timeSinceLastTap = touchEndTime - lastTapTimeRef.current;
-      const isSameTarget = lastTapTargetRef.current === target;
-      const isDoubleTap = timeSinceLastTap < 300 && timeSinceLastTap > 50 && isSameTarget; // 50-300ms以内で同じ要素
-      
-      console.log(`🔍 ダブルタップ判定: 
-        前回タップ時間: ${lastTapTimeRef.current}
-        今回タップ時間: ${touchEndTime}
-        時間差: ${timeSinceLastTap}ms
-        時間条件50ms超過: ${timeSinceLastTap > 50}
-        時間条件300ms未満: ${timeSinceLastTap < 300}
-        同じ要素: ${isSameTarget}
-        ダブルタップ: ${isDoubleTap}
-        前回要素: ${lastTapTargetRef.current?.textContent}
-        今回要素: ${target.textContent}`);
-      
-      // ダブルタップ判定をモバイル画面に表示（追記）
-      setDebugInfo(prev => prev + `\n\n【ダブルタップ判定】\n時間差: ${timeSinceLastTap}ms\n50ms超過: ${timeSinceLastTap > 50}\n300ms未満: ${timeSinceLastTap < 300}\n同じ要素: ${isSameTarget}\n結果: ${isDoubleTap ? '成功✅' : '失敗❌'}`);
-      
-      if (isDoubleTap) {
-        console.log('🎯🎯 ダブルタップ検知成功！:', word);
-        
-        // モバイル表示：成功メッセージ（追記）
-        setDebugInfo(prev => prev + `\n\n🎯 ダブルタップ成功！\nしおり作成中...`);
-        
-        // 視覚的フィードバック：赤色ハイライト
-        target.style.backgroundColor = '#ef4444';
-        target.style.color = 'white';
-        setTimeout(() => {
-          target.style.backgroundColor = '';
-          target.style.color = '';
-        }, 1500);
-        
-        // 前回の要素のシングルタップタイムアウトをクリア
-        if (lastTapTargetRef.current && (lastTapTargetRef.current as any)._singleTapTimeout) {
-          clearTimeout((lastTapTargetRef.current as any)._singleTapTimeout);
-          (lastTapTargetRef.current as any)._singleTapTimeout = null;
-          console.log('🚫 前回要素のシングルタップタイムアウトクリア');
-        }
-        
-        // 現在の要素のタイムアウトもクリア
-        if ((target as any)._singleTapTimeout) {
-          clearTimeout((target as any)._singleTapTimeout);
-          (target as any)._singleTapTimeout = null;
-          console.log('🚫 現在要素のシングルタップタイムアウトクリア');
-        }
-        
-        // ダブルタップ処理を実行
-        console.log('🎯 ダブルタップ処理実行中...');
-        handleDoubleTap(target);
-        
-        // ダブルタップ後はタップ状態をリセット
-        lastTapTimeRef.current = 0;
-        lastTapTargetRef.current = null;
-        return;
-      }
-      
-      // シングルタップの場合、300ms後に処理する（ダブルタップ待ち）
-      console.log(`📝 シングルタップとして記録: ${word}`);
-      
-      // モバイル表示：シングルタップ情報（追記）
-      setDebugInfo(prev => prev + `\n\n📝 シングルタップ記録\n300ms後にマイノート追加`);
-      
-      // 前回の異なる要素のタイムアウトをクリア（マイノート重複防止）
-      if (lastTapTargetRef.current && lastTapTargetRef.current !== target && (lastTapTargetRef.current as any)._singleTapTimeout) {
-        clearTimeout((lastTapTargetRef.current as any)._singleTapTimeout);
-        (lastTapTargetRef.current as any)._singleTapTimeout = null;
-        console.log('🚫 前回の異なる要素のタイムアウトクリア:', lastTapTargetRef.current.textContent);
-      }
-      
-      lastTapTimeRef.current = touchEndTime;
-      lastTapTargetRef.current = target;
-      
-      console.log(`📝 新しい状態記録: 時間=${touchEndTime}, 要素=${word}`);
-      
-      // 現在の要素の既存のタイムアウトをクリア
-      if ((target as any)._singleTapTimeout) {
-        clearTimeout((target as any)._singleTapTimeout);
-        console.log('🚫 現在要素の既存タイムアウトクリア:', word);
-      }
-      
-      const timeoutId = setTimeout(() => {
-        // 300ms後に同じ要素がまだタップ対象なら単語クリック処理実行
-        if (lastTapTargetRef.current === target && lastTapTimeRef.current === touchEndTime) {
-          console.log('📚📚 シングルタップタイムアウト実行:', word);
-          
-          // 視覚的フィードバック：青色ハイライト（シングルタップ）
-          target.style.backgroundColor = '#3b82f6';
-          target.style.color = 'white';
-          setTimeout(() => {
-            target.style.backgroundColor = '';
-            target.style.color = '';
-          }, 500);
-          
-          handleWordClick(word);
-          lastTapTimeRef.current = 0;
-          lastTapTargetRef.current = null;
-        } else {
-          console.log('📚 シングルタップタイムアウトキャンセル（状態変更）:', word);
-        }
-      }, 300);
-      
-      // タップ状態をリセットする際にタイムアウトをクリア
-      (target as any)._singleTapTimeout = timeoutId;
-      
-      // タッチイベント専用のフラグを設定してクリックイベントとの重複を防ぐ
-      (target as any)._touchHandled = true;
+      // 視覚的フィードバック：青色ハイライト（通常タップ）
+      target.style.backgroundColor = '#3b82f6';
+      target.style.color = 'white';
       setTimeout(() => {
-        delete (target as any)._touchHandled;
-      }, 100);
-      
-      // タッチ直後に即座にアクティブ状態をクリア（モバイル対応）
-      setTimeout(() => {
-        target.classList.remove('active', 'bg-yellow-300', 'bg-yellow-200', 'bg-yellow-100');
         target.style.backgroundColor = '';
-        target.style.background = '';
-      }, 50);
+        target.style.color = '';
+      }, 500);
+      
+      // 単語クリック処理を即座に実行
+      handleWordClick(word);
     }
   };
 
@@ -1273,7 +1209,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
               } ${bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
-              title="クリックして意味を調べる"
+              title="タップ: 意味を調べる / 長押し: しおり作成"
               data-word={word}
               data-idx={tokenIndex}
               style={{
