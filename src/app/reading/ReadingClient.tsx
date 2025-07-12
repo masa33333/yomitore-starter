@@ -1208,7 +1208,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               key={`${partIndex}-${wordIndex}`}
               className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
-              } ${bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
+              } ${bookmarkTokenIndex !== null && bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
               title="タップ: 意味を調べる / 長押し: しおり作成"
               data-word={word}
               data-idx={tokenIndex}
@@ -1697,6 +1697,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         onResume={() => {
           setShowResumeDialog(false);
           setIsResumeMode(false);
+          // 読書再開後はしおりマーカーをクリア
+          setBookmarkTokenIndex(null);
         }}
       />
 

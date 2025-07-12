@@ -20,9 +20,9 @@ body {
 
 /* しおり機能用スタイル */
 .bookmark-token {
-  color: #d00;
-  text-decoration: underline;
-  background-color: rgba(255, 0, 0, 0.1);
+  color: #059669;
+  border-bottom: 2px solid #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
 }
 
 .blur-reading {
