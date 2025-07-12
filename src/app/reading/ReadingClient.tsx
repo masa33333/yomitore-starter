@@ -1068,6 +1068,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // デバッグ情報を画面に表示（モバイル用）
   const [debugInfo, setDebugInfo] = useState<string>('');
   const tapCountRef = useRef<number>(0);
+  
+  // しおり機能用のグローバルトークンインデックス
+  const globalTokenIndexRef = useRef<number>(0);
 
   // タッチ開始ハンドラー（長押し対応）
   const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
@@ -1174,11 +1177,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   };
 
   // 英語テキストをクリック可能な単語に分割（マークダウン太字対応）
-  const renderClickableText = (text: string) => {
+  const renderClickableText = (text: string, paragraphIndex: number) => {
     console.log('🎨 renderClickableText called with:', text.substring(0, 100) + '...');
     
-    // しおり機能用のglobalTokenIndex（全体を通した連番）
-    let globalTokenIndex = 0;
+    // 段落開始時にインデックスを初期化（最初の段落のみ）
+    if (paragraphIndex === 0) {
+      globalTokenIndexRef.current = 0;
+    }
     
     // マークダウンの太字(**text**)を最初に処理
     const parts = text.split(/(\*\*[^*]+\*\*)/);
@@ -1202,13 +1207,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const result = words.map((word, wordIndex) => {
         if (/^[a-zA-Z]+$/.test(word)) {
           clickableWordCount++;
-          const tokenIndex = globalTokenIndex++;
+          const tokenIndex = globalTokenIndexRef.current++;
           return (
             <span
               key={`${partIndex}-${wordIndex}`}
               className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
-              } ${bookmarkTokenIndex !== null && bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
+              } ${!isResumeMode && bookmarkTokenIndex !== null && bookmarkTokenIndex === tokenIndex ? 'bookmark-token' : ''}`}
               title="タップ: 意味を調べる / 長押し: しおり作成"
               data-word={word}
               data-idx={tokenIndex}
@@ -1352,7 +1357,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                       touchAction: 'manipulation'
                     }}
                   >
-                    {renderClickableText(paragraph)}
+                    {renderClickableText(paragraph, index)}
                   </p>
                   
                   {/* 対応する日本語段落 */}
@@ -1697,8 +1702,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         onResume={() => {
           setShowResumeDialog(false);
           setIsResumeMode(false);
-          // 読書再開後はしおりマーカーをクリア
+          // 読書再開後はしおりマーカーとインデックスを完全にクリア
           setBookmarkTokenIndex(null);
+          globalTokenIndexRef.current = 0;
+          console.log('🔄 読書再開: しおりマーカーとインデックスをリセット');
         }}
       />
 
