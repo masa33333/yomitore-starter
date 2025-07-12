@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -163,8 +163,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // しおり機能用ステート
   const [bookmarkTokenIndex, setBookmarkTokenIndex] = useState<number | null>(null);
-  const [lastTapTime, setLastTapTime] = useState<number>(0);
-  const [lastTapTarget, setLastTapTarget] = useState<HTMLElement | null>(null);
+  const lastTapTimeRef = useRef<number>(0);
+  const lastTapTargetRef = useRef<HTMLElement | null>(null);
   const [bookmarkDialog, setBookmarkDialog] = useState<{
     isOpen: boolean;
     word: string;
@@ -645,7 +645,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const tokenIndex = parseInt(target.dataset.idx || '0', 10);
     const word = target.textContent || '';
     
-    alert(`🎯 handleDoubleTap実行: ${word} (index: ${tokenIndex})`);
     console.log('🎯 handleDoubleTap実行:', word, 'tokenIndex:', tokenIndex);
     console.log('🎯 target:', target);
     console.log('🎯 searchParams:', searchParams);
@@ -1047,9 +1046,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // タッチ開始時間を記録するためのstate
-  const [touchStartTime, setTouchStartTime] = useState<number>(0);
-  const [touchStartPosition, setTouchStartPosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+  // タッチ開始時間を記録するためのref
+  const touchStartTimeRef = useRef<number>(0);
+  const touchStartPositionRef = useRef<{x: number, y: number}>({x: 0, y: 0});
   
   // 単語ハイライト状態を管理
   const [highlightedWord, setHighlightedWord] = useState<string>('');
@@ -1057,15 +1056,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // タッチ開始ハンドラー
   const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
     const touch = e.touches[0];
-    setTouchStartTime(Date.now());
-    setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
+    touchStartTimeRef.current = Date.now();
+    touchStartPositionRef.current = { x: touch.clientX, y: touch.clientY };
   };
 
   // モバイル対応のタッチハンドラー（タッチ終了時）
   const handleTextTouch = (e: React.TouchEvent<HTMLParagraphElement>) => {
     const target = e.target as HTMLElement;
     const touchEndTime = Date.now();
-    const touchDuration = touchEndTime - touchStartTime;
+    const touchDuration = touchEndTime - touchStartTimeRef.current;
     
     // タッチ終了位置を取得
     const touch = e.changedTouches[0];
@@ -1073,8 +1072,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     // 移動距離を計算
     const moveDistance = Math.sqrt(
-      Math.pow(touchEndPosition.x - touchStartPosition.x, 2) + 
-      Math.pow(touchEndPosition.y - touchStartPosition.y, 2)
+      Math.pow(touchEndPosition.x - touchStartPositionRef.current.x, 2) + 
+      Math.pow(touchEndPosition.y - touchStartPositionRef.current.y, 2)
     );
     
     // タッチ時間が短すぎる（100ms未満）または移動距離が大きい（10px以上）場合は無視
@@ -1092,55 +1091,52 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log(`有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
       
       // ダブルタップ検知
-      const timeSinceLastTap = touchEndTime - lastTapTime;
-      const isSameTarget = lastTapTarget === target;
+      const timeSinceLastTap = touchEndTime - lastTapTimeRef.current;
+      const isSameTarget = lastTapTargetRef.current === target;
       const isDoubleTap = timeSinceLastTap < 300 && isSameTarget; // 300ms以内
       
-      // モバイルデバッグ用アラート
-      if (lastTapTime > 0) {
-        alert(`ダブルタップ判定:
-時間差: ${timeSinceLastTap}ms
-同じ要素: ${isSameTarget}
-ダブルタップ: ${isDoubleTap}
-前回: ${lastTapTarget?.textContent}
-今回: ${target.textContent}`);
-      }
-      
       console.log(`🔍 ダブルタップ判定: 
-        前回タップ時間: ${lastTapTime}
+        前回タップ時間: ${lastTapTimeRef.current}
         今回タップ時間: ${touchEndTime}
         時間差: ${timeSinceLastTap}ms
         同じ要素: ${isSameTarget}
         ダブルタップ: ${isDoubleTap}
-        前回要素: ${lastTapTarget?.textContent}
+        前回要素: ${lastTapTargetRef.current?.textContent}
         今回要素: ${target.textContent}`);
       
       if (isDoubleTap) {
-        alert(`✅ ダブルタップ成功: ${word}`);
         console.log('📖 ダブルタップ検知:', word);
         // シングルタップのタイムアウトをクリア（マイノート記録を防ぐ）
-        if (lastTapTarget && (lastTapTarget as any)._singleTapTimeout) {
-          clearTimeout((lastTapTarget as any)._singleTapTimeout);
-          (lastTapTarget as any)._singleTapTimeout = null;
+        if ((target as any)._singleTapTimeout) {
+          clearTimeout((target as any)._singleTapTimeout);
+          (target as any)._singleTapTimeout = null;
         }
-        // ダブルタップ処理
+        
+        // ダブルタップ処理を実行
+        console.log('🎯 ダブルタップ実行中...');
         handleDoubleTap(target);
+        
         // ダブルタップ後はタップ状態をリセット
-        setLastTapTime(0);
-        setLastTapTarget(null);
+        lastTapTimeRef.current = 0;
+        lastTapTargetRef.current = null;
         return;
       }
       
       // シングルタップの場合、300ms後に処理する（ダブルタップ待ち）
-      setLastTapTime(touchEndTime);
-      setLastTapTarget(target);
+      lastTapTimeRef.current = touchEndTime;
+      lastTapTargetRef.current = target;
+      
+      // 既存のタイムアウトをクリア
+      if ((target as any)._singleTapTimeout) {
+        clearTimeout((target as any)._singleTapTimeout);
+      }
       
       const timeoutId = setTimeout(() => {
         // 300ms後にダブルタップが発生していなければシングルタップとして処理
-        if (lastTapTime === touchEndTime && lastTapTarget === target) {
-          console.log('📚 シングルタップ処理:', word);
-          handleWordClick(word);
-        }
+        console.log('📚 シングルタップタイムアウト実行:', word);
+        handleWordClick(word);
+        lastTapTimeRef.current = 0;
+        lastTapTargetRef.current = null;
       }, 300);
       
       // タップ状態をリセットする際にタイムアウトをクリア

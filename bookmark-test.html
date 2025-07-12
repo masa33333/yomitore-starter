@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmark Double-Tap Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .clickable-word {
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        .clickable-word:hover {
+            background-color: #fef3c7;
+        }
+        .highlighted {
+            background-color: #fde047 !important;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal .confirm {
+            background-color: #dc2626;
+            color: white;
+        }
+        .modal .cancel {
+            background-color: #6b7280;
+            color: white;
+        }
+        #log {
+            background-color: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bookmark Double-Tap Test</h1>
+    <p>このテストページでダブルタップ機能をテストできます。単語をダブルタップしてしおり作成ダイアログが表示されるかテストしてください。</p>
+    
+    <div id="content">
+        <p>
+            <span class="clickable-word" data-word="The" data-idx="0">The</span>
+            <span> </span>
+            <span class="clickable-word" data-word="quick" data-idx="1">quick</span>
+            <span> </span>
+            <span class="clickable-word" data-word="brown" data-idx="2">brown</span>
+            <span> </span>
+            <span class="clickable-word" data-word="fox" data-idx="3">fox</span>
+            <span> </span>
+            <span class="clickable-word" data-word="jumps" data-idx="4">jumps</span>
+            <span> </span>
+            <span class="clickable-word" data-word="over" data-idx="5">over</span>
+            <span> </span>
+            <span class="clickable-word" data-word="the" data-idx="6">the</span>
+            <span> </span>
+            <span class="clickable-word" data-word="lazy" data-idx="7">lazy</span>
+            <span> </span>
+            <span class="clickable-word" data-word="dog" data-idx="8">dog</span>
+            <span>. </span>
+            <span class="clickable-word" data-word="This" data-idx="9">This</span>
+            <span> </span>
+            <span class="clickable-word" data-word="is" data-idx="10">is</span>
+            <span> </span>
+            <span class="clickable-word" data-word="a" data-idx="11">a</span>
+            <span> </span>
+            <span class="clickable-word" data-word="test" data-idx="12">test</span>
+            <span> </span>
+            <span class="clickable-word" data-word="sentence" data-idx="13">sentence</span>
+            <span>.</span>
+        </p>
+    </div>
+
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>しおり作成</h2>
+            <p id="modal-text"></p>
+            <button class="cancel" onclick="closeModal()">いいえ</button>
+            <button class="confirm" onclick="confirmBookmark()">はい</button>
+        </div>
+    </div>
+
+    <div id="log"></div>
+
+    <script>
+        let lastTapTime = 0;
+        let lastTapTarget = null;
+        let touchStartTime = 0;
+        let touchStartPosition = { x: 0, y: 0 };
+        let currentWord = '';
+        let currentTokenIndex = 0;
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function showModal(word, tokenIndex) {
+            currentWord = word;
+            currentTokenIndex = tokenIndex;
+            document.getElementById('modal-text').textContent = 
+                `「${word}」の位置でしおりを作成します。ここで一時中断しますか？`;
+            document.getElementById('modal').style.display = 'flex';
+            log(`📖 しおりダイアログ表示: ${word} (index: ${tokenIndex})`);
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            log(`❌ しおり作成キャンセル`);
+        }
+
+        function confirmBookmark() {
+            document.getElementById('modal').style.display = 'none';
+            log(`✅ しおり作成確定: ${currentWord} (index: ${currentTokenIndex})`);
+            alert(`しおりが作成されました: ${currentWord}`);
+        }
+
+        function handleWordClick(word) {
+            log(`📚 シングルタップ処理: ${word}`);
+            // Simulate highlighting
+            const elements = document.querySelectorAll(`[data-word="${word}"]`);
+            elements.forEach(el => {
+                el.classList.add('highlighted');
+                setTimeout(() => {
+                    el.classList.remove('highlighted');
+                }, 1000);
+            });
+        }
+
+        function handleDoubleTap(target) {
+            const word = target.dataset.word;
+            const tokenIndex = parseInt(target.dataset.idx);
+            log(`🎯 ダブルタップ処理実行: ${word} (index: ${tokenIndex})`);
+            showModal(word, tokenIndex);
+        }
+
+        // Touch event handlers
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.classList.contains('clickable-word')) {
+                const touch = e.touches[0];
+                touchStartTime = Date.now();
+                touchStartPosition = { x: touch.clientX, y: touch.clientY };
+                log(`👆 タッチ開始: ${e.target.dataset.word}`);
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            const target = e.target;
+            if (!target.classList.contains('clickable-word')) return;
+
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            const touch = e.changedTouches[0];
+            const touchEndPosition = { x: touch.clientX, y: touch.clientY };
+            const moveDistance = Math.sqrt(
+                Math.pow(touchEndPosition.x - touchStartPosition.x, 2) + 
+                Math.pow(touchEndPosition.y - touchStartPosition.y, 2)
+            );
+
+            log(`📱 タッチ終了: ${target.dataset.word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
+
+            // タッチ時間が短すぎるか移動距離が大きい場合は無視
+            if (touchDuration < 100 || moveDistance > 10) {
+                log(`⏭️ タッチ無視: 条件未満`);
+                return;
+            }
+
+            const word = target.dataset.word;
+            const timeSinceLastTap = touchEndTime - lastTapTime;
+            const isSameTarget = lastTapTarget === target;
+            const isDoubleTap = timeSinceLastTap < 300 && isSameTarget;
+
+            log(`🔍 ダブルタップ判定: 時間差=${timeSinceLastTap}ms, 同じ要素=${isSameTarget}, ダブルタップ=${isDoubleTap}`);
+
+            if (isDoubleTap) {
+                log(`✅ ダブルタップ検知: ${word}`);
+                // シングルタップのタイムアウトをクリア
+                if (target._singleTapTimeout) {
+                    clearTimeout(target._singleTapTimeout);
+                    target._singleTapTimeout = null;
+                    log(`🚫 シングルタップタイムアウトクリア`);
+                }
+                handleDoubleTap(target);
+                lastTapTime = 0;
+                lastTapTarget = null;
+                return;
+            }
+
+            // シングルタップの場合、300ms後に処理
+            lastTapTime = touchEndTime;
+            lastTapTarget = target;
+
+            if (target._singleTapTimeout) {
+                clearTimeout(target._singleTapTimeout);
+            }
+
+            target._singleTapTimeout = setTimeout(() => {
+                log(`⏰ シングルタップタイムアウト実行: ${word}`);
+                handleWordClick(word);
+                lastTapTime = 0;
+                lastTapTarget = null;
+            }, 300);
+
+            log(`⏱️ シングルタップタイムアウト設定: 300ms`);
+        });
+
+        // Mouse events for desktop testing
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('clickable-word')) return;
+            if (e.target._touchHandled) return; // タッチイベントで処理済み
+
+            const target = e.target;
+            const currentTime = Date.now();
+            const timeSinceLastClick = currentTime - lastTapTime;
+            const isSameTarget = lastTapTarget === target;
+            const isDoubleClick = timeSinceLastClick < 300 && isSameTarget;
+
+            log(`🖱️ マウスクリック: ${target.dataset.word} (時間差=${timeSinceLastClick}ms, ダブルクリック=${isDoubleClick})`);
+
+            if (isDoubleClick) {
+                log(`✅ ダブルクリック検知: ${target.dataset.word}`);
+                handleDoubleTap(target);
+                lastTapTime = 0;
+                lastTapTarget = null;
+                return;
+            }
+
+            lastTapTime = currentTime;
+            lastTapTarget = target;
+
+            setTimeout(() => {
+                if (lastTapTime === currentTime && lastTapTarget === target) {
+                    handleWordClick(target.dataset.word);
+                    lastTapTime = 0;
+                    lastTapTarget = null;
+                }
+            }, 300);
+        });
+
+        log('📝 テストページ初期化完了');
+        log('💡 使用方法: 単語をダブルタップ/ダブルクリックしてしおり作成ダイアログを表示');
+    </script>
+</body>
+</html>
