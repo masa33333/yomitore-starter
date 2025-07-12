@@ -8,8 +8,8 @@ export default function ExitCalendarHandler() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // カレンダーページ自体では動作させない
-    if (pathname === '/calendar') {
+    // カレンダーページ、storiesページ、読書ページでは動作させない
+    if (pathname === '/calendar' || pathname === '/stories' || pathname.startsWith('/reading')) {
       return;
     }
 
@@ -17,6 +17,11 @@ export default function ExitCalendarHandler() {
 
     // ページ離脱・アプリ終了の検知
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // storiesページまたは読書ページへの遷移中は確認ダイアログを表示しない
+      if (isNavigatingAway) {
+        return;
+      }
+      
       e.preventDefault();
       
       // モダンブラウザでは直接リダイレクトはできないが、
@@ -61,9 +66,13 @@ export default function ExitCalendarHandler() {
       
       if (link) {
         const href = link.getAttribute('href');
-        // 内部リンクの場合
+        // 内部リンクの場合（reading、stories、calendarページへは確実に除外）
         if (href && (href.startsWith('/') || href.startsWith('#'))) {
           isNavigatingAway = true;
+          // reading、stories、calendarページへの遷移では絶対にbeforeunloadを発動させない
+          if (href.startsWith('/reading') || href.startsWith('/stories') || href.startsWith('/calendar')) {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+          }
         }
         // 外部リンクの場合はカレンダーを表示
         else if (href && (href.startsWith('http') || href.startsWith('mailto'))) {
