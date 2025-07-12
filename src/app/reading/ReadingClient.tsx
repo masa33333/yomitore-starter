@@ -1055,6 +1055,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // デバッグ情報を画面に表示（モバイル用）
   const [debugInfo, setDebugInfo] = useState<string>('');
+  const tapCountRef = useRef<number>(0);
 
   // タッチ開始ハンドラー
   const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
@@ -1094,8 +1095,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log(`📱 有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
       console.log(`📱 タップ状態: 前回時間=${lastTapTimeRef.current}, 前回要素=${lastTapTargetRef.current?.textContent || 'なし'}`);
       
-      // モバイル用デバッグ表示
-      setDebugInfo(`タップ: ${word}\n時間: ${touchDuration}ms\n移動: ${moveDistance.toFixed(1)}px\n前回: ${lastTapTargetRef.current?.textContent || 'なし'}`);
+      // タップカウント増加
+      tapCountRef.current += 1;
+      
+      // モバイル用デバッグ表示（毎回新しく表示）
+      setDebugInfo(`【タップ #${tapCountRef.current}】\nタップ: ${word}\n時間: ${touchDuration}ms\n移動: ${moveDistance.toFixed(1)}px\n前回: ${lastTapTargetRef.current?.textContent || 'なし'}`);
       
       // ダブルタップ検知（同じ要素かつ300ms以内）
       const timeSinceLastTap = touchEndTime - lastTapTimeRef.current;
@@ -1113,13 +1117,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         前回要素: ${lastTapTargetRef.current?.textContent}
         今回要素: ${target.textContent}`);
       
-      // ダブルタップ判定をモバイル画面に表示
+      // ダブルタップ判定をモバイル画面に表示（追記）
       setDebugInfo(prev => prev + `\n\n【ダブルタップ判定】\n時間差: ${timeSinceLastTap}ms\n50ms超過: ${timeSinceLastTap > 50}\n300ms未満: ${timeSinceLastTap < 300}\n同じ要素: ${isSameTarget}\n結果: ${isDoubleTap ? '成功✅' : '失敗❌'}`);
       
       if (isDoubleTap) {
         console.log('🎯🎯 ダブルタップ検知成功！:', word);
         
-        // モバイル表示：成功メッセージ
+        // モバイル表示：成功メッセージ（追記）
         setDebugInfo(prev => prev + `\n\n🎯 ダブルタップ成功！\nしおり作成中...`);
         
         // 視覚的フィードバック：赤色ハイライト
@@ -1157,7 +1161,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       // シングルタップの場合、300ms後に処理する（ダブルタップ待ち）
       console.log(`📝 シングルタップとして記録: ${word}`);
       
-      // モバイル表示：シングルタップ情報
+      // モバイル表示：シングルタップ情報（追記）
       setDebugInfo(prev => prev + `\n\n📝 シングルタップ記録\n300ms後にマイノート追加`);
       
       // 前回の異なる要素のタイムアウトをクリア（マイノート重複防止）
