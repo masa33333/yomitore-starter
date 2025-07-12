@@ -18,11 +18,9 @@ body {
   }
 }
 
-/* しおり機能用スタイル */
+/* しおり機能用スタイル - 無効化 */
 .bookmark-token {
-  color: #059669;
-  border-bottom: 2px solid #10b981;
-  background-color: rgba(16, 185, 129, 0.1);
+  /* スタイルを完全に無効化 */
 }
 
 .blur-reading {

@@ -691,43 +691,62 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // しおり保存処理
   const saveBookmark = (tokenIndex: number, word: string) => {
-    // 現在の読み物を識別するためのslugを取得/生成
-    const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    if (!startTime) {
+      console.error('❌ 読書開始時間が設定されていません');
+      router.push('/choose');
+      return;
+    }
+
+    // 中断時の統計計算
+    const currentTime = Date.now();
+    const readingTime = currentTime - startTime;
+    const timeInMinutes = readingTime / 60000;
     
+    // tokenIndexまでの英単語数を計算
+    const allTokens = english.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
+    const wordsReadCount = allTokens.slice(0, tokenIndex).filter(token => /^[A-Za-z]+$/.test(token)).length;
+    const wpmCalculated = Math.round(wordsReadCount / timeInMinutes);
+    
+    // 統計データを設定（読了時と同じ形式）
+    setEndTime(currentTime);
+    setWpm(wpmCalculated);
+    
+    // 中断時は実際に読んだ語数を表示用に設定
+    const originalWordCount = wordCount;
+    setWordCount(wordsReadCount);
+    
+    // 2秒後に元に戻す
+    setTimeout(() => {
+      setWordCount(originalWordCount);
+    }, 2500);
+    
+    // 中断時の読書データを保存
+    console.log('📊 中断時統計:', {
+      wordsRead: wordsReadCount,
+      totalWords: wordCount,
+      timeInMinutes: timeInMinutes.toFixed(1),
+      wpm: wpmCalculated,
+      progress: `${Math.round((wordsReadCount / wordCount) * 100)}%`
+    });
+
+    // しおりデータを保存
+    const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
     const bookmarkData = {
       slug: currentSlug,
       level: selectedLevel,
       tokenIndex: tokenIndex
     };
-    
     localStorage.setItem('reading_bookmark', JSON.stringify(bookmarkData));
-    // しおりマーカーは表示しない（視覚的混乱を防ぐため）
-    // setBookmarkTokenIndex(tokenIndex);
     
-    console.log('📖 しおり保存:', bookmarkData);
+    // 読書状態を保存（次回復元用）
+    saveCurrentReadingState();
     
-    // 中断時の統計計算処理
-    const currentTime = Date.now();
-    const readingTime = currentTime - (startTime || currentTime);
+    console.log('📖 しおり保存完了:', bookmarkData);
     
-    // tokenIndexまでの英単語数を計算
-    const allTokens = english.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
-    const wordsRead = allTokens.slice(0, tokenIndex).filter(token => /^[A-Za-z]+$/.test(token)).length;
-    const wpmCalculated = wordsRead / (readingTime / 60000);
-    
-    // 統計データを保存（中断でも進捗に反映）
-    const progressData = {
-      wordsRead,
-      readingTime,
-      wpm: wpmCalculated,
-      date: new Date().toISOString(),
-      interrupted: true
-    };
-    
-    console.log('📊 中断時統計:', progressData);
-    
-    // 選択ページに戻る
-    router.push('/choose');
+    // 統計表示のため、少し待ってから画面を更新
+    setTimeout(() => {
+      router.push('/choose');
+    }, 2000); // 2秒間統計を表示してから遷移
   };
 
   // 単語クリック処理
@@ -1691,7 +1710,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       <BookmarkDialog
         isOpen={bookmarkDialog.isOpen}
         onClose={() => setBookmarkDialog({...bookmarkDialog, isOpen: false})}
-        onConfirm={() => saveBookmark(bookmarkDialog.tokenIndex, bookmarkDialog.word)}
+        onConfirm={() => {
+          // ダイアログを閉じてから統計処理実行
+          setBookmarkDialog({...bookmarkDialog, isOpen: false});
+          setTimeout(() => {
+            saveBookmark(bookmarkDialog.tokenIndex, bookmarkDialog.word);
+          }, 100);
+        }}
         word={bookmarkDialog.word}
         conflictLevel={bookmarkDialog.conflictLevel}
         currentLevel={selectedLevel}
