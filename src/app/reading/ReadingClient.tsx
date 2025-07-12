@@ -645,6 +645,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const tokenIndex = parseInt(target.dataset.idx || '0', 10);
     const word = target.textContent || '';
     
+    alert(`🎯 handleDoubleTap実行: ${word} (index: ${tokenIndex})`);
     console.log('🎯 handleDoubleTap実行:', word, 'tokenIndex:', tokenIndex);
     console.log('🎯 target:', target);
     console.log('🎯 searchParams:', searchParams);
@@ -1095,6 +1096,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const isSameTarget = lastTapTarget === target;
       const isDoubleTap = timeSinceLastTap < 300 && isSameTarget; // 300ms以内
       
+      // モバイルデバッグ用アラート
+      if (lastTapTime > 0) {
+        alert(`ダブルタップ判定:
+時間差: ${timeSinceLastTap}ms
+同じ要素: ${isSameTarget}
+ダブルタップ: ${isDoubleTap}
+前回: ${lastTapTarget?.textContent}
+今回: ${target.textContent}`);
+      }
+      
       console.log(`🔍 ダブルタップ判定: 
         前回タップ時間: ${lastTapTime}
         今回タップ時間: ${touchEndTime}
@@ -1105,6 +1116,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         今回要素: ${target.textContent}`);
       
       if (isDoubleTap) {
+        alert(`✅ ダブルタップ成功: ${word}`);
         console.log('📖 ダブルタップ検知:', word);
         // シングルタップのタイムアウトをクリア（マイノート記録を防ぐ）
         if (lastTapTarget && (lastTapTarget as any)._singleTapTimeout) {
