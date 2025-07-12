@@ -1090,10 +1090,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       console.log(`有効なタップ: ${word} (時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px)`);
       
-      // ダブルタップ検知
+      // ダブルタップ検知（同じ要素かつ300ms以内）
       const timeSinceLastTap = touchEndTime - lastTapTimeRef.current;
       const isSameTarget = lastTapTargetRef.current === target;
-      const isDoubleTap = timeSinceLastTap < 300 && isSameTarget; // 300ms以内
+      const isDoubleTap = timeSinceLastTap < 300 && timeSinceLastTap > 50 && isSameTarget; // 50-300ms以内で同じ要素
       
       console.log(`🔍 ダブルタップ判定: 
         前回タップ時間: ${lastTapTimeRef.current}
@@ -1106,10 +1106,18 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       if (isDoubleTap) {
         console.log('📖 ダブルタップ検知:', word);
-        // シングルタップのタイムアウトをクリア（マイノート記録を防ぐ）
+        // 前回の要素のシングルタップタイムアウトをクリア
+        if (lastTapTargetRef.current && (lastTapTargetRef.current as any)._singleTapTimeout) {
+          clearTimeout((lastTapTargetRef.current as any)._singleTapTimeout);
+          (lastTapTargetRef.current as any)._singleTapTimeout = null;
+          console.log('🚫 前回要素のシングルタップタイムアウトクリア');
+        }
+        
+        // 現在の要素のタイムアウトもクリア
         if ((target as any)._singleTapTimeout) {
           clearTimeout((target as any)._singleTapTimeout);
           (target as any)._singleTapTimeout = null;
+          console.log('🚫 現在要素のシングルタップタイムアウトクリア');
         }
         
         // ダブルタップ処理を実行
@@ -1123,20 +1131,32 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }
       
       // シングルタップの場合、300ms後に処理する（ダブルタップ待ち）
+      // 前回の異なる要素のタイムアウトをクリア（マイノート重複防止）
+      if (lastTapTargetRef.current && lastTapTargetRef.current !== target && (lastTapTargetRef.current as any)._singleTapTimeout) {
+        clearTimeout((lastTapTargetRef.current as any)._singleTapTimeout);
+        (lastTapTargetRef.current as any)._singleTapTimeout = null;
+        console.log('🚫 前回の異なる要素のタイムアウトクリア:', lastTapTargetRef.current.textContent);
+      }
+      
       lastTapTimeRef.current = touchEndTime;
       lastTapTargetRef.current = target;
       
-      // 既存のタイムアウトをクリア
+      // 現在の要素の既存のタイムアウトをクリア
       if ((target as any)._singleTapTimeout) {
         clearTimeout((target as any)._singleTapTimeout);
+        console.log('🚫 現在要素の既存タイムアウトクリア:', word);
       }
       
       const timeoutId = setTimeout(() => {
-        // 300ms後にダブルタップが発生していなければシングルタップとして処理
-        console.log('📚 シングルタップタイムアウト実行:', word);
-        handleWordClick(word);
-        lastTapTimeRef.current = 0;
-        lastTapTargetRef.current = null;
+        // 300ms後に同じ要素がまだタップ対象なら単語クリック処理実行
+        if (lastTapTargetRef.current === target && lastTapTimeRef.current === touchEndTime) {
+          console.log('📚 シングルタップタイムアウト実行:', word);
+          handleWordClick(word);
+          lastTapTimeRef.current = 0;
+          lastTapTargetRef.current = null;
+        } else {
+          console.log('📚 シングルタップタイムアウトキャンセル（状態変更）:', word);
+        }
       }, 300);
       
       // タップ状態をリセットする際にタイムアウトをクリア
