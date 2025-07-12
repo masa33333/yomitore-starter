@@ -645,7 +645,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const tokenIndex = parseInt(target.dataset.idx || '0', 10);
     const word = target.textContent || '';
     
-    console.log('📖 ダブルタップ検知:', word, 'tokenIndex:', tokenIndex);
+    console.log('🎯 handleDoubleTap実行:', word, 'tokenIndex:', tokenIndex);
+    console.log('🎯 target:', target);
+    console.log('🎯 searchParams:', searchParams);
     
     // 現在の読み物を識別するためのslugを取得/生成
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
@@ -667,6 +669,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
     
     // 中断確認ダイアログ表示
+    console.log('💬 BookmarkDialog表示:', { word, tokenIndex });
     setBookmarkDialog({
       isOpen: true,
       word,
@@ -1091,6 +1094,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const timeSinceLastTap = touchEndTime - lastTapTime;
       const isSameTarget = lastTapTarget === target;
       const isDoubleTap = timeSinceLastTap < 300 && isSameTarget; // 300ms以内
+      
+      console.log(`🔍 ダブルタップ判定: 
+        前回タップ時間: ${lastTapTime}
+        今回タップ時間: ${touchEndTime}
+        時間差: ${timeSinceLastTap}ms
+        同じ要素: ${isSameTarget}
+        ダブルタップ: ${isDoubleTap}
+        前回要素: ${lastTapTarget?.textContent}
+        今回要素: ${target.textContent}`);
       
       if (isDoubleTap) {
         console.log('📖 ダブルタップ検知:', word);
