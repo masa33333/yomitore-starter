@@ -47,6 +47,8 @@ interface ReadingClientProps {
     theme?: string;
     emotion?: string;
     style?: string;
+    slug?: string;
+    resume?: string;
   };
   initialData: InitialData | null;
   mode: string;
@@ -645,8 +647,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     console.log('📖 ダブルタップ検知:', word, 'tokenIndex:', tokenIndex);
     
-    // 現在の読み物を識別するためのslugを生成
-    const currentSlug = `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    // 現在の読み物を識別するためのslugを取得/生成
+    const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
     
     // 既存のしおりチェック
     const existingBookmark = localStorage.getItem('reading_bookmark');
@@ -674,8 +676,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // しおり保存処理
   const saveBookmark = (tokenIndex: number, word: string) => {
-    // 現在の読み物を識別するためのslugを生成
-    const currentSlug = `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    // 現在の読み物を識別するためのslugを取得/生成
+    const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
     
     const bookmarkData = {
       slug: currentSlug,
@@ -1092,6 +1094,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       if (isDoubleTap) {
         console.log('📖 ダブルタップ検知:', word);
+        // シングルタップのタイムアウトをクリア（マイノート記録を防ぐ）
+        if (lastTapTarget && (lastTapTarget as any)._singleTapTimeout) {
+          clearTimeout((lastTapTarget as any)._singleTapTimeout);
+          (lastTapTarget as any)._singleTapTimeout = null;
+        }
         // ダブルタップ処理
         handleDoubleTap(target);
         // ダブルタップ後はタップ状態をリセット
@@ -1104,13 +1111,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       setLastTapTime(touchEndTime);
       setLastTapTarget(target);
       
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         // 300ms後にダブルタップが発生していなければシングルタップとして処理
         if (lastTapTime === touchEndTime && lastTapTarget === target) {
           console.log('📚 シングルタップ処理:', word);
           handleWordClick(word);
         }
       }, 300);
+      
+      // タップ状態をリセットする際にタイムアウトをクリア
+      (target as any)._singleTapTimeout = timeoutId;
       
       // タッチイベント専用のフラグを設定してクリックイベントとの重複を防ぐ
       (target as any)._touchHandled = true;
