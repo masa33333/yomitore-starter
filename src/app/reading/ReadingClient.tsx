@@ -882,8 +882,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     console.log('🔥 saveBookmark関数実行開始:', { tokenIndex, word, startTime });
     
     if (!startTime) {
-      console.error('❌ 読書開始時間が設定されていません');
-      router.push('/choose');
+      console.log('⚠️ 読書開始時間がnull、現在時刻で設定');
+      // 再開時など、startTimeが設定されていない場合は現在時刻を使用
+      setStartTime(Date.now());
+      // 少し待ってから再実行
+      setTimeout(() => saveBookmark(tokenIndex, word), 100);
       return;
     }
 
@@ -1517,6 +1520,44 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setShowResumeDialog(false);
     setIsResumeMode(false);
     console.log('🔄 setIsResumeMode(false) + sessionStorage設定完了');
+    
+    // 再開時の核兵器級スクロール確保
+    const ensureScrollOnResume = () => {
+      [document.body, document.documentElement].forEach(el => {
+        el.style.cssText = `
+          overflow: visible !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          pointer-events: auto !important;
+          position: relative !important;
+          height: auto !important;
+          max-height: none !important;
+          min-height: 100vh !important;
+        `;
+      });
+      
+      // 全要素のスクロール阻害を解除
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.classList.remove('blur-reading', 'overflow-hidden', 'h-screen', 'max-h-screen');
+        const style = el as HTMLElement;
+        if (style.style.overflow === 'hidden') {
+          style.style.overflow = 'visible';
+        }
+      });
+      
+      console.log('🔧 再開時核兵器級スクロール確保 - scrollHeight:', document.body.scrollHeight);
+    };
+    
+    ensureScrollOnResume();
+    setTimeout(ensureScrollOnResume, 100);
+    setTimeout(ensureScrollOnResume, 500);
+    
+    // 再開時のstartTime設定（ブックマーク保存のため）
+    if (!startTime) {
+      setStartTime(Date.now());
+      console.log('🔄 再開時startTime設定:', Date.now());
+    }
     
     // ブックマーク位置へ自動スクロール
     if (bookmarkTokenIndex !== null) {
