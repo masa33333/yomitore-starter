@@ -783,15 +783,30 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const existingBookmark = localStorage.getItem('reading_bookmark');
     if (existingBookmark) {
       const bookmark = JSON.parse(existingBookmark);
-      if (bookmark.slug === currentSlug && bookmark.level !== selectedLevel) {
-        // レベル競合確認ダイアログ表示
-        setBookmarkDialog({
-          isOpen: true,
-          word,
-          tokenIndex,
-          conflictLevel: bookmark.level
-        });
-        return;
+      console.log('📖 既存ブックマーク確認:', { bookmark, currentSlug, selectedLevel });
+      
+      if (bookmark.slug === currentSlug) {
+        if (bookmark.level !== selectedLevel) {
+          // レベル競合確認ダイアログ表示
+          console.log('⚠️ レベル競合検出:', bookmark.level, '→', selectedLevel);
+          setBookmarkDialog({
+            isOpen: true,
+            word,
+            tokenIndex,
+            conflictLevel: bookmark.level
+          });
+          return;
+        } else {
+          // 同じレベルの場合は上書き確認ダイアログ表示
+          console.log('⚠️ 同レベル上書き確認:', tokenIndex);
+          setBookmarkDialog({
+            isOpen: true,
+            word,
+            tokenIndex,
+            conflictLevel: undefined // レベル競合なし
+          });
+          return;
+        }
       }
     }
     
@@ -1529,6 +1544,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           console.log('🟠 強制オレンジハイライト適用:', targetElement.textContent);
           
           console.log('📖 ブックマーク復帰完了:', targetElement.textContent);
+          
+          // ブックマーク復帰後のスクロール確保
+          setTimeout(() => {
+            [document.body, document.documentElement].forEach(el => {
+              el.style.setProperty('overflow', 'visible', 'important');
+              el.style.setProperty('overflow-y', 'auto', 'important');
+              el.style.setProperty('pointer-events', 'auto', 'important');
+            });
+            console.log('🔧 ブックマーク復帰後スクロール確保完了');
+          }, 100);
           
           // Remove highlight after 3 seconds
           setTimeout(() => {
