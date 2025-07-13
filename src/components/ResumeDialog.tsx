@@ -13,8 +13,8 @@ export function ResumeDialog({ isOpen, onResume }: ResumeDialogProps) {
   const handleResume = () => {
     console.log('🔄 ResumeDialog handleResume called');
     
-    // しおりを削除
-    localStorage.removeItem('reading_bookmark');
+    // ブックマークは削除しない（新しいブックマークを作成するまで保持）
+    // localStorage.removeItem('reading_bookmark'); // ← この行を削除
     
     // URLからresume=1パラメータを削除
     const urlParams = new URLSearchParams(window.location.search);
