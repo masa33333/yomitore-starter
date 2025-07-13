@@ -358,6 +358,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       if (bookmarkData) {
         try {
           const bookmark = JSON.parse(bookmarkData);
+          const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
           console.log('📖 読み込んだブックマークデータ:', bookmarkData);
           console.log('📖 パースされたブックマーク:', bookmark);
           console.log('📖 現在のslug:', currentSlug);
