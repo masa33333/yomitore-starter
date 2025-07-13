@@ -957,7 +957,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       setWordCount(originalWordCount);
     }, 2500);
     
-    // 中断時の読書データを保存
+    // 中断時の読書データを保存（ProgressServiceに保存）
     console.log('📊 中断時統計:', {
       wordsRead: wordsReadCount,
       totalWords: wordCount,
@@ -965,6 +965,24 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       wpm: wpmCalculated,
       progress: `${Math.round((wordsReadCount / wordCount) * 100)}%`
     });
+
+    // completeReading関数で中断時の統計を保存
+    const completionData: ReadingCompletionData = {
+      wordCount: wordsReadCount,
+      duration: Math.round(readingTime / 1000), // 秒単位
+      wpm: wpmCalculated,
+      level: selectedLevel,
+      title: displayTitle,
+      contentType: mode === 'story' ? 'story' : 'reading',
+      completionDate: new Date().toISOString()
+    };
+
+    try {
+      completeReading(completionData);
+      console.log('✅ 中断時統計をProgressServiceに保存完了');
+    } catch (error) {
+      console.error('❌ 中断時統計保存エラー:', error);
+    }
 
     // ブックマークデータを保存
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
