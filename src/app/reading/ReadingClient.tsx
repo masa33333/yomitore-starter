@@ -91,44 +91,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // 基本状態
   const [loading, setLoading] = useState(false);
   
-  // 単語要素のみの紫色検出・除去
-  useEffect(() => {
-    const purpleDetector = setInterval(() => {
-      const clickableWords = document.querySelectorAll('.clickable-word');
-      clickableWords.forEach(el => {
-        const element = el as HTMLElement;
-        const computedStyle = window.getComputedStyle(element);
-        
-        // 紫色系を検出してログ出力（単語要素のみ）
-        if (computedStyle.backgroundColor?.includes('139') || 
-            computedStyle.backgroundColor?.includes('purple') ||
-            computedStyle.borderColor?.includes('139') ||
-            computedStyle.borderColor?.includes('purple') ||
-            computedStyle.outlineColor?.includes('139') ||
-            computedStyle.outlineColor?.includes('purple') ||
-            computedStyle.backgroundColor?.includes('rgb(139') ||
-            computedStyle.borderColor?.includes('rgb(139') ||
-            computedStyle.outlineColor?.includes('rgb(139')) {
-          console.log('🟣 単語に紫色検出:', {
-            word: element.textContent,
-            className: element.className,
-            backgroundColor: computedStyle.backgroundColor,
-            borderColor: computedStyle.borderColor,
-            outlineColor: computedStyle.outlineColor
-          });
-          
-          // 強制削除
-          element.style.setProperty('background-color', 'transparent', 'important');
-          element.style.setProperty('border-color', 'transparent', 'important');
-          element.style.setProperty('outline-color', 'transparent', 'important');
-          element.style.setProperty('border', 'none', 'important');
-          element.style.setProperty('outline', 'none', 'important');
-        }
-      });
-    }, 1000); // 1秒ごとに実行
-    
-    return () => clearInterval(purpleDetector);
-  }, []);
   const [textSize, setTextSize] = useState<'small' | 'medium' | 'large'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('readingTextSize') as 'small' | 'medium' | 'large';
@@ -1354,18 +1316,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
       
-      // タッチ開始時のCSS状態もチェック
-      const computedStyle = window.getComputedStyle(target);
-      
-      // デバッグ用（必要時のみ使用）
-      // alert(`タッチ開始: ${word}`);
-      
-      console.log('👆 タッチ開始時CSS:', {
-        word: word,
-        backgroundColor: computedStyle.backgroundColor,
-        borderColor: computedStyle.borderColor,
-        outlineColor: computedStyle.outlineColor
-      });
       
       // 長押しタイマー（600ms）
       longPressTimeoutRef.current = setTimeout(() => {
@@ -1430,25 +1380,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       e.preventDefault();
       e.stopPropagation();
       
-      // 紫色の原因を特定するためのデバッグ
-      const computedStyle = window.getComputedStyle(target);
-      const debugInfo = {
-        word: word,
-        backgroundColor: computedStyle.backgroundColor,
-        borderColor: computedStyle.borderColor,
-        outlineColor: computedStyle.outlineColor,
-        border: computedStyle.border,
-        outline: computedStyle.outline,
-        boxShadow: computedStyle.boxShadow
-      };
-      
-      // デバッグ：まだ紫色が見える場合のみコメントアウトを外す
-      // alert(`動作確認: ${word}`);
       
       // web版と同じ動作：濃い黄色ハイライト + 単語クリック処理
       setHighlightedWord(word);
       console.log('🟡 モバイルタップ - 濃い黄色ハイライト:', word);
-      console.log('🔍 CSS状態:', debugInfo);
       
       // 単語クリック処理を即座に実行
       handleWordClick(word);
