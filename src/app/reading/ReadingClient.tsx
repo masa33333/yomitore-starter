@@ -184,7 +184,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [wordInfo, setWordInfo] = useState<WordInfo | null>(null);
   const [loadingWordInfo, setLoadingWordInfo] = useState(false);
   
-  // しおり機能用ステート
+  // ブックマーク機能用ステート
   const [bookmarkTokenIndex, setBookmarkTokenIndex] = useState<number | null>(null);
   const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isLongPressRef = useRef<boolean>(false);
@@ -343,7 +343,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       allParams: Object.fromEntries(urlParams.entries())
     });
 
-    // しおり再開モードの処理（一度だけ実行）
+    // ブックマーク再開モードの処理（一度だけ実行）
     console.log('🔍 CHECKING RESUME MODE:', { resumeMode, hasSessionFlag: !!sessionStorage.getItem('bookmark_resumed') });
     
     if (resumeMode && !sessionStorage.getItem('bookmark_resumed')) {
@@ -360,7 +360,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           const bookmark = JSON.parse(bookmarkData);
           console.log('📖 Bookmark restored (no visual marker):', bookmark);
           
-          // しおり位置保存（後でスクロールに使用）
+          // ブックマーク位置保存（後でスクロールに使用）
           setBookmarkTokenIndex(bookmark.tokenIndex);
           
           // ダイアログを即座に表示（スクロールは再開時に実行）
@@ -709,7 +709,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // 長押し処理（しおり機能）
+  // 長押し処理（ブックマーク機能）
   const handleLongPress = (target: HTMLElement) => {
     const tokenIndex = parseInt(target.dataset.idx || '0', 10);
     const word = target.textContent || '';
@@ -737,7 +737,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // 現在の読み物を識別するためのslugを取得/生成
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
     
-    // 既存のしおりチェック
+    // 既存のブックマークチェック
     const existingBookmark = localStorage.getItem('reading_bookmark');
     if (existingBookmark) {
       const bookmark = JSON.parse(existingBookmark);
@@ -778,7 +778,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }, 100);
   };
 
-  // しおり保存処理
+  // ブックマーク保存処理
   const saveBookmark = (tokenIndex: number, word: string) => {
     if (!startTime) {
       console.error('❌ 読書開始時間が設定されていません');
@@ -818,7 +818,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       progress: `${Math.round((wordsReadCount / wordCount) * 100)}%`
     });
 
-    // しおりデータを保存
+    // ブックマークデータを保存
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
     const bookmarkData = {
       slug: currentSlug,
@@ -830,7 +830,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // 読書状態を保存（次回復元用）
     saveCurrentReadingState();
     
-    console.log('📖 しおり保存完了:', bookmarkData);
+    console.log('📖 ブックマーク保存完了:', bookmarkData);
     
     // 統計表示のため、少し待ってから画面を更新
     setTimeout(() => {
@@ -1293,7 +1293,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [highlightedWord, setHighlightedWord] = useState<string>('');
   
   
-  // しおり機能用のグローバルトークンインデックス
+  // ブックマーク機能用のグローバルトークンインデックス
   const globalTokenIndexRef = useRef<number>(0);
 
   // タッチ開始ハンドラー（長押し対応）
@@ -1396,7 +1396,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     localStorage.setItem('readingTextSize', size);
   };
 
-  // 読書再開処理（しおり機能）
+  // 読書再開処理（ブックマーク機能）
   const handleResumeReading = () => {
     console.log('🔄 handleResumeReading 開始 - isResumeMode:', isResumeMode);
     
@@ -1407,10 +1407,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setIsResumeMode(false);
     console.log('🔄 setIsResumeMode(false) + sessionStorage設定完了');
     
-    // しおり位置へ自動スクロール
+    // ブックマーク位置へ自動スクロール
     if (bookmarkTokenIndex !== null) {
       const savedBookmarkIndex = bookmarkTokenIndex; // スクロール用に保存
-      console.log('🔍 しおり位置スクロール開始 (index:', savedBookmarkIndex, ')');
+      console.log('🔍 ブックマーク位置スクロール開始 (index:', savedBookmarkIndex, ')');
       
       // Enhanced approach with retry mechanism for robust DOM element detection
       const attemptBookmarkScroll = (attempt = 1, maxAttempts = 10) => {
@@ -1423,7 +1423,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         const targetElement = document.querySelector(`[data-idx="${savedBookmarkIndex}"]`) as HTMLElement;
         
         if (targetElement) {
-          console.log('✅ しおり位置にスクロール開始');
+          console.log('✅ ブックマーク位置にスクロール開始');
           console.log('📍 Target element:', {
             word: targetElement.textContent,
             index: savedBookmarkIndex,
@@ -1447,7 +1447,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           targetElement.style.setProperty('border', 'none', 'important');
           targetElement.style.setProperty('outline', 'none', 'important');
           
-          console.log('📖 しおり復帰完了:', targetElement.textContent);
+          console.log('📖 ブックマーク復帰完了:', targetElement.textContent);
           
           // Remove highlight after 3 seconds
           setTimeout(() => {
@@ -1459,11 +1459,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             targetElement.style.removeProperty('padding');
             targetElement.style.removeProperty('border-radius');
             targetElement.style.removeProperty('box-shadow');
-            console.log('✨ しおりハイライト終了');
+            console.log('✨ ブックマークハイライト終了');
           }, 3000);
           
         } else {
-          console.log(`❌ しおり位置が見つかりません (attempt ${attempt}/${maxAttempts})`);
+          console.log(`❌ ブックマーク位置が見つかりません (attempt ${attempt}/${maxAttempts})`);
           const allElements = document.querySelectorAll('[data-idx]');
           console.log('- 全要素数:', allElements.length);
           console.log('- 探している位置:', savedBookmarkIndex);
@@ -2112,7 +2112,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
 
 
-      {/* しおり機能のダイアログ */}
+      {/* ブックマーク機能のダイアログ */}
       <BookmarkDialog
         isOpen={bookmarkDialog.isOpen}
         onClose={() => setBookmarkDialog({...bookmarkDialog, isOpen: false})}

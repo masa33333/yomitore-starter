@@ -25,20 +25,20 @@ export function BookmarkDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">
-          {isLevelConflict ? 'しおりの上書き確認' : 'しおり作成'}
+          {isLevelConflict ? 'ブックマークの上書き確認' : 'ブックマーク'}
         </h2>
         <p className="text-gray-600 mb-6">
           {isLevelConflict ? (
             <>
-              この作品には以前 <strong>Level {conflictLevel}</strong> のしおりがあります。
+              この作品には以前 <strong>Level {conflictLevel}</strong> のブックマークがあります。
               <br />
               新しい <strong>Level {currentLevel}</strong> で上書きしますか？
             </>
           ) : (
             <>
-              「<strong>{word}</strong>」の位置でしおりを作成します。
+              「<strong>{word}</strong>」の位置で一時中断しますか？
               <br />
-              ここで一時中断しますか？
+              次回はここから再開できます。
             </>
           )}
         </p>
@@ -54,7 +54,7 @@ export function BookmarkDialog({
               onConfirm();
               onClose();
             }}
-            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+            className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md transition-colors"
           >
             {isLevelConflict ? '上書きする' : 'はい'}
           </button>
