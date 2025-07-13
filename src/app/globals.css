@@ -68,6 +68,40 @@ html {
   cursor: pointer;
 }
 
+/* 単語要素 - web版と同じ動作をモバイルでも */
+.clickable-word {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  transition: background-color 200ms ease;
+}
+
+/* hover時：薄い黄色（デスクトップ・モバイル共通） */
+.clickable-word:hover {
+  background-color: rgba(254, 240, 138, 0.5) !important; /* bg-yellow-200/50 */
+  outline: none !important;
+  border: none !important;
+}
+
+/* 不要な状態をクリア */
+.clickable-word:active,
+.clickable-word:focus,
+.clickable-word:visited,
+.clickable-word:link,
+.clickable-word:any-link,
+.clickable-word:target {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
 /* Animation classes */
 @keyframes wiggle {
   0%, 100% { transform: translateX(-50%) rotate(0deg); }

@@ -90,6 +90,45 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // 基本状態
   const [loading, setLoading] = useState(false);
+  
+  // 単語要素のみの紫色検出・除去
+  useEffect(() => {
+    const purpleDetector = setInterval(() => {
+      const clickableWords = document.querySelectorAll('.clickable-word');
+      clickableWords.forEach(el => {
+        const element = el as HTMLElement;
+        const computedStyle = window.getComputedStyle(element);
+        
+        // 紫色系を検出してログ出力（単語要素のみ）
+        if (computedStyle.backgroundColor?.includes('139') || 
+            computedStyle.backgroundColor?.includes('purple') ||
+            computedStyle.borderColor?.includes('139') ||
+            computedStyle.borderColor?.includes('purple') ||
+            computedStyle.outlineColor?.includes('139') ||
+            computedStyle.outlineColor?.includes('purple') ||
+            computedStyle.backgroundColor?.includes('rgb(139') ||
+            computedStyle.borderColor?.includes('rgb(139') ||
+            computedStyle.outlineColor?.includes('rgb(139')) {
+          console.log('🟣 単語に紫色検出:', {
+            word: element.textContent,
+            className: element.className,
+            backgroundColor: computedStyle.backgroundColor,
+            borderColor: computedStyle.borderColor,
+            outlineColor: computedStyle.outlineColor
+          });
+          
+          // 強制削除
+          element.style.setProperty('background-color', 'transparent', 'important');
+          element.style.setProperty('border-color', 'transparent', 'important');
+          element.style.setProperty('outline-color', 'transparent', 'important');
+          element.style.setProperty('border', 'none', 'important');
+          element.style.setProperty('outline', 'none', 'important');
+        }
+      });
+    }, 1000); // 1秒ごとに実行
+    
+    return () => clearInterval(purpleDetector);
+  }, []);
   const [textSize, setTextSize] = useState<'small' | 'medium' | 'large'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('readingTextSize') as 'small' | 'medium' | 'large';
@@ -728,16 +767,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setHighlightedWord('');
     console.log('🟡 黄色ハイライトクリア');
     
-    // 視覚的フィードバック：紫色ハイライト（長押し成功）
-    target.style.setProperty('background-color', '#8b5cf6', 'important');
-    target.style.setProperty('color', 'white', 'important');
-    target.style.setProperty('border', '3px solid #7c3aed', 'important');
+    // 紫色の視覚的フィードバックを削除（モバイル読書体験向上のため）
     target.classList.remove('bg-yellow-300'); // 黄色を完全に除去
-    console.log('🟣 長押し成功 - 濃い紫色設定');
-    setTimeout(() => {
-      target.style.backgroundColor = '';
-      target.style.color = '';
-    }, 1500);
+    console.log('🟣 長押し成功 - 視覚的フィードバック無し（読書集中のため）');
     
     
     // 現在の読み物を識別するためのslugを取得/生成
@@ -875,15 +907,30 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const allWords = document.querySelectorAll('.clickable-word');
       allWords.forEach(element => {
         const el = element as HTMLElement;
-        // CSSクラスを除去
-        el.classList.remove('active', 'bg-yellow-300', 'bg-yellow-200', 'bg-yellow-100');
-        // インラインスタイルを除去
+        // 全てのCSSクラスを除去
+        el.classList.remove('active', 'bg-yellow-300', 'bg-yellow-200', 'bg-yellow-100', 'bg-purple-500', 'bg-purple-400', 'border-purple-500');
+        // 全てのインラインスタイルを完全除去
         el.style.backgroundColor = '';
         el.style.background = '';
-        el.style.removeProperty('background-color');
-        el.style.removeProperty('background');
-        // 追加でCSSリセット
-        el.style.cssText = el.style.cssText.replace(/background[^;]*;?/g, '');
+        el.style.border = '';
+        el.style.borderColor = '';
+        el.style.borderStyle = '';
+        el.style.borderWidth = '';
+        el.style.outline = '';
+        el.style.outlineColor = '';
+        el.style.boxShadow = '';
+        el.style.color = '';
+        // removePropertyで確実に削除
+        ['background-color', 'background', 'border', 'border-color', 'border-style', 'border-width', 'outline', 'outline-color', 'box-shadow', 'color'].forEach(prop => {
+          el.style.removeProperty(prop);
+        });
+        // cssTextを完全にクリーンアップ
+        el.style.cssText = el.style.cssText
+          .replace(/background[^;]*;?/g, '')
+          .replace(/border[^;]*;?/g, '')
+          .replace(/outline[^;]*;?/g, '')
+          .replace(/box-shadow[^;]*;?/g, '')
+          .replace(/color[^;]*;?/g, '');
       });
     }, 1000);
     
@@ -1170,8 +1217,19 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const mouseDownTimeRef = useRef<number>(0);
   const mouseDownTargetRef = useRef<HTMLElement | null>(null);
 
+  // タッチデバイス検出
+  const isTouchDevice = () => {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  };
+
   // マウスダウンハンドラー（デスクトップ版長押し対応）
   const handleTextMouseDown = (e: React.MouseEvent<HTMLParagraphElement>) => {
+    // タッチデバイスではマウスイベントを無視
+    if (isTouchDevice()) {
+      console.log('🚫 タッチデバイス検出 - マウスイベント無効化');
+      return;
+    }
+
     const target = e.target as HTMLElement;
     
     // 単語要素の場合のみ長押しタイマーを開始
@@ -1189,11 +1247,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       isLongPressRef.current = false;
       
       console.log('🔵 マウス長押しタイマー開始:', word);
-      
-      // 長押し開始時の視覚的フィードバック（薄い紫）
-      target.style.setProperty('background-color', 'rgba(139, 92, 246, 0.5)', 'important');
-      target.style.setProperty('border', '2px solid #8b5cf6', 'important');
-      target.classList.remove('bg-yellow-300'); // 黄色ハイライトを除去
       
       // 長押しタイマー（600ms）
       longPressTimeoutRef.current = setTimeout(() => {
@@ -1228,9 +1281,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         longPressTimeoutRef.current = null;
       }
       
-      // 視覚的フィードバックをクリア
-      target.style.removeProperty('background-color');
-      target.style.removeProperty('border');
       
       // 長押しが実行された場合は、通常のクリック処理をスキップ
       if (isLongPressRef.current) {
@@ -1304,15 +1354,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
       
+      // タッチ開始時のCSS状態もチェック
+      const computedStyle = window.getComputedStyle(target);
+      console.log('👆 タッチ開始時CSS:', {
+        word: word,
+        backgroundColor: computedStyle.backgroundColor,
+        borderColor: computedStyle.borderColor,
+        outlineColor: computedStyle.outlineColor
+      });
       
-      
-      // 長押し開始時の視覚的フィードバック（薄い紫）- 黄色より優先
-      target.style.setProperty('background-color', 'rgba(139, 92, 246, 0.5)', 'important');
-      target.style.setProperty('border', '2px solid #8b5cf6', 'important');
-      target.classList.remove('bg-yellow-300'); // 黄色ハイライトを除去
-      console.log('🟣 紫色設定（強化版）:', target.style.backgroundColor);
-      
-      // 長押しタイマー（600ms）- ユーザビリティ向上
+      // 長押しタイマー（600ms）
       longPressTimeoutRef.current = setTimeout(() => {
         if (!isLongPressRef.current) {
           console.log('🔗 長押し検出:', word);
@@ -1341,12 +1392,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log('🛑 タイマークリア');
       clearTimeout(longPressTimeoutRef.current);
       longPressTimeoutRef.current = null;
-    }
-    
-    // 長押し開始時の視覚的フィードバックをクリア
-    if (target.classList.contains('clickable-word')) {
-      target.style.removeProperty('background-color');
-      console.log('🟡 紫色クリア');
     }
     
     // 長押しが実行された場合は、通常のタップ処理をスキップ
@@ -1381,15 +1426,25 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       e.preventDefault();
       e.stopPropagation();
       
+      // 紫色の原因を特定するためのデバッグ
+      const computedStyle = window.getComputedStyle(target);
+      const debugInfo = {
+        word: word,
+        backgroundColor: computedStyle.backgroundColor,
+        borderColor: computedStyle.borderColor,
+        outlineColor: computedStyle.outlineColor,
+        border: computedStyle.border,
+        outline: computedStyle.outline,
+        boxShadow: computedStyle.boxShadow
+      };
       
+      // モバイルでアラート表示
+      alert(`タップした単語: ${word}\n背景色: ${computedStyle.backgroundColor}\n枠線色: ${computedStyle.borderColor}\n輪郭色: ${computedStyle.outlineColor}\n枠線: ${computedStyle.border}\n輪郭: ${computedStyle.outline}`);
       
-      // 視覚的フィードバック：青色ハイライト（通常タップ）
-      target.style.backgroundColor = '#3b82f6';
-      target.style.color = 'white';
-      setTimeout(() => {
-        target.style.backgroundColor = '';
-        target.style.color = '';
-      }, 500);
+      // web版と同じ動作：濃い黄色ハイライト + 単語クリック処理
+      setHighlightedWord(word);
+      console.log('🟡 モバイルタップ - 濃い黄色ハイライト:', word);
+      console.log('🔍 CSS状態:', debugInfo);
       
       // 単語クリック処理を即座に実行
       handleWordClick(word);
@@ -1612,17 +1667,19 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           return (
             <span
               key={`${partIndex}-${wordIndex}`}
-              className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
+              className={`clickable-word ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
               } ${
                 bookmarkTokenIndex === tokenIndex ? 'bg-red-400 text-white font-bold' : ''
               }`}
-              title="タップ: 意味を調べる / 長押し: しおり作成"
               data-word={word}
               data-idx={tokenIndex}
               style={{
+                outline: 'none',
+                border: 'none',
+                boxShadow: 'none',
+                WebkitTapHighlightColor: 'transparent',
                 WebkitTouchCallout: 'none',
-                WebkitUserSelect: 'none',
                 touchAction: 'manipulation'
               }}
             >
