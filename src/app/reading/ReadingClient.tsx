@@ -325,6 +325,30 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     console.log('📋 English paragraphs:', englishParagraphs);
     console.log('📊 Word count:', wordCount);
     
+    // 🔥 EMERGENCY SCROLL FIX: Force enable scrolling immediately on page load
+    console.log('🔥 EMERGENCY: Enabling scrolling immediately on page load');
+    const forceEnableScrolling = () => {
+      // Remove any blocking overflow styles
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.pointerEvents = 'auto';
+      document.documentElement.style.pointerEvents = 'auto';
+      
+      // Force with !important
+      document.body.style.setProperty('overflow-y', 'auto', 'important');
+      document.documentElement.style.setProperty('overflow-y', 'auto', 'important');
+      
+      console.log('✅ Emergency scrolling enablement completed');
+    };
+    
+    // Execute immediately
+    forceEnableScrolling();
+    
+    // Execute again after a short delay to override any conflicting styles
+    setTimeout(forceEnableScrolling, 100);
+    setTimeout(forceEnableScrolling, 500);
+    setTimeout(forceEnableScrolling, 1000);
+    
     // 初期化時に正しい生成レベルをselectedLevelに設定
     const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
     setSelectedLevel(currentLevel);
@@ -505,23 +529,25 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // ページ読み込み時に即座にスクロールを確保
   useEffect(() => {
     const ensureScrollingImmediately = () => {
-      // 最強レベルのスクロール確保
-      [document.body, document.documentElement].forEach(el => {
-        el.style.cssText = `
-          overflow: visible !important;
-          overflow-y: auto !important;
-          overflow-x: hidden !important;
-          pointer-events: auto !important;
-          position: relative !important;
-          height: auto !important;
-          max-height: none !important;
-        `;
-      });
+      // 最強レベルのスクロール確保 - cssTextでの完全上書き
+      const bodyStyle = `
+        overflow: visible !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        pointer-events: auto !important;
+        position: relative !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 100vh !important;
+      `;
+      
+      document.body.setAttribute('style', bodyStyle);
+      document.documentElement.setAttribute('style', bodyStyle);
       
       // 全ての要素からスクロールを阻害するクラスを除去
       const allElements = document.querySelectorAll('*');
       allElements.forEach(el => {
-        el.classList.remove('blur-reading', 'overflow-hidden', 'h-screen', 'max-h-screen');
+        el.classList.remove('blur-reading', 'overflow-hidden', 'h-screen', 'max-h-screen', 'min-h-screen');
         const style = el as HTMLElement;
         if (style.style.overflow === 'hidden') {
           style.style.overflow = 'visible';
@@ -529,18 +555,22 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         if (style.style.overflowY === 'hidden') {
           style.style.overflowY = 'auto';
         }
+        if (style.style.height === '100vh' || style.style.height === '100%') {
+          style.style.height = 'auto';
+        }
       });
       
-      // ページコンテナの高さ制限を解除
-      const containers = document.querySelectorAll('main, .container, [class*="max-h"], [class*="h-screen"]');
-      containers.forEach(el => {
+      // layout.tsxのmainタグも修正
+      const mainElements = document.querySelectorAll('main');
+      mainElements.forEach(el => {
         const element = el as HTMLElement;
+        element.classList.remove('min-h-screen');
         element.style.setProperty('height', 'auto', 'important');
         element.style.setProperty('max-height', 'none', 'important');
         element.style.setProperty('min-height', 'auto', 'important');
       });
       
-      console.log('✅ 最強スクロール確保完了 - height:', document.body.scrollHeight, 'client:', document.body.clientHeight);
+      console.log('✅ setAttribute方式スクロール確保完了 - height:', document.body.scrollHeight, 'client:', document.body.clientHeight);
     };
     
     ensureScrollingImmediately();
@@ -549,6 +579,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setTimeout(ensureScrollingImmediately, 100);
     setTimeout(ensureScrollingImmediately, 500);
     setTimeout(ensureScrollingImmediately, 1000);
+    setTimeout(ensureScrollingImmediately, 2000);
+    setTimeout(ensureScrollingImmediately, 3000);
   }, []);
 
   // 英語テキストが変更されたら語彙レベルを自動判定
@@ -791,15 +823,25 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   };
 
   // 長押し処理（ブックマーク機能）
-  const handleLongPress = (target: HTMLElement) => {
-    const tokenIndex = parseInt(target.dataset.idx || '0', 10);
-    const word = target.textContent || '';
+  const handleLongPress = (target: HTMLElement | string, tokenIndex?: number) => {
+    let word: string;
+    let actualTokenIndex: number;
+    
+    if (typeof target === 'string') {
+      // デバッグボタンからの呼び出し
+      word = target;
+      actualTokenIndex = tokenIndex || 0;
+    } else {
+      // 通常の要素からの呼び出し
+      actualTokenIndex = parseInt(target.dataset.idx || '0', 10);
+      word = target.textContent || '';
+    }
     
     console.log('🎯 handleLongPress実行開始:', {
       word,
-      tokenIndex,
-      dataIdx: target.dataset.idx,
-      classList: Array.from(target.classList)
+      tokenIndex: actualTokenIndex,
+      target: typeof target === 'string' ? 'debug call' : target.dataset.idx,
+      classList: typeof target === 'string' ? 'debug call' : Array.from(target.classList)
     });
     
     // 長押しフラグを設定
@@ -810,11 +852,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setHighlightedWord('');
     console.log('🟡 黄色ハイライトクリア');
     
-    // ブックマーク作成時はオレンジでハイライト
-    target.style.setProperty('background-color', '#f97316', 'important'); // orange-500
-    target.style.setProperty('color', 'white', 'important');
-    target.style.setProperty('padding', '2px 4px', 'important');
-    target.style.setProperty('border-radius', '4px', 'important');
+    // ブックマーク作成時はオレンジでハイライト（要素の場合のみ）
+    if (typeof target !== 'string') {
+      target.style.setProperty('background-color', '#f97316', 'important'); // orange-500
+      target.style.setProperty('color', 'white', 'important');
+      target.style.setProperty('padding', '2px 4px', 'important');
+      target.style.setProperty('border-radius', '4px', 'important');
+    }
     console.log('🟠 長押し成功 - オレンジでハイライト:', word);
     
     
@@ -834,17 +878,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           setBookmarkDialog({
             isOpen: true,
             word,
-            tokenIndex,
+            tokenIndex: actualTokenIndex,
             conflictLevel: bookmark.level
           });
           return;
         } else {
           // 同じレベルの場合は上書き確認ダイアログ表示
-          console.log('⚠️ 同レベル上書き確認:', tokenIndex);
+          console.log('⚠️ 同レベル上書き確認:', actualTokenIndex);
           setBookmarkDialog({
             isOpen: true,
             word,
-            tokenIndex,
+            tokenIndex: actualTokenIndex,
             conflictLevel: undefined // レベル競合なし
           });
           return;
@@ -853,12 +897,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
     
     // 中断確認ダイアログ表示
-    console.log('💬 BookmarkDialog表示開始:', { word, tokenIndex });
+    console.log('💬 BookmarkDialog表示開始:', { word, tokenIndex: actualTokenIndex });
     console.log('💬 setBookmarkDialogを呼び出し中...');
     setBookmarkDialog({
       isOpen: true,
       word,
-      tokenIndex
+      tokenIndex: actualTokenIndex
     });
     console.log('💬 BookmarkDialog状態設定完了');
     
@@ -1678,19 +1722,43 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           }
         }
         
-        // Clear bookmark data only after successful scroll or max attempts
-        setBookmarkTokenIndex(null);
-        globalTokenIndexRef.current = 0;
+        // DON'T clear bookmark data - keep for multiple resume attempts
+        // setBookmarkTokenIndex(null);
+        // globalTokenIndexRef.current = 0;
       };
       
       // Start the scroll attempt after 800ms delay
       setTimeout(() => attemptBookmarkScroll(), 800);
       
     } else {
-      console.warn('⚠️ bookmarkTokenIndex が null です');
-      // nullの場合もクリア処理実行
-      setBookmarkTokenIndex(null);
-      globalTokenIndexRef.current = 0;
+      console.warn('⚠️ bookmarkTokenIndex が null です - ブックマークデータを再読み込み');
+      
+      // ブックマークデータを再度確認
+      const bookmarkData = localStorage.getItem('reading_bookmark');
+      if (bookmarkData) {
+        try {
+          const bookmark = JSON.parse(bookmarkData);
+          console.log('🔍 再読み込みブックマーク:', bookmark);
+          setBookmarkTokenIndex(bookmark.tokenIndex);
+          
+          // リトライ
+          setTimeout(() => {
+            const attemptBookmarkScrollAgain = (attempt = 1, maxAttempts = 5) => {
+              const targetElement = document.querySelector(`[data-idx="${bookmark.tokenIndex}"]`);
+              if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetElement.classList.add('bookmark-highlight', 'bookmark-active-highlight');
+                console.log('🔄 ブックマーク再試行成功');
+              } else if (attempt < maxAttempts) {
+                setTimeout(() => attemptBookmarkScrollAgain(attempt + 1, maxAttempts), 500);
+              }
+            };
+            attemptBookmarkScrollAgain();
+          }, 1000);
+        } catch (error) {
+          console.error('❌ ブックマーク再読み込みエラー:', error);
+        }
+      }
     }
     
     console.log('🔄 読書再開: ぼかし解除、通常の読書モードに移行');
@@ -2233,6 +2301,82 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 />
               </div>
               
+              {/* 🔧 デバッグ用ボタン群 */}
+              <div className="mb-4 rounded border border-yellow-300 bg-yellow-50 p-4">
+                <h4 className="mb-3 text-sm font-bold text-yellow-800">🔧 デバッグツール</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <button
+                    onClick={() => {
+                      console.log('🖱️ クリック式しおりテスト実行');
+                      const firstWord = document.querySelector('.clickable-word');
+                      if (firstWord) {
+                        const word = (firstWord as HTMLElement).textContent || 'test';
+                        handleLongPress(word, 5); // 最初の単語でテスト
+                      }
+                    }}
+                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                  >
+                    🖱️ クリック式しおり
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      console.log('👆 タッチ診断開始');
+                      const paragraphs = document.querySelectorAll('p');
+                      const words = document.querySelectorAll('.clickable-word');
+                      console.log('📊 DOM状態:', {
+                        paragraphs: paragraphs.length,
+                        words: words.length,
+                        hasTouchHandlers: !!paragraphs[0]?.ontouchstart
+                      });
+                      
+                      // イベントハンドラのチェック
+                      paragraphs.forEach((p, i) => {
+                        console.log(`段落${i}:`, {
+                          hasTouchStart: !!p.ontouchstart,
+                          hasTouchEnd: !!p.ontouchend
+                        });
+                      });
+                    }}
+                    className="rounded bg-purple-500 px-2 py-1 text-white hover:bg-purple-600"
+                  >
+                    👆 タッチ診断
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      console.log('💬 ダイアログテスト実行');
+                      setBookmarkDialog({
+                        isOpen: true,
+                        word: 'test',
+                        tokenIndex: 42
+                      });
+                    }}
+                    className="rounded bg-green-500 px-2 py-1 text-white hover:bg-green-600"
+                  >
+                    💬 ダイアログテスト
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      const scrollData = {
+                        bodyHeight: document.body.scrollHeight,
+                        windowHeight: window.innerHeight,
+                        canScroll: document.body.scrollHeight > window.innerHeight,
+                        currentY: window.scrollY,
+                        bodyOverflow: getComputedStyle(document.body).overflow,
+                        htmlOverflow: getComputedStyle(document.documentElement).overflow
+                      };
+                      console.log('🔍 スクロール診断:', scrollData);
+                      alert(JSON.stringify(scrollData, null, 2));
+                    }}
+                    className="rounded bg-orange-500 px-2 py-1 text-white hover:bg-orange-600"
+                  >
+                    🔍 スクロール診断
+                  </button>
+                </div>
+              </div>
+
               <div className="space-y-3">
                 <div className="grid grid-cols-3 gap-2">
                   <button

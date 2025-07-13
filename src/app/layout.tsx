@@ -25,7 +25,7 @@ export default function RootLayout({
           <PointsProvider>
             <LevelMigration />
             <AnimationPreloader />
-            <ScrollController />
+            {/* <ScrollController /> */}
             <ConditionalHeader />
             <ExitCalendarHandler />
             <main className="min-h-screen">{children}</main>
