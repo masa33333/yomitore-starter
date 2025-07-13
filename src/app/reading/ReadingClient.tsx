@@ -505,25 +505,50 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // ページ読み込み時に即座にスクロールを確保
   useEffect(() => {
     const ensureScrollingImmediately = () => {
+      // 最強レベルのスクロール確保
       [document.body, document.documentElement].forEach(el => {
-        el.style.setProperty('overflow', 'visible', 'important');
-        el.style.setProperty('overflow-y', 'auto', 'important');
-        el.style.setProperty('pointer-events', 'auto', 'important');
+        el.style.cssText = `
+          overflow: visible !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          pointer-events: auto !important;
+          position: relative !important;
+          height: auto !important;
+          max-height: none !important;
+        `;
       });
       
-      // Remove any problematic classes
+      // 全ての要素からスクロールを阻害するクラスを除去
       const allElements = document.querySelectorAll('*');
       allElements.forEach(el => {
-        el.classList.remove('blur-reading', 'overflow-hidden');
+        el.classList.remove('blur-reading', 'overflow-hidden', 'h-screen', 'max-h-screen');
+        const style = el as HTMLElement;
+        if (style.style.overflow === 'hidden') {
+          style.style.overflow = 'visible';
+        }
+        if (style.style.overflowY === 'hidden') {
+          style.style.overflowY = 'auto';
+        }
       });
       
-      console.log('✅ ページ読み込み時スクロール確保完了');
+      // ページコンテナの高さ制限を解除
+      const containers = document.querySelectorAll('main, .container, [class*="max-h"], [class*="h-screen"]');
+      containers.forEach(el => {
+        const element = el as HTMLElement;
+        element.style.setProperty('height', 'auto', 'important');
+        element.style.setProperty('max-height', 'none', 'important');
+        element.style.setProperty('min-height', 'auto', 'important');
+      });
+      
+      console.log('✅ 最強スクロール確保完了 - height:', document.body.scrollHeight, 'client:', document.body.clientHeight);
     };
     
     ensureScrollingImmediately();
     
-    // 100ms後にもう一度実行（他のコードが干渉する場合に備えて）
+    // 複数回実行で確実性を高める
     setTimeout(ensureScrollingImmediately, 100);
+    setTimeout(ensureScrollingImmediately, 500);
+    setTimeout(ensureScrollingImmediately, 1000);
   }, []);
 
   // 英語テキストが変更されたら語彙レベルを自動判定
@@ -561,22 +586,39 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setIsResumeMode(false);
     setShowResumeDialog(false);
     
-    // 超強力スクロール有効化（予防措置）
+    // 核兵器級スクロール有効化（予防措置）
     const ensureScrolling = () => {
+      // body/htmlの強制設定
       [document.body, document.documentElement].forEach(el => {
-        el.style.setProperty('overflow', 'visible', 'important');
-        el.style.setProperty('overflow-y', 'auto', 'important');
-        el.style.setProperty('pointer-events', 'auto', 'important');
+        el.style.cssText = `
+          overflow: visible !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          pointer-events: auto !important;
+          position: relative !important;
+          height: auto !important;
+          max-height: none !important;
+          min-height: 100vh !important;
+        `;
       });
       
-      // Remove any problematic classes
+      // 全要素のスクロール阻害を解除
       const allElements = document.querySelectorAll('*');
       allElements.forEach(el => {
-        el.classList.remove('blur-reading', 'overflow-hidden');
+        el.classList.remove('blur-reading', 'overflow-hidden', 'h-screen', 'max-h-screen');
+        const style = el as HTMLElement;
+        if (style.style.overflow === 'hidden') {
+          style.style.overflow = 'visible';
+        }
       });
+      
+      console.log('🔧 読書開始時核兵器級スクロール確保 - scrollHeight:', document.body.scrollHeight);
     };
     
     ensureScrolling();
+    // 3回実行で確実性を高める
+    setTimeout(ensureScrolling, 100);
+    setTimeout(ensureScrolling, 500);
     
     // 読書開始時の総語数を記録（スタンプ進捗表示用）
     const currentWordsRead = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
