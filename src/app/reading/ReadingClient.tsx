@@ -1438,8 +1438,25 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         boxShadow: computedStyle.boxShadow
       };
       
-      // モバイルでアラート表示
-      alert(`タップした単語: ${word}\n背景色: ${computedStyle.backgroundColor}\n枠線色: ${computedStyle.borderColor}\n輪郭色: ${computedStyle.outlineColor}\n枠線: ${computedStyle.border}\n輪郭: ${computedStyle.outline}`);
+      // 紫色検出チェック
+      const hasPurple = computedStyle.backgroundColor?.includes('139') || 
+                       computedStyle.backgroundColor?.includes('purple') ||
+                       computedStyle.borderColor?.includes('139') ||
+                       computedStyle.borderColor?.includes('purple') ||
+                       computedStyle.outlineColor?.includes('139') ||
+                       computedStyle.outlineColor?.includes('purple');
+      
+      if (hasPurple) {
+        alert(`🟣 紫色検出！単語: ${word}`);
+        alert(`🟣 背景色: ${computedStyle.backgroundColor}`);
+        alert(`🟣 枠線色: ${computedStyle.borderColor}`);
+        alert(`🟣 輪郭色: ${computedStyle.outlineColor}`);
+        alert(`🟣 枠線: ${computedStyle.border}`);
+        alert(`🟣 輪郭: ${computedStyle.outline}`);
+        alert(`🟣 ボックスシャドウ: ${computedStyle.boxShadow}`);
+      } else {
+        alert(`✅ 紫色なし: ${word}`);
+      }
       
       // web版と同じ動作：濃い黄色ハイライト + 単語クリック処理
       setHighlightedWord(word);
