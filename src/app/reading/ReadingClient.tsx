@@ -358,7 +358,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       if (bookmarkData) {
         try {
           const bookmark = JSON.parse(bookmarkData);
-          console.log('📖 Bookmark restored (no visual marker):', bookmark);
+          console.log('📖 読み込んだブックマークデータ:', bookmarkData);
+          console.log('📖 パースされたブックマーク:', bookmark);
+          console.log('📖 現在のslug:', currentSlug);
+          console.log('📖 ブックマークのslug:', bookmark.slug);
+          console.log('📖 tokenIndex:', bookmark.tokenIndex);
           
           // ブックマーク位置保存（後でスクロールに使用）
           setBookmarkTokenIndex(bookmark.tokenIndex);
@@ -496,6 +500,30 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log('🔄 URL changed - isResumeMode updated to:', resumeMode);
     }
   }, [searchParams]);
+
+  // ページ読み込み時に即座にスクロールを確保
+  useEffect(() => {
+    const ensureScrollingImmediately = () => {
+      [document.body, document.documentElement].forEach(el => {
+        el.style.setProperty('overflow', 'visible', 'important');
+        el.style.setProperty('overflow-y', 'auto', 'important');
+        el.style.setProperty('pointer-events', 'auto', 'important');
+      });
+      
+      // Remove any problematic classes
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.classList.remove('blur-reading', 'overflow-hidden');
+      });
+      
+      console.log('✅ ページ読み込み時スクロール確保完了');
+    };
+    
+    ensureScrollingImmediately();
+    
+    // 100ms後にもう一度実行（他のコードが干渉する場合に備えて）
+    setTimeout(ensureScrollingImmediately, 100);
+  }, []);
 
   // 英語テキストが変更されたら語彙レベルを自動判定
   useEffect(() => {
@@ -833,17 +861,27 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
     // ブックマークデータを保存
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    console.log('📖 ブックマーク保存時のslug:', currentSlug);
+    console.log('📖 ブックマーク保存時のsearchParams:', searchParams);
+    // 古いブックマークを確認
+    const oldBookmark = localStorage.getItem('reading_bookmark');
+    console.log('📖 古いブックマーク:', oldBookmark);
+    
     const bookmarkData = {
       slug: currentSlug,
       level: selectedLevel,
       tokenIndex: tokenIndex
     };
+    
     localStorage.setItem('reading_bookmark', JSON.stringify(bookmarkData));
+    
+    // 保存されたかを確認
+    const savedBookmark = localStorage.getItem('reading_bookmark');
+    console.log('📖 新しいブックマーク保存完了:', bookmarkData);
+    console.log('📖 実際に保存された内容:', savedBookmark);
     
     // 読書状態を保存（次回復元用）
     saveCurrentReadingState();
-    
-    console.log('📖 ブックマーク保存完了:', bookmarkData);
     
     // 統計表示のため、少し待ってから画面を更新
     setTimeout(() => {
