@@ -1783,14 +1783,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       })() ? (
         <div className="rounded-lg bg-white p-3 sm:p-6 shadow-sm">
           <div className="mb-6 text-center">
-            <h2 className="mb-2 text-lg font-semibold">読書を開始しますか？</h2>
+            <h2 className="mb-2 text-lg font-semibold">
+              {isResumeMode ? '前回の続きを読みますか？' : '読書を開始しますか？'}
+            </h2>
             <p className="mb-4 text-gray-600">語数: {wordCount}語</p>
             
             <button
               onClick={handleStartReading}
               className="mb-4 rounded-md bg-primary-active px-6 py-3 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
             >
-              読み始める
+              {isResumeMode ? '前回の続きを読む' : '読み始める'}
             </button>
             
             {/* TTS Button for full content */}
