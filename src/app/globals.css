@@ -89,7 +89,7 @@ html {
   border: none !important;
 }
 
-/* 不要な状態をクリア */
+/* 不要な状態をクリア - 紫色完全阻止 */
 .clickable-word:active,
 .clickable-word:focus,
 .clickable-word:visited,
@@ -100,6 +100,22 @@ html {
   border: none !important;
   box-shadow: none !important;
   text-decoration: none !important;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Tailwind デフォルトの active 状態を強制上書き */
+.clickable-word:active {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  outline-color: transparent !important;
+}
+
+/* 可能性のある他のクラスも無効化 */
+span:active,
+*:active {
+  outline: none !important;
+  border: none !important;
 }
 
 /* Animation classes */

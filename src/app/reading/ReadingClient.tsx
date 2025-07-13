@@ -1356,6 +1356,22 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       // タッチ開始時のCSS状態もチェック
       const computedStyle = window.getComputedStyle(target);
+      
+      // タッチ開始時の紫色チェック
+      const hasPurpleStart = computedStyle.backgroundColor?.includes('139') || 
+                            computedStyle.backgroundColor?.includes('purple') ||
+                            computedStyle.borderColor?.includes('139') ||
+                            computedStyle.borderColor?.includes('purple') ||
+                            computedStyle.outlineColor?.includes('139') ||
+                            computedStyle.outlineColor?.includes('purple');
+      
+      if (hasPurpleStart) {
+        alert(`🟣 タッチ開始時に紫色検出！`);
+        alert(`🟣 タッチ開始-背景色: ${computedStyle.backgroundColor}`);
+        alert(`🟣 タッチ開始-枠線色: ${computedStyle.borderColor}`);
+        alert(`🟣 タッチ開始-輪郭色: ${computedStyle.outlineColor}`);
+      }
+      
       console.log('👆 タッチ開始時CSS:', {
         word: word,
         backgroundColor: computedStyle.backgroundColor,
