@@ -1357,20 +1357,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       // タッチ開始時のCSS状態もチェック
       const computedStyle = window.getComputedStyle(target);
       
-      // タッチ開始時の紫色チェック
-      const hasPurpleStart = computedStyle.backgroundColor?.includes('139') || 
-                            computedStyle.backgroundColor?.includes('purple') ||
-                            computedStyle.borderColor?.includes('139') ||
-                            computedStyle.borderColor?.includes('purple') ||
-                            computedStyle.outlineColor?.includes('139') ||
-                            computedStyle.outlineColor?.includes('purple');
-      
-      if (hasPurpleStart) {
-        alert(`🟣 タッチ開始時に紫色検出！`);
-        alert(`🟣 タッチ開始-背景色: ${computedStyle.backgroundColor}`);
-        alert(`🟣 タッチ開始-枠線色: ${computedStyle.borderColor}`);
-        alert(`🟣 タッチ開始-輪郭色: ${computedStyle.outlineColor}`);
-      }
+      // デバッグ用（必要時のみ使用）
+      // alert(`タッチ開始: ${word}`);
       
       console.log('👆 タッチ開始時CSS:', {
         word: word,
@@ -1454,25 +1442,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         boxShadow: computedStyle.boxShadow
       };
       
-      // 紫色検出チェック
-      const hasPurple = computedStyle.backgroundColor?.includes('139') || 
-                       computedStyle.backgroundColor?.includes('purple') ||
-                       computedStyle.borderColor?.includes('139') ||
-                       computedStyle.borderColor?.includes('purple') ||
-                       computedStyle.outlineColor?.includes('139') ||
-                       computedStyle.outlineColor?.includes('purple');
-      
-      if (hasPurple) {
-        alert(`🟣 紫色検出！単語: ${word}`);
-        alert(`🟣 背景色: ${computedStyle.backgroundColor}`);
-        alert(`🟣 枠線色: ${computedStyle.borderColor}`);
-        alert(`🟣 輪郭色: ${computedStyle.outlineColor}`);
-        alert(`🟣 枠線: ${computedStyle.border}`);
-        alert(`🟣 輪郭: ${computedStyle.outline}`);
-        alert(`🟣 ボックスシャドウ: ${computedStyle.boxShadow}`);
-      } else {
-        alert(`✅ 紫色なし: ${word}`);
-      }
+      // デバッグ：まだ紫色が見える場合のみコメントアウトを外す
+      // alert(`動作確認: ${word}`);
       
       // web版と同じ動作：濃い黄色ハイライト + 単語クリック処理
       setHighlightedWord(word);
@@ -1708,12 +1679,26 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               data-word={word}
               data-idx={tokenIndex}
               style={{
-                outline: 'none',
-                border: 'none',
+                outline: '0',
+                border: '0',
                 boxShadow: 'none',
-                WebkitTapHighlightColor: 'transparent',
+                WebkitTapHighlightColor: 'rgba(0,0,0,0)',
                 WebkitTouchCallout: 'none',
-                touchAction: 'manipulation'
+                WebkitUserSelect: 'none',
+                touchAction: 'manipulation',
+                // 最強レベルの紫色阻止
+                backgroundColor: highlightedWord === word ? '#fde047' : 
+                                bookmarkTokenIndex === tokenIndex ? '#f87171' : 'transparent',
+                borderStyle: 'none',
+                borderWidth: '0',
+                borderColor: 'transparent',
+                outlineStyle: 'none',
+                outlineWidth: '0',
+                outlineColor: 'transparent',
+                // ブラウザ固有の無効化
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
               }}
             >
               {word}
