@@ -343,10 +343,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       allParams: Object.fromEntries(urlParams.entries())
     });
 
-    // ブックマーク再開モードの処理（一度だけ実行）
-    console.log('🔍 CHECKING RESUME MODE:', { resumeMode, hasSessionFlag: !!sessionStorage.getItem('bookmark_resumed') });
+    // ブックマーク再開モードの処理
+    console.log('🔍 CHECKING RESUME MODE:', { resumeMode });
     
-    if (resumeMode && !sessionStorage.getItem('bookmark_resumed')) {
+    if (resumeMode) {
       console.log('📖 Resume mode detected, setting up bookmark restoration...');
       
       // CRITICAL FIX: Force isReadingStarted to true for resume mode
@@ -486,6 +486,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.error('❌ Data sync error:', error);
     }
   }, [englishParagraphs, wordCount]);
+
+  // URLパラメータの変更を監視してisResumeModeを更新
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resumeMode = urlParams.get('resume') === '1';
+      setIsResumeMode(resumeMode);
+      console.log('🔄 URL changed - isResumeMode updated to:', resumeMode);
+    }
+  }, [searchParams]);
 
   // 英語テキストが変更されたら語彙レベルを自動判定
   useEffect(() => {
@@ -1403,8 +1413,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleResumeReading = () => {
     console.log('🔄 handleResumeReading 開始 - isResumeMode:', isResumeMode);
     
-    // 読書再開完了フラグを設定（ページリロード対策）
-    sessionStorage.setItem('bookmark_resumed', 'true');
+    // 読書再開完了フラグを設定（ページリロード対策） - 削除
+    // sessionStorage.setItem('bookmark_resumed', 'true');
     
     setShowResumeDialog(false);
     setIsResumeMode(false);
