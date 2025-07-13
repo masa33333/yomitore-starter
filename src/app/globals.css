@@ -29,27 +29,72 @@ html {
 }
 
 .bookmark-highlight {
-  background-color: #ef4444 !important;
+  background-color: #f97316 !important;
   color: white !important;
   font-weight: bold !important;
   padding: 2px 4px !important;
   border-radius: 4px !important;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6) !important;
   border: none !important;
   outline: none !important;
 }
 
-/* しおりハイライトの最優先表示 */
+/* しおりハイライトの最優先表示 - 核兵器級強制適用 */
+.bookmark-highlight,
 span.bookmark-highlight,
-.clickable-word.bookmark-highlight {
-  background-color: #ef4444 !important;
+.clickable-word.bookmark-highlight,
+*.bookmark-highlight,
+span.bookmark-highlight:hover,
+.clickable-word.bookmark-highlight:hover,
+span.bookmark-highlight:active,
+.clickable-word.bookmark-highlight:active,
+span.bookmark-highlight:focus,
+.clickable-word.bookmark-highlight:focus,
+span.bookmark-highlight:visited,
+.clickable-word.bookmark-highlight:visited,
+.bookmark-highlight * {
+  background-color: #f97316 !important;
+  background: #f97316 !important;
   color: white !important;
   font-weight: bold !important;
   padding: 2px 4px !important;
   border-radius: 4px !important;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6) !important;
   border: none !important;
   outline: none !important;
+  text-decoration: none !important;
+}
+
+/* さらに具体的な要素への強制適用 */
+[data-idx].bookmark-highlight,
+span[data-idx].bookmark-highlight {
+  background-color: #f97316 !important;
+  background: #f97316 !important;
+  color: white !important;
+}
+
+/* 新しいアプローチ: 最高優先度のブックマークハイライト */
+.bookmark-active-highlight {
+  background-color: #f97316 !important;
+  background: #f97316 !important;
+  color: white !important;
+  font-weight: bold !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6) !important;
+  border: none !important;
+  outline: none !important;
+  text-decoration: none !important;
+}
+
+/* あらゆる状態でも絶対にオレンジ */
+.bookmark-active-highlight:hover,
+.bookmark-active-highlight:active,
+.bookmark-active-highlight:focus,
+.bookmark-active-highlight:visited {
+  background-color: #f97316 !important;
+  background: #f97316 !important;
+  color: white !important;
 }
 
 .blur-reading {

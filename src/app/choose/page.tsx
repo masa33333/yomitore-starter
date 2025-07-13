@@ -68,8 +68,8 @@ export default function ChoosePage() {
       en: 'Continue Previous Reading',
     },
     resumeDesc: {
-      ja: `Level ${bookmark?.level} のしおりから再開`,
-      en: `Resume from Level ${bookmark?.level} bookmark`,
+      ja: 'ブックマークを付けたところから再開',
+      en: 'Resume from your bookmark',
     },
     level: {
       ja: (label: string) => `語彙レベル：${label}`,
@@ -124,11 +124,15 @@ export default function ChoosePage() {
         {bookmark && (
           <button
             onClick={handleResumeReading}
-            className="w-full mb-6 rounded-xl bg-red-500 hover:bg-red-600 px-6 py-4 text-left text-white transition-colors"
+            style={{
+              backgroundColor: '#b45309',
+              color: 'white'
+            }}
+            className="w-full mb-6 rounded-xl px-6 py-4 text-left transition-colors hover:opacity-90"
           >
             <div>
               <h3 className="mb-1 text-lg font-semibold">{text.resumeReading[displayLang]}</h3>
-              <p className="mt-1 text-sm text-red-100">{text.resumeDesc[displayLang]}</p>
+              <p className="mt-1 text-sm opacity-90">{text.resumeDesc[displayLang]}</p>
             </div>
           </button>
         )}

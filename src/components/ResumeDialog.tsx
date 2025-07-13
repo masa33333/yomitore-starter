@@ -32,15 +32,15 @@ export function ResumeDialog({ isOpen, onResume }: ResumeDialogProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md text-center">
         <h2 className="text-xl font-bold mb-4">
-          📖 読書を再開しますか？
+          読書を再開しますか？
         </h2>
         <p className="text-gray-600 mb-6">
-          しおりを付けた位置から読書を続けることができます。
+          ブックマークした位置から読書を続けることができます。
         </p>
         <div className="flex justify-center">
           <button
             onClick={handleResume}
-            className="px-8 py-3 text-lg bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors font-bold"
+            className="px-8 py-3 text-lg bg-orange-500 hover:bg-orange-600 text-white rounded-md transition-colors font-bold"
           >
             読書を再開する
           </button>

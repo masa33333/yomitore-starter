@@ -729,9 +729,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setHighlightedWord('');
     console.log('🟡 黄色ハイライトクリア');
     
-    // 紫色の視覚的フィードバックを削除（モバイル読書体験向上のため）
-    target.classList.remove('bg-yellow-300'); // 黄色を完全に除去
-    console.log('🟣 長押し成功 - 視覚的フィードバック無し（読書集中のため）');
+    // ブックマーク作成時はオレンジでハイライト
+    target.style.setProperty('background-color', '#f97316', 'important'); // orange-500
+    target.style.setProperty('color', 'white', 'important');
+    target.style.setProperty('padding', '2px 4px', 'important');
+    target.style.setProperty('border-radius', '4px', 'important');
+    console.log('🟠 長押し成功 - オレンジでハイライト:', word);
     
     
     // 現在の読み物を識別するためのslugを取得/生成
@@ -1436,24 +1439,31 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             block: 'center'
           });
           
-          // Highlight the bookmarked word in red - 強力な設定で確実に表示
+          // Highlight the bookmarked word in red - 超強力な設定で確実に表示
           targetElement.classList.add('bookmark-highlight');
-          targetElement.style.setProperty('background-color', '#ef4444', 'important');
-          targetElement.style.setProperty('color', 'white', 'important');
-          targetElement.style.setProperty('font-weight', 'bold', 'important');
-          targetElement.style.setProperty('padding', '2px 4px', 'important');
-          targetElement.style.setProperty('border-radius', '4px', 'important');
-          targetElement.style.setProperty('box-shadow', '0 0 8px rgba(239, 68, 68, 0.6)', 'important');
-          targetElement.style.setProperty('border', 'none', 'important');
-          targetElement.style.setProperty('outline', 'none', 'important');
+          
+          // 直接的なアプローチ: インラインスタイルで強制オレンジ
+          targetElement.setAttribute('style', 
+            'background-color: #f97316 !important; ' +
+            'color: white !important; ' +
+            'font-weight: bold !important; ' +
+            'padding: 2px 4px !important; ' +
+            'border-radius: 4px !important; ' +
+            'box-shadow: 0 0 8px rgba(249, 115, 22, 0.6) !important; ' +
+            'border: none !important; ' +
+            'outline: none !important;'
+          );
+          
+          console.log('🟠 強制オレンジハイライト適用:', targetElement.textContent);
           
           console.log('📖 ブックマーク復帰完了:', targetElement.textContent);
           
           // Remove highlight after 3 seconds
           setTimeout(() => {
-            targetElement.classList.remove('bookmark-highlight');
-            // 赤いハイライトのプロパティを個別に除去
+            targetElement.classList.remove('bookmark-highlight', 'bookmark-active-highlight');
+            // ハイライトのプロパティを個別に除去
             targetElement.style.removeProperty('background-color');
+            targetElement.style.removeProperty('background');
             targetElement.style.removeProperty('color');
             targetElement.style.removeProperty('font-weight');
             targetElement.style.removeProperty('padding');
