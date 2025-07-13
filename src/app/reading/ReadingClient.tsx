@@ -1442,17 +1442,40 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           // Highlight the bookmarked word in red - 超強力な設定で確実に表示
           targetElement.classList.add('bookmark-highlight');
           
-          // 直接的なアプローチ: インラインスタイルで強制オレンジ
-          targetElement.setAttribute('style', 
-            'background-color: #f97316 !important; ' +
-            'color: white !important; ' +
-            'font-weight: bold !important; ' +
-            'padding: 2px 4px !important; ' +
-            'border-radius: 4px !important; ' +
-            'box-shadow: 0 0 8px rgba(249, 115, 22, 0.6) !important; ' +
-            'border: none !important; ' +
-            'outline: none !important;'
-          );
+          // 最も単純なアプローチ: 直接テキストを変更
+          const originalText = targetElement.textContent;
+          
+          // 元の要素を完全に削除して新しい要素に置き換え
+          const newElement = document.createElement('span');
+          newElement.textContent = originalText;
+          newElement.className = 'bookmark-temp-highlight';
+          newElement.setAttribute('data-idx', targetElement.getAttribute('data-idx') || '');
+          
+          // 絶対確実なスタイル設定
+          newElement.style.cssText = `
+            background: #f97316 !important;
+            color: white !important;
+            font-weight: bold !important;
+            padding: 2px 4px !important;
+            border-radius: 4px !important;
+            display: inline !important;
+          `;
+          
+          // 元の要素を新しい要素で置き換え
+          if (targetElement.parentNode) {
+            targetElement.parentNode.replaceChild(newElement, targetElement);
+            
+            // 3秒後に元に戻す
+            setTimeout(() => {
+              if (newElement.parentNode) {
+                const restoreElement = document.createElement('span');
+                restoreElement.textContent = originalText;
+                restoreElement.className = 'clickable-word';
+                restoreElement.setAttribute('data-idx', newElement.getAttribute('data-idx') || '');
+                newElement.parentNode.replaceChild(restoreElement, newElement);
+              }
+            }, 3000);
+          }
           
           console.log('🟠 強制オレンジハイライト適用:', targetElement.textContent);
           
