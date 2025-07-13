@@ -837,6 +837,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // ブックマーク保存処理
   const saveBookmark = (tokenIndex: number, word: string) => {
+    console.log('🔥 saveBookmark関数実行開始:', { tokenIndex, word, startTime });
+    
     if (!startTime) {
       console.error('❌ 読書開始時間が設定されていません');
       router.push('/choose');
@@ -2226,9 +2228,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         isOpen={bookmarkDialog.isOpen}
         onClose={() => setBookmarkDialog({...bookmarkDialog, isOpen: false})}
         onConfirm={() => {
+          console.log('🔥 BookmarkDialog onConfirm実行:', bookmarkDialog);
           // ダイアログを閉じてから統計処理実行
           setBookmarkDialog({...bookmarkDialog, isOpen: false});
           setTimeout(() => {
+            console.log('🔥 saveBookmark呼び出し準備:', { tokenIndex: bookmarkDialog.tokenIndex, word: bookmarkDialog.word });
             saveBookmark(bookmarkDialog.tokenIndex, bookmarkDialog.word);
           }, 100);
         }}
