@@ -11,6 +11,8 @@ export function ResumeDialog({ isOpen, onResume }: ResumeDialogProps) {
   const router = useRouter();
 
   const handleResume = () => {
+    console.log('🔄 ResumeDialog handleResume called');
+    
     // しおりを削除
     localStorage.removeItem('reading_bookmark');
     

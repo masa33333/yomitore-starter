@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookmark Resume Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .step { margin: 15px 0; padding: 10px; border: 1px solid #ccc; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; }
+        button { margin: 5px; padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>Bookmark Resume Debug Test</h1>
+    
+    <div class="step">
+        <h2>Step 1: Create Bookmark</h2>
+        <button onclick="openReading()">Open Reading Page</button>
+        <p>Double-tap any word to create bookmark</p>
+    </div>
+    
+    <div class="step">
+        <h2>Step 2: Test Resume URL</h2>
+        <button onclick="testResumeURL()">Open Resume URL</button>
+        <div class="debug">
+            URL: http://localhost:3001/reading/bucket-list/2?resume=1
+        </div>
+    </div>
+    
+    <div class="step">
+        <h2>Step 3: Check Console Logs</h2>
+        <p>Look for these debug messages:</p>
+        <div class="debug">
+            🔄 isReadingStarted INITIALIZATION: {...}<br>
+            🔄 Resume mode detected - setting isReadingStarted to true<br>
+            🔥 RENDER DECISION: {isReadingStarted: true, decision: 'SHOW_TEXT_CONTENT'}<br>
+            📝 段落 1: ...<br>
+            🎨 renderClickableText called with: ...
+        </div>
+    </div>
+    
+    <div class="step">
+        <h2>Expected Fix Behavior</h2>
+        <ol>
+            <li>URL with resume=1 parameter</li>
+            <li>isReadingStarted = true (not false)</li>
+            <li>Text content shows (not start button)</li>
+            <li>DOM elements generated</li>
+            <li>Bookmark scroll + red highlight works</li>
+        </ol>
+    </div>
+
+    <script>
+        function openReading() {
+            window.open('http://localhost:3001/reading/bucket-list/2', '_blank');
+        }
+        
+        function testResumeURL() {
+            window.open('http://localhost:3001/reading/bucket-list/2?resume=1', '_blank');
+        }
+    </script>
+</body>
+</html>

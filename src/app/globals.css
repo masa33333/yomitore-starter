@@ -10,6 +10,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   max-width: var(--max-width); /* Apply max width to the body */
   margin: 0 auto; /* Center the body */
+  overflow: auto !important; /* Force enable scrolling */
+}
+
+html {
+  overflow: auto !important; /* Force enable scrolling */
 }
 
 @layer utilities {
@@ -18,14 +23,27 @@ body {
   }
 }
 
-/* しおり機能用スタイル - 無効化 */
+/* しおり機能用スタイル */
 .bookmark-token {
   /* スタイルを完全に無効化 */
 }
 
+.bookmark-highlight {
+  background-color: #ef4444 !important;
+  color: white !important;
+  font-weight: bold !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+}
+
 .blur-reading {
-  filter: blur(4px);
-  pointer-events: none;
+  /* COMPLETELY DISABLED - 完全に無効化 */
+  /* filter: blur(4px); */
+  /* pointer-events: none; */
+  /* 全てのインタラクションとスクロールを有効化 */
+  pointer-events: auto !important;
+  overflow: auto !important;
 }
 
 /* Story content styling */

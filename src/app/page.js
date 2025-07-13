@@ -127,8 +127,6 @@ export default function Home() {
         {/* メインボタン: 今日の読み物を決める */}
         <button
           onClick={handleChooseReading}
-          onMouseDown={() => console.log('👆 読み物ボタンがマウスダウンされました')}
-          onMouseUp={() => console.log('👆 読み物ボタンがマウスアップされました')}
           className="w-full mb-4 bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg cursor-pointer"
           style={{ pointerEvents: 'auto' }}
         >
@@ -138,8 +136,6 @@ export default function Home() {
         {/* サブボタン: 新たに多読の旅を始める */}
         <button
           onClick={handleNewJourney}
-          onMouseDown={() => console.log('👆 新たな旅ボタンがマウスダウンされました')}
-          onMouseUp={() => console.log('👆 新たな旅ボタンがマウスアップされました')}
           className="w-full bg-primary-inactive text-text-primary font-medium rounded-full px-6 py-3 text-base hover:opacity-80 transition-colors cursor-pointer"
           style={{ pointerEvents: 'auto' }}
         >

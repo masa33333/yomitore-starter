@@ -34,9 +34,12 @@ export default function StoriesPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<number>(3);
   const [showLevelSelector, setShowLevelSelector] = useState<boolean>(false);
+  const [hasBookmark, setHasBookmark] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return; // サーバーサイドでは実行しない
+    
     // 保存されたレベルを読み込み
     try {
       const savedLevel = localStorage.getItem('level') || localStorage.getItem('fixedLevel');
@@ -48,6 +51,37 @@ export default function StoriesPage() {
       }
     } catch (error) {
       console.error('語彙レベル読み込みエラー:', error);
+    }
+
+    // しおり確認
+    const bookmarkData = localStorage.getItem('reading_bookmark');
+    console.log('🔍 STORIES PAGE - Checking bookmark data:', {
+      bookmarkData: bookmarkData,
+      hasData: !!bookmarkData,
+      length: bookmarkData?.length || 0
+    });
+    
+    if (bookmarkData) {
+      try {
+        const bookmark = JSON.parse(bookmarkData);
+        console.log('📖 Bookmark found on stories page:', bookmark);
+        console.log('🔥 Setting hasBookmark to TRUE');
+        setHasBookmark(true);
+      } catch (error) {
+        console.error('しおりデータ解析エラー:', error);
+      }
+    } else {
+      console.log('❌ No bookmark data found');
+      setHasBookmark(false);
+    }
+
+    // URL パラメータで resume モードをチェック
+    const urlParams = new URLSearchParams(window.location.search);
+    const resumeMode = urlParams.get('resume') === '1';
+    if (resumeMode && bookmarkData) {
+      console.log('🔄 Stories page: Resume mode detected, redirecting to reading...');
+      const bookmark = JSON.parse(bookmarkData);
+      window.location.href = `/reading?slug=${bookmark.slug}&level=${bookmark.level}&resume=1`;
     }
   }, []);
 
@@ -152,6 +186,25 @@ export default function StoriesPage() {
               </div>
             )}
           </div>
+
+
+          {/* Resume ボタン */}
+          {hasBookmark && (
+            <div className="mb-6 text-center">
+              <button
+                onClick={() => {
+                  const bookmarkData = localStorage.getItem('reading_bookmark');
+                  if (bookmarkData) {
+                    const bookmark = JSON.parse(bookmarkData);
+                    window.location.href = `/reading?slug=${bookmark.slug}&level=${bookmark.level}&resume=1`;
+                  }
+                }}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-md transition-colors"
+              >
+                📖 前回の続きを読む
+              </button>
+            </div>
+          )}
 
           {/* ストーリーカード */}
           {stories.length > 0 ? (

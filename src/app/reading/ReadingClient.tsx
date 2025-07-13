@@ -133,10 +133,32 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // 読書状態
   const [showJapanese, setShowJapanese] = useState(false);
   const [isReadingStarted, setIsReadingStarted] = useState(() => {
-    if (isFromNotebook() && typeof window !== 'undefined') {
-      const saved = localStorage.getItem('currentReadingStarted');
-      return saved === 'true';
+    if (typeof window !== 'undefined') {
+      // Check if this is a resume mode
+      const urlParams = new URLSearchParams(window.location.search);
+      const resumeMode = urlParams.get('resume') === '1';
+      
+      console.log('🔄 isReadingStarted INITIALIZATION:', {
+        url: window.location.href,
+        resumeParam: urlParams.get('resume'),
+        resumeMode: resumeMode,
+        willSetReadingStarted: resumeMode
+      });
+      
+      // If resume mode, reading should be started
+      if (resumeMode) {
+        console.log('🔄 Resume mode detected - setting isReadingStarted to true');
+        return true;
+      }
+      
+      // Check saved state for notebook returns
+      if (isFromNotebook()) {
+        const saved = localStorage.getItem('currentReadingStarted');
+        console.log('🔄 Notebook return detected - saved state:', saved);
+        return saved === 'true';
+      }
     }
+    console.log('🔄 Default isReadingStarted: false');
     return false;
   });
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -175,7 +197,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     word: '',
     tokenIndex: 0
   });
-  const [isResumeMode, setIsResumeMode] = useState(false);
+  const [isResumeMode, setIsResumeMode] = useState(() => {
+    // 初期化時にURL パラメータをチェック
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resumeMode = urlParams.get('resume') === '1';
+      console.log('🔧 isResumeMode 初期化:', resumeMode ? 'true (resume detected)' : 'false');
+      return resumeMode;
+    }
+    return false;
+  });
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   
   const [sessionWords, setSessionWords] = useState<WordInfo[]>(() => {
@@ -205,9 +236,18 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     title: storyTitle,
     englishLength: english.length,
     paragraphCount: englishParagraphs.length,
-    isReadingStarted,
+    isReadingStarted: isReadingStarted,
+    isResumeMode: isResumeMode,
     wordCount,
     firstParagraphPreview: englishParagraphs[0]?.substring(0, 100) + '...'
+  });
+  
+  // 📊 CRITICAL DEBUG: Check rendering condition
+  console.log('🚨 RENDERING CONDITION CHECK:', {
+    'isReadingStarted': isReadingStarted,
+    'willShowText': isReadingStarted,
+    'willShowStartButton': !isReadingStarted,
+    'englishParagraphs.length': englishParagraphs.length
   });
 
   // 新しいコンテンツを生成する関数
@@ -302,29 +342,36 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       allParams: Object.fromEntries(urlParams.entries())
     });
 
-    // しおり再開モードの処理
-    if (resumeMode) {
+    // しおり再開モードの処理（一度だけ実行）
+    console.log('🔍 CHECKING RESUME MODE:', { resumeMode, hasSessionFlag: !!sessionStorage.getItem('bookmark_resumed') });
+    
+    if (resumeMode && !sessionStorage.getItem('bookmark_resumed')) {
       console.log('📖 Resume mode detected, setting up bookmark restoration...');
+      
+      // CRITICAL FIX: Force isReadingStarted to true for resume mode
+      console.log('🔥 FORCING isReadingStarted to true for resume mode');
+      setIsReadingStarted(true);
+      
       setIsResumeMode(true);
       const bookmarkData = localStorage.getItem('reading_bookmark');
       if (bookmarkData) {
         try {
           const bookmark = JSON.parse(bookmarkData);
-          // 読書再開時はしおりマーカーは設定しない（視覚的混乱を防ぐため）
           console.log('📖 Bookmark restored (no visual marker):', bookmark);
-          // しおり位置へのスクロールとぼかし表示はコンテンツ読み込み後に実行
-          setTimeout(() => {
-            const targetElement = document.querySelector(`[data-idx="${bookmark.tokenIndex}"]`);
-            if (targetElement) {
-              targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              console.log('📖 Scrolled to bookmark position');
-            }
-            setShowResumeDialog(true);
-          }, 1000);
+          
+          // しおり位置保存（後でスクロールに使用）
+          setBookmarkTokenIndex(bookmark.tokenIndex);
+          
+          // ダイアログを即座に表示（スクロールは再開時に実行）
+          setShowResumeDialog(true);
         } catch (error) {
           console.error('❌ Error parsing bookmark:', error);
         }
+      } else {
+        console.log('❌ No bookmark data found in localStorage');
       }
+    } else if (resumeMode) {
+      console.log('🔄 Resume mode detected but bookmark already processed (sessionStorage flag exists)');
     }
 
     // notebookから戻っていない場合、かつプリセットストーリーでない場合のみ新しいコンテンツを生成
@@ -470,11 +517,32 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setIsReadingStarted(true);
     setStartTime(Date.now());
     
+    // 読書開始時にresumeモード解除＆スクロール確保
+    setIsResumeMode(false);
+    setShowResumeDialog(false);
+    
+    // 超強力スクロール有効化（予防措置）
+    const ensureScrolling = () => {
+      [document.body, document.documentElement].forEach(el => {
+        el.style.setProperty('overflow', 'visible', 'important');
+        el.style.setProperty('overflow-y', 'auto', 'important');
+        el.style.setProperty('pointer-events', 'auto', 'important');
+      });
+      
+      // Remove any problematic classes
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        el.classList.remove('blur-reading', 'overflow-hidden');
+      });
+    };
+    
+    ensureScrolling();
+    
     // 読書開始時の総語数を記録（スタンプ進捗表示用）
     const currentWordsRead = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
     setReadingStartWordsRead(currentWordsRead);
     
-    console.log('📖 読書開始', { readingStartWordsRead: currentWordsRead });
+    console.log('📖 読書開始 + 超強力スクロール確保', { readingStartWordsRead: currentWordsRead });
     
     // 読書状態をlocalStorageに保存
     saveCurrentReadingState();
@@ -645,21 +713,32 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const tokenIndex = parseInt(target.dataset.idx || '0', 10);
     const word = target.textContent || '';
     
-    console.log('🎯 handleLongPress実行:', word, 'tokenIndex:', tokenIndex);
+    console.log('🎯 handleLongPress実行開始:', {
+      word,
+      tokenIndex,
+      dataIdx: target.dataset.idx,
+      classList: Array.from(target.classList)
+    });
     
     // 長押しフラグを設定
     isLongPressRef.current = true;
+    console.log('🔵 長押しフラグ設定: true');
     
-    // 視覚的フィードバック：紫色ハイライト（長押し）
-    target.style.backgroundColor = '#8b5cf6';
-    target.style.color = 'white';
+    // 黄色ハイライトをクリア（単語クリック機能と競合回避）
+    setHighlightedWord('');
+    console.log('🟡 黄色ハイライトクリア');
+    
+    // 視覚的フィードバック：紫色ハイライト（長押し成功）
+    target.style.setProperty('background-color', '#8b5cf6', 'important');
+    target.style.setProperty('color', 'white', 'important');
+    target.style.setProperty('border', '3px solid #7c3aed', 'important');
+    target.classList.remove('bg-yellow-300'); // 黄色を完全に除去
+    console.log('🟣 長押し成功 - 濃い紫色設定');
     setTimeout(() => {
       target.style.backgroundColor = '';
       target.style.color = '';
     }, 1500);
     
-    // モバイル表示：長押し成功メッセージ
-    setDebugInfo(prev => prev + `\n\n🎯 長押し成功！\nしおり作成中...`);
     
     // 現在の読み物を識別するためのslugを取得/生成
     const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
@@ -681,12 +760,28 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
     
     // 中断確認ダイアログ表示
-    console.log('💬 BookmarkDialog表示:', { word, tokenIndex });
+    console.log('💬 BookmarkDialog表示開始:', { word, tokenIndex });
+    console.log('💬 setBookmarkDialogを呼び出し中...');
     setBookmarkDialog({
       isOpen: true,
       word,
       tokenIndex
     });
+    console.log('💬 BookmarkDialog状態設定完了');
+    
+    // スクロール確保: ダイアログ表示時もスクロール可能にする
+    document.body.style.setProperty('overflow', 'auto', 'important');
+    document.documentElement.style.setProperty('overflow', 'auto', 'important');
+    console.log('📜 ダイアログ表示時スクロール確保');
+    
+    // デバッグ: 状態が正しく設定されたかを確認
+    setTimeout(() => {
+      console.log('🔍 BookmarkDialog状態確認:', {
+        isOpen: bookmarkDialog.isOpen,
+        word: bookmarkDialog.word,
+        tokenIndex: bookmarkDialog.tokenIndex
+      });
+    }, 100);
   };
 
   // しおり保存処理
@@ -753,6 +848,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleWordClick = async (word: string) => {
     console.log('🔍 handleWordClick called with:', word);
     console.log('📱 現在のsessionWords数:', sessionWords.length);
+    
+    // デバッグ: 特定の単語クリックでしおり情報を表示
+    if (word.toLowerCase() === 'the' || word.toLowerCase() === 'and' || word.toLowerCase() === 'to') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const resumeParam = urlParams.get('resume');
+      const hasBookmark = !!localStorage.getItem('reading_bookmark');
+      const bookmarkData = localStorage.getItem('reading_bookmark');
+      
+      return;
+    }
+    
     setSelectedWord(word);
     setLoadingWordInfo(true);
     
@@ -1060,21 +1166,110 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // 親要素のクリックハンドラー（Event Delegation）
+  // マウス長押し検知用のref
+  const mouseDownTimeRef = useRef<number>(0);
+  const mouseDownTargetRef = useRef<HTMLElement | null>(null);
+
+  // マウスダウンハンドラー（デスクトップ版長押し対応）
+  const handleTextMouseDown = (e: React.MouseEvent<HTMLParagraphElement>) => {
+    const target = e.target as HTMLElement;
+    
+    // 単語要素の場合のみ長押しタイマーを開始
+    if (target.classList.contains('clickable-word')) {
+      const word = target.textContent || '';
+      
+      console.log('🖱️ MouseDown発火:', {
+        target: target.tagName,
+        word: word,
+        isClickableWord: target.classList.contains('clickable-word')
+      });
+      
+      mouseDownTimeRef.current = Date.now();
+      mouseDownTargetRef.current = target;
+      isLongPressRef.current = false;
+      
+      console.log('🔵 マウス長押しタイマー開始:', word);
+      
+      // 長押し開始時の視覚的フィードバック（薄い紫）
+      target.style.setProperty('background-color', 'rgba(139, 92, 246, 0.5)', 'important');
+      target.style.setProperty('border', '2px solid #8b5cf6', 'important');
+      target.classList.remove('bg-yellow-300'); // 黄色ハイライトを除去
+      
+      // 長押しタイマー（600ms）
+      longPressTimeoutRef.current = setTimeout(() => {
+        console.log('⏰ マウス長押しタイマー発火:', word);
+        if (!isLongPressRef.current && mouseDownTargetRef.current === target) {
+          console.log('🔗 マウス長押し検出:', word);
+          handleLongPress(target);
+        }
+      }, 600);
+    }
+  };
+
+  // マウスアップハンドラー
+  const handleTextMouseUp = (e: React.MouseEvent<HTMLParagraphElement>) => {
+    const target = e.target as HTMLElement;
+    
+    if (target.classList.contains('clickable-word')) {
+      const mouseUpTime = Date.now();
+      const pressDuration = mouseUpTime - mouseDownTimeRef.current;
+      
+      console.log('🖱️ MouseUp発火:', {
+        target: target.tagName,
+        word: target.textContent,
+        duration: pressDuration,
+        isLongPress: isLongPressRef.current
+      });
+      
+      // 長押しタイマーをクリア
+      if (longPressTimeoutRef.current) {
+        console.log('🛑 マウス長押しタイマークリア');
+        clearTimeout(longPressTimeoutRef.current);
+        longPressTimeoutRef.current = null;
+      }
+      
+      // 視覚的フィードバックをクリア
+      target.style.removeProperty('background-color');
+      target.style.removeProperty('border');
+      
+      // 長押しが実行された場合は、通常のクリック処理をスキップ
+      if (isLongPressRef.current) {
+        console.log('✅ 長押しが実行済み、通常クリック処理をスキップ');
+        setTimeout(() => {
+          isLongPressRef.current = false;
+        }, 100);
+        return;
+      }
+      
+      // 短時間のクリック（600ms未満）の場合は単語意味表示
+      if (pressDuration < 600 && mouseDownTargetRef.current === target) {
+        const word = target.textContent || '';
+        console.log('👆 短いクリック:', word, pressDuration + 'ms');
+        handleWordClick(word);
+      }
+      
+      // リセット
+      mouseDownTimeRef.current = 0;
+      mouseDownTargetRef.current = null;
+    }
+  };
+
+  // 親要素のクリックハンドラー（Event Delegation）- 既存の単語クリック処理と競合回避
   const handleTextClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
     const target = e.target as HTMLElement;
     
-    // タッチイベントで既に処理された場合はスキップ
-    if ((target as any)._touchHandled) {
+    // 長押し処理が既に実行されている場合はスキップ
+    if (isLongPressRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
       return;
     }
     
-    // クリックされた要素が単語要素か確認
-    if (target.classList.contains('clickable-word')) {
-      const word = target.textContent || '';
+    // マウスダウン/アップで処理済みの場合はスキップ
+    if (mouseDownTargetRef.current === target) {
       e.preventDefault();
       e.stopPropagation();
-      handleWordClick(word);
+      return;
     }
   };
 
@@ -1085,9 +1280,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // 単語ハイライト状態を管理
   const [highlightedWord, setHighlightedWord] = useState<string>('');
   
-  // デバッグ情報を画面に表示（モバイル用）
-  const [debugInfo, setDebugInfo] = useState<string>('');
-  const tapCountRef = useRef<number>(0);
   
   // しおり機能用のグローバルトークンインデックス
   const globalTokenIndexRef = useRef<number>(0);
@@ -1097,6 +1289,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const target = e.target as HTMLElement;
     const touch = e.touches[0];
     
+    console.log('🟢 TouchStart発火:', {
+      target: target.tagName,
+      classList: Array.from(target.classList),
+      word: target.textContent,
+      isClickableWord: target.classList.contains('clickable-word')
+    });
+    
     touchStartTimeRef.current = Date.now();
     touchStartPositionRef.current = { x: touch.clientX, y: touch.clientY };
     isLongPressRef.current = false;
@@ -1105,18 +1304,21 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     if (target.classList.contains('clickable-word')) {
       const word = target.textContent || '';
       
-      // デバッグ情報更新
-      tapCountRef.current += 1;
-      setDebugInfo(`【タップ #${tapCountRef.current}】\nタップ開始: ${word}\n長押し判定中...`);
       
-      // 長押しタイマー（800ms）
+      
+      // 長押し開始時の視覚的フィードバック（薄い紫）- 黄色より優先
+      target.style.setProperty('background-color', 'rgba(139, 92, 246, 0.5)', 'important');
+      target.style.setProperty('border', '2px solid #8b5cf6', 'important');
+      target.classList.remove('bg-yellow-300'); // 黄色ハイライトを除去
+      console.log('🟣 紫色設定（強化版）:', target.style.backgroundColor);
+      
+      // 長押しタイマー（600ms）- ユーザビリティ向上
       longPressTimeoutRef.current = setTimeout(() => {
         if (!isLongPressRef.current) {
           console.log('🔗 長押し検出:', word);
-          setDebugInfo(prev => prev + `\n\n🔗 長押し検出！\n800ms経過`);
           handleLongPress(target);
         }
-      }, 800);
+      }, 600);
     }
   };
 
@@ -1126,16 +1328,35 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const touchEndTime = Date.now();
     const touchDuration = touchEndTime - touchStartTimeRef.current;
     
+    console.log('🔴 TouchEnd発火:', {
+      target: target.tagName,
+      word: target.textContent,
+      duration: touchDuration,
+      isLongPress: isLongPressRef.current,
+      hasTimer: !!longPressTimeoutRef.current
+    });
+    
     // 長押しタイマーをクリア
     if (longPressTimeoutRef.current) {
+      console.log('🛑 タイマークリア');
       clearTimeout(longPressTimeoutRef.current);
       longPressTimeoutRef.current = null;
     }
     
+    // 長押し開始時の視覚的フィードバックをクリア
+    if (target.classList.contains('clickable-word')) {
+      target.style.removeProperty('background-color');
+      console.log('🟡 紫色クリア');
+    }
+    
     // 長押しが実行された場合は、通常のタップ処理をスキップ
     if (isLongPressRef.current) {
-      console.log('長押しが実行済み、通常タップ処理をスキップ');
-      setDebugInfo(prev => prev + `\n\n📝 長押し実行済み\n通常タップはスキップ`);
+      console.log('✅ 長押しが実行済み、通常タップ処理をスキップ');
+      // Reset long press flag for next interaction
+      setTimeout(() => {
+        isLongPressRef.current = false;
+        console.log('🔄 長押しフラグリセット');
+      }, 100);
       return;
     }
     
@@ -1151,8 +1372,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     // タッチ時間が短すぎる（100ms未満）または移動距離が大きい（10px以上）場合は無視
     if (touchDuration < 100 || moveDistance > 10) {
-      console.log(`タッチ無視: 時間=${touchDuration}ms, 移動=${moveDistance.toFixed(1)}px`);
-      setDebugInfo(prev => prev + `\n\nタッチ無視:\n時間=${touchDuration}ms\n移動=${moveDistance.toFixed(1)}px`);
       return;
     }
     
@@ -1162,10 +1381,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       e.preventDefault();
       e.stopPropagation();
       
-      console.log(`📱 通常タップ: ${word} (時間=${touchDuration}ms)`);
       
-      // デバッグ表示更新
-      setDebugInfo(prev => prev + `\n\n📱 通常タップ: ${word}\n時間: ${touchDuration}ms\n→ マイノート追加`);
       
       // 視覚的フィードバック：青色ハイライト（通常タップ）
       target.style.backgroundColor = '#3b82f6';
@@ -1184,6 +1400,171 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const handleTextSizeChange = (size: 'small' | 'medium' | 'large') => {
     setTextSize(size);
     localStorage.setItem('readingTextSize', size);
+  };
+
+  // 読書再開処理（しおり機能）
+  const handleResumeReading = () => {
+    console.log('🔄 handleResumeReading 開始 - isResumeMode:', isResumeMode);
+    
+    // 読書再開完了フラグを設定（ページリロード対策）
+    sessionStorage.setItem('bookmark_resumed', 'true');
+    
+    setShowResumeDialog(false);
+    setIsResumeMode(false);
+    console.log('🔄 setIsResumeMode(false) + sessionStorage設定完了');
+    
+    // しおり位置へ自動スクロール
+    if (bookmarkTokenIndex !== null) {
+      const savedBookmarkIndex = bookmarkTokenIndex; // スクロール用に保存
+      console.log('🔍 しおり位置スクロール開始 (index:', savedBookmarkIndex, ')');
+      
+      // Enhanced approach with retry mechanism for robust DOM element detection
+      const attemptBookmarkScroll = (attempt = 1, maxAttempts = 10) => {
+        console.log(`🔍 BOOKMARK SCROLL ATTEMPT ${attempt}/${maxAttempts}:`, {
+          savedBookmarkIndex,
+          domElementsCount: document.querySelectorAll('[data-idx]').length,
+          targetExists: !!document.querySelector(`[data-idx="${savedBookmarkIndex}"]`)
+        });
+        
+        const targetElement = document.querySelector(`[data-idx="${savedBookmarkIndex}"]`) as HTMLElement;
+        
+        if (targetElement) {
+          console.log('✅ しおり位置にスクロール開始');
+          console.log('📍 Target element:', {
+            word: targetElement.textContent,
+            index: savedBookmarkIndex,
+            position: targetElement.getBoundingClientRect()
+          });
+          
+          // Scroll to bookmark position
+          targetElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'
+          });
+          
+          // Highlight the bookmarked word in red with CSS classes
+          targetElement.classList.add('bookmark-highlight');
+          targetElement.style.cssText = 'background-color: #ef4444 !important; color: white !important; font-weight: bold !important; padding: 2px 4px !important; border-radius: 4px !important;';
+          
+          console.log('📖 しおり復帰完了:', targetElement.textContent);
+          
+          // Remove highlight after 3 seconds
+          setTimeout(() => {
+            targetElement.classList.remove('bookmark-highlight');
+            targetElement.style.cssText = '';
+            console.log('✨ しおりハイライト終了');
+          }, 3000);
+          
+        } else {
+          console.log(`❌ しおり位置が見つかりません (attempt ${attempt}/${maxAttempts})`);
+          const allElements = document.querySelectorAll('[data-idx]');
+          console.log('- 全要素数:', allElements.length);
+          console.log('- 探している位置:', savedBookmarkIndex);
+          
+          if (attempt < maxAttempts && allElements.length === 0) {
+            // DOM elements not ready yet, retry after 500ms
+            console.log(`🔄 DOM要素未準備、${attempt + 1}回目を500ms後に実行`);
+            setTimeout(() => attemptBookmarkScroll(attempt + 1, maxAttempts), 500);
+            return;
+          } else if (attempt < maxAttempts) {
+            // Elements exist but target not found, retry with shorter delay
+            console.log(`🔄 対象要素未発見、${attempt + 1}回目を200ms後に実行`);
+            setTimeout(() => attemptBookmarkScroll(attempt + 1, maxAttempts), 200);
+            return;
+          } else {
+            console.log('❌ 最大試行回数に達しました - 詳細調査:');
+            console.log('- 最初の5つの要素:', Array.from(allElements).slice(0, 5).map(el => 
+              `idx=${el.getAttribute('data-idx')}: "${el.textContent}"`
+            ));
+          }
+        }
+        
+        // Clear bookmark data only after successful scroll or max attempts
+        setBookmarkTokenIndex(null);
+        globalTokenIndexRef.current = 0;
+      };
+      
+      // Start the scroll attempt after 800ms delay
+      setTimeout(() => attemptBookmarkScroll(), 800);
+      
+    } else {
+      console.warn('⚠️ bookmarkTokenIndex が null です');
+      // nullの場合もクリア処理実行
+      setBookmarkTokenIndex(null);
+      globalTokenIndexRef.current = 0;
+    }
+    
+    console.log('🔄 読書再開: ぼかし解除、通常の読書モードに移行');
+    
+    // FORCE ENABLE SCROLLING - Ultimate comprehensive fix
+    const enableScrolling = () => {
+      console.log('🔧 FORCE ENABLING SCROLLING - ULTIMATE FIX');
+      
+      // Remove ALL scroll blocking from root elements
+      document.body.style.removeProperty('overflow');
+      document.documentElement.style.removeProperty('overflow');
+      document.body.style.removeProperty('pointer-events');
+      document.documentElement.style.removeProperty('pointer-events');
+      
+      // Force enable with important declarations
+      document.body.style.setProperty('overflow', 'auto', 'important');
+      document.documentElement.style.setProperty('overflow', 'auto', 'important');
+      document.body.style.setProperty('pointer-events', 'auto', 'important');
+      document.documentElement.style.setProperty('pointer-events', 'auto', 'important');
+      
+      // Remove blur-reading class from ALL elements
+      const blurElements = document.querySelectorAll('.blur-reading');
+      blurElements.forEach(el => el.classList.remove('blur-reading'));
+      
+      // Remove scroll blocking from problematic elements
+      const problematicSelectors = ['main', '[data-blur]', '.fixed', '.absolute'];
+      problematicSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          const element = el as HTMLElement;
+          if (element.style) {
+            element.style.removeProperty('overflow');
+            element.style.removeProperty('pointer-events');
+            element.style.setProperty('pointer-events', 'auto', 'important');
+          }
+        });
+      });
+      
+      console.log('✅ Ultimate scrolling enablement completed');
+    };
+    
+    // Enable scrolling immediately
+    enableScrolling();
+    
+    // Re-enable scrolling every 2 seconds to prevent blocking
+    const scrollInterval = setInterval(() => {
+      enableScrolling();
+    }, 2000);
+    
+    // Stop recurring check after 10 seconds
+    setTimeout(() => {
+      clearInterval(scrollInterval);
+      console.log('🔧 停止recurring scroll check');
+    }, 10000);
+    
+    // Test scroll immediately
+    setTimeout(() => {
+      console.log('🧪 Testing scroll capability...');
+      const canScroll = document.body.scrollHeight > window.innerHeight;
+      console.log('📏 Scroll test:', {
+        bodyScrollHeight: document.body.scrollHeight,
+        windowHeight: window.innerHeight,
+        canScroll: canScroll,
+        currentScrollY: window.scrollY
+      });
+      
+      // Force a small test scroll
+      window.scrollBy(0, 10);
+      setTimeout(() => {
+        window.scrollBy(0, -10);
+        console.log('✅ Scroll test completed');
+      }, 100);
+    }, 500);
   };
 
   // テキストサイズのCSSクラス
@@ -1233,6 +1614,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               key={`${partIndex}-${wordIndex}`}
               className={`clickable-word cursor-pointer hover:bg-yellow-200/50 transition-colors duration-200 select-none ${
                 highlightedWord === word ? 'bg-yellow-300' : ''
+              } ${
+                bookmarkTokenIndex === tokenIndex ? 'bg-red-400 text-white font-bold' : ''
               }`}
               title="タップ: 意味を調べる / 長押し: しおり作成"
               data-word={word}
@@ -1263,7 +1646,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   }
 
   return (
-    <main className="min-h-screen bg-page-bg p-2 sm:p-4">
+    <main 
+      className="min-h-screen bg-page-bg p-2 sm:p-4"
+      style={{ 
+        overflow: 'auto',
+        pointerEvents: 'auto',
+        height: 'auto',
+        minHeight: '100vh'
+      }}
+    >
       {/* ページタイトル */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
@@ -1327,7 +1718,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       </div>
 
       {/* コンテンツ表示 */}
-      {!isReadingStarted ? (
+      {(() => {
+        console.log('🔥 RENDER DECISION:', {
+          isReadingStarted,
+          decision: !isReadingStarted ? 'SHOW_START_BUTTON' : 'SHOW_TEXT_CONTENT'
+        });
+        return !isReadingStarted;
+      })() ? (
         <div className="rounded-lg bg-white p-3 sm:p-6 shadow-sm">
           <div className="mb-6 text-center">
             <h2 className="mb-2 text-lg font-semibold">読書を開始しますか？</h2>
@@ -1355,12 +1752,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         <div className="space-y-6">
           {/* テキスト表示（段落ごと） */}
           <div 
-            className={`bg-white rounded-lg p-3 sm:p-6 shadow-sm ${
-              isResumeMode ? 'blur-reading' : ''
-            }`} 
-            style={{ pointerEvents: isResumeMode ? 'none' : 'auto' }}
+            className="bg-white rounded-lg p-3 sm:p-6 shadow-sm"
+            style={{ pointerEvents: 'auto' }}
           >
-            <div className="max-w-none" style={{ pointerEvents: isResumeMode ? 'none' : 'auto' }}>
+            <div className="max-w-none">
               {englishParagraphs.map((paragraph, index) => {
                 console.log(`📝 段落 ${index + 1}:`, paragraph.substring(0, 50) + '...');
                 return (
@@ -1369,6 +1764,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p 
                     className={`mb-3 ${getTextSizeClass()} leading-relaxed text-text-primary`}
                     onClick={handleTextClick}
+                    onMouseDown={handleTextMouseDown}
+                    onMouseUp={handleTextMouseUp}
                     onTouchStart={handleTextTouchStart}
                     onTouchEnd={handleTextTouch}
                     style={{ 
@@ -1690,21 +2087,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         onComplete={() => setShowStampFlash(false)} 
       />
 
-      {/* モバイル用デバッグ情報表示 */}
-      {debugInfo && (
-        <div className="fixed top-4 right-4 bg-black text-white p-3 rounded-lg text-xs max-w-sm z-50 opacity-90">
-          <div className="flex justify-between items-start mb-2">
-            <span className="font-bold">デバッグ情報</span>
-            <button
-              onClick={() => setDebugInfo('')}
-              className="text-red-400 ml-2"
-            >
-              ×
-            </button>
-          </div>
-          <pre className="whitespace-pre-wrap">{debugInfo}</pre>
-        </div>
-      )}
+
 
       {/* しおり機能のダイアログ */}
       <BookmarkDialog
@@ -1725,14 +2108,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       {/* 読書再開ダイアログ */}
       <ResumeDialog
         isOpen={showResumeDialog}
-        onResume={() => {
-          setShowResumeDialog(false);
-          setIsResumeMode(false);
-          // 読書再開後はしおりマーカーとインデックスを完全にクリア
-          setBookmarkTokenIndex(null);
-          globalTokenIndexRef.current = 0;
-          console.log('🔄 読書再開: ぼかし解除、通常の読書モードに移行');
-        }}
+        onResume={handleResumeReading}
       />
 
     </main>

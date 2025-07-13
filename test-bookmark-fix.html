@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookmark Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { margin: 5px; padding: 8px 15px; }
+        .blur-reading { filter: blur(4px); }
+    </style>
+</head>
+<body>
+    <h1>Bookmark Resume Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Server Status</h2>
+        <button onclick="testServer()">Test Server Connection</button>
+        <div id="server-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test Reading Page Load</h2>
+        <button onclick="testReadingPage()">Open Reading Page</button>
+        <div id="reading-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test Resume URL</h2>
+        <button onclick="testResumeURL()">Test Resume URL</button>
+        <div id="resume-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Expected Fix Results</h2>
+        <ul>
+            <li class="success">✅ No more "Uncaught SyntaxError: Invalid or unexpected token"</li>
+            <li class="success">✅ DOM elements generated even in resume mode</li>
+            <li class="success">✅ Automatic scrolling to bookmark position</li>
+            <li class="success">✅ Red highlighting of bookmarked word</li>
+            <li class="success">✅ Page scrolling enabled throughout</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. CSS Blur Test</h2>
+        <div id="blur-test">This text should blur when button is clicked</div>
+        <button onclick="toggleBlur()">Toggle Blur Effect</button>
+    </div>
+
+    <script>
+        function testServer() {
+            document.getElementById('server-status').innerHTML = '<div class="info">Testing server connection...</div>';
+            
+            fetch('http://localhost:3001')
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById('server-status').innerHTML = '<div class="success">✅ Server is running on localhost:3001</div>';
+                    } else {
+                        document.getElementById('server-status').innerHTML = '<div class="error">❌ Server responded with error: ' + response.status + '</div>';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('server-status').innerHTML = '<div class="error">❌ Cannot connect to server: ' + error.message + '</div>';
+                });
+        }
+        
+        function testReadingPage() {
+            document.getElementById('reading-status').innerHTML = '<div class="info">Opening reading page...</div>';
+            window.open('http://localhost:3001/reading/bucket-list/2', '_blank');
+            document.getElementById('reading-status').innerHTML = '<div class="success">✅ Reading page opened in new tab</div>';
+        }
+        
+        function testResumeURL() {
+            document.getElementById('resume-status').innerHTML = '<div class="info">Testing resume URL...</div>';
+            window.open('http://localhost:3001/reading/bucket-list/2?resume=1', '_blank');
+            document.getElementById('resume-status').innerHTML = '<div class="success">✅ Resume URL opened in new tab</div>';
+        }
+        
+        function toggleBlur() {
+            const element = document.getElementById('blur-test');
+            element.classList.toggle('blur-reading');
+        }
+        
+        // Auto-test server on load
+        window.onload = function() {
+            testServer();
+        };
+    </script>
+</body>
+</html>

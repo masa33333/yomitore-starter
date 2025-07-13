@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookmark Test Helper</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 15px 20px; font-size: 16px; }
+        .success { background: #28a745; color: white; }
+        .warning { background: #ffc107; color: black; }
+        .info { background: #17a2b8; color: white; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>Bookmark Test Helper</h1>
+    
+    <div>
+        <h2>Step 1: Clear SessionStorage</h2>
+        <button onclick="clearSession()" class="warning">Clear SessionStorage</button>
+        <div id="clear-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h2>Step 2: Find Correct Reading URL</h2>
+        <button onclick="testHomePage()" class="info">Test Home Page</button>
+        <button onclick="testReadingPage()" class="info">Test Reading Page</button>
+        <button onclick="testStoryPage()" class="info">Test Story Page</button>
+        <div id="reading-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h2>Step 3: Test Resume URL</h2>
+        <button onclick="testResume()" class="warning">Open Resume URL</button>
+        <div id="resume-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h2>Step 4: Debug Bookmark Creation</h2>
+        <button onclick="createTestBookmark()" class="warning">Create Test Bookmark</button>
+        <button onclick="checkBookmarkData()" class="info">Check Bookmark Data</button>
+        <div id="bookmark-debug" class="result"></div>
+    </div>
+    
+    <div>
+        <h2>Step 5: Check Status</h2>
+        <button onclick="checkStatus()" class="success">Check Current Status</button>
+        <div id="status-result" class="result"></div>
+    </div>
+
+    <script>
+        function clearSession() {
+            try {
+                // Clear bookmark-related sessionStorage
+                sessionStorage.removeItem('bookmark_resumed');
+                
+                // Also clear any localStorage bookmark data for fresh test
+                localStorage.removeItem('reading_bookmark');
+                
+                document.getElementById('clear-result').innerHTML = `
+                    ✅ SessionStorage cleared successfully<br>
+                    📋 bookmark_resumed: ${sessionStorage.getItem('bookmark_resumed')}<br>
+                    📋 reading_bookmark: ${localStorage.getItem('reading_bookmark')}
+                `;
+                
+                console.log('🔧 SessionStorage cleared');
+                console.log('bookmark_resumed:', sessionStorage.getItem('bookmark_resumed'));
+                
+            } catch (error) {
+                document.getElementById('clear-result').innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        function testHomePage() {
+            const url = 'http://localhost:3000';
+            window.open(url, '_blank');
+            document.getElementById('reading-result').innerHTML = `🔗 Testing: ${url}`;
+        }
+        
+        function testReadingPage() {
+            const url = 'http://localhost:3000/reading';
+            window.open(url, '_blank');
+            document.getElementById('reading-result').innerHTML = `🔗 Testing: ${url}`;
+        }
+        
+        function testStoryPage() {
+            const url = 'http://localhost:3000/stories';
+            window.open(url, '_blank');
+            document.getElementById('reading-result').innerHTML = `🔗 Testing: ${url}`;
+        }
+        
+        function testResume() {
+            // Test with stories page which doesn't regenerate content
+            const url = 'http://localhost:3000/stories?resume=1';
+            window.open(url, '_blank');
+            document.getElementById('resume-result').innerHTML = `
+                🔗 Opened: ${url}<br>
+                📋 Using stories page (no content regeneration)<br>
+                👀 Check console for these logs:<br>
+                - 🔍 CHECKING RESUME MODE<br>
+                - 📖 Resume mode detected<br>
+                - 🔥 FORCING isReadingStarted to true<br>
+                - 🔍 BOOKMARK SCROLL ATTEMPT<br>
+                - ✅ しおり位置にスクロール開始
+            `;
+        }
+        
+        function createTestBookmark() {
+            // Create a realistic test bookmark (within 100 elements range)
+            const testBookmark = {
+                slug: 'bucket-list',  // Use actual story slug
+                level: 2,
+                tokenIndex: 50  // Safe position within 100 elements
+            };
+            
+            try {
+                localStorage.setItem('reading_bookmark', JSON.stringify(testBookmark));
+                
+                // Verify it was saved
+                const saved = localStorage.getItem('reading_bookmark');
+                const verified = saved ? JSON.parse(saved) : null;
+                
+                document.getElementById('bookmark-debug').innerHTML = `
+                    ✅ Test bookmark created:<br>
+                    📋 Original: ${JSON.stringify(testBookmark)}<br>
+                    📋 Verified: ${JSON.stringify(verified)}<br>
+                    ✅ Successfully saved: ${!!saved}<br>
+                    🔄 Now refresh stories page to see resume button
+                `;
+                
+                console.log('✅ Test bookmark created and verified:', verified);
+                
+            } catch (error) {
+                document.getElementById('bookmark-debug').innerHTML = `
+                    ❌ Error creating bookmark: ${error.message}
+                `;
+                console.error('❌ Bookmark creation error:', error);
+            }
+        }
+        
+        function checkBookmarkData() {
+            const bookmarkData = localStorage.getItem('reading_bookmark');
+            const allLocalStorage = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                allLocalStorage[key] = localStorage.getItem(key);
+            }
+            
+            document.getElementById('bookmark-debug').innerHTML = `
+                📋 Bookmark Data: ${bookmarkData || 'null'}<br>
+                📋 All localStorage keys: ${Object.keys(allLocalStorage).join(', ')}<br>
+                📊 Total localStorage items: ${localStorage.length}
+            `;
+        }
+        
+        function checkStatus() {
+            const status = {
+                sessionStorage_bookmark_resumed: sessionStorage.getItem('bookmark_resumed'),
+                localStorage_reading_bookmark: localStorage.getItem('reading_bookmark'),
+                currentURL: window.location.href,
+                hasResumeParam: window.location.search.includes('resume=1')
+            };
+            
+            document.getElementById('status-result').innerHTML = `
+                📊 Current Status:<br>
+                SessionStorage bookmark_resumed: ${status.sessionStorage_bookmark_resumed || 'null'}<br>
+                LocalStorage reading_bookmark: ${status.localStorage_reading_bookmark ? 'exists' : 'null'}<br>
+                Current URL: ${status.currentURL}<br>
+                Has resume param: ${status.hasResumeParam}
+            `;
+        }
+        
+        // Auto-check status on load
+        window.onload = function() {
+            checkStatus();
+        };
+    </script>
+</body>
+</html>

@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 
 // スクロールを無効化すべきページのパス
 const NO_SCROLL_PAGES = [
-  '/',
   '/start',
   '/tokyo',
   '/quiz',

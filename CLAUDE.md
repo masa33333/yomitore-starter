@@ -667,6 +667,175 @@ src/lib/preloadSeoulLetter.ts          - Seoul手紙事前保存システム（�
 
 ---
 
+## 📋 Work Session Summary (2025-07-12)
+
+### 🎯 Session Goals
+**しおり機能のresumeエラー修正 & 長押しによるしおり作成機能実装** - 前回のしおり復帰機能は成功したが、新しいしおり作成（長押し）が動作しない問題に取り組み
+
+### ✅ Completed Today
+
+#### Task 1: しおり復帰機能の修正完了
+- **Problem**: しおり復帰時にスクロールしない・赤いハイライトが表示されない
+- **Root Cause**: `blur-reading`クラスが読書中も適用され続け、スクロールがブロック
+- **Solution**: 
+  - **Line 1668**: `isResumeMode ? 'blur-reading' : ''` → `'max-w-none'` に完全変更
+  - CSS `blur-reading`クラスの完全無効化
+  - `handleResumeReading`で retry mechanism（最大10回）実装
+  - 赤いハイライト用CSSクラス `.bookmark-highlight` 追加
+
+#### Task 2: スクロール問題の根本解決
+- **Problem**: 読書開始と同時にスクロールが無効になる（原因不明の繰り返し発生）
+- **Root Cause Analysis**: 
+  - 初回: `ScrollHeight: 4940, ClientHeight: 4940, Can scroll: false` → コンテンツが画面にちょうど収まっている状態
+  - 再発: 手動タッチイベント等でスクロールが再度ブロック
+- **Solution**: 段階的強化アプローチ
+  - **緊急スクロール復活**: 基本的な DOM 修正
+  - **超強力スクロール復活**: 全要素への `!important` 適用
+  - **☢️ 核兵器級スクロール復活**: CSS完全破壊・Window書き換え（500ms×20回実行）
+
+#### Task 3: 長押しによるしおり作成機能の実装とデバッグ
+- **Implementation**: 
+  - タッチイベントハンドラ（`handleTextTouchStart`, `handleTextTouch`）
+  - 600ms長押し判定タイマー
+  - 紫色ハイライト（薄い→濃い）
+  - BookmarkDialog表示
+- **Debug Infrastructure**: 
+  - **🖱️ クリック式しおり**: タッチイベントをバイパスして直接`handleLongPress`実行
+  - **👆 タッチ診断**: DOM要素・タッチハンドラの状態確認（段落33個、単語908個検出）
+  - **💬 ダイアログテスト**: 直接ダイアログ表示テスト
+- **Status**: 🚨 **未解決** - 長押しが動作せず（紫色表示なし、ダイアログ表示なし）
+
+### 🛠 Technical Achievements
+
+#### 1. **しおり復帰システムの完全実装**
+```typescript
+// Enhanced retry mechanism
+const attemptBookmarkScroll = (attempt = 1, maxAttempts = 10) => {
+  const targetElement = document.querySelector(`[data-idx="${savedBookmarkIndex}"]`);
+  if (targetElement) {
+    // 赤いハイライト with CSS classes + inline styles
+    targetElement.classList.add('bookmark-highlight');
+    targetElement.style.cssText = 'background-color: #ef4444 !important; color: white !important; font-weight: bold !important;';
+  } else if (attempt < maxAttempts) {
+    setTimeout(() => attemptBookmarkScroll(attempt + 1), 500);
+  }
+};
+```
+
+#### 2. **CSS強化によるスクロール確保**
+```css
+.bookmark-highlight {
+  background-color: #ef4444 !important;
+  color: white !important;
+  font-weight: bold !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+}
+
+.blur-reading {
+  /* COMPLETELY DISABLED - 完全に無効化 */
+  pointer-events: auto !important;
+  overflow: auto !important;
+}
+```
+
+#### 3. **核兵器級スクロール復活システム**
+```typescript
+const nuclearForceScrolling = () => {
+  // 1. CSS完全破壊
+  const allStyleSheets = Array.from(document.styleSheets);
+  // 2. Root要素強制書き換え  
+  [document.body, document.documentElement].forEach(el => {
+    el.style.cssText = `overflow: visible !important; overflow-y: auto !important; pointer-events: auto !important;`;
+  });
+  // 3. 全要素クリーンアップ
+  // 4. Window scroll capability強制有効化
+};
+```
+
+### 📁 Major Files Modified Today
+
+```
+src/app/reading/ReadingClient.tsx        - 長押し機能、デバッグシステム、スクロール修復システム
+src/app/globals.css                      - blur-reading無効化、bookmark-highlight追加
+src/components/BookmarkDialog.tsx        - 使用（修正なし）
+```
+
+### 🎯 Current System Status
+
+#### ✅ Working Features
+- **しおり復帰**: 自動スクロール・赤いハイライト・3秒後自動消去
+- **スクロール**: 核兵器級復活で確実に修復可能
+- **しおり作成（代替）**: 🖱️ クリック式しおりボタンでダイアログ表示確認済み
+
+#### 🚨 Critical Issues (Unresolved)
+- **長押しでのしおり作成**: 紫色表示なし、ダイアログ表示なし
+- **スクロール安定性**: 特定操作後に繰り返し無効化される
+
+### 🔍 Debug Status and Findings
+
+#### Long Press Investigation
+- **DOM Elements**: ✅ 正常（段落33個、単語908個）
+- **Touch Handlers**: ✅ 設定済み（handleTextTouchStart/End）
+- **Bypass Test**: ✅ クリック式しおりでダイアログ表示
+- **Console Logs**: ❓ 実際の長押しでログ出力状況未確認
+
+#### Suspected Issues
+1. **タッチイベント非発火**: デスクトップ環境でのTouch API制限
+2. **Event Delegation競合**: クリック・タッチイベントの干渉
+3. **CSS干渉**: hover/activeスタイルによる長押し阻害
+4. **Timer Cleanup**: タッチイベント前の premature timeout clearance
+
+### 🔧 Available Debug Tools
+
+```typescript
+// デバッグボタン
+🖱️ クリック式しおり    - handleLongPressを直接実行
+👆 タッチ診断          - DOM要素・タッチハンドラ状態確認  
+💬 ダイアログテスト     - BookmarkDialog直接表示
+🔍 スクロール診断       - CSS/DOM状態詳細確認
+☢️ 核兵器級スクロール復活 - 最強レベルのスクロール修復
+```
+
+### 🎯 明日のタスク優先順位
+
+#### 🚨 High Priority
+1. **長押し機能の根本解決**
+   - 実際の長押し時のコンソールログ確認
+   - タッチイベント発火の確認（`🟢 TouchStart発火`が出るか）
+   - デスクトップ環境での代替実装検討
+
+#### 🔄 Medium Priority  
+2. **スクロール安定化**
+   - スクロール無効化の根本原因特定
+   - 予防的スクロール確保の読書開始時統合
+
+#### 🎨 Low Priority
+3. **UI/UX改善**
+   - 長押し機能の代替UI実装
+   - しおり機能の説明・ガイダンス追加
+
+### 🧪 明日の検証手順
+
+1. **長押しログチェック**: 実際の長押しでコンソール確認
+2. **タッチ診断実行**: DOM/ハンドラ状態の詳細確認  
+3. **代替手段テスト**: クリック式でしおり機能全体の動作確認
+4. **スクロール安定性**: 各操作後のスクロール状態確認
+
+### 🔍 Key Technical Learnings
+
+1. **CSS Cascade Hell**: `blur-reading`のような継承クラスは予期しない副作用を持つ
+2. **Touch API Limitations**: デスクトップ環境でのタッチイベント制約
+3. **DOM State Management**: React状態とDOM状態の同期の複雑性
+4. **Debugging Strategy**: 段階的デバッグツールの有効性
+
+### 💭 Session Reflection
+
+1日中取り組んだが、長押し機能の根本解決には至らず。しかし包括的なデバッグインフラと代替手段を確立し、明日の問題解決への土台は整った。しおり復帰機能は完全に修復済み。
+
+---
+
 ## 📋 Work Session Summary (2025-06-29)
 
 ### ✅ Completed Today
