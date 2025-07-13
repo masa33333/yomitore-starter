@@ -1436,16 +1436,29 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             block: 'center'
           });
           
-          // Highlight the bookmarked word in red with CSS classes
+          // Highlight the bookmarked word in red - 強力な設定で確実に表示
           targetElement.classList.add('bookmark-highlight');
-          targetElement.style.cssText = 'background-color: #ef4444 !important; color: white !important; font-weight: bold !important; padding: 2px 4px !important; border-radius: 4px !important;';
+          targetElement.style.setProperty('background-color', '#ef4444', 'important');
+          targetElement.style.setProperty('color', 'white', 'important');
+          targetElement.style.setProperty('font-weight', 'bold', 'important');
+          targetElement.style.setProperty('padding', '2px 4px', 'important');
+          targetElement.style.setProperty('border-radius', '4px', 'important');
+          targetElement.style.setProperty('box-shadow', '0 0 8px rgba(239, 68, 68, 0.6)', 'important');
+          targetElement.style.setProperty('border', 'none', 'important');
+          targetElement.style.setProperty('outline', 'none', 'important');
           
           console.log('📖 しおり復帰完了:', targetElement.textContent);
           
           // Remove highlight after 3 seconds
           setTimeout(() => {
             targetElement.classList.remove('bookmark-highlight');
-            targetElement.style.cssText = '';
+            // 赤いハイライトのプロパティを個別に除去
+            targetElement.style.removeProperty('background-color');
+            targetElement.style.removeProperty('color');
+            targetElement.style.removeProperty('font-weight');
+            targetElement.style.removeProperty('padding');
+            targetElement.style.removeProperty('border-radius');
+            targetElement.style.removeProperty('box-shadow');
             console.log('✨ しおりハイライト終了');
           }, 3000);
           

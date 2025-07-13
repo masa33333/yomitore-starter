@@ -35,6 +35,21 @@ html {
   padding: 2px 4px !important;
   border-radius: 4px !important;
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* しおりハイライトの最優先表示 */
+span.bookmark-highlight,
+.clickable-word.bookmark-highlight {
+  background-color: #ef4444 !important;
+  color: white !important;
+  font-weight: bold !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
+  border: none !important;
+  outline: none !important;
 }
 
 .blur-reading {
