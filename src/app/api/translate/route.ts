@@ -18,7 +18,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'テキストが指定されていません' }, { status: 400 });
     }
 
-    console.log('🔄 翻訳リクエスト:', { text: text.substring(0, 100) + '...', targetLanguage, isStory });
+    console.log('🔄 翻訳リクエスト:', { 
+      textLength: text.length, 
+      textPreview: text.substring(0, 100) + '...', 
+      targetLanguage, 
+      isStory 
+    });
 
     const userPrompt = `Translate the following English text to natural Japanese:
 
@@ -36,8 +41,8 @@ Output only the Japanese translation, nothing else.`;
     console.log('📤 OpenAIに送信する翻訳プロンプト');
 
     // ストーリーモードの場合はより多くのトークンを許可
-    const maxTokens = isStory ? 4000 : 1000;
-    const model = isStory ? "gpt-3.5-turbo-16k" : "gpt-3.5-turbo";
+    const maxTokens = isStory ? 8000 : 1000;
+    const model = isStory ? "gpt-4o-mini" : "gpt-3.5-turbo";
     
     console.log(`📤 OpenAI翻訳設定: model=${model}, maxTokens=${maxTokens}`);
 
@@ -55,12 +60,26 @@ Output only the Japanese translation, nothing else.`;
     });
 
     let translation = completion.choices[0].message.content?.trim() ?? "";
-    console.log('📥 OpenAIからの翻訳応答:', translation);
+    console.log('📥 OpenAIからの翻訳応答:', {
+      translationLength: translation.length,
+      translationPreview: translation.substring(0, 200) + '...',
+      finishReason: completion.choices[0].finish_reason,
+      usage: completion.usage
+    });
     
     // 引用符を除去（文頭・文末のみ）
     translation = translation.replace(/^["'「『]/, '').replace(/["'」』]$/, '').trim();
     
-    console.log('📥 クリーニング後の翻訳:', translation);
+    console.log('📥 クリーニング後の翻訳:', {
+      cleanedLength: translation.length,
+      finishReason: completion.choices[0].finish_reason,
+      wasTruncated: completion.choices[0].finish_reason === 'length'
+    });
+    
+    // If translation was truncated due to token limit, log a warning
+    if (completion.choices[0].finish_reason === 'length') {
+      console.warn('⚠️ 翻訳が最大トークン数により途中で切れました。より多くのトークンが必要です。');
+    }
 
     if (translation && translation.length > 0) {
       console.log('✅ 翻訳取得成功:', text, '->', translation);

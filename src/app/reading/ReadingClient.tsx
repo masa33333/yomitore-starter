@@ -1292,6 +1292,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     // 日本語翻訳がない場合は取得してから表示
     try {
+      console.log('🔄 翻訳リクエスト送信中:', {
+        textLength: english.length,
+        textPreview: english.substring(0, 200) + '...',
+        isStory: mode === 'story',
+        mode
+      });
+      
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1303,6 +1310,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       if (response.ok) {
         const data = await response.json();
+        console.log('📥 翻訳レスポンス受信:', {
+          translationLength: data.translation?.length || 0,
+          translationPreview: data.translation?.substring(0, 200) + '...' || 'No translation',
+          hasTranslation: !!data.translation
+        });
         setJapanese(data.translation);
         setJapaneseParagraphs(data.translation.split('\n\n'));
         setShowJapanese(true);
@@ -1325,6 +1337,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         setTimeout(() => {
           saveCurrentReadingState();
         }, 100);
+      } else {
+        console.error('❌ 翻訳APIレスポンスエラー:', {
+          status: response.status,
+          statusText: response.statusText
+        });
+        const errorData = await response.json().catch(() => null);
+        if (errorData) {
+          console.error('❌ エラー詳細:', errorData);
+        }
       }
     } catch (error) {
       console.error('❌ 翻訳エラー:', error);
