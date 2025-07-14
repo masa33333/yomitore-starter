@@ -895,12 +895,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setHighlightedWord('');
     console.log('🟡 黄色ハイライトクリア');
     
-    // ブックマーク作成時はオレンジでハイライト（要素の場合のみ）
+    // ブックマーク作成時はオレンジでハイライト（要素の場合のみ、重複を防ぐ）
     if (typeof target !== 'string') {
-      target.style.setProperty('background-color', '#f97316', 'important'); // orange-500
-      target.style.setProperty('color', 'white', 'important');
-      target.style.setProperty('padding', '2px 4px', 'important');
-      target.style.setProperty('border-radius', '4px', 'important');
+      // 既にオレンジハイライトされていない場合のみ適用
+      if (target.style.backgroundColor !== 'rgb(249, 115, 22)') {
+        target.style.setProperty('background-color', '#f97316', 'important'); // orange-500
+        target.style.setProperty('color', 'white', 'important');
+        target.style.setProperty('padding', '2px 4px', 'important');
+        target.style.setProperty('border-radius', '4px', 'important');
+      }
     }
     console.log('🟠 長押し成功 - オレンジでハイライト:', word);
     
@@ -1595,13 +1598,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const word = target.textContent || '';
       
       
-      // 長押しタイマー（200ms）
+      // 長押しタイマー（400ms）- モバイル用に調整
       longPressTimeoutRef.current = setTimeout(() => {
         if (!isLongPressRef.current) {
           console.log('🔗 長押し検出:', word);
           handleLongPress(target);
         }
-      }, 200);
+      }, 400);
     }
   };
 
@@ -1647,8 +1650,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       Math.pow(touchEndPosition.y - touchStartPositionRef.current.y, 2)
     );
     
-    // タッチ時間が短すぎる（100ms未満）または移動距離が大きい（10px以上）場合は無視
-    if (touchDuration < 100 || moveDistance > 10) {
+    // タッチ時間が短すぎる（100ms未満）または移動距離が大きい（15px以上）場合は無視
+    if (touchDuration < 100 || moveDistance > 15) {
       return;
     }
     
@@ -2573,7 +2576,20 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       {/* ブックマーク機能のダイアログ */}
       <BookmarkDialog
         isOpen={bookmarkDialog.isOpen}
-        onClose={() => setBookmarkDialog({...bookmarkDialog, isOpen: false})}
+        onClose={() => {
+          // オレンジハイライトをクリア
+          const targetElement = document.querySelector(`[data-idx="${bookmarkDialog.tokenIndex}"]`) as HTMLElement;
+          if (targetElement) {
+            targetElement.style.removeProperty('background-color');
+            targetElement.style.removeProperty('color');
+            targetElement.style.removeProperty('padding');
+            targetElement.style.removeProperty('border-radius');
+            console.log('🧹 オレンジハイライトクリア:', bookmarkDialog.word);
+          }
+          // 長押しフラグをリセット
+          isLongPressRef.current = false;
+          setBookmarkDialog({...bookmarkDialog, isOpen: false});
+        }}
         onConfirm={() => {
           console.log('🔥 BookmarkDialog onConfirm実行:', bookmarkDialog);
           console.log('🛑 ダイアログを閉じる前に遷移阻止設定');
