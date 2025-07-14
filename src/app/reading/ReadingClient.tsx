@@ -186,6 +186,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // ブックマーク機能用ステート
   const [bookmarkTokenIndex, setBookmarkTokenIndex] = useState<number | null>(null);
+  // 読書開始位置（再開時は前回のブックマーク位置）
+  const [readingStartTokenIndex, setReadingStartTokenIndex] = useState<number>(0);
   const longPressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isLongPressRef = useRef<boolean>(false);
   const [bookmarkDialog, setBookmarkDialog] = useState<{
@@ -198,6 +200,38 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     word: '',
     tokenIndex: 0
   });
+
+  // ブックマーク統計表示用の状態
+  const [bookmarkStats, setBookmarkStats] = useState<{
+    isVisible: boolean;
+    element: HTMLElement | null;
+    stats: {
+      wordsRead: number;
+      readingTime: string;
+      wpm: number;
+    } | null;
+  }>({
+    isVisible: false,
+    element: null,
+    stats: null
+  });
+
+  // ページ読み込み時に統計状態をクリア
+  useEffect(() => {
+    setBookmarkStats({
+      isVisible: false,
+      element: null,
+      stats: null
+    });
+    // 長押しフラグもリセット
+    isLongPressRef.current = false;
+    // タイマーもクリア
+    if (longPressTimeoutRef.current) {
+      clearTimeout(longPressTimeoutRef.current);
+      longPressTimeoutRef.current = null;
+    }
+    console.log('🔄 ブックマーク統計状態初期化');
+  }, []);
   const [isResumeMode, setIsResumeMode] = useState(() => {
     // 初期化時にURL パラメータをチェック
     if (typeof window !== 'undefined') {
@@ -391,6 +425,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
           
           // ブックマーク位置保存（後でスクロールに使用）
           setBookmarkTokenIndex(bookmark.tokenIndex);
+          // 読書開始位置をブックマーク位置に設定（語数カウント用）
+          setReadingStartTokenIndex(bookmark.tokenIndex);
+          console.log('📊 読書開始位置設定:', bookmark.tokenIndex);
           
           // ダイアログを即座に表示（スクロールは再開時に実行）
           setShowResumeDialog(true);
@@ -674,11 +711,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     const duration = endTimeValue - startTime; // ミリ秒
     const timeInMinutes = duration / 60000;
-    const calculatedWpm = Math.round(wordCount / timeInMinutes);
+    
+    // 読書開始位置から最後までの実際の語数を計算
+    const allTokens = english.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
+    const actualWordsRead = allTokens.slice(readingStartTokenIndex).filter(token => /^[A-Za-z-]+$/.test(token) && token !== '-').length;
+    const calculatedWpm = Math.round(actualWordsRead / timeInMinutes);
     setWpm(calculatedWpm);
     
     console.log('✅ 読書完了:', {
-      wordCount,
+      totalWordCount: wordCount,
+      actualWordsRead: actualWordsRead,
+      readingStartIndex: readingStartTokenIndex,
       timeInMinutes: timeInMinutes.toFixed(1),
       wpm: calculatedWpm,
       duration
@@ -687,7 +730,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // スタンプカード統合システムで進捗更新
     const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
     const completionData: ReadingCompletionData = {
-      wordCount: wordCount,
+      wordCount: actualWordsRead, // 実際に読んだ語数を使用
       duration: duration,
       wpm: calculatedWpm,
       level: currentLevel,
@@ -922,7 +965,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   };
 
   // ブックマーク保存処理
-  const saveBookmark = (tokenIndex: number, word: string) => {
+  const saveBookmark = (tokenIndex: number, word: string, targetElement?: HTMLElement) => {
     console.log('🔥 saveBookmark関数実行開始:', { tokenIndex, word, startTime });
     
     if (!startTime) {
@@ -939,23 +982,78 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const readingTime = currentTime - startTime;
     const timeInMinutes = readingTime / 60000;
     
-    // tokenIndexまでの英単語数を計算
-    const allTokens = english.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
-    const wordsReadCount = allTokens.slice(0, tokenIndex).filter(token => /^[A-Za-z]+$/.test(token)).length;
+    // レンダリング時と同じ方法で実際の英単語をカウント
+    // globalTokenIndexRefを使って実際にレンダリングされた単語のみをカウント
+    const actualWordsInRange = [];
+    let tempIndex = 0;
+    
+    for (const paragraph of englishParagraphs) {
+      const parts = paragraph.split(/(\*\*[^*]+\*\*)/);
+      for (const part of parts) {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          continue; // 太字部分はスキップ
+        }
+        const words = part.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
+        for (const word of words) {
+          if (/^[a-zA-Z-]+$/.test(word) && word !== '-') {
+            if (tempIndex >= readingStartTokenIndex && tempIndex < tokenIndex) {
+              actualWordsInRange.push(word);
+            }
+            tempIndex++;
+          }
+        }
+      }
+    }
+    
+    const wordsReadCount = actualWordsInRange.length;
+    
+    console.log('🔍 正確な語数カウント:', {
+      readingStartIndex: readingStartTokenIndex,
+      currentTokenIndex: tokenIndex,
+      actualWordsInRange,
+      wordsReadCount
+    });
     const wpmCalculated = Math.round(wordsReadCount / timeInMinutes);
     
-    // 統計データを設定（読了時と同じ形式）
-    setEndTime(currentTime);
+    // ブックマーク時は下部統計表示ではなく、インライン統計表示を使用
+    // setEndTime(currentTime); // 下部統計表示を無効化
     setWpm(wpmCalculated);
     
-    // 中断時は実際に読んだ語数を表示用に設定
-    const originalWordCount = wordCount;
+    // 中断時は実際に読んだ語数を表示用に設定（元に戻さない）
     setWordCount(wordsReadCount);
     
-    // 2秒後に元に戻す
-    setTimeout(() => {
-      setWordCount(originalWordCount);
-    }, 2500);
+    console.log('📊 ブックマーク時統計設定完了:', {
+      endTime: currentTime,
+      wpm: wpmCalculated,
+      wordsRead: wordsReadCount,
+      displayWordCount: wordsReadCount
+    });
+
+    // 長押しした要素の位置にブックマーク統計を表示
+    const readingTimeStr = `${Math.floor(readingTime / 60000)}分${Math.floor((readingTime % 60000) / 1000)}秒`;
+    console.log('📊 ブックマーク統計設定:', {
+      targetElement,
+      readingTimeStr,
+      wordsReadCount,
+      wpmCalculated
+    });
+    
+    setBookmarkStats({
+      isVisible: true,
+      element: targetElement || null,
+      stats: {
+        wordsRead: wordsReadCount,
+        readingTime: readingTimeStr,
+        wpm: wpmCalculated
+      }
+    });
+    
+    console.log('📊 ブックマーク統計状態設定完了');
+    
+    // 統計表示時もスクロールを確保
+    document.body.style.setProperty('overflow', 'auto', 'important');
+    document.documentElement.style.setProperty('overflow', 'auto', 'important');
+    console.log('📜 統計表示時スクロール確保');
     
     // 中断時の読書データを保存（ProgressServiceに保存）
     console.log('📊 中断時統計:', {
@@ -1005,13 +1103,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     console.log('📖 新しいブックマーク保存完了:', bookmarkData);
     console.log('📖 実際に保存された内容:', savedBookmark);
     
+    // 次回の読書開始位置を現在のブックマーク位置に更新
+    setReadingStartTokenIndex(tokenIndex);
+    console.log('📊 次回読書開始位置更新:', tokenIndex);
+    
     // 読書状態を保存（次回復元用）
     saveCurrentReadingState();
     
-    // 統計表示のため、少し待ってから画面を更新
-    setTimeout(() => {
-      router.push('/choose');
-    }, 2000); // 2秒間統計を表示してから遷移
+    // ブックマーク完了メッセージを表示
+    console.log('✅ ブックマーク保存完了 - 統計表示中...');
+    
+    // 注意: 自動遷移は行わず、ユーザーが「他のものを読む」ボタンを押すまで統計を表示
   };
 
   // 単語クリック処理
@@ -1493,13 +1595,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const word = target.textContent || '';
       
       
-      // 長押しタイマー（600ms）
+      // 長押しタイマー（200ms）
       longPressTimeoutRef.current = setTimeout(() => {
         if (!isLongPressRef.current) {
           console.log('🔗 長押し検出:', word);
           handleLongPress(target);
         }
-      }, 600);
+      }, 200);
     }
   };
 
@@ -1891,7 +1993,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       
       let clickableWordCount = 0;
       const result = words.map((word, wordIndex) => {
-        if (/^[a-zA-Z]+$/.test(word)) {
+        if (/^[a-zA-Z-]+$/.test(word) && word !== '-') {
           clickableWordCount++;
           const tokenIndex = globalTokenIndexRef.current++;
           return (
@@ -2399,7 +2501,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={handleReadAgain}
-                    className="rounded-md bg-green-500 px-4 py-2 font-medium text-white transition-colors hover:bg-green-600"
+                    className="rounded-md bg-orange-600 px-4 py-2 font-medium text-white transition-colors hover:bg-orange-700"
                   >
                     もう一度読む
                   </button>
@@ -2474,12 +2576,26 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         onClose={() => setBookmarkDialog({...bookmarkDialog, isOpen: false})}
         onConfirm={() => {
           console.log('🔥 BookmarkDialog onConfirm実行:', bookmarkDialog);
-          // ダイアログを閉じてから統計処理実行
-          setBookmarkDialog({...bookmarkDialog, isOpen: false});
+          console.log('🛑 ダイアログを閉じる前に遷移阻止設定');
+          
+          // 遷移を阻止してから統計処理実行
+          console.log('🔥 saveBookmark呼び出し開始:', { tokenIndex: bookmarkDialog.tokenIndex, word: bookmarkDialog.word });
+          
+          // 長押しした要素を取得
+          const targetElement = document.querySelector(`[data-idx="${bookmarkDialog.tokenIndex}"]`) as HTMLElement;
+          console.log('🎯 長押し要素取得:', {
+            tokenIndex: bookmarkDialog.tokenIndex,
+            selector: `[data-idx="${bookmarkDialog.tokenIndex}"]`,
+            targetElement,
+            found: !!targetElement
+          });
+          saveBookmark(bookmarkDialog.tokenIndex, bookmarkDialog.word, targetElement);
+          
+          // saveBookmark完了後にダイアログを閉じる
           setTimeout(() => {
-            console.log('🔥 saveBookmark呼び出し準備:', { tokenIndex: bookmarkDialog.tokenIndex, word: bookmarkDialog.word });
-            saveBookmark(bookmarkDialog.tokenIndex, bookmarkDialog.word);
-          }, 100);
+            console.log('🛑 ダイアログを閉じる');
+            setBookmarkDialog({...bookmarkDialog, isOpen: false});
+          }, 500);
         }}
         word={bookmarkDialog.word}
         conflictLevel={bookmarkDialog.conflictLevel}
@@ -2491,6 +2607,133 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         isOpen={showResumeDialog}
         onResume={handleResumeReading}
       />
+
+      {/* ブックマーク統計表示 */}
+      {(() => {
+        console.log('📊 ブックマーク統計表示判定:', {
+          isVisible: bookmarkStats.isVisible,
+          hasStats: !!bookmarkStats.stats,
+          stats: bookmarkStats.stats,
+          element: bookmarkStats.element
+        });
+        return bookmarkStats.isVisible && bookmarkStats.stats;
+      })() && (
+        <>
+          {/* 統計表示 */}
+          <div 
+            className="fixed rounded-lg p-4 shadow-lg z-50"
+          style={(() => {
+            if (bookmarkStats.element) {
+              // getBoundingClientRect()でビューポート基準の位置を取得
+              const rect = bookmarkStats.element.getBoundingClientRect();
+              const top = rect.bottom + window.scrollY + 10;
+              const left = rect.left + window.scrollX;
+              
+              console.log('📊 統計表示位置計算:', {
+                element: bookmarkStats.element,
+                rect,
+                scrollY: window.scrollY,
+                scrollX: window.scrollX,
+                calculatedTop: top,
+                calculatedLeft: left
+              });
+              
+              return {
+                top: '20px', // テスト用：画面上部に固定
+                left: '20px', // テスト用：画面左に固定
+                maxWidth: '280px',
+                minWidth: '200px',
+                backgroundColor: '#f5f5dc', // ベージュ
+                pointerEvents: 'auto' // この要素だけでイベントを処理
+              };
+            } else {
+              return {
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                maxWidth: '280px',
+                minWidth: '200px'
+              };
+            }
+          })()}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-orange-600">ブックマーク完了</h3>
+            <button
+              onClick={() => {
+                setBookmarkStats(prev => ({ ...prev, isVisible: false }));
+                // 長押しフラグをリセット
+                isLongPressRef.current = false;
+                // スクロール確保
+                document.body.style.setProperty('overflow', 'auto', 'important');
+                document.documentElement.style.setProperty('overflow', 'auto', 'important');
+                console.log('🔄 統計閉じる: フラグリセット');
+              }}
+              className="text-gray-500 hover:text-gray-700 text-lg"
+            >
+              ×
+            </button>
+          </div>
+          
+          {/* シンプルな統計表示 */}
+          <div className="text-xs space-y-1 mb-3">
+            <div className="flex justify-between">
+              <span className="text-gray-600">読了:</span>
+              <span className="font-bold">{bookmarkStats.stats?.wordsRead || 100} 語</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">時間:</span>
+              <span className="font-bold">{bookmarkStats.stats?.readingTime || '2分30秒'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">速度:</span>
+              <span className="font-bold">{bookmarkStats.stats?.wpm || 125} WPM</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col space-y-2">
+            <button
+              onClick={() => {
+                // 詳細統計エリアにスクロール
+                setEndTime(Date.now()); // 詳細統計を表示
+                setBookmarkStats(prev => ({ ...prev, isVisible: false }));
+                // 長押しフラグをリセット
+                isLongPressRef.current = false;
+                
+                // スクロール確保
+                document.body.style.setProperty('overflow', 'auto', 'important');
+                document.documentElement.style.setProperty('overflow', 'auto', 'important');
+                
+                // 統計エリアにスクロール
+                setTimeout(() => {
+                  const statsElement = document.querySelector('[class*="rounded-lg"][class*="border-[#FFE1B5]"]');
+                  if (statsElement) {
+                    statsElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 100);
+              }}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-2 rounded-md transition-colors text-sm"
+            >
+              詳しい情報を見る
+            </button>
+            <button
+              onClick={() => {
+                setBookmarkStats(prev => ({ ...prev, isVisible: false }));
+                // 長押しフラグをリセット
+                isLongPressRef.current = false;
+                // スクロール確保
+                document.body.style.setProperty('overflow', 'auto', 'important');
+                document.documentElement.style.setProperty('overflow', 'auto', 'important');
+                router.push('/choose');
+              }}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-md transition-colors text-sm"
+            >
+              他のものを読む
+            </button>
+          </div>
+          </div>
+        </>
+      )}
 
     </main>
   );
