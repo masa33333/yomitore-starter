@@ -1270,12 +1270,35 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       return;
     }
     
+    // 保存済み翻訳をチェック
+    const currentSlug = searchParams.slug || `${searchParams.mode || 'default'}-${searchParams.genre || 'general'}-${searchParams.topic || 'default'}`;
+    const translationKey = `translation_${currentSlug}_${selectedLevel}`;
+    const savedTranslation = localStorage.getItem(translationKey);
+    
+    if (savedTranslation) {
+      try {
+        const parsed = JSON.parse(savedTranslation);
+        if (parsed.english === english && parsed.translation) {
+          console.log('📚 保存済み翻訳を使用:', translationKey);
+          setJapanese(parsed.translation);
+          setJapaneseParagraphs(parsed.translation.split('\n\n'));
+          setShowJapanese(true);
+          return;
+        }
+      } catch (error) {
+        console.error('❌ 保存済み翻訳の読み込みエラー:', error);
+      }
+    }
+    
     // 日本語翻訳がない場合は取得してから表示
     try {
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: english })
+        body: JSON.stringify({ 
+          text: english,
+          isStory: mode === 'story'
+        })
       });
       
       if (response.ok) {
@@ -1283,6 +1306,20 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         setJapanese(data.translation);
         setJapaneseParagraphs(data.translation.split('\n\n'));
         setShowJapanese(true);
+        
+        // 翻訳を永続保存（みんなで使えるように）
+        try {
+          const translationData = {
+            english: english,
+            translation: data.translation,
+            timestamp: Date.now(),
+            isStory: mode === 'story'
+          };
+          localStorage.setItem(translationKey, JSON.stringify(translationData));
+          console.log('💾 翻訳を永続保存しました:', translationKey);
+        } catch (error) {
+          console.error('❌ 翻訳保存エラー:', error);
+        }
         
         // 翻訳取得後に状態を保存
         setTimeout(() => {
@@ -2114,6 +2151,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 variant="secondary"
                 className="text-sm px-3 py-1"
               />
+            )}
+            
+            {/* 日本語訳表示ボタン */}
+            {isReadingStarted && (
+              <button
+                onClick={handleShowJapanese}
+                className="text-sm px-3 py-1 font-bold rounded-md transition-colors bg-primary-inactive text-text-primary hover:bg-primary-active"
+              >
+                {showJapanese ? '日本語を隠す' : '日本語を表示'}
+              </button>
             )}
           </div>
         </div>
