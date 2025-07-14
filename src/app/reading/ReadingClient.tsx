@@ -1598,13 +1598,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const word = target.textContent || '';
       
       
-      // 長押しタイマー（400ms）- モバイル用に調整
+      // 長押しタイマー（800ms）- モバイル用に調整
       longPressTimeoutRef.current = setTimeout(() => {
         if (!isLongPressRef.current) {
           console.log('🔗 長押し検出:', word);
           handleLongPress(target);
         }
-      }, 400);
+      }, 800);
     }
   };
 
