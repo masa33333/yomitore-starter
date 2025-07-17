@@ -58,6 +58,10 @@ export const storyMetadata: Record<string, { title: string; englishTitle: string
   'bucket-list': {
     title: '最高の人生の見つけ方',
     englishTitle: 'The Bucket List'
+  },
+  'river_stream/ep1': {
+    title: 'River Stream',
+    englishTitle: 'River Stream'
   }
 };
 

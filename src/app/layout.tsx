@@ -1,6 +1,7 @@
 import "./globals.css";
 import PointsProvider from "@/context/PointsContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { RewardProvider } from "@/context/RewardContext";
 import ConditionalHeader from "@/components/ConditionalHeader";
 import ScrollController from "@/components/ScrollController";
 import AnimationPreloader from "@/components/AnimationPreloader";
@@ -23,12 +24,14 @@ export default function RootLayout({
       <body className="antialiased min-h-screen bg-page-bg">
         <LanguageProvider>
           <PointsProvider>
-            <LevelMigration />
-            <AnimationPreloader />
-            {/* <ScrollController /> */}
-            <ConditionalHeader />
-            <ExitCalendarHandler />
-            <main className="min-h-screen">{children}</main>
+            <RewardProvider>
+              <LevelMigration />
+              <AnimationPreloader />
+              {/* <ScrollController /> */}
+              <ConditionalHeader />
+              <ExitCalendarHandler />
+              <main className="min-h-screen">{children}</main>
+            </RewardProvider>
           </PointsProvider>
         </LanguageProvider>
       </body>

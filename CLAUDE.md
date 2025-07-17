@@ -1547,20 +1547,36 @@ src/app/reading/ReadingClient.tsx         - スタンプカード表示追加
 - パフォーマンス最適化
 - 追加のUI/UX向上
 
-### 🔨 Updated TODO (2025-07-07)
+### 🔨 Updated TODO (2025-07-14)
 
-* [x] **35語短文生成問題修正 (2025-07-07 COMPLETED)**
-* [x] **CatLoaderアニメーション表示遅延問題解決 (2025-07-07 COMPLETED)**
-* [x] **読了後スタンプカード表示修正 (2025-07-07 COMPLETED)**
-* [x] **エラーログ強化・診断機能向上 (2025-07-07 COMPLETED)**
-* [x] **アニメーションキャッシュシステム実装 (2025-07-07 COMPLETED)**
-* [x] **モバイル版単語ハイライト持続問題修正 (2025-07-08 COMPLETED)**
+#### 🚨 High Priority (明日の最優先タスク)
+* [ ] **メール・手紙システムの完全修復 (2025-07-15予定)**
+  - 語数しきい値の不整合修正（letterDisplayHelpers.ts vs cities.json）
+  - Seoul/Beijing到着時の手紙送信トリガー実装
+  - 読書完了時の都市到着検知システム追加
+  - 手紙表示ページでの都市別手紙表示修正
+
+#### ✅ Recent Completions (2025-07-14)
+* [x] **ブックマーク統計表示機能実装 (2025-07-14 COMPLETED)**
+* [x] **ストーリー翻訳機能完全実装 (2025-07-14 COMPLETED)**
+* [x] **段落別日本語訳表示 (2025-07-14 COMPLETED)**
+* [x] **翻訳永続保存システム (2025-07-14 COMPLETED)**
+
+#### 🔄 Medium Priority
 * [ ] TTS Phase 2: 段階的生成・音声圧縮（コスト最適化）
 * [ ] TTS Phase 3: 再生速度調整・スクロール同期（UX向上）
 * [ ] Adjust cat/flag positions on map so Tokyo & Seoul markers do not overlap popup
 * [ ] Replace static map with react‑leaflet + dynamic zoom
 * [ ] Ensure `vocabLevel` propagates to generateReading()
 * [ ] Remove legacy cat emoji overlay
+
+#### 📋 Previous Completions
+* [x] **35語短文生成問題修正 (2025-07-07 COMPLETED)**
+* [x] **CatLoaderアニメーション表示遅延問題解決 (2025-07-07 COMPLETED)**
+* [x] **読了後スタンプカード表示修正 (2025-07-07 COMPLETED)**
+* [x] **エラーログ強化・診断機能向上 (2025-07-07 COMPLETED)**
+* [x] **アニメーションキャッシュシステム実装 (2025-07-07 COMPLETED)**
+* [x] **モバイル版単語ハイライト持続問題修正 (2025-07-08 COMPLETED)**
 
 ---
 

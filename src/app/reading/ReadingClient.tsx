@@ -3,12 +3,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { useReward } from '@/context/RewardContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useStory } from '@/lib/store/story';
 import { completeReading } from '@/lib/readingProgress';
 import type { ReadingCompletionData } from '@/types/stampCard';
 import { notifyNewStampCardUpdate } from '@/components/NewStampCard';
 import NewStampCard from '@/components/NewStampCard';
+import RewardDisplay from '@/components/RewardDisplay';
+import RewardEarnedFlash from '@/components/RewardEarnedFlash';
+import RewardFlashManager from '@/components/RewardFlashManager';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 import StampFlash from '@/components/StampFlash';
@@ -71,6 +75,7 @@ const posToJapanese: { [key: string]: string } = {
 export default function ReadingClient({ searchParams, initialData, mode }: ReadingClientProps) {
   const router = useRouter();
   const { displayLang } = useLanguage();
+  const { addWordsToReward, reward } = useReward();
   const { t } = useTranslation();
   const { story, updateStory } = useStory();
 
@@ -765,16 +770,23 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         }, 500); // スタンプフラッシュ後に再生
       }
       
-      // 20個完成時の特別ファンファーレ
+      // 20個完成時の特別ファンファーレ + コイン獲得
       if (updatedProgress.currentCardStamps === 0 && updatedProgress.totalStamps > 0 && stampsEarned > 0) {
         setTimeout(() => {
           playCardCompleteFanfare();
           console.log('🎊 カード完成ファンファーレ再生');
+          
+          // RewardSystemにコイン獲得演出追加（20スタンプ = 2000語相当）
+          addWordsToReward(2000);
+          console.log('🪙 スタンプカード完成でコイン獲得！');
         }, 1500); // スタンプファンファーレ後に再生
       }
       
       // 新しいスタンプカードに更新通知
       notifyNewStampCardUpdate();
+      
+      // RewardSystemに語数を追加
+      addWordsToReward(actualWordsRead);
       
       // 2回目の読了完了時に一通目の手紙を送信（既存ロジック維持）
       if (updatedProgress.totalStamps === 2) {
@@ -2119,6 +2131,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         minHeight: '100vh'
       }}
     >
+      {/* 報酬獲得演出 */}
+      <RewardEarnedFlash />
+      <RewardFlashManager />
       {/* ページタイトル */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
@@ -2402,6 +2417,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                         return `あと${nextStampAt}語で+1個`;
                       }
                     })()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">報酬</p>
+                  <p className="text-lg font-bold">
+                    <RewardDisplay name="" reward={reward} />
                   </p>
                 </div>
               </div>

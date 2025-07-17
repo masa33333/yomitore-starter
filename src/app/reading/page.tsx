@@ -160,9 +160,9 @@ export default async function ReadingPage({ searchParams }: PageProps) {
     
     console.log(`📚 プリセットストーリー要求: ${slug}, Level: ${userLevel}`);
     
-    // bucket-listの場合はファイルベースシステムを使用
-    if (slug === 'bucket-list') {
-      console.log('📖 Bucket List サーバーサイドファイルシステムから読み込み');
+    // bucket-listとriver_stream/ep1の場合はファイルベースシステムを使用
+    if (slug === 'bucket-list' || slug === 'river_stream/ep1') {
+      console.log(`📖 ${slug} サーバーサイドファイルシステムから読み込み`);
       const storyFromFile = await loadStoryFromFileServer(slug, userLevel);
       initialData = storyFromFile;
     }

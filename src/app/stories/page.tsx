@@ -28,7 +28,8 @@ export default function StoriesPage() {
   // 利用可能なストーリー一覧
   const [stories, setStories] = useState<Story[]>([
     { slug: 'notting-hill', title: 'ノッティングヒルの恋人 (Notting Hill)' },
-    { slug: 'bucket-list', title: '最高の人生の見つけ方 (The Bucket List)' }
+    { slug: 'bucket-list', title: '最高の人生の見つけ方 (The Bucket List)' },
+    { slug: 'river_stream/ep1', title: 'River Stream' }
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
