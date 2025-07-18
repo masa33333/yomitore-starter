@@ -48,8 +48,10 @@ export default function MessageNotification() {
   useEffect(() => {
     const interval = setInterval(checkAndDisplayMessage, 2000); // 2秒毎にチェック
     
-    // 初回チェック
-    checkAndDisplayMessage();
+    // 初回チェック（3秒遅延してヘッダーバッジが見えるようにする）
+    setTimeout(() => {
+      checkAndDisplayMessage();
+    }, 3000);
     
     return () => clearInterval(interval);
   }, [isVisible, isLoading]);

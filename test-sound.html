@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音テスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        button { padding: 15px 30px; margin: 10px; font-size: 16px; }
+        .mail { background: #2196F3; color: white; }
+        .letter { background: #9C27B0; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🔊 音テスト</h1>
+    
+    <button class="mail" onclick="testMailSound()">📧 メール音</button>
+    <button class="letter" onclick="testLetterSound()">📮 手紙音</button>
+    
+    <p>音が聞こえない場合は、ブラウザの音量設定を確認してください。</p>
+    
+    <script>
+        function testMailSound() {
+            console.log('メール音テスト開始');
+            playSimpleNotificationSound('mail');
+        }
+        
+        function testLetterSound() {
+            console.log('手紙音テスト開始');
+            playSimpleNotificationSound('letter');
+        }
+        
+        function playSimpleNotificationSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                if (type === 'mail') {
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                    console.log('🔊 メール音再生');
+                } else {
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.2);
+                    console.log('🔊 手紙音再生');
+                }
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                
+                alert(`${type === 'mail' ? 'メール' : '手紙'}音を再生しました`);
+                
+            } catch (error) {
+                console.error('音の生成エラー:', error);
+                alert('音の生成に失敗: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

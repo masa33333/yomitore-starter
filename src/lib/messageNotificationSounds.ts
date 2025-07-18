@@ -12,19 +12,13 @@ export function playMailNotificationSound() {
     audio.volume = 0.3;
     audio.play().catch(error => {
       console.warn('メール通知音の再生に失敗:', error);
-      // フォールバック: システムの通知音API
-      if ('Notification' in window && Notification.permission === 'granted') {
-        // 無音の通知でシステム音を鳴らす
-        new Notification('📬 新しいメールが届きました', {
-          body: '猫からのメールをチェックしてください',
-          icon: '/images/logo.png',
-          silent: false,
-          tag: 'mail-notification'
-        });
-      }
+      // フォールバック: 簡易音を即座に再生
+      playSimpleNotificationSound('mail');
     });
   } catch (error) {
     console.warn('メール通知音システムエラー:', error);
+    // フォールバック: 簡易音を即座に再生
+    playSimpleNotificationSound('mail');
   }
 }
 
@@ -38,18 +32,13 @@ export function playLetterNotificationSound() {
     audio.volume = 0.4;
     audio.play().catch(error => {
       console.warn('手紙通知音の再生に失敗:', error);
-      // フォールバック: システムの通知音API
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('📮 新しい手紙が届きました', {
-          body: '猫からの手紙をチェックしてください',
-          icon: '/images/logo.png',
-          silent: false,
-          tag: 'letter-notification'
-        });
-      }
+      // フォールバック: 簡易音を即座に再生
+      playSimpleNotificationSound('letter');
     });
   } catch (error) {
     console.warn('手紙通知音システムエラー:', error);
+    // フォールバック: 簡易音を即座に再生
+    playSimpleNotificationSound('letter');
   }
 }
 
@@ -95,16 +84,15 @@ export function playSimpleNotificationSound(type: 'mail' | 'letter') {
 export function playNotificationSound(type: 'mail' | 'letter') {
   console.log(`🔊 ${type === 'mail' ? 'メール' : '手紙'}通知音を再生します`);
   
+  // 即座に簡易音を再生（確実に音が出るように）
+  playSimpleNotificationSound(type);
+  
+  // 音声ファイルも試す（存在する場合）
   if (type === 'mail') {
     playMailNotificationSound();
   } else {
     playLetterNotificationSound();
   }
-  
-  // フォールバック: 簡易音
-  setTimeout(() => {
-    playSimpleNotificationSound(type);
-  }, 100);
 }
 
 /**

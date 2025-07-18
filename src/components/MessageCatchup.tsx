@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { autoRunCatchup } from '@/utils/catchupMessages';
+import { playNotificationSound } from '@/lib/messageNotificationSounds';
 
 /**
  * メール・手紙キャッチアップコンポーネント
@@ -26,6 +27,13 @@ export default function MessageCatchup() {
             手紙: result.lettersSent,
             送信した語数: result.triggers
           });
+          
+          // 🔊 音通知を再生（メールまたは手紙）
+          if (result.lettersSent > 0) {
+            playNotificationSound('letter');
+          } else if (result.mailsSent > 0) {
+            playNotificationSound('mail');
+          }
         } else {
           console.log('📍 キャッチアップ対象なし（または既に送信済み）');
         }
