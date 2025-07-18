@@ -5,6 +5,30 @@ image: /letters/seoul.png
 city: Seoul
 ---
 
+🎉 Arrived in Seoul, meow!
+
+Thanks to you reading 20,300 words, I finally arrived in Seoul!
+
+On the way from the airport to the city, I saw lots of Hangeul characters, and I really felt like I came to a foreign country.
+
+Walking through Myeongdong street, there are so many delicious smells of Korean food! I'm especially curious about the kimchi smell.
+
+I can see N Seoul Tower too, and it's so tall and sparkly! It must be even more beautiful at night.
+
+The people in the city are kind, and they waved at me when they saw me looking lost.
+
+I met Korean cats too! They taught me that the greeting is "Nyan-nyong-haseyo"!
+
+I also visited Gyeongbokgung, a beautiful palace. It's where the old kings used to live. I can feel the history!
+
+I was able to come this far thanks to your reading power. The next destination will surely be wonderful too!
+
+Let's keep reading lots and travel the world together!
+
+📮 With love from Seoul, Travel Cat
+
+---
+
 🎉 ソウル到着だニャー！
 
 きみが20,300語も読んでくれたおかげで、ついにソウルに到着したよ！

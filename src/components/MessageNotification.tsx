@@ -61,8 +61,8 @@ export default function MessageNotification() {
   const isLetter = metadata.type === 'letter';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="max-w-md w-full mx-4 bg-white rounded-lg shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="max-w-md w-full max-h-[90vh] bg-white rounded-lg shadow-xl overflow-hidden flex flex-col">
         {/* ヘッダー */}
         <div className={`px-6 py-4 text-white ${isLetter ? 'bg-purple-600' : 'bg-blue-600'}`}>
           <div className="flex items-center justify-between">
@@ -86,30 +86,33 @@ export default function MessageNotification() {
           )}
         </div>
 
-        {/* 画像 */}
-        {metadata.image && (
-          <div className="px-6 py-4">
-            <img
-              src={metadata.image}
-              alt={`${metadata.city || metadata.type} image`}
-              className="w-full h-32 object-cover rounded-lg"
-            />
-          </div>
-        )}
+        {/* スクロール可能な内容 */}
+        <div className="flex-1 overflow-y-auto">
+          {/* 画像 */}
+          {metadata.image && (
+            <div className="px-6 py-4">
+              <img
+                src={metadata.image}
+                alt={`${metadata.city || metadata.type} image`}
+                className="w-full h-32 object-cover rounded-lg"
+              />
+            </div>
+          )}
 
-        {/* メッセージ内容 */}
-        <div className="px-6 py-4">
-          <div className="prose prose-sm max-w-none">
-            {content.split('\n').map((line, index) => (
-              <p key={index} className="mb-2 text-gray-700 leading-relaxed">
-                {line}
-              </p>
-            ))}
+          {/* メッセージ内容 */}
+          <div className="px-6 py-4">
+            <div className="prose prose-sm max-w-none">
+              {content.split('\n').map((line, index) => (
+                <p key={index} className="mb-2 text-gray-700 leading-relaxed">
+                  {line}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* フッター */}
-        <div className="px-6 py-4 bg-gray-50 border-t">
+        <div className="px-6 py-4 bg-gray-50 border-t flex-shrink-0">
           <div className="flex justify-between items-center text-sm text-gray-600">
             <span>Trigger: {metadata.trigger}語</span>
             <button

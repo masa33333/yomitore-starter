@@ -5,6 +5,26 @@ image: /letters/tokyo.png
 city: Tokyo
 ---
 
+✈️ Meow from the airplane!
+
+I'm flying above the clouds now! The view from the window looks like cotton candy.
+
+They served in-flight meal and there was fish! (Of course it's for humans, so I can't eat it...)
+
+The flight attendant was kind and smiled at me when she saw me.
+
+Thanks to you reading 5300 words, I can travel this far! I want to say "thank you" from above the clouds!
+
+Oh, the captain just said "altitude 10,000 meters". That's really high!
+
+I can see small towns below. I bet lots of people live there.
+
+We'll arrive at my first destination soon. I'm excited!
+
+🌟 From the flying cat
+
+---
+
 ✈️ 機内からニャー！
 
 今、雲の上を飛んでるよ！窓から見える景色は綿菓子みたい。

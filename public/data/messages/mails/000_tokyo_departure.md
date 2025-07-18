@@ -5,6 +5,24 @@ image: /letters/tokyo.png
 city: Tokyo
 ---
 
+🛫 Meow! I'm at Narita Airport!
+
+First thing that surprised me was the distance from Tokyo! Almost one hour by express train, and the fare costs more than dinner in the city center.
+
+According to locals, it was built in the middle of farmland in 1978 to keep nighttime airplane noise away from the capital. A clever plan to protect the quiet sky, but it means travelers have to take a long and expensive journey.
+
+I'm in the departure lounge now. Bright yellow, green, and blue information boards flash the times one after another. Ground staff guide big jet planes with small orange lights, and the scene looks like a slow parade.
+
+In my backpack, I have postcards, a lucky coin, and a notebook for writing these letters. I hope my letters bring you as much joy in reading as I feel starting this journey.
+
+My next message will be from the plane during the first short flight across the Yellow Sea to Seoul.
+
+Thank you, let's keep reading lots together and continue this journey!
+
+From <name>
+
+---
+
 🛫 ニャー！成田空港にいるよ！
 
 まず驚いたのは東京からの距離の長さ！特急列車でほぼ１時間、しかも運賃は都心での夕食代よりももっと高かった。
