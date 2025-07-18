@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Reset Functionality</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .step { margin: 20px 0; border: 1px solid #ccc; padding: 15px; }
+        button { padding: 10px 20px; margin: 5px; }
+        .results { background: #e8f4f8; padding: 10px; margin: 10px 0; white-space: pre; }
+    </style>
+</head>
+<body>
+    <h1>Test Reset Functionality</h1>
+    
+    <div class="step">
+        <h3>1. Set up "dirty" localStorage (simulate existing data)</h3>
+        <button onclick="setupDirtyData()">Set Dirty Data</button>
+        <div id="setup-results" class="results"></div>
+    </div>
+    
+    <div class="step">
+        <h3>2. Perform Nuclear Reset (exact copy of /start logic)</h3>
+        <button onclick="performNuclearReset()">Nuclear Reset</button>
+        <div id="reset-results" class="results"></div>
+    </div>
+    
+    <div class="step">
+        <h3>3. Test Fresh Start Detection</h3>
+        <button onclick="testFreshStartDetection()">Test Fresh Start</button>
+        <div id="fresh-results" class="results"></div>
+    </div>
+
+    <script>
+        function log(msg) {
+            console.log(msg);
+            return msg;
+        }
+        
+        function setupDirtyData() {
+            // Simulate various localStorage data that could cause issues
+            localStorage.setItem('totalWordsRead', '1800');
+            localStorage.setItem('userProgress', JSON.stringify({
+                totalWords: 1800,
+                totalStamps: 18,
+                currentCardStamps: 18,
+                completedCards: 0
+            }));
+            localStorage.setItem('yomitore.reward.v2', JSON.stringify({
+                words: 1800, stamps: 18, coin: 0, bronze: 0, silver: 0, gold: 0, platinum: 0
+            }));
+            localStorage.setItem('stampCard', '[]');
+            localStorage.setItem('someOtherKey', 'someOtherValue');
+            
+            const results = [];
+            results.push('Dirty data setup complete!');
+            results.push(`localStorage.length: ${localStorage.length}`);
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    results.push(`  ${key}: ${localStorage.getItem(key)}`);
+                }
+            }
+            
+            document.getElementById('setup-results').textContent = results.join('\n');
+        }
+        
+        async function performNuclearReset() {
+            log('🚨 NUCLEAR RESET: Starting complete reset...');
+            
+            // Exact copy of the /start page logic
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Short wait
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            const allKnownKeys = [
+                'catName', 'vocabLevel', 'vocabularyLevel', 'level', 'fixedLevel',
+                'totalWordsRead', 'totalReadingTime', 'completedReadings',
+                'currentCityIndex', 'mapIntroShown', 'language', 'displayLang',
+                'userProgress', 'stampCard', 'dailyData', 'readingProgress',
+                'currentReadingEnglish', 'currentReadingJapanese', 'currentReadingTitle',
+                'currentReadingWordCount', 'currentReadingStarted', 'currentReadingEndTime',
+                'currentReadingWpm', 'currentSessionWords', 'currentReadingState',
+                'letters', 'mails', 'notified', 'newLetter', 'letterText', 'messageQueue',
+                'clickedWords', 'myNotebook', 'readingHistory',
+                'consecutiveReadingMessage', 'welcomeBackMessage',
+                'calendarData', 'todayRecord',
+                'yomitore.reward.v2', 'rewardPoints', 'rewardHistory', 'earnedRewards',
+                'quizCompleted', 'userLevel',
+                'bookmarks', 'settings', 'preferences'
+            ];
+            
+            allKnownKeys.forEach(key => {
+                try {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                } catch (error) {
+                    log(`Failed to remove ${key}: ${error}`);
+                }
+            });
+            
+            // Final verification
+            log('📊 localStorage after nuclear reset:', Object.keys(localStorage));
+            log('📊 localStorage length after reset:', localStorage.length);
+            
+            const criticalKeys = ['totalWordsRead', 'userProgress', 'yomitore.reward.v2', 'stampCard'];
+            const resetResults = [];
+            criticalKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                resetResults.push(`🔍 ${key}: ${value}`);
+                if (value !== null) {
+                    resetResults.push(`❌ RESET FAILED: ${key} still exists!`);
+                }
+            });
+            
+            // Set cat name
+            localStorage.setItem('catName', 'TestCat');
+            resetResults.push('✨ Fresh start with cat name: TestCat');
+            resetResults.push(`📊 Final localStorage length: ${localStorage.length}`);
+            resetResults.push(`📊 Final keys: ${Object.keys(localStorage).join(', ')}`);
+            
+            document.getElementById('reset-results').textContent = resetResults.join('\n');
+        }
+        
+        function testFreshStartDetection() {
+            // Test the fresh start detection logic from readingProgress.ts
+            const allKeys = Object.keys(localStorage);
+            const isFreshStart = allKeys.length <= 2 && allKeys.includes('catName');
+            
+            const results = [];
+            results.push('Fresh Start Detection Test:');
+            results.push(`All localStorage keys: [${allKeys.join(', ')}]`);
+            results.push(`Key count: ${allKeys.length}`);
+            results.push(`Contains catName: ${allKeys.includes('catName')}`);
+            results.push(`Is Fresh Start: ${isFreshStart}`);
+            
+            if (isFreshStart) {
+                results.push('✅ FRESH START DETECTED - will use zero values');
+            } else {
+                results.push('❌ LEGACY MIGRATION - will use existing data');
+            }
+            
+            document.getElementById('fresh-results').textContent = results.join('\n');
+        }
+    </script>
+</body>
+</html>

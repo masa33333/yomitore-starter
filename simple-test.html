@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automated Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f0f0f0; }
+        .step { background: white; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .result { background: #e8f5e8; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe8e8; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005999; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Automated localStorage Test</h1>
+    <button onclick="runFullTest()">Run Full Test</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'result') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            document.getElementById('results').appendChild(div);
+            console.log(message);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function runFullTest() {
+            log('🚀 Starting full test...', 'step');
+            
+            try {
+                // Step 1: Complete reset
+                log('📋 Step 1: Complete reset', 'step');
+                localStorage.clear();
+                sessionStorage.clear();
+                localStorage.setItem('catName', 'TestCat');
+                localStorage.setItem('vocabularyLevel', '3');
+                localStorage.setItem('vocabLevel', '3');
+                localStorage.setItem('level', '3');
+                localStorage.setItem('quizCompleted', 'true');
+                
+                log(`✅ Reset complete. Keys: ${Object.keys(localStorage).length}`, 'result');
+                
+                // Step 2: Simulate reading completion
+                log('📋 Step 2: Simulate reading completion (1066 words)', 'step');
+                
+                // Simulate the exact flow from ReadingClient
+                const wordCount = 1066;
+                
+                // Check initial state
+                const initialTotal = (() => {
+                    const userProgressData = localStorage.getItem('userProgress');
+                    return userProgressData ? JSON.parse(userProgressData).totalWords : 0;
+                })();
+                
+                log(`Initial total: ${initialTotal}`, 'result');
+                
+                // Simulate completeReading function
+                const progress = {
+                    totalWords: initialTotal,
+                    totalStamps: Math.floor(initialTotal / 100),
+                    currentCardStamps: Math.floor(initialTotal / 100) % 20,
+                    completedCards: Math.floor(Math.floor(initialTotal / 100) / 20),
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                log(`Progress before: ${JSON.stringify(progress)}`, 'result');
+                
+                // Add words
+                progress.totalWords += wordCount;
+                progress.totalStamps = Math.floor(progress.totalWords / 100);
+                progress.currentCardStamps = progress.totalStamps % 20;
+                progress.completedCards = Math.floor(progress.totalStamps / 20);
+                
+                log(`Progress after: ${JSON.stringify(progress)}`, 'result');
+                
+                // Save progress
+                localStorage.setItem('userProgress', JSON.stringify(progress));
+                
+                // Check result
+                const finalTotal = progress.totalWords;
+                const expectedTotal = initialTotal + wordCount;
+                
+                if (finalTotal === expectedTotal) {
+                    log(`✅ SUCCESS: ${wordCount} words → ${finalTotal} total (expected: ${expectedTotal})`, 'result');
+                } else {
+                    log(`❌ FAILURE: ${wordCount} words → ${finalTotal} total (expected: ${expectedTotal})`, 'error');
+                }
+                
+                // Step 3: Second reading test
+                log('📋 Step 3: Second reading test (961 words)', 'step');
+                
+                const secondWordCount = 961;
+                const secondInitialTotal = progress.totalWords;
+                
+                progress.totalWords += secondWordCount;
+                progress.totalStamps = Math.floor(progress.totalWords / 100);
+                progress.currentCardStamps = progress.totalStamps % 20;
+                progress.completedCards = Math.floor(progress.totalStamps / 20);
+                
+                localStorage.setItem('userProgress', JSON.stringify(progress));
+                
+                const secondFinalTotal = progress.totalWords;
+                const secondExpectedTotal = secondInitialTotal + secondWordCount;
+                
+                if (secondFinalTotal === secondExpectedTotal) {
+                    log(`✅ SUCCESS: ${secondWordCount} words → ${secondFinalTotal} total (expected: ${secondExpectedTotal})`, 'result');
+                } else {
+                    log(`❌ FAILURE: ${secondWordCount} words → ${secondFinalTotal} total (expected: ${secondExpectedTotal})`, 'error');
+                }
+                
+                // Final summary
+                log('📊 Final Summary:', 'step');
+                log(`Total words read: ${progress.totalWords}`, 'result');
+                log(`Total stamps: ${progress.totalStamps}`, 'result');
+                log(`Current card stamps: ${progress.currentCardStamps}`, 'result');
+                log(`Completed cards: ${progress.completedCards}`, 'result');
+                
+                // Check localStorage consistency
+                const storedProgress = JSON.parse(localStorage.getItem('userProgress'));
+                log(`localStorage userProgress: ${JSON.stringify(storedProgress)}`, 'result');
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

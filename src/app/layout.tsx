@@ -7,6 +7,7 @@ import ScrollController from "@/components/ScrollController";
 import AnimationPreloader from "@/components/AnimationPreloader";
 import ExitCalendarHandler from "@/components/ExitCalendarHandler";
 import LevelMigration from "@/components/LevelMigration";
+import MessageNotification from "@/components/MessageNotification";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function RootLayout({
               {/* <ScrollController /> */}
               <ConditionalHeader />
               <ExitCalendarHandler />
+              <MessageNotification />
               <main className="min-h-screen">{children}</main>
             </RewardProvider>
           </PointsProvider>

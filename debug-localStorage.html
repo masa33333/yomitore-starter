@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug localStorage Reset Issue</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+        .step { margin: 20px 0; border: 1px solid #ccc; padding: 15px; }
+        button { padding: 10px 20px; margin: 5px; }
+        .results { background: #e8f4f8; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Debug localStorage Reset Issue</h1>
+    
+    <div class="step">
+        <h3>Step 1: Check Current localStorage State</h3>
+        <button onclick="checkLocalStorage()">Check Current State</button>
+        <div id="current-state" class="results"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 2: Simulate Nuclear Reset (from /start)</h3>
+        <button onclick="simulateNuclearReset()">Perform Nuclear Reset</button>
+        <div id="reset-results" class="results"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 3: Simulate Reading 141 Words</h3>
+        <button onclick="simulateReading(141)">Read 141 Words</button>
+        <div id="reading-results" class="results"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 4: Simulate Reading 142 More Words</h3>
+        <button onclick="simulateReading(142)">Read 142 More Words</button>
+        <div id="reading2-results" class="results"></div>
+    </div>
+
+    <script>
+        function log(msg) {
+            console.log(msg);
+            return msg;
+        }
+        
+        function checkLocalStorage() {
+            const results = [];
+            results.push(`Total localStorage keys: ${localStorage.length}`);
+            
+            // Check specific keys
+            const importantKeys = [
+                'totalWordsRead', 'userProgress', 'stampCard', 
+                'yomitore.reward.v2', 'completedReadings', 'catName'
+            ];
+            
+            importantKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                results.push(`${key}: ${value}`);
+            });
+            
+            // List ALL keys
+            results.push('\nAll localStorage keys:');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    results.push(`  ${key}: ${localStorage.getItem(key)}`);
+                }
+            }
+            
+            document.getElementById('current-state').innerHTML = '<pre>' + results.join('\n') + '</pre>';
+        }
+        
+        function simulateNuclearReset() {
+            log('🚨 NUCLEAR RESET: Starting complete reset...');
+            
+            // Step 1: localStorage.clear()
+            localStorage.clear();
+            log('✅ localStorage.clear() completed');
+            
+            // Step 2: Individual key removal (same as /start page)
+            const allKnownKeys = [
+                'catName', 'vocabLevel', 'vocabularyLevel', 'level', 'fixedLevel',
+                'totalWordsRead', 'totalReadingTime', 'completedReadings',
+                'currentCityIndex', 'mapIntroShown', 'language', 'displayLang',
+                'userProgress', 'stampCard', 'dailyData', 'readingProgress',
+                'currentReadingEnglish', 'currentReadingJapanese', 'currentReadingTitle',
+                'currentReadingWordCount', 'currentReadingStarted', 'currentReadingEndTime',
+                'currentReadingWpm', 'currentSessionWords', 'currentReadingState',
+                'letters', 'mails', 'notified', 'newLetter', 'letterText', 'messageQueue',
+                'clickedWords', 'myNotebook', 'readingHistory',
+                'consecutiveReadingMessage', 'welcomeBackMessage',
+                'calendarData', 'todayRecord',
+                'yomitore.reward.v2', 'rewardPoints', 'rewardHistory', 'earnedRewards',
+                'quizCompleted', 'userLevel',
+                'bookmarks', 'settings', 'preferences'
+            ];
+            
+            allKnownKeys.forEach(key => {
+                try {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                } catch (error) {
+                    log(`Failed to remove ${key}: ${error}`);
+                }
+            });
+            
+            // Step 3: Set cat name
+            localStorage.setItem('catName', 'TestCat');
+            
+            const results = [];
+            results.push('Nuclear reset completed!');
+            results.push(`localStorage keys after reset: ${localStorage.length}`);
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    results.push(`  ${key}: ${localStorage.getItem(key)}`);
+                }
+            }
+            
+            document.getElementById('reset-results').innerHTML = '<pre>' + results.join('\n') + '</pre>';
+        }
+        
+        function simulateReading(wordCount) {
+            log(`🚨 SIMULATING: Reading ${wordCount} words...`);
+            
+            // Check initial state
+            const beforeState = {
+                totalWordsRead: localStorage.getItem('totalWordsRead') || '0',
+                userProgress: localStorage.getItem('userProgress'),
+                yomitoreReward: localStorage.getItem('yomitore.reward.v2')
+            };
+            
+            log('Before reading state:', beforeState);
+            
+            // Simulate reading completion (simplified version of the actual code)
+            
+            // 1. Update totalWordsRead
+            const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+            const newTotal = currentTotal + wordCount;
+            localStorage.setItem('totalWordsRead', newTotal.toString());
+            
+            // 2. Update userProgress (simplified)
+            let userProgress;
+            try {
+                userProgress = JSON.parse(localStorage.getItem('userProgress') || 'null');
+            } catch (e) {
+                userProgress = null;
+            }
+            
+            if (!userProgress) {
+                userProgress = {
+                    totalStamps: 0,
+                    totalWords: 0,
+                    currentCardStamps: 0,
+                    completedCards: 0,
+                    lastUpdated: new Date().toISOString()
+                };
+            }
+            
+            userProgress.totalWords += wordCount;
+            userProgress.totalStamps = Math.floor(userProgress.totalWords / 100);
+            userProgress.currentCardStamps = userProgress.totalStamps % 20;
+            userProgress.completedCards = Math.floor(userProgress.totalStamps / 20);
+            userProgress.lastUpdated = new Date().toISOString();
+            
+            localStorage.setItem('userProgress', JSON.stringify(userProgress));
+            
+            // 3. Update yomitore.reward.v2 (simplified)
+            let rewardState;
+            try {
+                rewardState = JSON.parse(localStorage.getItem('yomitore.reward.v2') || 'null');
+            } catch (e) {
+                rewardState = null;
+            }
+            
+            if (!rewardState) {
+                rewardState = {
+                    words: 0, stamps: 0, coin: 0, bronze: 0, silver: 0, gold: 0, platinum: 0
+                };
+            }
+            
+            rewardState.words += wordCount;
+            rewardState.stamps += Math.floor(wordCount / 100);
+            
+            if (rewardState.stamps >= 20) {
+                rewardState.coin += Math.floor(rewardState.stamps / 20);
+                rewardState.stamps %= 20;
+            }
+            
+            localStorage.setItem('yomitore.reward.v2', JSON.stringify(rewardState));
+            
+            // Check final state
+            const afterState = {
+                totalWordsRead: localStorage.getItem('totalWordsRead'),
+                userProgress: localStorage.getItem('userProgress'),
+                yomitoreReward: localStorage.getItem('yomitore.reward.v2'),
+                stamps: Math.floor(newTotal / 100) - Math.floor(currentTotal / 100)
+            };
+            
+            const results = [];
+            results.push(`Reading ${wordCount} words completed!`);
+            results.push(`\nBefore: totalWords = ${currentTotal}`);
+            results.push(`After: totalWords = ${newTotal}`);
+            results.push(`Stamps earned: ${afterState.stamps}`);
+            results.push(`\nFinal state:`);
+            results.push(`totalWordsRead: ${afterState.totalWordsRead}`);
+            results.push(`userProgress: ${afterState.userProgress}`);
+            results.push(`yomitore.reward.v2: ${afterState.yomitoreReward}`);
+            
+            const resultElement = wordCount === 141 ? 'reading-results' : 'reading2-results';
+            document.getElementById(resultElement).innerHTML = '<pre>' + results.join('\n') + '</pre>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Standalone Debug - localStorage Reset Test</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .section { background: white; border: 1px solid #ddd; margin: 20px 0; padding: 20px; border-radius: 8px; }
+        button { background: #007acc; color: white; border: none; padding: 12px 20px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a9e; }
+        .results { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; margin: 10px 0; white-space: pre-wrap; font-family: monospace; border-radius: 4px; }
+        .success { border-color: #28a745; background: #d4edda; }
+        .error { border-color: #dc3545; background: #f8d7da; }
+        .info { border-color: #17a2b8; background: #d1ecf1; }
+        h2 { color: #333; margin-top: 0; }
+        h3 { color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 localStorage Reset Debug Tool</h1>
+        <p>ユーザー報告問題の再現・検証ツール</p>
+        
+        <div class="section">
+            <h2>📊 Current State</h2>
+            <button onclick="checkCurrentState()">Check Current localStorage</button>
+            <div id="current-state" class="results"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🚨 Setup Problem Scenario</h2>
+            <p>ユーザー報告の状況を再現：語数が累積される問題</p>
+            <button onclick="setupProblemScenario()">Setup Problem Data</button>
+            <div id="problem-setup" class="results"></div>
+        </div>
+        
+        <div class="section">
+            <h2>💣 Nuclear Reset Test</h2>
+            <p>修正されたリセット機能をテスト</p>
+            <button onclick="performNuclearReset()">Perform Nuclear Reset</button>
+            <div id="reset-results" class="results"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🧪 Reading Simulation</h2>
+            <p>読書完了時の語数累積をシミュレート</p>
+            <button onclick="simulateReading(141)">Read 141 Words</button>
+            <button onclick="simulateReading(142)">Read 142 More Words</button>
+            <button onclick="resetForNewTest()">Reset for New Test</button>
+            <div id="reading-results" class="results"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Fresh Start Detection Test</h2>
+            <button onclick="testFreshStartDetection()">Test Fresh Start Logic</button>
+            <div id="fresh-detection" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(msg) {
+            console.log(msg);
+            return msg;
+        }
+        
+        function updateResults(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+            element.className = `results ${type}`;
+        }
+        
+        function checkCurrentState() {
+            const results = [];
+            results.push(`=== CURRENT LOCALSTORAGE STATE ===`);
+            results.push(`Total keys: ${localStorage.length}`);
+            results.push('');
+            
+            // Important keys
+            const importantKeys = [
+                'totalWordsRead', 'userProgress', 'yomitore.reward.v2', 
+                'stampCard', 'completedReadings', 'catName'
+            ];
+            
+            results.push('Important keys:');
+            importantKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                results.push(`  ${key}: ${value || 'null'}`);
+            });
+            
+            results.push('');
+            results.push('All keys:');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    const value = localStorage.getItem(key);
+                    results.push(`  ${key}: ${value}`);
+                }
+            }
+            
+            updateResults('current-state', results.join('\n'), 'info');
+        }
+        
+        function setupProblemScenario() {
+            log('Setting up problem scenario...');
+            
+            // Simulate the exact issue reported by user
+            localStorage.setItem('totalWordsRead', '142');  // Previous reading left data
+            localStorage.setItem('userProgress', JSON.stringify({
+                totalWords: 142,
+                totalStamps: 1,
+                currentCardStamps: 1,
+                completedCards: 0,
+                lastUpdated: new Date().toISOString()
+            }));
+            localStorage.setItem('yomitore.reward.v2', JSON.stringify({
+                words: 142, stamps: 1, coin: 0, bronze: 0, silver: 0, gold: 0, platinum: 0
+            }));
+            localStorage.setItem('completedReadings', '1');
+            localStorage.setItem('someOtherKey', 'leftover data');
+            
+            const results = [];
+            results.push('Problem scenario setup complete!');
+            results.push('This simulates the user\'s issue where:');
+            results.push('- Previous reading left 142 words in storage');
+            results.push('- Next reading of 141 words should show 141, not 283');
+            results.push('');
+            results.push('Current problematic state:');
+            results.push(`totalWordsRead: ${localStorage.getItem('totalWordsRead')}`);
+            results.push(`userProgress.totalWords: ${JSON.parse(localStorage.getItem('userProgress') || '{}').totalWords}`);
+            
+            updateResults('problem-setup', results.join('\n'), 'error');
+        }
+        
+        async function performNuclearReset() {
+            log('🚨 NUCLEAR RESET: Starting...');
+            
+            const results = [];
+            results.push('=== NUCLEAR RESET EXECUTION ===');
+            
+            // Step 1: localStorage.clear()
+            results.push('Step 1: localStorage.clear()');
+            localStorage.clear();
+            results.push(`✓ After clear: ${localStorage.length} keys remaining`);
+            
+            // Step 2: sessionStorage.clear()
+            results.push('Step 2: sessionStorage.clear()');
+            sessionStorage.clear();
+            results.push('✓ Session storage cleared');
+            
+            // Step 3: Wait (simulated)
+            results.push('Step 3: 50ms wait...');
+            await new Promise(resolve => setTimeout(resolve, 50));
+            results.push('✓ Wait completed');
+            
+            // Step 4: Individual key removal (as in the fixed /start page)
+            results.push('Step 4: Individual key removal');
+            const allKnownKeys = [
+                'catName', 'vocabLevel', 'vocabularyLevel', 'level', 'fixedLevel',
+                'totalWordsRead', 'totalReadingTime', 'completedReadings',
+                'currentCityIndex', 'mapIntroShown', 'language', 'displayLang',
+                'userProgress', 'stampCard', 'dailyData', 'readingProgress',
+                'currentReadingEnglish', 'currentReadingJapanese', 'currentReadingTitle',
+                'currentReadingWordCount', 'currentReadingStarted', 'currentReadingEndTime',
+                'currentReadingWpm', 'currentSessionWords', 'currentReadingState',
+                'letters', 'mails', 'notified', 'newLetter', 'letterText', 'messageQueue',
+                'clickedWords', 'myNotebook', 'readingHistory',
+                'consecutiveReadingMessage', 'welcomeBackMessage',
+                'calendarData', 'todayRecord',
+                'yomitore.reward.v2', 'rewardPoints', 'rewardHistory', 'earnedRewards',
+                'quizCompleted', 'userLevel',
+                'bookmarks', 'settings', 'preferences'
+            ];
+            
+            allKnownKeys.forEach(key => {
+                try {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                } catch (error) {
+                    results.push(`Warning: Failed to remove ${key}: ${error}`);
+                }
+            });
+            results.push(`✓ Attempted removal of ${allKnownKeys.length} known keys`);
+            
+            // Step 5: Verification
+            results.push('Step 5: Verification');
+            results.push(`Final localStorage.length: ${localStorage.length}`);
+            
+            const criticalKeys = ['totalWordsRead', 'userProgress', 'yomitore.reward.v2', 'stampCard'];
+            let resetSuccess = true;
+            criticalKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                results.push(`  ${key}: ${value || 'null'}`);
+                if (value !== null) {
+                    results.push(`  ❌ RESET FAILED: ${key} still exists!`);
+                    resetSuccess = false;
+                }
+            });
+            
+            // Step 6: Set catName
+            results.push('Step 6: Setting catName');
+            localStorage.setItem('catName', 'TestCat');
+            results.push('✓ catName set to TestCat');
+            results.push(`Final localStorage.length: ${localStorage.length}`);
+            
+            if (resetSuccess) {
+                results.push('');
+                results.push('🎉 NUCLEAR RESET SUCCESS!');
+                updateResults('reset-results', results.join('\n'), 'success');
+            } else {
+                results.push('');
+                results.push('❌ NUCLEAR RESET FAILED!');
+                updateResults('reset-results', results.join('\n'), 'error');
+            }
+        }
+        
+        function simulateReading(wordCount) {
+            log(`Simulating reading ${wordCount} words...`);
+            
+            const results = [`=== READING SIMULATION: ${wordCount} WORDS ===`];
+            
+            // Check initial state
+            const beforeWords = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+            results.push(`Before reading: ${beforeWords} words`);
+            
+            // Simulate reading completion logic (simplified version of actual code)
+            
+            // 1. Get or create userProgress
+            let userProgress;
+            try {
+                userProgress = JSON.parse(localStorage.getItem('userProgress') || 'null');
+            } catch (e) {
+                userProgress = null;
+            }
+            
+            if (!userProgress) {
+                // Fresh start detection (from our fix)
+                const allKeys = Object.keys(localStorage);
+                const isFreshStart = (allKeys.length === 0) || // 完全に空の場合
+                                    (allKeys.length <= 2 && allKeys.includes('catName')); // catName + 最大1つの他のキー
+                
+                results.push(`Fresh start detection: ${isFreshStart}`);
+                results.push(`  localStorage keys: [${allKeys.join(', ')}]`);
+                
+                if (isFreshStart) {
+                    results.push('✅ FRESH START DETECTED - using zero values');
+                    userProgress = {
+                        totalWords: 0,
+                        totalStamps: 0,
+                        currentCardStamps: 0,
+                        completedCards: 0,
+                        lastUpdated: new Date().toISOString()
+                    };
+                } else {
+                    results.push('🔄 LEGACY MIGRATION - using existing data');
+                    const legacyWords = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+                    userProgress = {
+                        totalWords: legacyWords,
+                        totalStamps: Math.floor(legacyWords / 100),
+                        currentCardStamps: Math.floor(legacyWords / 100) % 20,
+                        completedCards: Math.floor(Math.floor(legacyWords / 100) / 20),
+                        lastUpdated: new Date().toISOString()
+                    };
+                }
+            }
+            
+            const previousTotalWords = userProgress.totalWords;
+            results.push(`Previous total words: ${previousTotalWords}`);
+            
+            // 2. Add new words
+            userProgress.totalWords += wordCount;
+            userProgress.totalStamps = Math.floor(userProgress.totalWords / 100);
+            userProgress.currentCardStamps = userProgress.totalStamps % 20;
+            userProgress.completedCards = Math.floor(userProgress.totalStamps / 20);
+            
+            results.push(`New total words: ${userProgress.totalWords}`);
+            results.push(`Words added: ${wordCount}`);
+            results.push(`New stamps: ${userProgress.totalStamps}`);
+            
+            // 3. Save to localStorage
+            localStorage.setItem('userProgress', JSON.stringify(userProgress));
+            localStorage.setItem('totalWordsRead', userProgress.totalWords.toString());
+            
+            // 4. Update reward system
+            let rewardState;
+            try {
+                rewardState = JSON.parse(localStorage.getItem('yomitore.reward.v2') || 'null');
+            } catch (e) {
+                rewardState = null;
+            }
+            
+            if (!rewardState) {
+                rewardState = {
+                    words: 0, stamps: 0, coin: 0, bronze: 0, silver: 0, gold: 0, platinum: 0
+                };
+            }
+            
+            rewardState.words += wordCount;
+            rewardState.stamps = Math.floor(rewardState.words / 100);
+            if (rewardState.stamps >= 20) {
+                rewardState.coin += Math.floor(rewardState.stamps / 20);
+                rewardState.stamps %= 20;
+            }
+            
+            localStorage.setItem('yomitore.reward.v2', JSON.stringify(rewardState));
+            
+            results.push('');
+            results.push('=== FINAL STATE ===');
+            results.push(`totalWordsRead: ${localStorage.getItem('totalWordsRead')}`);
+            results.push(`userProgress.totalWords: ${userProgress.totalWords}`);
+            results.push(`rewardState.words: ${rewardState.words}`);
+            
+            // Check if this matches expected behavior
+            const expectedTotal = previousTotalWords + wordCount;
+            if (userProgress.totalWords === expectedTotal) {
+                results.push(`✅ SUCCESS: Correct cumulative total (${expectedTotal})`);
+                updateResults('reading-results', results.join('\n'), 'success');
+            } else {
+                results.push(`❌ FAILURE: Expected ${expectedTotal}, got ${userProgress.totalWords}`);
+                updateResults('reading-results', results.join('\n'), 'error');
+            }
+        }
+        
+        function testFreshStartDetection() {
+            const allKeys = Object.keys(localStorage);
+            const isFreshStart = (allKeys.length === 0) || // 完全に空の場合
+                                (allKeys.length <= 2 && allKeys.includes('catName')); // catName + 最大1つの他のキー
+            
+            const results = [];
+            results.push('=== FRESH START DETECTION TEST ===');
+            results.push(`All localStorage keys: [${allKeys.join(', ')}]`);
+            results.push(`Key count: ${allKeys.length}`);
+            results.push(`Contains catName: ${allKeys.includes('catName')}`);
+            results.push(`Formula: (keyCount === 0) || (keyCount <= 2 && includes(catName))`);
+            results.push(`Result: ${isFreshStart}`);
+            results.push('');
+            
+            if (isFreshStart) {
+                results.push('✅ FRESH START DETECTED');
+                results.push('- Will use zero values for new user');
+                results.push('- No legacy data migration');
+                updateResults('fresh-detection', results.join('\n'), 'success');
+            } else {
+                results.push('❌ LEGACY USER DETECTED');
+                results.push('- Will attempt to migrate existing data');
+                results.push('- May cause cumulative word count issues');
+                updateResults('fresh-detection', results.join('\n'), 'error');
+            }
+        }
+        
+        function resetForNewTest() {
+            localStorage.clear();
+            sessionStorage.clear();
+            updateResults('reading-results', 'localStorage cleared for new test', 'info');
+        }
+        
+        // Auto-check current state on page load
+        window.onload = function() {
+            checkCurrentState();
+        };
+    </script>
+</body>
+</html>

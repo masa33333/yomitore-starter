@@ -124,11 +124,7 @@ export default function ChoosePage() {
         {bookmark && (
           <button
             onClick={handleResumeReading}
-            style={{
-              backgroundColor: '#b45309',
-              color: 'white'
-            }}
-            className="w-full mb-6 rounded-xl px-6 py-4 text-left transition-colors hover:opacity-90"
+            className="w-full mb-6 rounded-xl px-6 py-4 text-left transition-colors bg-gray-500 hover:bg-gray-600 text-white"
           >
             <div>
               <h3 className="mb-1 text-lg font-semibold">{text.resumeReading[displayLang]}</h3>

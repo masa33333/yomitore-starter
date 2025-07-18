@@ -11,41 +11,14 @@ export default function StartPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // startページに来た時点でデータを完全リセット（念のため）
-    const keysToReset = [
-      'catName',
-      'vocabLevel', 
-      'vocabularyLevel',
-      'level',
-      'fixedLevel',
-      'totalWordsRead',
-      'totalReadingTime',
-      'completedReadings',
-      'currentCityIndex',
-      'mapIntroShown',
-      'letters',
-      'mails',
-      'clickedWords',
-      'myNotebook',
-      'readingHistory',
-      'currentReadingEnglish',
-      'currentReadingJapanese',
-      'currentReadingTitle',
-      'currentReadingWordCount',
-      'currentReadingStarted',
-      'currentReadingEndTime',
-      'currentReadingWpm',
-      'currentSessionWords',
-      'notified',
-      'newLetter',
-      'letterText'
-    ];
+    // startページアクセス時：即座に完全リセット
+    console.log('🚨 START PAGE: Immediate nuclear reset');
     
-    keysToReset.forEach(key => {
-      localStorage.removeItem(key);
-    });
+    // localStorage完全クリア
+    localStorage.clear();
+    sessionStorage.clear();
     
-    console.log('🔄 Data reset on start page - fresh beginning');
+    console.log('🔄 START PAGE: All data cleared - fresh beginning');
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +33,7 @@ export default function StartPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!catName.trim()) {
@@ -68,8 +41,85 @@ export default function StartPage() {
       return;
     }
 
+    // 🔥 NUCLEAR RESET: 完全にlocalStorageをクリア
+    console.log('🚨 NUCLEAR RESET: Clearing ALL localStorage data');
+    
+    // 1. 全てのlocalStorageをクリア（核兵器レベル）
+    localStorage.clear();
+    
+    // 1.5. セッションストレージもクリア
+    sessionStorage.clear();
+    
+    // 1.6. ページ遷移前に短時間待機（ブラウザのキャッシュを避ける）
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // 2. 念のため、知られているキーを個別削除
+    const allKnownKeys = [
+      // 基本システム
+      'catName', 'vocabLevel', 'vocabularyLevel', 'level', 'fixedLevel',
+      'totalWordsRead', 'totalReadingTime', 'completedReadings',
+      'currentCityIndex', 'mapIntroShown', 'language', 'displayLang',
+      
+      // 読書・進捗システム
+      'userProgress', 'stampCard', 'dailyData', 'readingProgress',
+      'currentReadingEnglish', 'currentReadingJapanese', 'currentReadingTitle',
+      'currentReadingWordCount', 'currentReadingStarted', 'currentReadingEndTime',
+      'currentReadingWpm', 'currentSessionWords', 'currentReadingState',
+      
+      // メール・手紙システム
+      'letters', 'mails', 'notified', 'newLetter', 'letterText', 'messageQueue',
+      
+      // ノートブック・履歴
+      'clickedWords', 'myNotebook', 'readingHistory',
+      
+      // 報酬・カレンダー
+      'consecutiveReadingMessage', 'welcomeBackMessage',
+      'calendarData', 'todayRecord',
+      
+      // RewardContext関連 (新システム & 旧システム)
+      'yomitore.reward.v2', 'rewardPoints', 'rewardHistory', 'earnedRewards',
+      
+      // クイズシステム
+      'quizCompleted', 'userLevel',
+      
+      // その他
+      'bookmarks', 'settings', 'preferences'
+    ];
+    
+    // 3. 各キーを強制削除
+    allKnownKeys.forEach(key => {
+      try {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key); // sessionStorageもクリア
+      } catch (error) {
+        console.warn(`Failed to remove ${key}:`, error);
+      }
+    });
+    
+    // 4. ページリロード前の最終確認
+    console.log('📊 localStorage after nuclear reset:', Object.keys(localStorage));
+    console.log('📊 localStorage length after reset:', localStorage.length);
+    
+    // 特定のキーが本当に削除されたか確認
+    const criticalKeys = ['totalWordsRead', 'userProgress', 'yomitore.reward.v2', 'stampCard'];
+    criticalKeys.forEach(key => {
+      const value = localStorage.getItem(key);
+      console.log(`🔍 ${key}:`, value);
+      if (value !== null) {
+        console.error(`❌ RESET FAILED: ${key} still exists with value:`, value);
+      }
+    });
+
+    // 猫の名前を設定
     localStorage.setItem('catName', catName.trim());
-    router.push('/tokyo');
+    
+    console.log('✨ Fresh start with cat name:', catName.trim());
+    console.log('📊 Final localStorage after catName set:', Object.keys(localStorage));
+    
+    // 5. 短い遅延後に遷移（リセットが確実に完了するため）
+    setTimeout(() => {
+      router.push('/tokyo');
+    }, 100);
   };
 
   return (

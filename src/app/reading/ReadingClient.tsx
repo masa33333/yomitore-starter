@@ -21,6 +21,8 @@ import { ResumeDialog } from '@/components/ResumeDialog';
 import { analyzeVocabulary } from '@/constants/ngslData';
 import { playStampFanfare, playCardCompleteFanfare } from '@/lib/stampSounds';
 import { updateTodayRecord } from '@/lib/calendarData';
+import { shouldSendMail, shouldSendLetter } from '@/utils/rewardRules';
+import { queueMessage } from '@/utils/messageLoader';
 
 // 単語情報のインターフェース
 interface WordInfo {
@@ -719,8 +721,13 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     // 読書開始位置から最後までの実際の語数を計算
     const allTokens = english.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
-    const actualWordsRead = allTokens.slice(readingStartTokenIndex).filter(token => /^[A-Za-z-]+$/.test(token) && token !== '-').length;
+    const complexActualWordsRead = allTokens.slice(readingStartTokenIndex).filter(token => /^[A-Za-z-]+$/.test(token) && token !== '-').length;
+    
+    // 🔧 修正: wordCount を使用（一貫性のため）
+    const actualWordsRead = wordCount;
     const calculatedWpm = Math.round(actualWordsRead / timeInMinutes);
+    
+    // Debug logging removed - problem resolved
     setWpm(calculatedWpm);
     
     console.log('✅ 読書完了:', {
@@ -743,11 +750,18 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       contentType: 'reading'
     };
     
+    // Debug logging removed - problem resolved
+    
     try {
-      // スタンプ獲得数を事前計算（ファンファーレ用）
-      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+      // Debug logging removed - problem resolved
+      
+      // 🔧 修正: userProgress から直接取得
+      const userProgressData = localStorage.getItem('userProgress');
+      const currentTotal = userProgressData ? JSON.parse(userProgressData).totalWords : 0;
       const newTotal = currentTotal + wordCount;
       const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
+      
+      // Debug logging removed - problem resolved
       
       const updatedProgress = completeReading(completionData);
       console.log('🎆 スタンプカード更新完了:', updatedProgress);
@@ -785,12 +799,30 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       // 新しいスタンプカードに更新通知
       notifyNewStampCardUpdate();
       
-      // RewardSystemに語数を追加
-      addWordsToReward(actualWordsRead);
+      // RewardSystemに語数を追加 - 削除（重複加算を防ぐため）
+      // console.log('🚨 DEBUG: Adding words to RewardContext:', actualWordsRead);
+      // console.log('🚨 DEBUG: Current reward state before:', reward);
+      // addWordsToReward(actualWordsRead);  // ← readingProgress.ts で既に処理済み
+      // console.log('🚨 DEBUG: Current reward state after:', reward);
       
       // 2回目の読了完了時に一通目の手紙を送信（既存ロジック維持）
       if (updatedProgress.totalStamps === 2) {
         sendFirstLetter();
+      }
+      
+      // 🔥 新メール・手紙システム: 語数しきい値チェック
+      const totalWordsAfterReading = updatedProgress.totalWords;
+      
+      // メール送信チェック（300語、5300語、10300語、15300語...）
+      if (shouldSendMail(totalWordsAfterReading)) {
+        console.log(`📬 メール送信トリガー: ${totalWordsAfterReading}語`);
+        queueMessage('mail', totalWordsAfterReading);
+      }
+      
+      // 手紙送信チェック（20300語、40300語、60300語...）
+      if (shouldSendLetter(totalWordsAfterReading)) {
+        console.log(`📮 手紙送信トリガー: ${totalWordsAfterReading}語`);
+        queueMessage('letter', totalWordsAfterReading);
       }
       
     } catch (error) {

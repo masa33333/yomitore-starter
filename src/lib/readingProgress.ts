@@ -88,24 +88,33 @@ function migrateFromLegacySystem(): UserProgress {
   const legacyWords = parseInt(localStorage.getItem(STORAGE_KEYS.TOTAL_WORDS_READ) || '0', 10);
   const legacyReadings = parseInt(localStorage.getItem(STORAGE_KEYS.COMPLETED_READINGS) || '0', 10);
   
-  progress.totalWords = legacyWords;
-  // 100語毎にスタンプ1個の新システムに変更（語数ベースで計算）
-  progress.totalStamps = Math.floor(legacyWords / 100);
-  progress.currentCardStamps = progress.totalStamps % 20;
-  progress.completedCards = Math.floor(progress.totalStamps / 20);
+  // 🔍 新規ユーザー検出: 進捗データが存在しない場合は新規ユーザー
+  const allKeys = Object.keys(localStorage);
+  const hasProgressData = allKeys.some(key => 
+    ['totalWordsRead', 'userProgress', 'yomitore.reward.v2', 'stampCard', 'completedReadings'].includes(key)
+  );
+  const isFreshStart = !hasProgressData; // 進捗データがない場合は新規ユーザー
+  
+  if (isFreshStart) {
+    progress.totalWords = 0;
+    progress.totalStamps = 0;
+    progress.currentCardStamps = 0;
+    progress.completedCards = 0;
+  } else {
+    progress.totalWords = legacyWords;
+    // 100語毎にスタンプ1個の新システムに変更（語数ベースで計算）
+    progress.totalStamps = Math.floor(legacyWords / 100);
+    progress.currentCardStamps = progress.totalStamps % 20;
+    progress.completedCards = Math.floor(progress.totalStamps / 20);
+  }
   
   // データ整合性チェック - 語数とスタンプ数の論理的チェック
-  const expectedStamps = Math.floor(legacyWords / 100);
+  const expectedStamps = Math.floor(progress.totalWords / 100);
   if (progress.totalStamps !== expectedStamps) {
-    console.warn(`⚠️ Stamp count mismatch detected! Expected: ${expectedStamps}, Got: ${progress.totalStamps}`);
-    console.warn(`⚠️ Correcting stamp count based on word count: ${legacyWords} words`);
     progress.totalStamps = expectedStamps;
     progress.currentCardStamps = expectedStamps % 20;
     progress.completedCards = Math.floor(expectedStamps / 20);
   }
-  
-  // legacyReadings（読了回数）は参考値として記録するが、スタンプ計算には使用しない
-  console.log(`📊 Migration data - Words: ${legacyWords}, Legacy readings: ${legacyReadings}, Calculated stamps: ${progress.totalStamps}`);
   
   // コインとトロフィーを計算（新しいスタンプ数ベース）
   progress.bronzeCoins = Math.floor(progress.totalStamps / 10);
@@ -114,7 +123,6 @@ function migrateFromLegacySystem(): UserProgress {
   progress.goldTrophies = Math.floor(progress.silverTrophies / 5);
   progress.platinumTrophies = Math.floor(progress.goldTrophies / 4);
   
-  console.log('📦 Migrated from legacy system:', progress);
   saveUserProgress(progress);
   
   return progress;
@@ -128,11 +136,11 @@ export function saveUserProgress(progress: UserProgress): void {
     progress.lastUpdated = new Date().toISOString();
     localStorage.setItem(STORAGE_KEYS.USER_PROGRESS, JSON.stringify(progress));
     
-    // 既存システムとの互換性を保持
-    localStorage.setItem(STORAGE_KEYS.TOTAL_WORDS_READ, progress.totalWords.toString());
-    localStorage.setItem(STORAGE_KEYS.COMPLETED_READINGS, progress.totalStamps.toString());
+    // 🔧 修正: 既存システムとの互換性を削除（重複を防ぐため）
+    // localStorage.setItem(STORAGE_KEYS.TOTAL_WORDS_READ, progress.totalWords.toString());
+    // localStorage.setItem(STORAGE_KEYS.COMPLETED_READINGS, progress.totalStamps.toString());
     
-    console.log('💾 User progress saved:', progress);
+    // Debug logging removed - problem resolved
   } catch (error) {
     console.error('❌ Failed to save user progress:', error);
   }
@@ -254,6 +262,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   const previousTotalWords = progress.totalWords;
   
   // 3. 基本進捗更新
+  // Debug logging removed - problem resolved
   progress.totalWords += data.wordCount;
   progress.dailyStoriesRead += 1;
   

@@ -80,13 +80,6 @@ export default function TokyoPage() {
           )}
         </div>
       </div>
-
-      {/* 成田空港の表示 */}
-      <div className="absolute bottom-4 left-4 z-10">
-        <div className="bg-white/90 rounded-lg px-3 py-2 text-sm text-gray-700">
-          📍 成田空港 / Narita Airport
-        </div>
-      </div>
     </main>
   );
 }

@@ -76,38 +76,35 @@ export function VocabularyQuiz() {
       }
     }
     
-    // 全体正答率による調整（保守的に）
+    // 全体正答率による調整（緩和版）
     let finalLevel: number;
     
-    if (overallAccuracy >= 0.85) {
-      // 85%以上: 安定レベル + 1
+    if (overallAccuracy >= 0.8) {
+      // 80%以上: 安定レベル + 1
       finalLevel = Math.min(3, stableLevel + 1);
-    } else if (overallAccuracy >= 0.75) {
-      // 75%以上: 安定レベル
+    } else if (overallAccuracy >= 0.65) {
+      // 65%以上: 安定レベル
       finalLevel = stableLevel;
-    } else if (overallAccuracy >= 0.6) {
-      // 60%以上: 安定レベル - 1
-      finalLevel = Math.max(1, stableLevel - 1);
     } else if (overallAccuracy >= 0.5) {
-      // 50%以上: 安定レベル - 2
-      finalLevel = Math.max(1, stableLevel - 2);
+      // 50%以上: 安定レベル - 1
+      finalLevel = Math.max(1, stableLevel - 1);
     } else {
-      // 50%未満: 大幅減点
-      finalLevel = Math.max(1, Math.min(2, stableLevel - 2));
+      // 50%未満: 安定レベル - 1（大幅減点を削除）
+      finalLevel = Math.max(1, stableLevel - 1);
     }
     
-    // 正解数による制限（新3段階システム）
+    // 正解数による制限（緩和版）
     let finalLevelByCorrectAnswers = 1;
-    if (correctAnswers >= 12) {
-      finalLevelByCorrectAnswers = 3; // 12問以上でLv.3（3問不正解まで）
-    } else if (correctAnswers >= 9) {
-      finalLevelByCorrectAnswers = 2; // 9-11問でLv.2
-    } else if (correctAnswers >= 6) {
-      finalLevelByCorrectAnswers = 1; // 6-8問でLv.1
+    if (correctAnswers >= 10) {
+      finalLevelByCorrectAnswers = 3; // 10問以上でLv.3（5問不正解まで）
+    } else if (correctAnswers >= 7) {
+      finalLevelByCorrectAnswers = 2; // 7-9問でLv.2
+    } else if (correctAnswers >= 4) {
+      finalLevelByCorrectAnswers = 1; // 4-6問でLv.1
     }
     
-    // 正解数基準と計算結果のうち、低い方を採用（厳格化）
-    finalLevel = Math.min(finalLevel, finalLevelByCorrectAnswers);
+    // 正解数基準と計算結果のうち、高い方を採用（緩和版）
+    finalLevel = Math.max(finalLevel, finalLevelByCorrectAnswers);
     finalLevel = Math.min(3, finalLevel); // 最大3に制限
     
     console.log('📊 レベル計算詳細 (新3段階システム):', {
@@ -467,6 +464,23 @@ export function VocabularyQuiz() {
                 className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
               >
                 テストを始める
+              </button>
+              
+              <button
+                onClick={() => {
+                  // クイズスキップ - レベル3で設定
+                  localStorage.setItem('vocabularyLevel', '3');
+                  localStorage.setItem('vocabLevel', '3');
+                  localStorage.setItem('level', '3');
+                  localStorage.setItem('fixedLevel', '3');
+                  localStorage.setItem('userLevel', 'B1');
+                  localStorage.setItem('quizCompleted', 'true');
+                  console.log('📚 Quiz skipped - Level 3 set');
+                  router.push('/choose');
+                }}
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                スキップ（レベル3で開始）
               </button>
               
             </div>
