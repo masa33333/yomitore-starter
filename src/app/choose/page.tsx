@@ -3,6 +3,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useEffect, useState } from 'react';
 
 // 語彙レベルから難易度ラベルとCEFRレベルを取得する関数
@@ -38,6 +39,7 @@ function getLevelFromDifficulty(difficulty: string): number {
 export default function ChoosePage() {
   const router = useRouter();
   const { displayLang } = useLanguage();
+  const { t } = useTranslation();
   const [bookmark, setBookmark] = useState<{
     slug: string;
     level: number;
@@ -154,6 +156,17 @@ export default function ChoosePage() {
           <div>
             <h3 className="text-lg font-semibold mb-1">{text.storyCard.title[displayLang]}</h3>
             <p className="text-sm text-[#1E1E1E] mt-1">{text.storyCard.desc[displayLang]}</p>
+          </div>
+        </button>
+
+        {/* TOEICリーディング対策ボタン */}
+        <button
+          onClick={() => router.push('/toeic')}
+          className="w-full rounded-xl bg-orange-500 px-6 py-4 text-left text-black transition-colors hover:bg-orange-600 md:col-span-2"
+        >
+          <div>
+            <h3 className="mb-1 text-lg font-semibold">{t('choose.toeic.title')}</h3>
+            <p className="mt-1 text-sm text-black/90">{t('choose.toeic.desc')}</p>
           </div>
         </button>
       </div>

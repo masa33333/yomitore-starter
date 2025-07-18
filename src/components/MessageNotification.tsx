@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getMessageQueue, dequeueMessage, loadMessageByTrigger } from '@/utils/messageLoader';
 import type { MessageData } from '@/utils/messageLoader';
+import { playNotificationSound } from '@/lib/messageNotificationSounds';
 
 export default function MessageNotification() {
   const [currentMessage, setCurrentMessage] = useState<MessageData | null>(null);
@@ -25,6 +26,13 @@ export default function MessageNotification() {
       if (messageData) {
         setCurrentMessage(messageData);
         setIsVisible(true);
+        
+        // 🔊 通知音を再生
+        playNotificationSound(messageData.metadata.type);
+        
+        // 📧 ヘッダー通知バッジを更新
+        updateHeaderNotificationBadge();
+        
         console.log(`✅ Message loaded and displayed: ${messageData.metadata.id}`);
       } else {
         console.warn(`⚠️ Failed to load message for trigger: ${queuedMessage.trigger}`);
@@ -46,10 +54,29 @@ export default function MessageNotification() {
     return () => clearInterval(interval);
   }, [isVisible, isLoading]);
 
+  // ヘッダー通知バッジを更新
+  const updateHeaderNotificationBadge = () => {
+    const queue = getMessageQueue();
+    const unreadCount = queue.length;
+    
+    // localStorageに通知カウントを保存
+    localStorage.setItem('messageNotificationCount', unreadCount.toString());
+    
+    // カスタムイベントを発火してヘッダーに通知
+    window.dispatchEvent(new CustomEvent('messageNotificationUpdate', {
+      detail: { count: unreadCount }
+    }));
+    
+    console.log(`📧 ヘッダー通知更新: ${unreadCount}件`);
+  };
+
   // メッセージを閉じる
   const handleClose = () => {
     setIsVisible(false);
     setCurrentMessage(null);
+    
+    // 通知バッジを更新（1件減る）
+    updateHeaderNotificationBadge();
     
     // 少し待ってから次のメッセージをチェック
     setTimeout(checkAndDisplayMessage, 1000);

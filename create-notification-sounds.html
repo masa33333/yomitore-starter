@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知音生成ツール</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px; border: none; border-radius: 5px; cursor: pointer; }
+        .primary { background: #2196F3; color: white; }
+        .secondary { background: #FF9800; color: white; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 通知音生成ツール</h1>
+        
+        <div class="status">
+            <p>このツールは、メール・手紙通知用の簡易音を生成します。</p>
+            <p>実際の音声ファイルがない場合、Web Audio APIを使用して音を生成します。</p>
+        </div>
+        
+        <h3>音のテスト</h3>
+        <button class="primary" onclick="testMailSound()">📧 メール通知音テスト</button>
+        <button class="secondary" onclick="testLetterSound()">📮 手紙通知音テスト</button>
+        
+        <h3>音の種類</h3>
+        <p><strong>メール音:</strong> 軽やかな2音の電子音（800Hz → 1000Hz）</p>
+        <p><strong>手紙音:</strong> 重厚な3音の電子音（600Hz → 750Hz → 900Hz）</p>
+        
+        <div class="status">
+            <h4>実装方法</h4>
+            <p>1. 実際の音声ファイル（.mp3）を使用</p>
+            <p>2. フォールバック: Web Audio API で簡易音生成</p>
+            <p>3. 最終フォールバック: システム通知音</p>
+        </div>
+    </div>
+
+    <script>
+        // メール通知音テスト
+        function testMailSound() {
+            playSimpleNotificationSound('mail');
+        }
+
+        // 手紙通知音テスト
+        function testLetterSound() {
+            playSimpleNotificationSound('letter');
+        }
+
+        // 簡易音生成
+        function playSimpleNotificationSound(type) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // メールと手紙で異なる音程
+                if (type === 'mail') {
+                    // メール: 軽やかな音
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                    console.log('🔊 メール通知音を再生');
+                } else {
+                    // 手紙: より重厚な音
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.2);
+                    console.log('🔊 手紙通知音を再生');
+                }
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                
+            } catch (error) {
+                console.error('音の生成に失敗:', error);
+                alert('音の生成に失敗しました: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

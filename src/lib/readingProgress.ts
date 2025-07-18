@@ -136,9 +136,9 @@ export function saveUserProgress(progress: UserProgress): void {
     progress.lastUpdated = new Date().toISOString();
     localStorage.setItem(STORAGE_KEYS.USER_PROGRESS, JSON.stringify(progress));
     
-    // 🔧 修正: 既存システムとの互換性を削除（重複を防ぐため）
-    // localStorage.setItem(STORAGE_KEYS.TOTAL_WORDS_READ, progress.totalWords.toString());
-    // localStorage.setItem(STORAGE_KEYS.COMPLETED_READINGS, progress.totalStamps.toString());
+    // 🔧 修正: 既存システムとの互換性を維持
+    localStorage.setItem(STORAGE_KEYS.TOTAL_WORDS_READ, progress.totalWords.toString());
+    localStorage.setItem(STORAGE_KEYS.COMPLETED_READINGS, progress.totalStamps.toString());
     
     // Debug logging removed - problem resolved
   } catch (error) {

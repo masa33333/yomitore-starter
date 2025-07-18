@@ -33,7 +33,7 @@ export default function RootLayout({
               <ConditionalHeader />
               <ExitCalendarHandler />
               <MessageNotification />
-              <MessageCatchup />
+              {/* <MessageCatchup /> */}
               <main className="min-h-screen">{children}</main>
             </RewardProvider>
           </PointsProvider>

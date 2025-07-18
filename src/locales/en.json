@@ -48,5 +48,7 @@
   "map_popup": "Next destination: Seoul\nI'll arrive after reading 5,000 words",
   "map_welcome": "Welcome!",
   "map_instruction": "First, find your suitable vocabulary level",
-  "map_quiz_button": "📝 Take vocabulary test"
+  "map_quiz_button": "📝 Take vocabulary test",
+  "choose.toeic.title": "TOEIC Reading Practice",
+  "choose.toeic.desc": "Practice with TOEIC Part 7 style questions"
 }

@@ -161,9 +161,10 @@ export default async function ReadingPage({ searchParams }: PageProps) {
     console.log(`📚 プリセットストーリー要求: ${slug}, Level: ${userLevel}`);
     
     // bucket-listとriver_stream/ep1の場合はファイルベースシステムを使用
-    if (slug === 'bucket-list' || slug === 'river_stream/ep1') {
+    if (slug === 'bucket-list' || slug === 'river_stream/ep1' || slug.startsWith('toeic/')) {
       console.log(`📖 ${slug} サーバーサイドファイルシステムから読み込み`);
-      const storyFromFile = await loadStoryFromFileServer(slug, userLevel);
+      // TOEICの場合、levelは不要なので0を渡すか、loadStoryFromFileServerのシグネチャを変更する
+      const storyFromFile = await loadStoryFromFileServer(slug, slug.startsWith('toeic/') ? 0 : userLevel);
       initialData = storyFromFile;
     }
     // notting-hillの場合は実際のファイルから読み込み

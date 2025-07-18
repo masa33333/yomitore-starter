@@ -9,6 +9,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { getCurrentMapImage, getFallbackMapImage, getCurrentCity } from '@/utils/mapImageUtils';
 import { mapQuizLevelToGenerationLevel } from '@/utils/getEnglishText';
 import { MiniReadingCalendar } from '@/components/ReadingCalendar';
+import MessageCatchup from '@/components/MessageCatchup';
 
 export default function MapPage() {
   const router = useRouter();
@@ -95,9 +96,10 @@ export default function MapPage() {
     };
   }, []);
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center relative">
+    <>
+      <MessageCatchup />
+      <div className="min-h-screen flex items-center justify-center relative">
 
       {/* 目的地表示ポップアップ */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-40">

@@ -1,0 +1,130 @@
+/**
+ * メール・手紙通知の音システム
+ */
+
+/**
+ * メール到着音を再生
+ */
+export function playMailNotificationSound() {
+  try {
+    // システムの通知音を使用
+    const audio = new Audio('/sounds/mail-notification.mp3');
+    audio.volume = 0.3;
+    audio.play().catch(error => {
+      console.warn('メール通知音の再生に失敗:', error);
+      // フォールバック: システムの通知音API
+      if ('Notification' in window && Notification.permission === 'granted') {
+        // 無音の通知でシステム音を鳴らす
+        new Notification('📬 新しいメールが届きました', {
+          body: '猫からのメールをチェックしてください',
+          icon: '/images/logo.png',
+          silent: false,
+          tag: 'mail-notification'
+        });
+      }
+    });
+  } catch (error) {
+    console.warn('メール通知音システムエラー:', error);
+  }
+}
+
+/**
+ * 手紙到着音を再生
+ */
+export function playLetterNotificationSound() {
+  try {
+    // より特別な音を使用
+    const audio = new Audio('/sounds/letter-notification.mp3');
+    audio.volume = 0.4;
+    audio.play().catch(error => {
+      console.warn('手紙通知音の再生に失敗:', error);
+      // フォールバック: システムの通知音API
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('📮 新しい手紙が届きました', {
+          body: '猫からの手紙をチェックしてください',
+          icon: '/images/logo.png',
+          silent: false,
+          tag: 'letter-notification'
+        });
+      }
+    });
+  } catch (error) {
+    console.warn('手紙通知音システムエラー:', error);
+  }
+}
+
+/**
+ * 簡易音生成（音声ファイルがない場合のフォールバック）
+ */
+export function playSimpleNotificationSound(type: 'mail' | 'letter') {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // メールと手紙で異なる音程
+    if (type === 'mail') {
+      // メール: 軽やかな音
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+    } else {
+      // 手紙: より重厚な音
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.2);
+    }
+    
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+    
+    console.log(`🔊 ${type === 'mail' ? 'メール' : '手紙'}通知音を再生しました`);
+  } catch (error) {
+    console.warn('簡易通知音の生成に失敗:', error);
+  }
+}
+
+/**
+ * 通知音の再生（メイン関数）
+ */
+export function playNotificationSound(type: 'mail' | 'letter') {
+  console.log(`🔊 ${type === 'mail' ? 'メール' : '手紙'}通知音を再生します`);
+  
+  if (type === 'mail') {
+    playMailNotificationSound();
+  } else {
+    playLetterNotificationSound();
+  }
+  
+  // フォールバック: 簡易音
+  setTimeout(() => {
+    playSimpleNotificationSound(type);
+  }, 100);
+}
+
+/**
+ * 通知許可を要求
+ */
+export function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(permission => {
+      console.log('通知許可:', permission);
+    });
+  }
+}
+
+// 開発者コンソール用
+if (typeof window !== 'undefined') {
+  (window as any).messageNotificationSounds = {
+    playMailNotificationSound,
+    playLetterNotificationSound,
+    playSimpleNotificationSound,
+    playNotificationSound,
+    requestNotificationPermission
+  };
+}
