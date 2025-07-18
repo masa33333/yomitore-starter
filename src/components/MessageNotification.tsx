@@ -10,8 +10,14 @@ export default function MessageNotification() {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // キューをチェックしてメッセージを表示
-  const checkAndDisplayMessage = async () => {
+  // キューをチェックしてヘッダーバッジのみを更新（自動表示しない）
+  const checkAndUpdateBadge = () => {
+    console.log('🔍 キューをチェックしてヘッダーバッジを更新');
+    updateHeaderNotificationBadge();
+  };
+
+  // ヘッダーから呼び出される：次のメッセージを表示
+  const displayNextMessage = async () => {
     if (isVisible || isLoading) return; // 既に表示中またはロード中の場合はスキップ
     
     const queuedMessage = dequeueMessage();
@@ -27,9 +33,6 @@ export default function MessageNotification() {
         setCurrentMessage(messageData);
         setIsVisible(true);
         
-        // 🔊 通知音を再生
-        playNotificationSound(messageData.metadata.type);
-        
         // 📧 ヘッダー通知バッジを更新
         updateHeaderNotificationBadge();
         
@@ -44,16 +47,25 @@ export default function MessageNotification() {
     }
   };
 
-  // 定期的にキューをチェック
+  // 定期的にキューをチェック（バッジ更新のみ）
   useEffect(() => {
-    const interval = setInterval(checkAndDisplayMessage, 2000); // 2秒毎にチェック
+    const interval = setInterval(checkAndUpdateBadge, 2000); // 2秒毎にチェック
     
-    // 初回チェック（3秒遅延してヘッダーバッジが見えるようにする）
-    setTimeout(() => {
-      checkAndDisplayMessage();
-    }, 3000);
+    // 初回チェック（即座にバッジを更新）
+    checkAndUpdateBadge();
     
     return () => clearInterval(interval);
+  }, []);
+
+  // ヘッダーからの表示要求をリスンする
+  useEffect(() => {
+    const handleShowMessage = () => {
+      console.log('📧 ヘッダーから表示要求を受信');
+      displayNextMessage();
+    };
+
+    window.addEventListener('showMessageFromHeader', handleShowMessage);
+    return () => window.removeEventListener('showMessageFromHeader', handleShowMessage);
   }, [isVisible, isLoading]);
 
   // ヘッダー通知バッジを更新
@@ -79,9 +91,6 @@ export default function MessageNotification() {
     
     // 通知バッジを更新（1件減る）
     updateHeaderNotificationBadge();
-    
-    // 少し待ってから次のメッセージをチェック
-    setTimeout(checkAndDisplayMessage, 1000);
   };
 
   if (!isVisible || !currentMessage) return null;

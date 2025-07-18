@@ -34,6 +34,8 @@ export default function MessageCatchup() {
           } else if (result.mailsSent > 0) {
             playNotificationSound('mail');
           }
+          
+          // 注意：自動表示はしない。ユーザーがヘッダーをクリックして表示する。
         } else {
           console.log('📍 キャッチアップ対象なし（または既に送信済み）');
         }

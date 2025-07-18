@@ -5,14 +5,12 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import Image from 'next/image';
 import { getMessageQueue } from '@/utils/messageLoader';
-import MessageViewModal from './MessageViewModal';
 
 export default function Header() {
   const { displayLang, setDisplayLang } = useLanguage();
   const [hasNewLetter, setHasNewLetter] = useState(false);
   const [showMailNotification, setShowMailNotification] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
   // 手紙通知の確認（従来のシステム）
   useEffect(() => {
@@ -91,7 +89,9 @@ export default function Header() {
 
   // 手紙アイコンクリック処理
   const handleMessageIconClick = () => {
-    setIsMessageModalOpen(true);
+    console.log('📧 手紙アイコンクリック - メッセージ表示要求');
+    // MessageNotificationコンポーネントに表示要求を送信
+    window.dispatchEvent(new CustomEvent('showMessageFromHeader'));
   };
   return (
     <header className="bg-header-bg text-text-primary px-4 py-3 shadow-sm">
@@ -156,12 +156,6 @@ export default function Header() {
         {/* 右側: 空のスペース */}
         <div></div>
       </div>
-      
-      {/* メッセージビューモーダル */}
-      <MessageViewModal 
-        isOpen={isMessageModalOpen}
-        onClose={() => setIsMessageModalOpen(false)}
-      />
     </header>
   );
 }
