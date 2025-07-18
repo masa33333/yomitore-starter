@@ -9,7 +9,7 @@ export function playMailNotificationSound() {
   try {
     // システムの通知音を使用
     const audio = new Audio('/sounds/mail-notification.mp3');
-    audio.volume = 0.6;
+    audio.volume = 0.9;
     audio.play().catch(error => {
       console.warn('メール通知音の再生に失敗:', error);
       // フォールバック: 簡易音を即座に再生
@@ -29,7 +29,7 @@ export function playLetterNotificationSound() {
   try {
     // より特別な音を使用
     const audio = new Audio('/sounds/letter-notification.mp3');
-    audio.volume = 0.7;
+    audio.volume = 0.9;
     audio.play().catch(error => {
       console.warn('手紙通知音の再生に失敗:', error);
       // フォールバック: 簡易音を即座に再生
@@ -66,8 +66,8 @@ export function playSimpleNotificationSound(type: 'mail' | 'letter') {
       oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.2);
     }
     
-    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.02, audioContext.currentTime + 0.5);
+    gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 0.5);
     
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.5);
