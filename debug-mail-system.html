@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メール・手紙システム デバッグ</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .info { background: #e3f2fd; }
+        .success { background: #e8f5e9; }
+        .warning { background: #fff3e0; }
+        .error { background: #ffebee; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .primary { background: #2196F3; color: white; }
+        .secondary { background: #FF9800; color: white; }
+        .danger { background: #f44336; color: white; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 3px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 メール・手紙システム デバッグ</h1>
+        
+        <div class="status info">
+            <h3>📊 現在の状況</h3>
+            <p>現在の語数: <strong id="currentWords">読み込み中...</strong></p>
+            <p>キュー内メッセージ: <strong id="queueCount">読み込み中...</strong></p>
+        </div>
+        
+        <div class="status info">
+            <h3>🔍 メール・手紙判定テスト</h3>
+            <input type="number" id="testWords" placeholder="語数を入力" value="300">
+            <button class="primary" onclick="testTriggers()">判定テスト</button>
+            <div id="testResults"></div>
+        </div>
+        
+        <div class="status info">
+            <h3>📬 手動メール・手紙送信</h3>
+            <button class="secondary" onclick="sendTestMail(300)">300語メール送信</button>
+            <button class="secondary" onclick="sendTestMail(5300)">5300語メール送信</button>
+            <button class="secondary" onclick="sendTestLetter(20300)">20300語手紙送信</button>
+            <button class="danger" onclick="clearQueue()">キューをクリア</button>
+        </div>
+        
+        <div class="status success">
+            <h3>🚀 キャッチアップ機能</h3>
+            <p>現在の語数に基づいて、過去に送信されるべきだったメール・手紙を遡って送信</p>
+            <button class="primary" onclick="runCatchup()">キャッチアップ実行</button>
+            <button class="secondary" onclick="showExpectedMessages()">期待されるメッセージ表示</button>
+            <div id="catchupResults"></div>
+        </div>
+        
+        <div class="status info">
+            <h3>📋 メッセージキュー</h3>
+            <button class="primary" onclick="refreshQueue()">キュー更新</button>
+            <div id="queueStatus"></div>
+        </div>
+        
+        <div class="status info">
+            <h3>🛠️ 語数更新テスト</h3>
+            <input type="number" id="newWords" placeholder="新しい語数" value="500">
+            <button class="primary" onclick="updateWords()">語数更新</button>
+            <button class="danger" onclick="resetWords()">語数リセット</button>
+        </div>
+        
+        <div class="status info">
+            <h3>📝 デバッグログ</h3>
+            <pre id="debugLog"></pre>
+        </div>
+    </div>
+
+    <script>
+        // デバッグログ
+        let debugLog = [];
+        function log(message) {
+            console.log(message);
+            debugLog.push(new Date().toLocaleTimeString() + ': ' + message);
+            document.getElementById('debugLog').textContent = debugLog.slice(-10).join('\n');
+        }
+
+        // 現在の状況を取得
+        function getCurrentStatus() {
+            const totalWords = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+            const userProgress = localStorage.getItem('userProgress');
+            let progressWords = 0;
+            
+            if (userProgress) {
+                try {
+                    const parsed = JSON.parse(userProgress);
+                    progressWords = parsed.totalWords || 0;
+                } catch (e) {
+                    log('userProgress解析エラー: ' + e.message);
+                }
+            }
+            
+            const actualWords = Math.max(totalWords, progressWords);
+            document.getElementById('currentWords').textContent = actualWords + '語';
+            
+            const queue = getMessageQueue();
+            document.getElementById('queueCount').textContent = queue.length + '件';
+            
+            log(`現在の語数: ${actualWords} (totalWordsRead: ${totalWords}, userProgress: ${progressWords})`);
+            return actualWords;
+        }
+
+        // メッセージキューを取得
+        function getMessageQueue() {
+            try {
+                const stored = localStorage.getItem('messageQueue');
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                log('キュー取得エラー: ' + e.message);
+                return [];
+            }
+        }
+
+        // メッセージキューを更新
+        function refreshQueue() {
+            const queue = getMessageQueue();
+            let html = '<h4>キュー内容:</h4>';
+            
+            if (queue.length === 0) {
+                html += '<p>キューは空です</p>';
+            } else {
+                queue.forEach((msg, index) => {
+                    html += `<div class="status warning">
+                        <strong>${msg.type}</strong> - ${msg.trigger}語 
+                        <small>(${new Date(msg.timestamp).toLocaleTimeString()})</small>
+                    </div>`;
+                });
+            }
+            
+            document.getElementById('queueStatus').innerHTML = html;
+            log(`キュー更新: ${queue.length}件のメッセージ`);
+        }
+
+        // 判定テスト
+        function testTriggers() {
+            const words = parseInt(document.getElementById('testWords').value);
+            
+            // メール判定
+            const shouldSendMail = (totalWords) => {
+                if (totalWords === 300) return true;
+                const d = totalWords - 300;
+                return d > 0 && [5_000, 10_000, 15_000].includes(d % 20_000);
+            };
+            
+            // 手紙判定
+            const shouldSendLetter = (totalWords) => {
+                if (totalWords === 1_000_000) return true;
+                return totalWords >= 20_300 && (totalWords - 20_300) % 20_000 === 0;
+            };
+            
+            const mailResult = shouldSendMail(words);
+            const letterResult = shouldSendLetter(words);
+            
+            const html = `
+                <div class="status ${mailResult ? 'success' : 'warning'}">
+                    <strong>${words}語でメール送信:</strong> ${mailResult ? 'YES' : 'NO'}
+                </div>
+                <div class="status ${letterResult ? 'success' : 'warning'}">
+                    <strong>${words}語で手紙送信:</strong> ${letterResult ? 'YES' : 'NO'}
+                </div>
+            `;
+            
+            document.getElementById('testResults').innerHTML = html;
+            log(`判定テスト ${words}語: メール=${mailResult}, 手紙=${letterResult}`);
+        }
+
+        // メール送信テスト
+        function sendTestMail(trigger) {
+            queueMessage('mail', trigger);
+            log(`テストメール送信: ${trigger}語`);
+            refreshQueue();
+        }
+
+        // 手紙送信テスト
+        function sendTestLetter(trigger) {
+            queueMessage('letter', trigger);
+            log(`テスト手紙送信: ${trigger}語`);
+            refreshQueue();
+        }
+
+        // メッセージをキューに追加
+        function queueMessage(type, trigger) {
+            try {
+                const queue = getMessageQueue();
+                const exists = queue.some(msg => msg.type === type && msg.trigger === trigger);
+                
+                if (!exists) {
+                    queue.push({
+                        type,
+                        trigger,
+                        timestamp: Date.now()
+                    });
+                    localStorage.setItem('messageQueue', JSON.stringify(queue));
+                    log(`キューに追加: ${type} - ${trigger}語`);
+                } else {
+                    log(`既に存在: ${type} - ${trigger}語`);
+                }
+            } catch (e) {
+                log('キュー追加エラー: ' + e.message);
+            }
+        }
+
+        // キューをクリア
+        function clearQueue() {
+            localStorage.removeItem('messageQueue');
+            log('キューをクリアしました');
+            refreshQueue();
+        }
+
+        // 語数更新
+        function updateWords() {
+            const newWords = parseInt(document.getElementById('newWords').value);
+            localStorage.setItem('totalWordsRead', newWords.toString());
+            
+            // userProgressも更新
+            const userProgress = localStorage.getItem('userProgress');
+            if (userProgress) {
+                try {
+                    const parsed = JSON.parse(userProgress);
+                    parsed.totalWords = newWords;
+                    localStorage.setItem('userProgress', JSON.stringify(parsed));
+                } catch (e) {
+                    log('userProgress更新エラー: ' + e.message);
+                }
+            }
+            
+            log(`語数を${newWords}語に更新しました`);
+            getCurrentStatus();
+        }
+
+        // 語数リセット
+        function resetWords() {
+            localStorage.setItem('totalWordsRead', '0');
+            
+            // userProgressも更新
+            const userProgress = localStorage.getItem('userProgress');
+            if (userProgress) {
+                try {
+                    const parsed = JSON.parse(userProgress);
+                    parsed.totalWords = 0;
+                    localStorage.setItem('userProgress', JSON.stringify(parsed));
+                } catch (e) {
+                    log('userProgress更新エラー: ' + e.message);
+                }
+            }
+            
+            log('語数を0にリセットしました');
+            getCurrentStatus();
+        }
+
+        // キャッチアップ実行
+        function runCatchup() {
+            const currentWords = getCurrentStatus();
+            const result = catchupMessages(currentWords);
+            
+            const html = `
+                <div class="status success">
+                    <h4>キャッチアップ結果:</h4>
+                    <p><strong>メール:</strong> ${result.mailsSent}件</p>
+                    <p><strong>手紙:</strong> ${result.lettersSent}件</p>
+                    <p><strong>送信した語数:</strong> ${result.triggers.join(', ')}</p>
+                </div>
+            `;
+            
+            document.getElementById('catchupResults').innerHTML = html;
+            log(`キャッチアップ完了: メール${result.mailsSent}件, 手紙${result.lettersSent}件`);
+            refreshQueue();
+        }
+
+        // 期待されるメッセージ表示
+        function showExpectedMessages() {
+            const currentWords = getCurrentStatus();
+            const expectedMessages = getExpectedMessages(0, currentWords);
+            
+            let html = '<h4>期待されるメッセージ:</h4>';
+            if (expectedMessages.length === 0) {
+                html += '<p>期待されるメッセージはありません</p>';
+            } else {
+                expectedMessages.forEach(msg => {
+                    html += `<div class="status info">
+                        <strong>${msg.trigger}語:</strong> ${msg.type === 'mail' ? 'メール' : '手紙'}
+                    </div>`;
+                });
+            }
+            
+            document.getElementById('catchupResults').innerHTML = html;
+        }
+
+        // キャッチアップ関数
+        function catchupMessages(currentWords) {
+            const result = {
+                mailsSent: 0,
+                lettersSent: 0,
+                triggers: []
+            };
+
+            const existingQueue = getMessageQueue();
+            const existingTriggers = new Set(existingQueue.map(msg => msg.trigger));
+
+            for (let words = 300; words <= currentWords; words++) {
+                if (existingTriggers.has(words)) {
+                    continue;
+                }
+
+                // メール判定
+                if (shouldSendMail(words)) {
+                    queueMessage('mail', words);
+                    result.mailsSent++;
+                    result.triggers.push(words);
+                }
+
+                // 手紙判定
+                if (shouldSendLetter(words)) {
+                    queueMessage('letter', words);
+                    result.lettersSent++;
+                    result.triggers.push(words);
+                }
+            }
+
+            return result;
+        }
+
+        // 期待されるメッセージ取得
+        function getExpectedMessages(startWords, endWords) {
+            const messages = [];
+
+            for (let words = startWords; words <= endWords; words++) {
+                if (shouldSendMail(words)) {
+                    messages.push({ trigger: words, type: 'mail' });
+                }
+                if (shouldSendLetter(words)) {
+                    messages.push({ trigger: words, type: 'letter' });
+                }
+            }
+
+            return messages.sort((a, b) => a.trigger - b.trigger);
+        }
+
+        // メール判定関数
+        function shouldSendMail(totalWords) {
+            if (totalWords === 300) return true;
+            const d = totalWords - 300;
+            return d > 0 && [5_000, 10_000, 15_000].includes(d % 20_000);
+        }
+
+        // 手紙判定関数
+        function shouldSendLetter(totalWords) {
+            if (totalWords === 1_000_000) return true;
+            return totalWords >= 20_300 && (totalWords - 20_300) % 20_000 === 0;
+        }
+
+        // 初期化
+        window.onload = function() {
+            getCurrentStatus();
+            refreshQueue();
+            log('デバッグシステム初期化完了');
+        };
+    </script>
+</body>
+</html>

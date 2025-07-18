@@ -8,6 +8,7 @@ import AnimationPreloader from "@/components/AnimationPreloader";
 import ExitCalendarHandler from "@/components/ExitCalendarHandler";
 import LevelMigration from "@/components/LevelMigration";
 import MessageNotification from "@/components/MessageNotification";
+import MessageCatchup from "@/components/MessageCatchup";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function RootLayout({
               <ConditionalHeader />
               <ExitCalendarHandler />
               <MessageNotification />
+              <MessageCatchup />
               <main className="min-h-screen">{children}</main>
             </RewardProvider>
           </PointsProvider>
