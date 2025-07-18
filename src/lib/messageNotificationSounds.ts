@@ -56,21 +56,25 @@ export function playSimpleNotificationSound(type: 'mail' | 'letter') {
     
     // メールと手紙で異なる音程
     if (type === 'mail') {
-      // メール: 軽やかな音
+      // メール: 軽やかな音（より長く）
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.4);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.6);
     } else {
-      // 手紙: より重厚な音
+      // 手紙: より重厚な音（より長く）
       oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-      oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.1);
-      oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.2);
+      oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.2);
+      oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.4);
+      oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.6);
+      oscillator.frequency.setValueAtTime(900, audioContext.currentTime + 0.8);
     }
     
     gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 0.5);
+    gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 1.0);
     
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
+    oscillator.stop(audioContext.currentTime + 1.0);
     
     console.log(`🔊 ${type === 'mail' ? 'メール' : '手紙'}通知音を再生しました`);
   } catch (error) {
