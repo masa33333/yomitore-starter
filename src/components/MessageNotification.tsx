@@ -132,7 +132,7 @@ export default function MessageNotification() {
               <img
                 src={metadata.image}
                 alt={`${metadata.city || metadata.type} image`}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-full h-auto object-contain rounded-lg max-h-64"
               />
             </div>
           )}
