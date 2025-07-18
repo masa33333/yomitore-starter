@@ -25,6 +25,7 @@ export default function MessageDebugPage() {
   const [messageQueue, setMessageQueue] = useState<any[]>([]);
   const [validationResult, setValidationResult] = useState<any>(null);
   const [loadedMessage, setLoadedMessage] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
 
   // キューの状態を更新
   const updateQueueStatus = () => {
@@ -34,6 +35,7 @@ export default function MessageDebugPage() {
 
   // 初回ロード
   useEffect(() => {
+    setIsClient(true);
     updateQueueStatus();
     setValidationResult(validateSystemAt1M());
   }, []);
@@ -78,6 +80,8 @@ export default function MessageDebugPage() {
 
   // 語数を累計に反映（テスト用）
   const simulateReading = (words: number) => {
+    if (!isClient) return;
+    
     const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
     const newTotal = currentTotal + words;
     localStorage.setItem('totalWordsRead', newTotal.toString());
@@ -91,6 +95,18 @@ export default function MessageDebugPage() {
       handleQueueMessage('letter', newTotal);
     }
   };
+
+  // クライアントサイドでのみ表示
+  if (!isClient) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        <h1 className="text-3xl font-bold text-gray-800">メール・手紙システム デバッグ</h1>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -158,7 +174,7 @@ export default function MessageDebugPage() {
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">読書シミュレーション</h2>
         <p className="text-sm text-gray-600 mb-4">
-          現在の累計: {parseInt(localStorage.getItem('totalWordsRead') || '0', 10)}語
+          現在の累計: {isClient ? parseInt(localStorage.getItem('totalWordsRead') || '0', 10) : 0}語
         </p>
         <div className="flex gap-2">
           {[100, 300, 500, 1000, 2000, 5000].map(words => (

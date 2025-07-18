@@ -144,6 +144,9 @@ interface QueuedMessage {
 const MESSAGE_QUEUE_KEY = 'messageQueue';
 
 export function queueMessage(type: 'mail' | 'letter', trigger: number): void {
+  // SSR対応: サーバーサイドでは何もしない
+  if (typeof window === 'undefined') return;
+  
   try {
     const queue = getMessageQueue();
     
@@ -168,6 +171,9 @@ export function queueMessage(type: 'mail' | 'letter', trigger: number): void {
 }
 
 export function getMessageQueue(): QueuedMessage[] {
+  // SSR対応: サーバーサイドでは空配列を返す
+  if (typeof window === 'undefined') return [];
+  
   try {
     const stored = localStorage.getItem(MESSAGE_QUEUE_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -178,6 +184,9 @@ export function getMessageQueue(): QueuedMessage[] {
 }
 
 export function dequeueMessage(): QueuedMessage | null {
+  // SSR対応: サーバーサイドでは何もしない
+  if (typeof window === 'undefined') return null;
+  
   try {
     const queue = getMessageQueue();
     if (queue.length === 0) return null;
@@ -204,6 +213,9 @@ export function dequeueMessage(): QueuedMessage | null {
 }
 
 export function clearMessageQueue(): void {
+  // SSR対応: サーバーサイドでは何もしない
+  if (typeof window === 'undefined') return;
+  
   localStorage.removeItem(MESSAGE_QUEUE_KEY);
   console.log('🗑️ Message queue cleared');
 }
@@ -212,6 +224,11 @@ export function clearMessageQueue(): void {
  * デバッグ用：メッセージシステムの状態確認
  */
 export function debugMessageSystem() {
+  // SSR対応: サーバーサイドでは空のデータを返す
+  if (typeof window === 'undefined') {
+    return { queue: [] };
+  }
+  
   const queue = getMessageQueue();
   console.log('📊 Message System Debug:', {
     queueLength: queue.length,
