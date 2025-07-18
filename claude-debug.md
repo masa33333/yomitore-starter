@@ -131,3 +131,61 @@ Error:   × You're importing a component that needs `useRouter`. This React hook
 
 - `src/app/toeic/page.tsx`が`"use client";`ディレクティブが正しく機能していない可能性があり、`useRouter`, `useEffect`, `useState`に関するエラーが継続している。
     - 解決策として、`"use client";`の記述の再確認、開発サーバーの再起動、`.next`ディレクトリの削除を推奨。
+
+---
+
+## 📋 明日のタスク (2025-07-19)
+
+### 🎯 TOEICページの整備・完成
+**優先度**: 🚨 **HIGH**
+
+#### 1. TOEICページの基本修正
+- [ ] `src/app/toeic/page.tsx`の`"use client"`ディレクティブ問題解決
+- [ ] useRouter, useEffect, useStateのエラー修正
+- [ ] 開発サーバー再起動・.nextディレクトリクリア
+- [ ] TOEICパッセージ一覧の表示確認
+
+#### 2. TOEICパッセージ機能の完成
+- [ ] パッセージ選択時の読書ページ遷移動作確認
+- [ ] レベル別パッセージ表示の動作確認
+- [ ] Front Matter解析機能の動作確認
+- [ ] TOEICパッセージ読み込みエラーの修正
+
+#### 3. UI/UX改善
+- [ ] TOEICページのデザイン調整
+- [ ] 語彙レベル選択機能の動作確認
+- [ ] パッセージリストの表示形式改善
+- [ ] レスポンシブデザイン対応
+
+#### 4. 累計語数・進捗管理
+- [ ] TOEICパッセージ読了後の語数加算確認
+- [ ] 読書履歴への適切な記録
+- [ ] 進捗データの整合性確認
+
+#### 5. 最終テスト・デバッグ
+- [ ] 全体的な動作テスト
+- [ ] エラーログの確認・修正
+- [ ] パフォーマンスチェック
+- [ ] 不要なデバッグツールの削除
+
+### 🔧 技術的課題
+- **Client Component問題**: useRouter/useEffect/useStateエラーの根本解決
+- **API連携**: TOEICパッセージAPIとの正しい連携
+- **ファイル読み込み**: Markdownファイルの確実な読み込み
+- **状態管理**: localStorage連携とReact状態の同期
+
+### 📁 関連ファイル
+```
+src/app/toeic/page.tsx              - メインのTOEICページ
+src/app/api/toeic-passages/route.ts - TOEICパッセージAPI
+src/lib/serverStoryLoader.ts        - サーバーサイドストーリーローダー
+content/toeic/                      - TOEICパッセージファイル
+scripts/generateToeicLevels.mjs     - レベル生成スクリプト
+```
+
+### 🎯 成功基準
+- ✅ TOEICページが正常に表示される
+- ✅ パッセージ選択が正しく動作する
+- ✅ 語彙レベル変更機能が動作する
+- ✅ 読書完了後の語数加算が正しく動作する
+- ✅ エラーが発生しない
