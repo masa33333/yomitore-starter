@@ -36,5 +36,16 @@
   "map_instruction": "まずは自分に合った語彙レベルを見つけましょう",
   "map_quiz_button": "📝 語彙レベルを判定する",
   "choose.toeic.title": "TOEICリーディング対策",
-  "choose.toeic.desc": "TOEIC Part 7形式の問題に挑戦"
+  "choose.toeic.desc": "TOEIC Part 7形式の問題に挑戦",
+  "toeic.title": "TOEICリーディング対策",
+  "toeic.description": "ビジネス・実用文書の読解力を向上させましょう",
+  "toeic.levelSelect": "語彙レベル選択",
+  "toeic.currentLevel": "現在のレベル",
+  "toeic.changeLevel": "レベル変更",
+  "toeic.levels.1": "初級",
+  "toeic.levels.2": "中級", 
+  "toeic.levels.3": "上級",
+  "toeic.levelDesc.1": "基本語彙のみ",
+  "toeic.levelDesc.2": "日常語彙",
+  "toeic.levelDesc.3": "幅広い語彙"
 }

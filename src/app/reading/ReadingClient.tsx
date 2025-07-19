@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useReward } from '@/context/RewardContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useStory } from '@/lib/store/story';
-import { completeReading } from '@/lib/readingProgress';
+import { completeReading, getUserProgress } from '@/lib/readingProgress';
 import type { ReadingCompletionData } from '@/types/stampCard';
 import { notifyNewStampCardUpdate } from '@/components/NewStampCard';
 import NewStampCard from '@/components/NewStampCard';
@@ -697,8 +697,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setTimeout(ensureScrolling, 500);
     
     // 読書開始時の総語数を記録（スタンプ進捗表示用）
-    const currentWordsRead = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
+    const progress = getUserProgress();
+    const currentWordsRead = progress.totalWords;
     setReadingStartWordsRead(currentWordsRead);
+    
+    console.log('📊 読書開始時の語数記録:', {
+      progressTotalWords: progress.totalWords,
+      legacyTotalWords: parseInt(localStorage.getItem('totalWordsRead') || '0', 10),
+      currentWordsRead
+    });
     
     console.log('📖 読書開始 + 超強力スクロール確保', { readingStartWordsRead: currentWordsRead });
     
@@ -709,9 +716,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // 読書完了処理（スタンプカード統合版）
   const handleCompleteReading = () => {
     if (!startTime) return;
-    
-    // まずスタンプフラッシュを表示
-    setShowStampFlash(true);
     
     const endTimeValue = Date.now();
     setEndTime(endTimeValue);
@@ -739,6 +743,28 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       duration
     });
     
+    // カード完成判定のための事前計算
+    const userProgressData = localStorage.getItem('userProgress');
+    const currentTotal = userProgressData ? JSON.parse(userProgressData).totalWords : 0;
+    const newTotal = currentTotal + wordCount;
+    const previousStampCount = Math.floor(currentTotal / 100);
+    const newStampCount = Math.floor(newTotal / 100);
+    const stampsEarned = newStampCount - previousStampCount;
+    
+    // カード完成チェック（20個に到達したかどうか）
+    const cardsBeforeReading = Math.floor(previousStampCount / 20);
+    const cardsAfterReading = Math.floor(newStampCount / 20);
+    const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
+    
+    // カード完成時はスタンプ演出をスキップ、通常時は表示
+    if (newCardsCompleted === 0 && stampsEarned > 0) {
+      console.log('📮 通常スタンプ演出を表示（ReadingClient）');
+      setShowStampFlash(true);
+    } else if (newCardsCompleted > 0) {
+      console.log('🎊 カード完成時のため、ReadingClientでスタンプ演出をスキップ');
+      // スタンプ演出はスキップ
+    }
+    
     // スタンプカード統合システムで進捗更新
     const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
     const completionData: ReadingCompletionData = {
@@ -754,12 +780,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     try {
       // Debug logging removed - problem resolved
-      
-      // 🔧 修正: userProgress から直接取得
-      const userProgressData = localStorage.getItem('userProgress');
-      const currentTotal = userProgressData ? JSON.parse(userProgressData).totalWords : 0;
-      const newTotal = currentTotal + wordCount;
-      const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
       
       // Debug logging removed - problem resolved
       
@@ -2415,9 +2435,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p className="text-sm text-gray-600">累計語数</p>
                   <p className="text-lg font-bold">
                     {(() => {
-                      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
-                      const newTotal = currentTotal + wordCount;
-                      // 表示のみ - localStorage は更新しない（読了処理で更新される）
+                      // 読書開始前の語数がnullの場合は現在の進捗から取得
+                      const startWords = readingStartWordsRead ?? getUserProgress().totalWords;
+                      const newTotal = startWords + wordCount;
+                      console.log('📊 累計語数表示:', { 
+                        readingStartWordsRead, 
+                        startWords,
+                        wordCount, 
+                        newTotal 
+                      });
                       return `${newTotal.toLocaleString()} 語`;
                     })()}
                   </p>
@@ -2426,16 +2452,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   <p className="text-sm text-gray-600">スタンプ進捗</p>
                   <p className="text-lg font-bold">
                     {(() => {
-                      // 現在の累計語数（読書完了処理前の値）
-                      const currentTotal = parseInt(localStorage.getItem('totalWordsRead') || '0', 10);
-                      const newTotal = currentTotal + wordCount;
-                      const stampsEarned = Math.floor(newTotal / 100) - Math.floor(currentTotal / 100);
-                      // 重要: totalStampsは現在の累計から計算（二重加算を防ぐ）
-                      const totalStamps = Math.floor(currentTotal / 100) + stampsEarned;
+                      // 読書開始前の語数がnullの場合は現在の進捗から取得
+                      const startWords = readingStartWordsRead ?? getUserProgress().totalWords;
+                      const newTotal = startWords + wordCount;
+                      const stampsEarned = Math.floor(newTotal / 100) - Math.floor(startWords / 100);
+                      const totalStamps = Math.floor(newTotal / 100);
                       const nextStampAt = ((Math.floor(newTotal / 100) + 1) * 100) - newTotal;
                       
                       console.log('📊 スタンプ進捗計算（修正版）:', {
-                        currentTotal,
+                        readingStartWordsRead,
+                        startWords,
                         wordCount,
                         newTotal,
                         stampsEarned,

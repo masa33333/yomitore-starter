@@ -47,14 +47,7 @@ export default function NewStampCard({
             setAnimatingStamp(null);
           }, 600);
           
-          // 20個完了時のコールバック
-          if (userProgress.currentCardStamps === 0 && userProgress.totalStamps > 0 && onComplete) {
-            setTimeout(() => {
-              playCardCompleteFanfare();
-              console.log('🎊 NewStampCard: カード完成ファンファーレ再生');
-              onComplete();
-            }, 1000);
-          }
+          // 20個完了は別のイベントで処理する
         }
       } catch (error) {
         console.error('❌ Failed to load stamp card data:', error);
@@ -68,10 +61,26 @@ export default function NewStampCard({
       updateData();
     };
 
+    // カード完成イベントのリスナー
+    const handleCardCompleted = (event: CustomEvent) => {
+      const { newCards, totalCards } = event.detail;
+      console.log('🎊 NewStampCard: Card completion detected!', { newCards, totalCards });
+      
+      if (onComplete) {
+        setTimeout(() => {
+          playCardCompleteFanfare();
+          console.log('🎊 NewStampCard: カード完成ファンファーレ再生');
+          onComplete();
+        }, 1000);
+      }
+    };
+
     window.addEventListener('stampCardUpdate', handleProgressUpdate);
+    window.addEventListener('cardCompleted', handleCardCompleted as EventListener);
     
     return () => {
       window.removeEventListener('stampCardUpdate', handleProgressUpdate);
+      window.removeEventListener('cardCompleted', handleCardCompleted as EventListener);
     };
   }, [onComplete]); // progressを依存配列から削除して無限ループを防ぐ
 
@@ -102,7 +111,7 @@ export default function NewStampCard({
       >
         <div className="flex-1 text-xs text-black leading-relaxed pr-3">
           100語読むごとにスタンプ進呈。<br/>
-          20個たまると{catName}からメールが届きます。
+          全部たまるとコインがもらえます。
         </div>
         
         {/* ネコアイコン円 */}

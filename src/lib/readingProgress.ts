@@ -48,22 +48,28 @@ export function getUserProgress(): UserProgress {
     const stored = localStorage.getItem(STORAGE_KEYS.USER_PROGRESS);
     if (stored) {
       const parsed = JSON.parse(stored) as UserProgress;
+      console.log('🔍 getUserProgress: Loaded from storage:', {
+        totalWords: parsed.totalWords,
+        totalStamps: parsed.totalStamps,
+        currentCardStamps: parsed.currentCardStamps
+      });
       
-      // 既存システムからのマイグレーション
-      const legacyWords = parseInt(localStorage.getItem(STORAGE_KEYS.TOTAL_WORDS_READ) || '0', 10);
-      if (legacyWords > parsed.totalWords) {
-        parsed.totalWords = legacyWords;
-        console.log('📊 Migrated totalWords from legacy system:', legacyWords);
-      }
+      // マイグレーション処理を削除（重複更新の原因）
+      // 既存データは初回時のmigrateFromLegacySystem()のみで処理
       
       // データ整合性チェック - 語数とスタンプ数の論理的チェック
       const expectedStamps = Math.floor(parsed.totalWords / 100);
       if (parsed.totalStamps !== expectedStamps) {
         console.warn(`⚠️ Stamp count mismatch detected! Expected: ${expectedStamps}, Got: ${parsed.totalStamps}`);
         console.warn(`⚠️ Correcting stamp count based on word count: ${parsed.totalWords} words`);
+        const oldData = { ...parsed };
         parsed.totalStamps = expectedStamps;
         parsed.currentCardStamps = expectedStamps % 20;
         parsed.completedCards = Math.floor(expectedStamps / 20);
+        console.log('🔧 Data corrected:', {
+          before: oldData,
+          after: parsed
+        });
         // 修正したデータを保存
         saveUserProgress(parsed);
       }
@@ -257,6 +263,11 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   // 1. 既存進捗データを取得（日付チェックは行わない）
   let progress = getUserProgress();
+  console.log('🔍 Current progress before reading:', {
+    totalWords: progress.totalWords,
+    totalStamps: progress.totalStamps,
+    currentCardStamps: progress.currentCardStamps
+  });
   
   // 2. 読書前の累計語数を記録
   const previousTotalWords = progress.totalWords;
@@ -280,15 +291,30 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
     stampsEarned: newStampsEarned
   });
   
-  // 5. スタンプ数更新
+  // 5. スタンプ数更新とカード完成チェック
+  const previousCardStamps = progress.currentCardStamps;
   progress.totalStamps = newStampCount;
-  progress.currentCardStamps = progress.totalStamps % 20;
+  const newCardStamps = progress.totalStamps % 20;
   
-  // 3. カード完成チェック
-  if (progress.currentCardStamps === 0 && progress.totalStamps > 0) {
-    progress.completedCards += 1;
-    console.log('🎊 Card completed! Total cards:', progress.completedCards);
+  // カード完成チェック（20個に到達したかどうか）
+  const previousTotalStamps = previousStampCount;
+  const cardsBeforeReading = Math.floor(previousTotalStamps / 20);
+  const cardsAfterReading = Math.floor(progress.totalStamps / 20);
+  const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
+  
+  if (newCardsCompleted > 0) {
+    progress.completedCards += newCardsCompleted;
+    console.log('🎊 Card completed! New cards:', newCardsCompleted, 'Total cards:', progress.completedCards);
+    
+    // カード完成通知をUIに送信
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('cardCompleted', { 
+        detail: { newCards: newCardsCompleted, totalCards: progress.completedCards } 
+      }));
+    }, 100);
   }
+  
+  progress.currentCardStamps = newCardStamps;
   
   // 4. コイン・トロフィー更新
   updateAchievements(progress);
@@ -326,9 +352,25 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   saveStampCardData(stamps);
   
-  // 獲得したスタンプ数をログ出力
+  // 獲得したスタンプ数をログ出力と演出制御
   if (newStampsEarned > 0) {
     console.log(`🌟 ${newStampsEarned}個のスタンプを獲得！（${data.wordCount}語読了）`);
+    
+    // 20個目のスタンプ（カード完成）の場合はスタンプ演出をスキップ
+    if (newCardsCompleted === 0) {
+      // 通常のスタンプ演出のみ（カード完成時以外）
+      console.log('📮 通常スタンプ演出を表示');
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('stampEarned', { 
+          detail: { 
+            stampsEarned: newStampsEarned,
+            showAnimation: true
+          } 
+        }));
+      }, 50);
+    } else {
+      console.log('🎊 カード完成時のため、スタンプ演出をスキップしてコイン演出のみ表示');
+    }
   }
   
   // 8. 履歴保存（既存システム）
@@ -346,7 +388,15 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   // 9. 進捗データ保存
   saveUserProgress(progress);
   
-  console.log('✅ Reading completion process finished:', progress);
+  console.log('✅ Reading completion process finished:', {
+    totalStamps: progress.totalStamps,
+    currentCardStamps: progress.currentCardStamps,
+    completedCards: progress.completedCards,
+    bronzeCoins: progress.bronzeCoins,
+    totalWords: progress.totalWords,
+    newStampsEarned,
+    newCardsCompleted
+  });
   
   return progress;
 }
@@ -355,8 +405,50 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
  * コイン・トロフィー更新
  */
 function updateAchievements(progress: UserProgress): void {
+  // 以前のコイン数を記録
+  const previousCoins = progress.bronzeCoins;
+  
+  console.log('🪙 updateAchievements: コイン計算開始', {
+    previousCoins: previousCoins,
+    totalStamps: progress.totalStamps,
+    expectedCoins: Math.floor(progress.totalStamps / 10)
+  });
+  
   // ブロンズコイン（10スタンプごと）
   progress.bronzeCoins = Math.floor(progress.totalStamps / 10);
+  
+  // 新しいコインが獲得された場合
+  const newCoinsEarned = progress.bronzeCoins - previousCoins;
+  
+  console.log('🪙 updateAchievements: コイン計算結果', {
+    previousCoins,
+    newCoins: progress.bronzeCoins,
+    newCoinsEarned,
+    totalStamps: progress.totalStamps
+  });
+  
+  if (newCoinsEarned > 0) {
+    console.log(`🪙 ${newCoinsEarned}個のブロンズコインを獲得！合計: ${progress.bronzeCoins}コイン`);
+    
+    // 大きな全画面コイン演出を表示
+    setTimeout(() => {
+      console.log('🪙 Dispatching showRewardFlash event for coins:', { 
+        newCoins: newCoinsEarned, 
+        totalCoins: progress.bronzeCoins,
+        rewardType: 'coin'
+      });
+      
+      // 全画面RewardFlash用のイベント
+      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+        detail: { 
+          rewardType: 'coin',
+          count: newCoinsEarned
+        } 
+      }));
+    }, 100);
+  } else {
+    console.log('🪙 コイン獲得なし（新しいコイン数が以前と同じかそれより少ない）');
+  }
   
   // ブロンズトロフィー（5カード完成）
   progress.bronzeTrophies = Math.floor(progress.completedCards / 5);
@@ -537,12 +629,48 @@ export function resetProgress(): void {
   console.log('🗑️ All progress data reset');
 }
 
+// 緊急デバッグ機能を追加
+export function emergencyDebugProgress(): void {
+  const progress = getUserProgress();
+  console.log('🚨 Emergency Debug - Current Progress:', progress);
+  
+  const actualTotalWords = 162 + 142; // 実際に読んだ語数
+  const expectedStamps = Math.floor(actualTotalWords / 100);
+  
+  console.log('🧮 Manual calculation:', {
+    actualWordsRead: actualTotalWords,
+    expectedStamps: expectedStamps,
+    currentStamps: progress.totalStamps,
+    currentWords: progress.totalWords,
+    difference: progress.totalWords - actualTotalWords
+  });
+}
+
+export function emergencyFixProgress(): void {
+  const actualTotalWords = 162 + 142; // 実際に読んだ語数
+  const progress = getUserProgress();
+  
+  console.log('🔧 Emergency Fix - Before:', progress);
+  
+  progress.totalWords = actualTotalWords;
+  progress.totalStamps = Math.floor(actualTotalWords / 100);
+  progress.currentCardStamps = progress.totalStamps % 20;
+  progress.completedCards = Math.floor(progress.totalStamps / 20);
+  progress.bronzeCoins = Math.floor(progress.totalStamps / 10);
+  
+  saveUserProgress(progress);
+  
+  console.log('🔧 Emergency Fix - After:', progress);
+}
+
 // 開発者コンソール用
 if (typeof window !== 'undefined') {
   (window as any).readingProgress = {
     getUserProgress,
     getStampCardDisplay,
     resetProgress,
-    completeReading
+    completeReading,
+    emergencyDebugProgress,
+    emergencyFixProgress
   };
 }

@@ -50,5 +50,16 @@
   "map_instruction": "First, find your suitable vocabulary level",
   "map_quiz_button": "📝 Take vocabulary test",
   "choose.toeic.title": "TOEIC Reading Practice",
-  "choose.toeic.desc": "Practice with TOEIC Part 7 style questions"
+  "choose.toeic.desc": "Practice with TOEIC Part 7 style questions",
+  "toeic.title": "TOEIC Reading Practice",
+  "toeic.description": "Improve your business and practical reading comprehension",
+  "toeic.levelSelect": "Vocabulary Level Selection",
+  "toeic.currentLevel": "Current Level",
+  "toeic.changeLevel": "Change Level",
+  "toeic.levels.1": "Beginner",
+  "toeic.levels.2": "Intermediate", 
+  "toeic.levels.3": "Advanced",
+  "toeic.levelDesc.1": "Basic vocabulary only",
+  "toeic.levelDesc.2": "Daily vocabulary",
+  "toeic.levelDesc.3": "Wide vocabulary"
 }

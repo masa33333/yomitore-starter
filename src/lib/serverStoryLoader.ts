@@ -123,15 +123,36 @@ export async function loadStoryFromFileServer(slug: string, level: number): Prom
     if (slug.startsWith('toeic/')) {
       // TOEICパッセージの場合
       const toeicId = slug.replace('toeic/', '');
-      filePath = path.join(process.cwd(), 'content', 'toeic', `${toeicId}.md`);
-      console.log(`[loadStoryFromFileServer] TOEIC path constructed: ${filePath}`);
+      console.log(`[loadStoryFromFileServer] Processing TOEIC passage: ${slug} -> toeicId: ${toeicId}, level: ${level}`);
       
-      content = await fs.readFile(filePath, 'utf-8');
-      const { metadata, body } = parseFrontMatter(content);
+      // まずレベル別JSONファイルを探す
+      const levelJsonPath = path.join(process.cwd(), 'content', 'toeic', `${toeicId}_level${level}.json`);
+      console.log(`[loadStoryFromFileServer] Trying level-specific JSON: ${levelJsonPath}`);
       
-      title = metadata.title || `TOEIC Passage ${toeicId.replace('passage', '')}`;
-      content = body; // 本文のみを使用
-      themes.push('TOEIC', `Passage ${toeicId.replace('passage', '')}`);
+      try {
+        const jsonContent = await fs.readFile(levelJsonPath, 'utf-8');
+        const jsonData = JSON.parse(jsonContent);
+        
+        title = jsonData.title || `TOEIC Passage ${toeicId.replace('toeic-passage-', '')} (Level ${level})`;
+        content = jsonData.english;
+        themes.push('TOEIC', `Level ${level}`, `Passage ${toeicId.replace('toeic-passage-', '')}`);
+        
+        console.log(`[loadStoryFromFileServer] ✅ Successfully loaded level-specific JSON for ${toeicId}`);
+      } catch (jsonError) {
+        // レベル別ファイルがない場合は原文を使用
+        console.log(`[loadStoryFromFileServer] Level-specific JSON not found, trying original file: ${jsonError}`);
+        
+        // toeicIdから適切なファイル名を生成（toeic-passage-1 -> passage1）
+        const filename = toeicId.replace('toeic-passage-', 'passage');
+        filePath = path.join(process.cwd(), 'content', 'toeic', filename);
+        console.log(`[loadStoryFromFileServer] TOEIC original path constructed: ${filePath} (from toeicId: ${toeicId})`);
+        
+        content = await fs.readFile(filePath, 'utf-8');
+        title = `TOEIC Passage ${toeicId.replace('toeic-passage-', '')} (Level ${level})`;
+        themes.push('TOEIC', `Level ${level}`, `Passage ${toeicId.replace('toeic-passage-', '')}`);
+        
+        console.log(`[loadStoryFromFileServer] ✅ Successfully loaded original TOEIC file for ${filename}`);
+      }
 
     } else {
       // 既存のストーリーの場合
@@ -174,7 +195,9 @@ export async function loadStoryFromFileServer(slug: string, level: number): Prom
     // エラー時のフォールバックパスを正確に表示
     let attemptedFilePath: string;
     if (slug.startsWith('toeic/')) {
-      attemptedFilePath = path.join(process.cwd(), 'content', 'toeic', `${slug.replace('toeic/', '')}.md`);
+      const toeicId = slug.replace('toeic/', '');
+      const filename = toeicId.replace('toeic-passage-', 'passage');
+      attemptedFilePath = path.join(process.cwd(), 'content', 'toeic', filename);
     } else {
       attemptedFilePath = path.join(process.cwd(), 'public', 'stories', slug, `level${level}.txt`);
     }

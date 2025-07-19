@@ -21,6 +21,22 @@ export default function ToeicPage() {
   const [selectedLevel, setSelectedLevel] = useState<number>(3); // 追加
   const [showLevelSelector, setShowLevelSelector] = useState<boolean>(false); // 追加
 
+  const fetchPassages = async (level: number) => {
+    try {
+      console.log(`📡 Fetching TOEIC passages for level ${level}`);
+      const response = await fetch(`/api/toeic-passages?level=${level}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data: Passage[] = await response.json();
+      console.log(`✅ Received ${data.length} TOEIC passages:`, data);
+      setPassages(data);
+    } catch (err: any) {
+      console.error(`❌ Error fetching TOEIC passages:`, err);
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     // 保存されたレベルを読み込み
     try {
@@ -34,22 +50,11 @@ export default function ToeicPage() {
     } catch (error) {
       console.error('語彙レベル読み込みエラー:', error);
     }
-
-    const fetchPassages = async () => {
-      try {
-        const response = await fetch('/api/toeic-passages');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data: Passage[] = await response.json();
-        setPassages(data);
-      } catch (err: any) {
-        setError(err.message);
-      }
-    };
-
-    fetchPassages();
   }, []);
+
+  useEffect(() => {
+    fetchPassages(selectedLevel);
+  }, [selectedLevel]);
 
   // レベル変更処理
   const handleLevelChange = (newLevel: number) => {
@@ -66,6 +71,8 @@ export default function ToeicPage() {
   };
 
   const handlePassageSelect = (slug: string) => {
+    console.log(`🎯 TOEIC passage selected: slug="${slug}", level=${selectedLevel}`);
+    console.log(`🔗 Navigating to: /reading?slug=${slug}&level=${selectedLevel}`);
     router.push(`/reading?slug=${slug}&level=${selectedLevel}`); // levelパラメータを追加
   };
 
@@ -80,34 +87,34 @@ export default function ToeicPage() {
   return (
     <main className="mx-auto max-w-4xl p-4 min-h-screen">
       <div className="mb-6 mt-8">
-        <h1 className="text-xl font-bold mb-4">{t('choose.toeic.title')}</h1>
-        <p className="text-gray-600">{t('choose.toeic.desc')}</p>
+        <h1 className="text-xl font-bold mb-4">{t('toeic.title')}</h1>
+        <p className="text-gray-600">{t('toeic.description')}</p>
       </div>
 
       {/* 語彙レベル選択セクション */}
       <div className="bg-white rounded-lg p-4 border border-gray-200 mb-6 w-full max-w-md mx-auto">
         <div className="flex items-center justify-between">
           <span className="text-gray-700 font-bold">
-            語彙レベル：{getGenerationLevelName(selectedLevel)}
+            {t('toeic.currentLevel')}：{getGenerationLevelName(selectedLevel)}
           </span>
           <button
             type="button"
             onClick={() => setShowLevelSelector(!showLevelSelector)}
             className="text-gray-800 hover:text-gray-600 underline text-sm"
           >
-            レベル変更
+            {t('toeic.changeLevel')}
           </button>
         </div>
         
         {/* レベル選択UI */}
         {showLevelSelector && (
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-3">語彙レベルを選択してください：</p>
+            <p className="text-sm text-gray-600 mb-3">{t('toeic.levelSelect')}：</p>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { level: 1, label: '初級', description: '基本語彙のみ' },
-                { level: 2, label: '中級', description: '日常語彙' },
-                { level: 3, label: '上級', description: '幅広い語彙' }
+                { level: 1, label: t('toeic.levels.1'), description: t('toeic.levelDesc.1') },
+                { level: 2, label: t('toeic.levels.2'), description: t('toeic.levelDesc.2') },
+                { level: 3, label: t('toeic.levels.3'), description: t('toeic.levelDesc.3') }
               ].map(({ level, label, description }) => (
                 <button
                   key={level}
