@@ -1,7 +1,7 @@
 ---
 id: letter-000
 trigger: 10300
-image: /images/letters/seoul.png
+image: /letters/seoul.png
 city: Seoul
 level: auto
 ---
