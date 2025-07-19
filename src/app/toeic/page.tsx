@@ -143,7 +143,7 @@ export default function ToeicPage() {
             <button
               key={passage.id}
               onClick={() => handlePassageSelect(passage.slug)}
-              className="w-full rounded-xl bg-white p-6 text-left text-gray-800 transition-colors hover:bg-gray-100 border border-gray-200"
+              className="w-full rounded-xl bg-gray-100 p-6 text-left text-gray-800 transition-colors hover:bg-gray-200 border border-gray-200"
             >
               <h3 className="mb-1 text-lg font-semibold">{passage.title}</h3>
               <p className="mt-1 text-sm text-gray-600">{passage.description}</p>

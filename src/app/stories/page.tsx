@@ -216,7 +216,7 @@ export default function StoriesPage() {
                   href={`/reading?slug=${story.slug}&level=${selectedLevel}`}
                   className="group"
                 >
-                  <div className="bg-white rounded-lg shadow-md p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 border border-gray-200">
+                  <div className="bg-gray-100 rounded-lg shadow-md p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 border border-gray-200">
                     <div className="flex items-center">
                       <div className="w-12 h-12 bg-primary-inactive rounded-full flex items-center justify-center mr-4">
                         <span className="text-2xl">📖</span>
