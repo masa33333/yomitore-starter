@@ -2336,7 +2336,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                   {/* 対応する日本語段落 */}
                   {showJapanese && japaneseParagraphs[index] && (
                     <div className="rounded-lg border border-[#FFE1B5] bg-page-bg p-4">
-                      <p className={`${getTextSizeClass()} italic text-text-primary`}>
+                      <p className={`${getTextSizeClass()} text-text-primary`}>
                         {japaneseParagraphs[index]}
                       </p>
                     </div>
