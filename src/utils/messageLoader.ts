@@ -157,11 +157,21 @@ function getUserLevel(): number {
  */
 function selectLevelContent(content: string, userLevel: number): string {
   try {
-    // Level 1-3のセクションを抽出
-    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*([\s\S]*?)(?=\*\*Level [23]|\*\*日本語版|\*\*---|\s*---)/);
-    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*([\s\S]*?)(?=\*\*Level 3|\*\*日本語版|\*\*---|\s*---)/);
-    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*([\s\S]*?)(?=\*\*日本語版|\*\*---|\s*---)/);
-    const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*([\s\S]*?)(?=\s*---|\s*$)/);
+    console.log(`🔍 Selecting content for level: ${userLevel}`);
+    console.log(`📄 Original content length: ${content.length}`);
+    
+    // より厳密な正規表現でLevel 1-3のセクションを抽出
+    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 2|\n+\*\*日本語版|\n+---|\s*$)/);
+    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 3|\n+\*\*日本語版|\n+---|\s*$)/);
+    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*日本語版|\n+---|\s*$)/);
+    const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*\n+([\s\S]*?)(?=\n+---|\s*$)/);
+    
+    console.log(`📊 Match results:`, {
+      level1: !!level1Match,
+      level2: !!level2Match,
+      level3: !!level3Match,
+      japanese: !!japaneseMatch
+    });
     
     let selectedContent = '';
     
@@ -169,32 +179,40 @@ function selectLevelContent(content: string, userLevel: number): string {
     switch (userLevel) {
       case 1:
         selectedContent = level1Match?.[1]?.trim() || '';
+        console.log(`📝 Selected Level 1 content (${selectedContent.length} chars)`);
         break;
       case 2:
         selectedContent = level2Match?.[1]?.trim() || '';
+        console.log(`📝 Selected Level 2 content (${selectedContent.length} chars)`);
         break;
       case 3:
         selectedContent = level3Match?.[1]?.trim() || '';
+        console.log(`📝 Selected Level 3 content (${selectedContent.length} chars)`);
         break;
       default:
         selectedContent = level2Match?.[1]?.trim() || '';
+        console.log(`📝 Selected default Level 2 content (${selectedContent.length} chars)`);
     }
     
     // 日本語版を追加
     const japaneseContent = japaneseMatch?.[1]?.trim() || '';
+    console.log(`🇯🇵 Japanese content (${japaneseContent.length} chars)`);
     
     if (selectedContent && japaneseContent) {
-      return `${selectedContent}\n\n---\n\n**日本語版:**\n\n${japaneseContent}`;
+      const result = `${selectedContent}\n\n---\n\n**日本語版:**\n\n${japaneseContent}`;
+      console.log(`✅ Combined content ready (${result.length} chars)`);
+      return result;
     } else if (selectedContent) {
+      console.log(`⚠️ Using English only (no Japanese found)`);
       return selectedContent;
     } else {
       // フォールバック: 元のコンテンツをそのまま返す
-      console.warn(`Could not extract level ${userLevel} content, using original`);
+      console.warn(`❌ Could not extract level ${userLevel} content, using original`);
       return content;
     }
     
   } catch (error) {
-    console.error('Error selecting level content:', error);
+    console.error('❌ Error selecting level content:', error);
     return content; // エラー時は元のコンテンツを返す
   }
 }
