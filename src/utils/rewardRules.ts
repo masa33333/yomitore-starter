@@ -11,21 +11,42 @@
  */
 
 export function shouldSendMail(totalWords: number): boolean {
-  // ① 出発メール（300語）- 送信はするがカウントしない
+  // ① 出発メール（300語）
   if (totalWords === 300) return true;
+  
+  // ② 初期メール（5300語）
+  if (totalWords === 5_300) return true;
+  
+  // ③ 初期メール（15300語）
+  if (totalWords === 15_300) return true;
 
-  // ② 周期メール：300語を基準に20,000語サイクル
-  //     (totalWords - 300) % 20,000 が 5,000 / 10,000 / 15,000 の時
-  const d = totalWords - 300;
-  return d > 0 && [5_000, 10_000, 15_000].includes(d % 20_000);
+  // ④ 20300語以降の周期メール：25300語から20,000語サイクル
+  //     25300, 30300, 35300でメール、その後20000語毎
+  if (totalWords >= 25_300) {
+    const d = totalWords - 25_300;
+    return d >= 0 && [0, 5_000, 10_000].includes(d % 20_000);
+  }
+  
+  return false;
 }
 
 export function shouldSendLetter(totalWords: number): boolean {
-  // 特別ケース：1,000,000語ちょうどで手紙（本来は1,000,300語だが特別対応）
+  // ① Seoul手紙（10300語）
+  if (totalWords === 10_300) return true;
+  
+  // ② Beijing手紙（20300語）
+  if (totalWords === 20_300) return true;
+  
+  // ③ 40300語以降の周期手紙：40300語から20,000語サイクル
+  if (totalWords >= 40_300) {
+    const d = totalWords - 40_300;
+    return d >= 0 && d % 20_000 === 0;
+  }
+  
+  // 特別ケース：1,000,000語ちょうどで手紙
   if (totalWords === 1_000_000) return true;
   
-  // 手紙：20,300語を起点に20,000語周期
-  return totalWords >= 20_300 && (totalWords - 20_300) % 20_000 === 0;
+  return false;
 }
 
 // コイン：カード1枚 (2,000語) 毎
@@ -63,23 +84,33 @@ export function getMessageFileName(trigger: number): string | null {
   if (type === 'mail') {
     // メールファイル名の生成
     if (trigger === 300) return '000_tokyo_departure';
+    if (trigger === 5_300) return '001_tokyo_seoul_mail1';
+    if (trigger === 15_300) return '002_seoul_beijing_mail1';
     
-    // 周期メールの場合
-    const d = trigger - 300;
-    const cycle = Math.floor(d / 20_000);
-    const position = (d % 20_000) / 5_000;
-    
-    if (position === 1) return `${String(cycle * 3 + 1).padStart(3, '0')}_cycle${cycle}_mail1`;
-    if (position === 2) return `${String(cycle * 3 + 2).padStart(3, '0')}_cycle${cycle}_mail2`;
-    if (position === 3) return `${String(cycle * 3 + 3).padStart(3, '0')}_cycle${cycle}_mail3`;
+    // 25300語以降の周期メール
+    if (trigger >= 25_300) {
+      const d = trigger - 25_300;
+      const cycle = Math.floor(d / 20_000);
+      const position = (d % 20_000) / 5_000;
+      
+      if (position === 0) return `${String(cycle * 3 + 3).padStart(3, '0')}_cycle${cycle}_mail1`;
+      if (position === 1) return `${String(cycle * 3 + 4).padStart(3, '0')}_cycle${cycle}_mail2`;
+      if (position === 2) return `${String(cycle * 3 + 5).padStart(3, '0')}_cycle${cycle}_mail3`;
+    }
   }
   
   if (type === 'letter') {
     // 手紙ファイル名の生成
-    const letterIndex = Math.floor((trigger - 20_300) / 20_000);
-    const cities = ['seoul', 'beijing', 'shanghai']; // 都市を順番に割り当て
-    const city = cities[letterIndex % cities.length];
-    return `${String(letterIndex).padStart(3, '0')}_${city}_arrival`;
+    if (trigger === 10_300) return '000_seoul_arrival';
+    if (trigger === 20_300) return '001_beijing_arrival';
+    
+    // 40300語以降の周期手紙
+    if (trigger >= 40_300) {
+      const letterIndex = Math.floor((trigger - 40_300) / 20_000) + 2; // seoul, beijingの次から
+      const cities = ['shanghai', 'mumbai', 'cairo', 'london', 'paris']; // 都市を順番に割り当て
+      const city = cities[(letterIndex - 2) % cities.length];
+      return `${String(letterIndex).padStart(3, '0')}_${city}_arrival`;
+    }
   }
   
   return null;
@@ -149,34 +180,46 @@ export function getExpectedMessageCounts(totalWords: number): {mails: number, le
   let mails = 0;
   let letters = 0;
   
-  // 出発メール（300語）- 送信はするがカウントしない
-  // if (totalWords >= 300) mails++; // カウントから除外
+  // 出発メール（300語）- カウントに含める
+  if (totalWords >= 300) mails++;
   
-  // 周期メール：300語を基準に20,000語サイクルで5,000/10,000/15,000語時点
-  if (totalWords >= 5_300) {
-    const wordsAfterDeparture = totalWords - 300;
-    const completeCycles = Math.floor(wordsAfterDeparture / 20_000);
-    const remainingWords = wordsAfterDeparture % 20_000;
+  // 初期メール（5300語）
+  if (totalWords >= 5_300) mails++;
+  
+  // Seoul手紙（10300語）
+  if (totalWords >= 10_300) letters++;
+  
+  // 中間メール（15300語）
+  if (totalWords >= 15_300) mails++;
+  
+  // Beijing手紙（20300語）
+  if (totalWords >= 20_300) letters++;
+  
+  // 25300語以降の周期メール：25300, 30300, 35300でメール、その後20000語毎
+  if (totalWords >= 25_300) {
+    const d = totalWords - 25_300;
+    const completeCycles = Math.floor(d / 20_000);
+    const remainingWords = d % 20_000;
     
     // 完了した周期分のメール（各周期3通）
     mails += completeCycles * 3;
     
     // 現在の周期内のメール
-    if (remainingWords >= 5_000) mails++;
-    if (remainingWords >= 10_000) mails++;
-    if (remainingWords >= 15_000) mails++;
+    if (remainingWords >= 0) mails++; // 25300語時点
+    if (remainingWords >= 5_000) mails++; // 30300語時点
+    if (remainingWords >= 10_000) mails++; // 35300語時点
   }
   
-  // 手紙：20,300語を起点に20,000語周期
-  if (totalWords >= 20_300) {
-    const wordsAfterFirstLetter = totalWords - 20_300;
-    const letterCycles = Math.floor(wordsAfterFirstLetter / 20_000);
-    letters = 1 + letterCycles; // 最初の手紙 + 周期手紙
-    
-    // 特別ケース：1,000,000語ちょうどで追加の手紙
-    if (totalWords === 1_000_000) {
-      letters += 1;
-    }
+  // 40300語以降の周期手紙：40300語から20,000語サイクル
+  if (totalWords >= 40_300) {
+    const d = totalWords - 40_300;
+    const letterCycles = Math.floor(d / 20_000) + 1; // +1 for the letter at 40300
+    letters += letterCycles;
+  }
+  
+  // 特別ケース：1,000,000語ちょうどで追加の手紙
+  if (totalWords === 1_000_000) {
+    letters += 1;
   }
   
   return { mails, letters };
