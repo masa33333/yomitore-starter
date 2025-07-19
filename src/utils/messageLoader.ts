@@ -87,7 +87,13 @@ export async function loadMessage(
     
     // ユーザーが付けた猫の名前で <name> を置換
     const catName = getCatName();
-    const processedContent = content.replace(/<name>/g, catName);
+    let processedContent = content.replace(/<name>/g, catName);
+    
+    // レベル別コンテンツの選択（メールの場合）
+    if (kind === 'mail') {
+      const userLevel = getUserLevel();
+      processedContent = selectLevelContent(processedContent, userLevel);
+    }
     
     return {
       metadata: metadata as MessageMetadata,
@@ -110,6 +116,86 @@ function getCatName(): string {
   } catch (error) {
     console.warn('Failed to get cat name from localStorage:', error);
     return 'ネコ';
+  }
+}
+
+/**
+ * ユーザーの語彙レベルを取得（localStorageから）
+ */
+function getUserLevel(): number {
+  if (typeof window === 'undefined') return 2; // デフォルトレベル
+  
+  try {
+    // 複数のキーから語彙レベルを探す（互換性のため）
+    const level = localStorage.getItem('vocabLevel') || 
+                  localStorage.getItem('vocabularyLevel') || 
+                  localStorage.getItem('level') || 
+                  localStorage.getItem('fixedLevel') || 
+                  '2';
+    
+    const parsed = parseInt(level, 10);
+    
+    // 1-3の範囲に制限（既存のレベルシステムに合わせる）
+    if (parsed >= 1 && parsed <= 3) {
+      return parsed;
+    }
+    
+    // 5段階レベルの場合は3段階に変換
+    if (parsed >= 4 && parsed <= 5) {
+      return 3;
+    }
+    
+    return 2; // デフォルト
+  } catch (error) {
+    console.warn('Failed to get user level from localStorage:', error);
+    return 2;
+  }
+}
+
+/**
+ * メールコンテンツからユーザーレベルに応じた内容を選択
+ */
+function selectLevelContent(content: string, userLevel: number): string {
+  try {
+    // Level 1-3のセクションを抽出
+    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*([\s\S]*?)(?=\*\*Level [23]|\*\*日本語版|\*\*---|\s*---)/);
+    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*([\s\S]*?)(?=\*\*Level 3|\*\*日本語版|\*\*---|\s*---)/);
+    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*([\s\S]*?)(?=\*\*日本語版|\*\*---|\s*---)/);
+    const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*([\s\S]*?)(?=\s*---|\s*$)/);
+    
+    let selectedContent = '';
+    
+    // ユーザーレベルに応じて英語コンテンツを選択
+    switch (userLevel) {
+      case 1:
+        selectedContent = level1Match?.[1]?.trim() || '';
+        break;
+      case 2:
+        selectedContent = level2Match?.[1]?.trim() || '';
+        break;
+      case 3:
+        selectedContent = level3Match?.[1]?.trim() || '';
+        break;
+      default:
+        selectedContent = level2Match?.[1]?.trim() || '';
+    }
+    
+    // 日本語版を追加
+    const japaneseContent = japaneseMatch?.[1]?.trim() || '';
+    
+    if (selectedContent && japaneseContent) {
+      return `${selectedContent}\n\n---\n\n**日本語版:**\n\n${japaneseContent}`;
+    } else if (selectedContent) {
+      return selectedContent;
+    } else {
+      // フォールバック: 元のコンテンツをそのまま返す
+      console.warn(`Could not extract level ${userLevel} content, using original`);
+      return content;
+    }
+    
+  } catch (error) {
+    console.error('Error selecting level content:', error);
+    return content; // エラー時は元のコンテンツを返す
   }
 }
 
@@ -247,6 +333,8 @@ if (typeof window !== 'undefined') {
     getMessageQueue,
     dequeueMessage,
     clearMessageQueue,
-    debugMessageSystem
+    debugMessageSystem,
+    getUserLevel,
+    selectLevelContent
   };
 }
