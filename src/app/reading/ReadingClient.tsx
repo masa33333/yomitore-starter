@@ -266,6 +266,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // 通知状態
   const [showStampFlash, setShowStampFlash] = useState(false);
+  const [earnedStampsCount, setEarnedStampsCount] = useState(1);
   
   // レベル変更状態
   const [showLevelSelector, setShowLevelSelector] = useState(false);
@@ -758,7 +759,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     
     // カード完成時はスタンプ演出をスキップ、通常時は表示
     if (newCardsCompleted === 0 && stampsEarned > 0) {
-      console.log('📮 通常スタンプ演出を表示（ReadingClient）');
+      console.log(`📮 通常スタンプ演出を表示（ReadingClient）: ${stampsEarned}個`);
+      setEarnedStampsCount(stampsEarned);
       setShowStampFlash(true);
     } else if (newCardsCompleted > 0) {
       console.log('🎊 カード完成時のため、ReadingClientでスタンプ演出をスキップ');
@@ -2641,6 +2643,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       {/* スタンプフラッシュ表示 */}
       <StampFlash 
         show={showStampFlash} 
+        stampsEarned={earnedStampsCount}
         onComplete={() => setShowStampFlash(false)} 
       />
 

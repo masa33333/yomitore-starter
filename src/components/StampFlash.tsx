@@ -2,13 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { playStampFanfare } from '@/lib/stampSounds';
 
 interface StampFlashProps {
   show: boolean;
   onComplete: () => void;
+  stampsEarned?: number; // 獲得したスタンプ数
 }
 
-const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete }) => {
+const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete, stampsEarned = 1 }) => {
   const [visible, setVisible] = useState(false);
   const [scale, setScale] = useState(0);
 
@@ -16,6 +18,10 @@ const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete }) => {
     if (show) {
       // 表示開始
       setVisible(true);
+      
+      // スタンプ音を鳴らす（獲得数に応じて連続再生）
+      console.log(`🎵 Playing stamp fanfare for ${stampsEarned} stamps`);
+      playStampFanfare(stampsEarned);
       
       // スケールアニメーション開始
       const scaleTimer = setTimeout(() => {
@@ -37,7 +43,7 @@ const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete }) => {
         clearTimeout(hideTimer);
       };
     }
-  }, [show, onComplete]);
+  }, [show, onComplete, stampsEarned]);
 
   if (!visible) return null;
 
@@ -56,7 +62,7 @@ const StampFlash: React.FC<StampFlashProps> = ({ show, onComplete }) => {
         {/* 「スタンプ獲得！」テキスト */}
         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-center z-20">
           <div className="bg-white text-black px-8 py-3 rounded-lg font-bold shadow-lg text-xl whitespace-nowrap" style={{ writingMode: 'horizontal-tb', minWidth: '200px' }}>
-            スタンプ獲得！
+            スタンプ{stampsEarned > 1 ? `${stampsEarned}個` : ''}獲得！
           </div>
         </div>
         

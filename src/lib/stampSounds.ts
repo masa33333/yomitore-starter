@@ -16,16 +16,64 @@ export function playStampFanfare(stampCount: number = 1): void {
   try {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     
-    // 複数スタンプ獲得時は特別なファンファーレ
-    if (stampCount >= 3) {
-      playSpecialFanfare(audioContext);
-    } else if (stampCount === 2) {
-      playDoubleFanfare(audioContext);
-    } else {
-      playSingleStampFanfare(audioContext);
-    }
+    // 獲得したスタンプ数分だけ連続で音を鳴らす
+    playConsecutiveStampSounds(audioContext, stampCount);
   } catch (error) {
     console.log('🔇 Audio playback not supported:', error);
+  }
+}
+
+/**
+ * スタンプ数分だけ連続で音を鳴らす
+ */
+function playConsecutiveStampSounds(audioContext: AudioContext, stampCount: number): void {
+  console.log(`🎵 Playing ${stampCount} consecutive stamp sounds`);
+  
+  for (let i = 0; i < stampCount; i++) {
+    setTimeout(() => {
+      playIndividualStampSound(audioContext, i + 1, stampCount);
+    }, i * 300); // 300ms間隔で連続再生
+  }
+}
+
+/**
+ * 個別のスタンプ音を再生（獲得順序に応じて音程を上げる）
+ */
+function playIndividualStampSound(audioContext: AudioContext, currentStamp: number, totalStamps: number): void {
+  // 基本音程（C5から始まり、スタンプごとに音程を上げる）
+  const baseFreq = 523.25; // C5
+  const scaleNotes = [0, 2, 4, 5, 7, 9, 11, 12]; // Cメジャースケール（半音単位）
+  const noteIndex = (currentStamp - 1) % scaleNotes.length;
+  const octaveShift = Math.floor((currentStamp - 1) / scaleNotes.length);
+  const freq = baseFreq * Math.pow(2, (scaleNotes[noteIndex] + octaveShift * 12) / 12);
+  
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  // 音色設定
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+  
+  // 音量設定（最後のスタンプは少し強調）
+  const volume = currentStamp === totalStamps ? VOLUME_SETTINGS.special : VOLUME_SETTINGS.single;
+  const duration = currentStamp === totalStamps ? 0.4 : 0.25;
+  
+  // 音量エンベロープ
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.02);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+  
+  // 最後のスタンプにはチャイム効果を追加
+  if (currentStamp === totalStamps) {
+    setTimeout(() => {
+      addChimeEffect(audioContext, 0.2);
+    }, duration * 1000);
   }
 }
 
