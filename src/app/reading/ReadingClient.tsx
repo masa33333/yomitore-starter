@@ -864,6 +864,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setTimeout(() => {
       saveCurrentReadingState();
     }, 100);
+    
+    // 読書分析結果が見えるように自動スクロール
+    setTimeout(() => {
+      console.log('📜 読書分析結果表示エリアに自動スクロール');
+      // ページの最下部から少し上にスクロールして分析結果を表示
+      const scrollTarget = document.documentElement.scrollHeight - window.innerHeight + 200;
+      window.scrollTo({
+        top: scrollTarget,
+        behavior: 'smooth'
+      });
+    }, 1000); // スタンプ演出後にスクロール
   };
 
   // 一通目の手紙を送信する関数
