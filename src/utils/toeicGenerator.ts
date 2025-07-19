@@ -1,4 +1,4 @@
-import { getWordLevel, NGSL_LEVEL_1, NGSL_LEVEL_2, NGSL_LEVEL_3 } from '@/constants/ngslData';
+import { getWordLevel, getAllowedWords } from '@/constants/ngslData';
 
 interface ToeicGenerationOptions {
   level: 1 | 2 | 3;
@@ -122,19 +122,6 @@ function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 }
 
-// レベル別に許可された語彙を取得
-function getAllowedWords(level: number): string[] {
-  switch (level) {
-    case 1:
-      return NGSL_LEVEL_1;
-    case 2:
-      return [...NGSL_LEVEL_1, ...NGSL_LEVEL_2];
-    case 3:
-      return [...NGSL_LEVEL_1, ...NGSL_LEVEL_2, ...NGSL_LEVEL_3];
-    default:
-      return NGSL_LEVEL_1;
-  }
-}
 
 // 語彙レベルを検証
 function validateVocabulary(text: string, level: number): boolean {
