@@ -1,4 +1,4 @@
-import { getNGSLLevel, getAllowedWords } from '@/constants/ngslData';
+import { getWordLevel, NGSL_LEVEL_1, NGSL_LEVEL_2, NGSL_LEVEL_3 } from '@/constants/ngslData';
 
 interface ToeicGenerationOptions {
   level: 1 | 2 | 3;
@@ -122,6 +122,20 @@ function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 }
 
+// レベル別に許可された語彙を取得
+function getAllowedWords(level: number): string[] {
+  switch (level) {
+    case 1:
+      return NGSL_LEVEL_1;
+    case 2:
+      return [...NGSL_LEVEL_1, ...NGSL_LEVEL_2];
+    case 3:
+      return [...NGSL_LEVEL_1, ...NGSL_LEVEL_2, ...NGSL_LEVEL_3];
+    default:
+      return NGSL_LEVEL_1;
+  }
+}
+
 // 語彙レベルを検証
 function validateVocabulary(text: string, level: number): boolean {
   const words = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
@@ -129,7 +143,7 @@ function validateVocabulary(text: string, level: number): boolean {
   
   for (const word of words) {
     if (!allowedWords.includes(word)) {
-      const wordLevel = getNGSLLevel(word);
+      const wordLevel = getWordLevel(word);
       if (wordLevel > level) {
         console.warn(`Word "${word}" (level ${wordLevel}) exceeds target level ${level}`);
         return false;
