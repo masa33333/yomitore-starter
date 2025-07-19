@@ -868,8 +868,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // 読書分析結果が見えるように自動スクロール
     setTimeout(() => {
       console.log('📜 読書分析結果表示エリアに自動スクロール');
-      // 「日本語を表示」「音声を聞く」ボタンがギリギリ見える位置にスクロール
-      const scrollTarget = document.documentElement.scrollHeight - window.innerHeight - 50;
+      // 「日本語を表示」ボタンが画面の一番上に見える位置にスクロール
+      const scrollTarget = document.documentElement.scrollHeight - window.innerHeight - 200;
       window.scrollTo({
         top: scrollTarget,
         behavior: 'smooth'
