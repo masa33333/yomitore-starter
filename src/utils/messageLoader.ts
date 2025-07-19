@@ -89,8 +89,8 @@ export async function loadMessage(
     const catName = getCatName();
     let processedContent = content.replace(/<name>/g, catName);
     
-    // レベル別コンテンツの選択（メールの場合）
-    if (kind === 'mail') {
+    // レベル別コンテンツの選択（メール・手紙の場合）
+    if (kind === 'mail' || kind === 'letter') {
       const userLevel = getUserLevel();
       processedContent = selectLevelContent(processedContent, userLevel);
     }
