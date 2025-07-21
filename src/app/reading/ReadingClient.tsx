@@ -835,17 +835,48 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       // 🔥 新メール・手紙システム: 語数しきい値チェック
       const totalWordsAfterReading = updatedProgress.totalWords;
       
+      // 🔍 DEBUG: 詳細ログ開始
+      console.log('=== MAIL/LETTER DEBUG START ===');
+      console.log(`📊 Current totalWordsAfterReading: ${totalWordsAfterReading}`);
+      
+      // 🧪 Test known values to verify functions work
+      console.log('🧪 Testing shouldSendMail with known values:');
+      console.log(`  shouldSendMail(300): ${shouldSendMail(300)}`);
+      console.log(`  shouldSendMail(5300): ${shouldSendMail(5300)}`);
+      console.log(`  shouldSendMail(10300): ${shouldSendMail(10300)}`);
+      
+      console.log('🧪 Testing shouldSendLetter with known values:');
+      console.log(`  shouldSendLetter(10300): ${shouldSendLetter(10300)}`);
+      console.log(`  shouldSendLetter(20300): ${shouldSendLetter(20300)}`);
+      console.log(`  shouldSendLetter(40300): ${shouldSendLetter(40300)}`);
+      
+      // 🎯 Actual checks with current word count
+      const shouldSendMailResult = shouldSendMail(totalWordsAfterReading);
+      const shouldSendLetterResult = shouldSendLetter(totalWordsAfterReading);
+      
+      console.log('🎯 Actual results for current word count:');
+      console.log(`  shouldSendMail(${totalWordsAfterReading}): ${shouldSendMailResult}`);
+      console.log(`  shouldSendLetter(${totalWordsAfterReading}): ${shouldSendLetterResult}`);
+      
       // メール送信チェック（300語、5300語、10300語、15300語...）
-      if (shouldSendMail(totalWordsAfterReading)) {
-        console.log(`📬 メール送信トリガー: ${totalWordsAfterReading}語`);
+      if (shouldSendMailResult) {
+        console.log(`📬 ✅ メール送信トリガー: ${totalWordsAfterReading}語 - queueMessage('mail') を呼び出し`);
         queueMessage('mail', totalWordsAfterReading);
+        console.log(`📬 ✅ queueMessage('mail', ${totalWordsAfterReading}) 完了`);
+      } else {
+        console.log(`📬 ❌ メール送信なし: ${totalWordsAfterReading}語 - しきい値に達していません`);
       }
       
       // 手紙送信チェック（20300語、40300語、60300語...）
-      if (shouldSendLetter(totalWordsAfterReading)) {
-        console.log(`📮 手紙送信トリガー: ${totalWordsAfterReading}語`);
+      if (shouldSendLetterResult) {
+        console.log(`📮 ✅ 手紙送信トリガー: ${totalWordsAfterReading}語 - queueMessage('letter') を呼び出し`);
         queueMessage('letter', totalWordsAfterReading);
+        console.log(`📮 ✅ queueMessage('letter', ${totalWordsAfterReading}) 完了`);
+      } else {
+        console.log(`📮 ❌ 手紙送信なし: ${totalWordsAfterReading}語 - しきい値に達していません`);
       }
+      
+      console.log('=== MAIL/LETTER DEBUG END ===');
       
     } catch (error) {
       console.error('❌ スタンプカード更新エラー:', error);
