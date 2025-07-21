@@ -8,8 +8,8 @@ export default function ExitCalendarHandler() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // カレンダーページ、storiesページ、読書ページでは動作させない
-    if (pathname === '/calendar' || pathname === '/stories' || pathname.startsWith('/reading')) {
+    // カレンダーページ、storiesページ、読書ページ、chooseページでは動作させない
+    if (pathname === '/calendar' || pathname === '/stories' || pathname.startsWith('/reading') || pathname === '/choose') {
       return;
     }
 
