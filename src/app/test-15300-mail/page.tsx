@@ -121,8 +121,8 @@ export default function Test15300Mail() {
       {/* デバッグ情報 */}
       <div className="mt-6 p-4 bg-gray-100 rounded">
         <h3 className="font-semibold mb-2">デバッグ情報</h3>
-        <p className="text-sm">LocalStorage vocabLevel: {localStorage.getItem('vocabLevel') || 'なし'}</p>
-        <p className="text-sm">LocalStorage totalWordsRead: {localStorage.getItem('totalWordsRead') || 'なし'}</p>
+        <p className="text-sm">LocalStorage vocabLevel: {typeof window !== 'undefined' ? localStorage.getItem('vocabLevel') || 'なし' : 'サーバーサイド'}</p>
+        <p className="text-sm">LocalStorage totalWordsRead: {typeof window !== 'undefined' ? localStorage.getItem('totalWordsRead') || 'なし' : 'サーバーサイド'}</p>
         <p className="text-sm">Expected trigger: 15300語でSeoul→Beijingメール配信</p>
         <p className="text-sm">Content: ソウル街歩き、韓国文化・マナー、明日の予定</p>
       </div>

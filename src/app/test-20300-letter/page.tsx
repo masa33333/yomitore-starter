@@ -121,8 +121,8 @@ export default function Test20300Letter() {
       {/* デバッグ情報 */}
       <div className="mt-6 p-4 bg-gray-100 rounded">
         <h3 className="font-semibold mb-2">デバッグ情報</h3>
-        <p className="text-sm">LocalStorage vocabLevel: {localStorage.getItem('vocabLevel') || 'なし'}</p>
-        <p className="text-sm">LocalStorage totalWordsRead: {localStorage.getItem('totalWordsRead') || 'なし'}</p>
+        <p className="text-sm">LocalStorage vocabLevel: {typeof window !== 'undefined' ? localStorage.getItem('vocabLevel') || 'なし' : 'サーバーサイド'}</p>
+        <p className="text-sm">LocalStorage totalWordsRead: {typeof window !== 'undefined' ? localStorage.getItem('totalWordsRead') || 'なし' : 'サーバーサイド'}</p>
         <p className="text-sm">Expected trigger: 20300語でBeijing手紙配信</p>
         <p className="text-sm">Content: 北京到着、グルメ冒険、テーブルマナー、歴史・万里の長城</p>
         <div className="mt-2">
