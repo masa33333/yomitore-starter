@@ -102,7 +102,7 @@ export default function MessageNotification() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="max-w-md w-full max-h-[90vh] bg-white rounded-lg shadow-xl overflow-hidden flex flex-col">
         {/* ヘッダー */}
-        <div className={`px-6 py-4 text-white ${isLetter ? 'bg-purple-600' : 'bg-blue-600'}`}>
+        <div className={`px-6 py-4 text-white ${isLetter ? 'bg-gray-500' : 'bg-blue-600'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-2xl">{isLetter ? '📮' : '✉️'}</span>
@@ -157,7 +157,7 @@ export default function MessageNotification() {
               onClick={handleClose}
               className={`px-4 py-2 rounded text-white font-medium ${
                 isLetter 
-                  ? 'bg-purple-600 hover:bg-purple-700' 
+                  ? 'bg-gray-500 hover:bg-gray-600' 
                   : 'bg-blue-600 hover:bg-blue-700'
               }`}
             >
