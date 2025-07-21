@@ -188,10 +188,10 @@ function selectLevelContent(content: string, userLevel: number): string {
       console.log(`🔍 Level 2 header:`, JSON.stringify(content.substring(level2Index, level2Index + 50)));
     }
     
-    // より厳密な正規表現でLevel 1-3のセクションを抽出（括弧・ハイフン対応）
-    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 2|\n+\*\*日本語版|\n+---|\s*$)/);
-    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 3|\n+\*\*日本語版|\n+---|\s*$)/);
-    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*日本語版|\n+---|\s*$)/);
+    // より厳密な正規表現でLevel 1-3のセクションを抽出（改行修正版）
+    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n*\*\*Level 2|\n*\*\*日本語版|\n*---|\s*$)/);
+    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n*\*\*Level 3|\n*\*\*日本語版|\n*---|\s*$)/);
+    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n*\*\*日本語版|\n*---|\s*$)/);
     const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*\n+([\s\S]*?)(?=\n+---|\s*$)/);
     
     console.log(`📊 Match results:`, {
@@ -202,9 +202,24 @@ function selectLevelContent(content: string, userLevel: number): string {
     });
     
     // デバッグ: マッチした内容の詳細表示
-    if (level1Match) console.log(`🔍 Level 1 match preview:`, level1Match[1]?.substring(0, 100) + '...');
-    if (level2Match) console.log(`🔍 Level 2 match preview:`, level2Match[1]?.substring(0, 100) + '...');
-    if (level3Match) console.log(`🔍 Level 3 match preview:`, level3Match[1]?.substring(0, 100) + '...');
+    if (level1Match) {
+      console.log(`🔍 Level 1 match preview:`, level1Match[1]?.substring(0, 100) + '...');
+      console.log(`🔍 Level 1 match length:`, level1Match[1]?.length);
+    } else {
+      console.log(`❌ Level 1 regex failed`);
+    }
+    if (level2Match) {
+      console.log(`🔍 Level 2 match preview:`, level2Match[1]?.substring(0, 100) + '...');
+      console.log(`🔍 Level 2 match length:`, level2Match[1]?.length);
+    } else {
+      console.log(`❌ Level 2 regex failed`);
+    }
+    if (level3Match) {
+      console.log(`🔍 Level 3 match preview:`, level3Match[1]?.substring(0, 100) + '...');
+      console.log(`🔍 Level 3 match length:`, level3Match[1]?.length);
+    } else {
+      console.log(`❌ Level 3 regex failed`);
+    }
     if (japaneseMatch) console.log(`🔍 Japanese match preview:`, japaneseMatch[1]?.substring(0, 100) + '...');
     
     let selectedContent = '';
