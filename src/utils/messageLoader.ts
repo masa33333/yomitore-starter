@@ -160,6 +160,14 @@ function selectLevelContent(content: string, userLevel: number): string {
     console.log(`🔍 Selecting content for level: ${userLevel}`);
     console.log(`📄 Original content length: ${content.length}`);
     
+    // レベル分けがない単純なメール/手紙かチェック
+    const hasLevelSections = content.includes('**Level 1') || content.includes('**Level 2') || content.includes('**Level 3');
+    
+    if (!hasLevelSections) {
+      console.log(`📝 No level sections found - returning original content (simple mail/letter)`);
+      return content;
+    }
+    
     // より厳密な正規表現でLevel 1-3のセクションを抽出
     const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 2|\n+\*\*日本語版|\n+---|\s*$)/);
     const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 3|\n+\*\*日本語版|\n+---|\s*$)/);
@@ -172,6 +180,12 @@ function selectLevelContent(content: string, userLevel: number): string {
       level3: !!level3Match,
       japanese: !!japaneseMatch
     });
+    
+    // デバッグ: マッチした内容の詳細表示
+    if (level1Match) console.log(`🔍 Level 1 match preview:`, level1Match[1]?.substring(0, 100) + '...');
+    if (level2Match) console.log(`🔍 Level 2 match preview:`, level2Match[1]?.substring(0, 100) + '...');
+    if (level3Match) console.log(`🔍 Level 3 match preview:`, level3Match[1]?.substring(0, 100) + '...');
+    if (japaneseMatch) console.log(`🔍 Japanese match preview:`, japaneseMatch[1]?.substring(0, 100) + '...');
     
     let selectedContent = '';
     
