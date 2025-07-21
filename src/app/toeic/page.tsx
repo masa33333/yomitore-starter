@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useEffect, useState } from 'react';
-import { getGenerationLevelName } from '@/utils/getEnglishText'; // 追加
+import { getGenerationLevelName } from '@/utils/getEnglishText';
 
 interface Passage {
   id: string;
