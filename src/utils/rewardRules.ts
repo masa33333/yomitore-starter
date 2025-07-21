@@ -31,10 +31,16 @@ export function shouldSendMail(totalWords: number): boolean {
 }
 
 export function shouldSendLetter(totalWords: number): boolean {
-  // ① Seoul手紙（10300語）
+  // ① Seoul手紙（1000語）- 旧システム復活
+  if (totalWords === 1_000) return true;
+  
+  // ② Beijing手紙（2000語）- 旧システム復活  
+  if (totalWords === 2_000) return true;
+  
+  // ③ Seoul手紙（10300語）- 新システム
   if (totalWords === 10_300) return true;
   
-  // ② Beijing手紙（20300語）
+  // ④ Beijing手紙（20300語）- 新システム
   if (totalWords === 20_300) return true;
   
   // ③ 40300語以降の周期手紙：40300語から20,000語サイクル
@@ -101,8 +107,10 @@ export function getMessageFileName(trigger: number): string | null {
   
   if (type === 'letter') {
     // 手紙ファイル名の生成
-    if (trigger === 10_300) return '000_seoul_arrival';
-    if (trigger === 20_300) return '001_beijing_arrival';
+    if (trigger === 1_000) return '000_seoul_arrival';    // 旧システム復活
+    if (trigger === 2_000) return '001_beijing_arrival';  // 旧システム復活
+    if (trigger === 10_300) return '000_seoul_arrival';   // 新システム（同じファイル）
+    if (trigger === 20_300) return '001_beijing_arrival'; // 新システム（同じファイル）
     
     // 40300語以降の周期手紙
     if (trigger >= 40_300) {
