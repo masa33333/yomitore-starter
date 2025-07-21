@@ -129,8 +129,9 @@ Error:   × You're importing a component that needs `useRouter`. This React hook
 
 ### 🐛 現在の課題
 
-- `src/app/toeic/page.tsx`が`"use client";`ディレクティブが正しく機能していない可能性があり、`useRouter`, `useEffect`, `useState`に関するエラーが継続している。
-    - 解決策として、`"use client";`の記述の再確認、開発サーバーの再起動、`.next`ディレクトリの削除を推奨。
+- ~~`src/app/toeic/page.tsx`が`"use client";`ディレクティブが正しく機能していない可能性があり、`useRouter`, `useEffect`, `useState`に関するエラーが継続している。~~
+    - ✅ **解決済み (2025-07-21)**: `.next`ディレクトリ削除とサーバー再起動でエラー解決
+    - TOEICページが正常に表示されることを確認
 
 ---
 
