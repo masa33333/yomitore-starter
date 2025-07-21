@@ -121,8 +121,8 @@ export default function Test10300Letter() {
       {/* デバッグ情報 */}
       <div className="mt-6 p-4 bg-gray-100 rounded">
         <h3 className="font-semibold mb-2">デバッグ情報</h3>
-        <p className="text-sm">LocalStorage vocabLevel: {localStorage.getItem('vocabLevel') || 'なし'}</p>
-        <p className="text-sm">LocalStorage totalWordsRead: {localStorage.getItem('totalWordsRead') || 'なし'}</p>
+        <p className="text-sm">LocalStorage vocabLevel: {typeof window !== 'undefined' ? localStorage.getItem('vocabLevel') || 'なし' : 'サーバーサイド'}</p>
+        <p className="text-sm">LocalStorage totalWordsRead: {typeof window !== 'undefined' ? localStorage.getItem('totalWordsRead') || 'なし' : 'サーバーサイド'}</p>
         <p className="text-sm">Expected trigger: 10300語でSeoul手紙配信</p>
       </div>
     </div>
