@@ -52,6 +52,28 @@ export default function DebugMailPage() {
     updateQueue();
   };
 
+  const test5300Words = () => {
+    // 5300語に設定
+    const userProgress = { totalWords: 5300, totalStamps: 53 };
+    localStorage.setItem('userProgress', JSON.stringify(userProgress));
+    localStorage.setItem('totalWordsRead', '5300');
+    localStorage.setItem('wordCountTotal', '5300');
+    
+    // メール判定
+    const shouldMail = shouldSendMail(5300);
+    const fileName = getMessageFileName(5300);
+    
+    if (shouldMail) {
+      queueMessage('mail', 5300);
+      setTestResult(`✅ 5300語メール送信: ファイル名=${fileName}`);
+    } else {
+      setTestResult(`❌ 5300語でメール送信されませんでした`);
+    }
+    
+    setCurrentWords(5300);
+    updateQueue();
+  };
+
   const test10300Words = () => {
     // 10300語に設定
     const userProgress = { totalWords: 10300, totalStamps: 103 };
@@ -139,6 +161,11 @@ ${message.content.substring(0, 100)}...`);
             </span>
           </p>
           <p className="text-sm">
+            5300語でメール: <span className={shouldSendMail(5300) ? 'text-green-600' : 'text-red-600'}>
+              {shouldSendMail(5300) ? '✅' : '❌'}
+            </span>
+          </p>
+          <p className="text-sm">
             10300語で手紙: <span className={shouldSendLetter(10300) ? 'text-green-600' : 'text-red-600'}>
               {shouldSendLetter(10300) ? '✅' : '❌'}
             </span>
@@ -157,6 +184,12 @@ ${message.content.substring(0, 100)}...`);
             300語メールテスト
           </button>
           <button
+            onClick={test5300Words}
+            className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+          >
+            5300語メールテスト
+          </button>
+          <button
             onClick={test10300Words}
             className="bg-purple-500 text-white px-4 py-2 rounded mr-2"
           >
@@ -164,13 +197,19 @@ ${message.content.substring(0, 100)}...`);
           </button>
           <button
             onClick={() => testLoadMessage(300)}
-            className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+            className="bg-orange-500 text-white px-4 py-2 rounded mr-2"
           >
             300語メッセージ読み込みテスト
           </button>
           <button
+            onClick={() => testLoadMessage(5300)}
+            className="bg-orange-600 text-white px-4 py-2 rounded mr-2"
+          >
+            5300語メッセージ読み込みテスト
+          </button>
+          <button
             onClick={() => testLoadMessage(10300)}
-            className="bg-green-600 text-white px-4 py-2 rounded mr-2"
+            className="bg-orange-700 text-white px-4 py-2 rounded mr-2"
           >
             10300語メッセージ読み込みテスト
           </button>
