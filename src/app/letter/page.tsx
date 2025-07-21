@@ -46,7 +46,7 @@ function LetterPageContent() {
     
     // letter type content header
     const letterHeader = (
-      <div className="border-l-4 border-[#FFB86C] pl-4 mb-4">
+      <div className="border-l-4 border-gray-500 pl-4 mb-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
             <span className="text-[#FFB86C] text-lg">📮</span>

@@ -170,6 +170,37 @@ export default function NotebookPage() {
         >
           ← 読書画面へ戻る
         </button>
+
+        {/* Demo Navigation Buttons */}
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <h3 className="text-sm font-semibold text-yellow-800 mb-3">📹 デモ用ナビゲーション</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <button
+              onClick={() => window.open('/letters/istanbul.png', '_blank')}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🏛️ Istanbul
+            </button>
+            <button
+              onClick={() => window.open('/letters/london.png', '_blank')}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🏰 London
+            </button>
+            <button
+              onClick={() => window.open('/letters/nairobi.png', '_blank')}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              🦁 Nairobi
+            </button>
+            <button
+              onClick={() => router.push('/calendar')}
+              className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              📅 Calendar
+            </button>
+          </div>
+        </div>
         
         <h1 className="mb-2 text-xl font-bold text-text-primary">{t('notebook.title')}</h1>
         <p className="text-text-primary">

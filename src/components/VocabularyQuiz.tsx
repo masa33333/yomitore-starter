@@ -466,23 +466,6 @@ export function VocabularyQuiz() {
                 テストを始める
               </button>
               
-              <button
-                onClick={() => {
-                  // クイズスキップ - レベル3で設定
-                  localStorage.setItem('vocabularyLevel', '3');
-                  localStorage.setItem('vocabLevel', '3');
-                  localStorage.setItem('level', '3');
-                  localStorage.setItem('fixedLevel', '3');
-                  localStorage.setItem('userLevel', 'B1');
-                  localStorage.setItem('quizCompleted', 'true');
-                  console.log('📚 Quiz skipped - Level 3 set');
-                  router.push('/choose');
-                }}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-              >
-                スキップ（レベル3で開始）
-              </button>
-              
             </div>
           </div>
         </div>
