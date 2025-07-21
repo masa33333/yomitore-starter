@@ -168,7 +168,27 @@ function selectLevelContent(content: string, userLevel: number): string {
       return content;
     }
     
-    // より厳密な正規表現でLevel 1-3のセクションを抽出
+    // デバッグ: レベルヘッダーの検索
+    console.log(`🔍 Level headers found:`, {
+      level1Found: content.includes('**Level 1'),
+      level2Found: content.includes('**Level 2'),
+      level3Found: content.includes('**Level 3'),
+      level1Index: content.indexOf('**Level 1'),
+      level2Index: content.indexOf('**Level 2'),
+      level3Index: content.indexOf('**Level 3')
+    });
+    
+    // デバッグ: 実際のヘッダー文字列を確認
+    const level1Index = content.indexOf('**Level 1');
+    const level2Index = content.indexOf('**Level 2');
+    if (level1Index >= 0) {
+      console.log(`🔍 Level 1 header:`, JSON.stringify(content.substring(level1Index, level1Index + 50)));
+    }
+    if (level2Index >= 0) {
+      console.log(`🔍 Level 2 header:`, JSON.stringify(content.substring(level2Index, level2Index + 50)));
+    }
+    
+    // より厳密な正規表現でLevel 1-3のセクションを抽出（括弧・ハイフン対応）
     const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 2|\n+\*\*日本語版|\n+---|\s*$)/);
     const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 3|\n+\*\*日本語版|\n+---|\s*$)/);
     const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*日本語版|\n+---|\s*$)/);
