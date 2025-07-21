@@ -197,10 +197,51 @@ function selectLevelContent(content: string, userLevel: number): string {
     const simpleLevel2Test = /\*\*Level 2/.test(content);
     console.log(`🧪 Simple regex tests:`, { level1: simpleLevel1Test, level2: simpleLevel2Test });
     
-    // より厳密な正規表現でLevel 1-3のセクションを抽出（From <name>区切り方式）
-    const level1Match = content.match(/\*\*Level 1.*?\n\n([\s\S]*?)From <name>/s);
-    const level2Match = content.match(/\*\*Level 2.*?\n\n([\s\S]*?)From <name>/s);
-    const level3Match = content.match(/\*\*Level 3.*?\n\n([\s\S]*?)From <name>/s);
+    // 直接的な文字列操作でLevel 1-3のセクションを抽出
+    let level1Match = null, level2Match = null, level3Match = null;
+    
+    // Level 1 抽出
+    const level1Start = content.indexOf('**Level 1');
+    const level2Start = content.indexOf('**Level 2');
+    if (level1Start >= 0 && level2Start > level1Start) {
+      const level1Section = content.substring(level1Start, level2Start);
+      const headerEnd = level1Section.indexOf('\n\n');
+      if (headerEnd >= 0) {
+        const level1Content = level1Section.substring(headerEnd + 2);
+        const fromIndex = level1Content.lastIndexOf('From <name>');
+        if (fromIndex >= 0) {
+          level1Match = [null, level1Content.substring(0, fromIndex).trim()];
+        }
+      }
+    }
+    
+    // Level 2 抽出
+    const level3Start = content.indexOf('**Level 3');
+    if (level2Start >= 0 && level3Start > level2Start) {
+      const level2Section = content.substring(level2Start, level3Start);
+      const headerEnd = level2Section.indexOf('\n\n');
+      if (headerEnd >= 0) {
+        const level2Content = level2Section.substring(headerEnd + 2);
+        const fromIndex = level2Content.lastIndexOf('From <name>');
+        if (fromIndex >= 0) {
+          level2Match = [null, level2Content.substring(0, fromIndex).trim()];
+        }
+      }
+    }
+    
+    // Level 3 抽出
+    const japaneseStart = content.indexOf('**日本語版');
+    if (level3Start >= 0 && japaneseStart > level3Start) {
+      const level3Section = content.substring(level3Start, japaneseStart);
+      const headerEnd = level3Section.indexOf('\n\n');
+      if (headerEnd >= 0) {
+        const level3Content = level3Section.substring(headerEnd + 2);
+        const fromIndex = level3Content.lastIndexOf('From <name>');
+        if (fromIndex >= 0) {
+          level3Match = [null, level3Content.substring(0, fromIndex).trim()];
+        }
+      }
+    }
     const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*\n+([\s\S]*?)(?=\n+---|\s*$)/);
     
     console.log(`📊 Match results:`, {
