@@ -168,12 +168,77 @@ function selectLevelContent(content: string, userLevel: number): string {
       return content;
     }
     
-    // 3レベル問題を諦めて、元のコンテンツをそのまま返す
-    console.log(`🔥 TEMPORARY FIX: Returning original content with all levels (3レベル表示)`);
-    return content;
+    // シンプルな文字列分割でレベル別コンテンツを抽出
+    console.log(`🔧 Extracting level ${userLevel} content using simple string splitting`);
+    
+    // まず日本語セクションを分離
+    const japaneseStart = content.indexOf('**日本語版:**');
+    const englishPart = japaneseStart >= 0 ? content.substring(0, japaneseStart) : content;
+    const japanesePart = japaneseStart >= 0 ? content.substring(japaneseStart) : '';
+    
+    // 日本語部分を抽出
+    const japaneseMatch = japanesePart.match(/\*\*日本語版:\*\*\s*\n+([\s\S]*?)(?=\n*---|\s*$)/);
+    const japaneseContent = japaneseMatch ? japaneseMatch[1].trim() : '';
+    
+    // 英語部分をレベル別に分割
+    const targetLevel = `**Level ${userLevel}`;
+    const levelStart = englishPart.indexOf(targetLevel);
+    
+    if (levelStart === -1) {
+      console.warn(`❌ Level ${userLevel} not found, falling back to original content`);
+      return content;
+    }
+    
+    // 次のレベルの開始位置を見つける
+    let nextLevelStart = englishPart.length;
+    for (let i = 1; i <= 3; i++) {
+      if (i !== userLevel) {
+        const nextLevel = englishPart.indexOf(`**Level ${i}`, levelStart + 1);
+        if (nextLevel > levelStart && nextLevel < nextLevelStart) {
+          nextLevelStart = nextLevel;
+        }
+      }
+    }
+    
+    // 対象レベルのセクションを抽出
+    const levelSection = englishPart.substring(levelStart, nextLevelStart).trim();
+    
+    // ヘッダー行を除いてコンテンツを抽出
+    const lines = levelSection.split('\n');
+    const contentLines = [];
+    let headerPassed = false;
+    
+    for (const line of lines) {
+      if (!headerPassed && line.startsWith('**Level')) {
+        headerPassed = true;
+        continue;
+      }
+      if (headerPassed && line.trim() !== '') {
+        contentLines.push(line);
+      }
+    }
+    
+    const selectedContent = contentLines.join('\n').trim();
+    
+    // "From <name>" を除去
+    const finalContent = selectedContent.replace(/\n\s*From <name>\s*$/, '').trim();
+    
+    console.log(`✅ Extracted Level ${userLevel} content (${finalContent.length} chars)`);
+    console.log(`📝 Content preview: ${finalContent.substring(0, 100)}...`);
+    
+    // 日本語版と結合
+    if (japaneseContent) {
+      const result = `${finalContent}\n\n---\n\n**日本語版:**\n\n${japaneseContent}`;
+      console.log(`✅ Combined with Japanese version (${result.length} chars total)`);
+      return result;
+    } else {
+      console.log(`⚠️ No Japanese version found, using English only`);
+      return finalContent;
+    }
     
   } catch (error) {
     console.error('❌ Error selecting level content:', error);
+    console.error('❌ Falling back to original content');
     return content; // エラー時は元のコンテンツを返す
   }
 }
