@@ -181,17 +181,26 @@ function selectLevelContent(content: string, userLevel: number): string {
     // デバッグ: 実際のヘッダー文字列を確認
     const level1Index = content.indexOf('**Level 1');
     const level2Index = content.indexOf('**Level 2');
+    const level3Index = content.indexOf('**Level 3');
     if (level1Index >= 0) {
-      console.log(`🔍 Level 1 header:`, JSON.stringify(content.substring(level1Index, level1Index + 50)));
+      console.log(`🔍 Level 1 section:`, JSON.stringify(content.substring(level1Index, level1Index + 200)));
     }
     if (level2Index >= 0) {
-      console.log(`🔍 Level 2 header:`, JSON.stringify(content.substring(level2Index, level2Index + 50)));
+      console.log(`🔍 Level 2 section:`, JSON.stringify(content.substring(level2Index, level2Index + 200)));
+    }
+    if (level3Index >= 0) {
+      console.log(`🔍 Level 3 section:`, JSON.stringify(content.substring(level3Index, level3Index + 200)));
     }
     
-    // より厳密な正規表現でLevel 1-3のセクションを抽出（改行修正版）
-    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n*\*\*Level 2|\n*\*\*日本語版|\n*---|\s*$)/);
-    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n*\*\*Level 3|\n*\*\*日本語版|\n*---|\s*$)/);
-    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n*\*\*日本語版|\n*---|\s*$)/);
+    // デバッグ: 手動で簡単な正規表現テスト
+    const simpleLevel1Test = /\*\*Level 1/.test(content);
+    const simpleLevel2Test = /\*\*Level 2/.test(content);
+    console.log(`🧪 Simple regex tests:`, { level1: simpleLevel1Test, level2: simpleLevel2Test });
+    
+    // より厳密な正規表現でLevel 1-3のセクションを抽出（From <name>を含む）
+    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 2|\n+\*\*日本語版|\n+---|\s*$)/);
+    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 3|\n+\*\*日本語版|\n+---|\s*$)/);
+    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*日本語版|\n+---|\s*$)/);
     const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*\n+([\s\S]*?)(?=\n+---|\s*$)/);
     
     console.log(`📊 Match results:`, {
