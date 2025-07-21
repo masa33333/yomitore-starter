@@ -1,8 +1,7 @@
 ---
 id: mail-002
 trigger: 15300
-image: /letters/seoul.png
-city: Seoul
+city: In-Flight
 level: auto
 ---
 

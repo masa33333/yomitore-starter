@@ -1,8 +1,7 @@
 ---
 id: mail-001
 trigger: 5300
-image: /letters/tokyo.png
-city: Tokyo
+city: In-Flight
 level: auto
 ---
 
