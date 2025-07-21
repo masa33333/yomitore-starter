@@ -197,10 +197,10 @@ function selectLevelContent(content: string, userLevel: number): string {
     const simpleLevel2Test = /\*\*Level 2/.test(content);
     console.log(`🧪 Simple regex tests:`, { level1: simpleLevel1Test, level2: simpleLevel2Test });
     
-    // より厳密な正規表現でLevel 1-3のセクションを抽出（From <name>を含む）
-    const level1Match = content.match(/\*\*Level 1[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 2|\n+\*\*日本語版|\n+---|\s*$)/);
-    const level2Match = content.match(/\*\*Level 2[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*Level 3|\n+\*\*日本語版|\n+---|\s*$)/);
-    const level3Match = content.match(/\*\*Level 3[^*]*\*\*:\s*\n+([\s\S]*?)(?=\n+\*\*日本語版|\n+---|\s*$)/);
+    // より厳密な正規表現でLevel 1-3のセクションを抽出（From <name>区切り方式）
+    const level1Match = content.match(/\*\*Level 1.*?\n\n([\s\S]*?)From <name>/s);
+    const level2Match = content.match(/\*\*Level 2.*?\n\n([\s\S]*?)From <name>/s);
+    const level3Match = content.match(/\*\*Level 3.*?\n\n([\s\S]*?)From <name>/s);
     const japaneseMatch = content.match(/\*\*日本語版:\*\*\s*\n+([\s\S]*?)(?=\n+---|\s*$)/);
     
     console.log(`📊 Match results:`, {
