@@ -208,6 +208,15 @@ function selectLevelContent(content: string, userLevel: number): string {
     } else {
       // フォールバック: 元のコンテンツをそのまま返す
       console.warn(`❌ Could not extract level ${userLevel} content, using original`);
+      console.warn(`🔍 Debug info:`, {
+        userLevel,
+        selectedContentLength: selectedContent.length,
+        japaneseContentLength: japaneseContent.length,
+        hasLevel1: !!level1Match,
+        hasLevel2: !!level2Match,
+        hasLevel3: !!level3Match,
+        contentPreview: content.substring(0, 200)
+      });
       return content;
     }
     

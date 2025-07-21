@@ -80,7 +80,24 @@ export default function DebugMailPage() {
       const message = await loadMessageByTrigger(trigger);
       
       if (message) {
-        setTestResult(`✅ メッセージ読み込み成功: ${message.metadata.id} (${message.content.length}文字)`);
+        // ユーザーレベルとコンテンツの詳細を表示
+        const userLevel = localStorage.getItem('vocabLevel') || localStorage.getItem('vocabularyLevel') || '不明';
+        const hasLevel1 = message.content.includes('**Level 1');
+        const hasLevel2 = message.content.includes('**Level 2');
+        const hasLevel3 = message.content.includes('**Level 3');
+        const hasJapanese = message.content.includes('**日本語版');
+        
+        setTestResult(`✅ メッセージ読み込み成功: ${message.metadata.id}
+📊 コンテンツ分析:
+- 文字数: ${message.content.length}文字
+- ユーザーレベル: ${userLevel}
+- Level 1セクション: ${hasLevel1 ? '✅' : '❌'}
+- Level 2セクション: ${hasLevel2 ? '✅' : '❌'}
+- Level 3セクション: ${hasLevel3 ? '✅' : '❌'}
+- 日本語セクション: ${hasJapanese ? '✅' : '❌'}
+
+📝 表示内容の最初100文字:
+${message.content.substring(0, 100)}...`);
       } else {
         setTestResult(`❌ メッセージ読み込み失敗: trigger=${trigger}`);
       }
