@@ -166,7 +166,7 @@ export default function ChoosePage() {
         >
           <div>
             <h3 className="mb-1 text-lg font-semibold">ストーリーを生成する</h3>
-            <p className="mt-1 text-sm text-black/90">ジャンル・雰囲気・読後感を選んでオリジナルストーリーを作成</p>
+            <p className="mt-1 text-sm text-black/90">オリジナルのストーリーを生成する</p>
           </div>
         </button>
       </div>
