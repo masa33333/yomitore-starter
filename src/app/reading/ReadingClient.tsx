@@ -1562,44 +1562,40 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
             .map(line => line.substring(1).trim());
           
           let storyContent;
-          let paragraphs = [];
+          let paragraphs;
           
           if (newLevel === 1) {
-            // レベル1：最初の-行の後、空行で区切られた段落構造
+            // レベル1：-で始まる行とその後に続く行をまとめて段落とする
             const contentLines = [];
             let currentParagraph = [];
-            let foundFirstDash = false;
             
-            for (const line of lines) {
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
               if (line.startsWith('*')) {
                 continue; // タイトル行はスキップ
               } else if (line.startsWith('-')) {
-                // 最初の-行
-                currentParagraph.push(line.substring(1).trim());
-                foundFirstDash = true;
-              } else if (foundFirstDash) {
-                if (line.trim() === '') {
-                  // 空行で段落終了
-                  if (currentParagraph.length > 0) {
-                    contentLines.push(currentParagraph.join(' '));
-                    currentParagraph = [];
-                  }
-                } else {
-                  // 段落の続き
-                  currentParagraph.push(line.trim());
+                // 前の段落を保存
+                if (currentParagraph.length > 0) {
+                  contentLines.push(currentParagraph.join('\n'));
+                  currentParagraph = [];
                 }
+                // 新しい段落開始
+                currentParagraph.push(line.substring(1).trim());
+              } else if (line.trim() !== '') {
+                // -の後に続く行
+                currentParagraph.push(line.trim());
               }
             }
             
             // 最後の段落を追加
             if (currentParagraph.length > 0) {
-              contentLines.push(currentParagraph.join(' '));
+              contentLines.push(currentParagraph.join('\n'));
             }
             
             storyContent = contentLines.join('\n\n');
             paragraphs = contentLines;
           } else {
-            // レベル2,3の場合：-で始まる行のみを段落として扱う
+            // レベル2,3：-で始まる行のみを段落として扱う
             storyContent = dashLines.join('\n\n');
             paragraphs = dashLines;
           }
