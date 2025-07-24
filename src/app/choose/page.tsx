@@ -159,14 +159,14 @@ export default function ChoosePage() {
           </div>
         </button>
 
-        {/* TOEICリーディング対策ボタン */}
+        {/* ストーリー生成ボタン */}
         <button
-          onClick={() => router.push('/toeic')}
-          className="w-full rounded-xl bg-orange-500 px-6 py-4 text-left text-black transition-colors hover:bg-orange-600 md:col-span-2"
+          onClick={() => router.push('/story-form')}
+          className="w-full rounded-xl bg-orange-400 px-6 py-4 text-left text-black transition-colors hover:bg-orange-500 md:col-span-2"
         >
           <div>
-            <h3 className="mb-1 text-lg font-semibold">{t('choose.toeic.title')}</h3>
-            <p className="mt-1 text-sm text-black/90">{t('choose.toeic.desc')}</p>
+            <h3 className="mb-1 text-lg font-semibold">ストーリーを生成する</h3>
+            <p className="mt-1 text-sm text-black/90">ジャンル・雰囲気・読後感を選んでオリジナルストーリーを作成</p>
           </div>
         </button>
       </div>

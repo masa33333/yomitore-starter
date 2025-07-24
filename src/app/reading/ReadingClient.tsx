@@ -1536,11 +1536,124 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // レベル再生成処理
   const handleRegenerateWithLevel = async (newLevel: number) => {
-    setLoading(true);
     setShowLevelSelector(false);
     
+    // river_streamの場合は同期処理で即座に切り替え
+    if (searchParams.slug && searchParams.slug.includes('river_stream/ep1')) {
+      console.log('📚 river_stream即座レベル変更:', { slug: searchParams.slug, newLevel });
+      
+      // 静的ファイル読み込み（同期）
+      fetch(`/stories/river_stream/ep1/level${newLevel}.txt`)
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          }
+          throw new Error('ファイル読み込み失敗');
+        })
+        .then(content => {
+          const lines = content.split('\n').filter(line => line.trim());
+          
+          // タイトル行（*で始まる）を探す
+          const titleLine = lines.find(line => line.startsWith('*'));
+          const title = titleLine ? titleLine.substring(1).trim() : 'River Stream';
+          
+          // 本文行（-で始まる）を抽出
+          const dashLines = lines.filter(line => line.startsWith('-'))
+            .map(line => line.substring(1).trim());
+          
+          let storyContent;
+          let paragraphs = [];
+          
+          if (newLevel === 1) {
+            // レベル1：最初の-行の後、空行で区切られた段落構造
+            const contentLines = [];
+            let currentParagraph = [];
+            let foundFirstDash = false;
+            
+            for (const line of lines) {
+              if (line.startsWith('*')) {
+                continue; // タイトル行はスキップ
+              } else if (line.startsWith('-')) {
+                // 最初の-行
+                currentParagraph.push(line.substring(1).trim());
+                foundFirstDash = true;
+              } else if (foundFirstDash) {
+                if (line.trim() === '') {
+                  // 空行で段落終了
+                  if (currentParagraph.length > 0) {
+                    contentLines.push(currentParagraph.join(' '));
+                    currentParagraph = [];
+                  }
+                } else {
+                  // 段落の続き
+                  currentParagraph.push(line.trim());
+                }
+              }
+            }
+            
+            // 最後の段落を追加
+            if (currentParagraph.length > 0) {
+              contentLines.push(currentParagraph.join(' '));
+            }
+            
+            storyContent = contentLines.join('\n\n');
+            paragraphs = contentLines;
+          } else {
+            // レベル2,3の場合：-で始まる行のみを段落として扱う
+            storyContent = dashLines.join('\n\n');
+            paragraphs = dashLines;
+          }
+          
+          if (storyContent.length > 0) {
+            console.log('📖 river_stream即座切り替え完了:', {
+              title,
+              contentLength: storyContent.length,
+              newLevel
+            });
+            
+            // 内容を更新
+            setEnglish(storyContent);
+            
+            // 段落設定
+            setEnglishParagraphs(paragraphs);
+            setSelectedLevel(newLevel);
+            
+            // タイトルを更新（重要: これでタイトルが表示される）
+            setStoryTitle(title);
+            
+            // 語数を再計算
+            const words = storyContent.trim().split(/\s+/).filter(w => w.length > 0);
+            setWordCount(words.length);
+            
+            // localStorageの生成レベルも更新
+            localStorage.setItem('level', newLevel.toString());
+            localStorage.setItem('fixedLevel', newLevel.toString());
+            
+            // 日本語翻訳をリセット
+            setJapanese('');
+            setJapaneseParagraphs([]);
+            setShowJapanese(false);
+            
+            // 読書状態をリセット
+            setIsReadingStarted(false);
+            setStartTime(null);
+            setEndTime(null);
+            setWpm(null);
+            setSessionWords([]);
+            
+            console.log('✅ river_stream即座レベル変更完了');
+          }
+        })
+        .catch(error => {
+          console.error('❌ river_streamファイル読み込みエラー:', error);
+        });
+      return;
+    }
+    
+    // 従来の再生成処理（プリセット以外またはファイル読み込み失敗時）
+    setLoading(true);
+    
     try {
-      // 現在の英語テキストを新しいレベルで書き直し
       const response = await fetch('/api/rewrite-level', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2234,7 +2347,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
           <h1 className="text-2xl font-bold text-text-primary">
-            {mode === 'story' ? (initialData?.title || displayTitle) : displayTitle}
+            {(searchParams.slug && searchParams.slug.includes('river_stream') && storyTitle) ? 
+              storyTitle : 
+              (storyTitle || (mode === 'story' ? (initialData?.title || displayTitle) : displayTitle))
+            }
           </h1>
           
           {/* 文字サイズ変更コントロール & 音声再生 */}
