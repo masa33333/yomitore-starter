@@ -129,6 +129,8 @@ type PageProps = {
   searchParams?: {
     slug?: string;      // プリセットストーリー用
     mode?: string;
+    type?: string;      // 'story' for generated stories
+    id?: string;        // Story ID for generated stories
     genre?: string;
     tone?: string;
     feeling?: string;
@@ -145,16 +147,24 @@ export default async function ReadingPage({ searchParams }: PageProps) {
   const params = await searchParams || {};
   console.log('🏗️ Server Component executing with params:', params);
   
-  const { slug } = params;
+  const { slug, type, id } = params;
   const mode = params.mode || 'reading';
   const isStoryMode = mode === 'story';
+  const isGeneratedStoryMode = type === 'story' && !!id;
   const isPresetMode = !!slug;
   
   // サーバーサイドでデータを取得
   let initialData: StoryData | null = null;
 
+  // Generated story mode - delegate to client-side to load from localStorage
+  if (isGeneratedStoryMode) {
+    console.log(`📖 Generated story mode: ${id}`);
+    // The story data will be loaded on the client side from localStorage
+    // We pass null as initialData and let ReadingClient handle it
+    initialData = null;
+  }
   // プリセットストーリーの場合
-  if (isPresetMode && slug) {
+  else if (isPresetMode && slug) {
     // ユーザーのレベルを取得（デフォルト: 1）
     const userLevel = parseInt(params.level || '1');
     
@@ -226,7 +236,7 @@ export default async function ReadingPage({ searchParams }: PageProps) {
     }
   }
   
-  if (isStoryMode) {
+  else if (isStoryMode) {
     const { genre, tone, feeling } = params;
     
     if (genre && tone && feeling) {

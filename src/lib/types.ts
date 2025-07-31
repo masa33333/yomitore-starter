@@ -7,3 +7,15 @@ export interface RoutePoint {
   trivia: string[];
   photoTier: 'full' | 'stock' | 'none';
 }
+
+export interface Story {
+  id: string;
+  title: string;
+  enText: string;
+  jpText?: string;
+  vocabLevel: number;
+  genre: string;
+  mood: string;
+  tone?: string;
+  createdAt: string;
+}

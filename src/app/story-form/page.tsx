@@ -24,16 +24,10 @@ export default function StoryFormPage() {
     setError('');
     setIsGenerating(true);
 
-    // 🔧【修正】パラメータバリデーション - 空文字や null をチェック
+    // パラメータバリデーション
     const validGenre = genre && genre.trim() !== '' ? genre : null;
     const validTone = tone && tone.trim() !== '' ? tone : null;
     const validFeeling = feeling && feeling.trim() !== '' ? feeling : null;
-    
-    console.log('🎭 【ストーリーフォーム】遷移前パラメータ検証:', { 
-      validGenre, 
-      validTone, 
-      validFeeling 
-    });
     
     if (!validGenre || !validTone || !validFeeling) {
       setError('選択した値が正しくありません。再度選択してください。');
@@ -41,31 +35,52 @@ export default function StoryFormPage() {
       return;
     }
 
-    // ユーザーの生成レベル（1-5）を取得
-    const level = Number(localStorage.getItem('level')) || Number(localStorage.getItem('fixedLevel')) || 3;
-    console.log('📊 Story-form: 生成レベル使用:', level);
+    // ユーザーの語彙レベル（1-5）を取得
+    const vocabLevel = Number(localStorage.getItem('vocabLevel')) || Number(localStorage.getItem('level')) || 3;
     
-    // localStorageにも保存（フォールバック用）
-    localStorage.setItem('storyParams', JSON.stringify({
-      genre: validGenre,
-      tone: validTone,
-      feeling: validFeeling,
-      level
-    }));
-    
-    // 🔧【修正】URLパラメータでgenre/tone/feelingを渡す
-    const queryParams = new URLSearchParams({
-      mode: 'story',
-      genre: validGenre,
-      tone: validTone,
-      feeling: validFeeling,
-      level: level.toString()
-    });
-    
-    console.log('🎭 【ストーリーフォーム】遷移URL:', `/reading?${queryParams.toString()}`);
-    
-    // URLパラメータ付きで遷移
-    router.push(`/reading?${queryParams.toString()}`);
+    try {
+      // Generate story via API
+      const response = await fetch('/api/generate-story', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          genre: validGenre,
+          mood: validFeeling, // Using 'mood' instead of 'feeling' as per spec
+          tone: validTone,
+          vocabLevel
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Save story data to localStorage
+      if (data.storyData) {
+        localStorage.setItem('generatedStories', JSON.stringify({
+          [data.storyId]: data.storyData
+        }));
+        
+        // Also save current story ID for easy access
+        localStorage.setItem('currentStoryId', data.storyId);
+      }
+
+      // Redirect to reading page with story type and ID
+      router.push(`/reading?type=story&id=${data.storyId}`);
+      
+    } catch (err) {
+      console.error('Story generation failed:', err);
+      setError(err instanceof Error ? err.message : 'ストーリー生成に失敗しました');
+      setIsGenerating(false);
+    }
   };
 
   // 表示言語に応じたラベル生成関数
@@ -90,35 +105,7 @@ export default function StoryFormPage() {
           Create Your Story
         </h1>
 
-        {/* 機能無効化の通知 */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-          <div className="flex items-center">
-            <div className="text-yellow-400 mr-3">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-yellow-800 font-medium">機能一時停止中</h3>
-              <p className="text-yellow-700 text-sm mt-1">
-                この機能は現在メンテナンス中です。代わりに<strong>プリセットストーリー</strong>をご利用ください。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* 戻るボタンを上に移動 */}
-        <div className="text-center mb-6">
-          <button
-            onClick={() => router.push('/choose')}
-            className="bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-semibold hover:bg-[#e5a561] transition-colors"
-          >
-            ← 選択画面に戻る
-          </button>
-        </div>
-
-        {/* フォームフィールドを一時的に非表示 */}
-        <div className="space-y-6" style={{ display: 'none' }}>
+        <div className="space-y-6">
           {/* Genre Selection */}
           <div>
             <label htmlFor="genre" className="block text-base font-medium text-[#1E1E1E] mb-2">

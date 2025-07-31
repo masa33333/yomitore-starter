@@ -11,11 +11,10 @@ import type { ReadingCompletionData } from '@/types/stampCard';
 import { notifyNewStampCardUpdate } from '@/components/NewStampCard';
 import NewStampCard from '@/components/NewStampCard';
 import RewardDisplay from '@/components/RewardDisplay';
-import RewardEarnedFlash from '@/components/RewardEarnedFlash';
 import RewardFlashManager from '@/components/RewardFlashManager';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
-import StampFlash from '@/components/StampFlash';
+// import StampFlash from '@/components/StampFlash'; // 無効化：ちゃちい演出を削除
 import { BookmarkDialog } from '@/components/BookmarkDialog';
 import { ResumeDialog } from '@/components/ResumeDialog';
 import { analyzeVocabulary } from '@/constants/ngslData';
@@ -45,6 +44,8 @@ interface InitialData {
 interface ReadingClientProps {
   searchParams: {
     mode?: string;
+    type?: string;
+    id?: string;
     genre?: string;
     tone?: string;
     feeling?: string;
@@ -264,9 +265,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     return [];
   });
   
-  // 通知状態
-  const [showStampFlash, setShowStampFlash] = useState(false);
-  const [earnedStampsCount, setEarnedStampsCount] = useState(1);
+  // 通知状態（StampFlash無効化）
+  // const [showStampFlash, setShowStampFlash] = useState(false);
+  // const [earnedStampsCount, setEarnedStampsCount] = useState(1);
   
   // レベル変更状態
   const [showLevelSelector, setShowLevelSelector] = useState(false);
@@ -360,6 +361,56 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
+  // Generated story loading function
+  const loadGeneratedStory = (storyId: string) => {
+    try {
+      console.log('📖 Loading generated story from localStorage:', storyId);
+      
+      const generatedStories = JSON.parse(localStorage.getItem('generatedStories') || '{}');
+      const storyData = generatedStories[storyId];
+      
+      if (!storyData) {
+        console.error('❌ Story not found in localStorage:', storyId);
+        alert('ストーリーが見つかりません。新しいストーリーを生成してください。');
+        router.push('/story-form');
+        return;
+      }
+      
+      console.log('✅ Generated story loaded:', storyData);
+      
+      // Set story content
+      setEnglish(storyData.enText);
+      setStoryTitle(storyData.title);
+      
+      // Split into paragraphs
+      const paragraphs = storyData.enText.split('\n\n').filter((p: string) => p.trim());
+      setEnglishParagraphs(paragraphs);
+      
+      // Calculate word count
+      const words = storyData.enText.trim().split(/\s+/).filter((w: string) => w.length > 0);
+      setWordCount(words.length);
+      
+      // If Japanese translation exists, load it
+      if (storyData.jpText) {
+        setJapanese(storyData.jpText);
+        const jpParagraphs = storyData.jpText.split('\n\n').filter((p: string) => p.trim());
+        setJapaneseParagraphs(jpParagraphs);
+      }
+      
+      console.log('✅ Generated story content set:', {
+        title: storyData.title,
+        englishLength: storyData.enText.length,
+        wordCount: words.length,
+        paragraphCount: paragraphs.length
+      });
+      
+    } catch (error) {
+      console.error('❌ Error loading generated story:', error);
+      alert('ストーリーの読み込みに失敗しました。新しいストーリーを生成してください。');
+      router.push('/story-form');
+    }
+  };
+
   // コンポーネントマウント時にテストログ出力とデータ統一
   React.useEffect(() => {
     console.log('🚀 ReadingClient mounted!');
@@ -449,8 +500,16 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       console.log('🔄 Resume mode detected but bookmark already processed (sessionStorage flag exists)');
     }
 
+    // Check for generated story first
+    const storyType = urlParams.get('type');
+    const storyId = urlParams.get('id');
+    
+    if (storyType === 'story' && storyId && !fromNotebook) {
+      console.log('📖 Loading generated story:', storyId);
+      loadGeneratedStory(storyId);
+    }
     // notebookから戻っていない場合、かつプリセットストーリーでない場合のみ新しいコンテンツを生成
-    if (!fromNotebook && !isClientRestored && !initialData) {
+    else if (!fromNotebook && !isClientRestored && !initialData) {
       console.log('🔧 No initial data, generating new content...');
       generateNewContent();
     } else if (initialData) {
@@ -721,7 +780,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const endTimeValue = Date.now();
     setEndTime(endTimeValue);
     
-    const duration = endTimeValue - startTime; // ミリ秒
+    // 読書完了時にstartTimeをnullにして、タイマーの重複実行を防ぐ
+    const originalStartTime = startTime;
+    setStartTime(null);
+    
+    const duration = endTimeValue - originalStartTime; // ミリ秒
     const timeInMinutes = duration / 60000;
     
     // 読書開始位置から最後までの実際の語数を計算
@@ -757,15 +820,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     const cardsAfterReading = Math.floor(newStampCount / 20);
     const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
     
-    // カード完成時はスタンプ演出をスキップ、通常時は表示
-    if (newCardsCompleted === 0 && stampsEarned > 0) {
-      console.log(`📮 通常スタンプ演出を表示（ReadingClient）: ${stampsEarned}個`);
-      setEarnedStampsCount(stampsEarned);
-      setShowStampFlash(true);
-    } else if (newCardsCompleted > 0) {
-      console.log('🎊 カード完成時のため、ReadingClientでスタンプ演出をスキップ');
-      // スタンプ演出はスキップ
-    }
+    // StampFlash演出を無効化（ちゃちい演出削除）
+    console.log('🎊 StampFlash演出は無効化されています（豪華演出のみ使用）');
+    console.log(`📮 スタンプ獲得: ${stampsEarned}個（演出なし）`, { 
+      stampsEarned, 
+      newCardsCompleted 
+    });
+    
+    // 演出はRewardFlashManagerで豪華版を表示
     
     // スタンプカード統合システムで進捗更新
     const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
@@ -788,11 +850,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const updatedProgress = completeReading(completionData);
       console.log('🎆 スタンプカード更新完了:', updatedProgress);
       
+      // 合計読書時間を更新（一度だけ）
+      const totalReadingTime = parseInt(localStorage.getItem('totalReadingTime') || '0', 10);
+      const newTotalTime = totalReadingTime + duration;
+      localStorage.setItem('totalReadingTime', newTotalTime.toString());
+      console.log('⏰ 合計読書時間更新:', { duration, totalReadingTime, newTotalTime });
+      
       // カレンダーデータを更新
       updateTodayRecord(
         1, // 1話読了
         wordCount,
-        endTime && startTime ? (endTime - startTime) : 0,
+        duration,
         wpm || 0,
         selectedLevel
       );
@@ -1080,11 +1148,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     console.log('🔥 saveBookmark関数実行開始:', { tokenIndex, word, startTime });
     
     if (!startTime) {
-      console.log('⚠️ 読書開始時間がnull、現在時刻で設定');
-      // 再開時など、startTimeが設定されていない場合は現在時刻を使用
-      setStartTime(Date.now());
-      // 少し待ってから再実行
-      setTimeout(() => saveBookmark(tokenIndex, word), 100);
+      console.log('⚠️ 読書開始時間がnull、保存を停止');
+      alert('読書開始前はブックマークを保存できません');
       return;
     }
 
@@ -1523,6 +1588,11 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setHighlightedWord('');
     setShowJapanese(false);
     setShowLevelSelector(false);
+    
+    // タイマー関連の状態もリセット
+    setBookmarkStats({ isVisible: false, element: null, stats: null });
+    // setShowStampFlash(false); // 無効化
+    // setEarnedStampsCount(1); // 無効化
     
     // 状態保存をクリア
     if (typeof window !== 'undefined') {
@@ -1995,8 +2065,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     setTimeout(ensureScrollOnResume, 100);
     setTimeout(ensureScrollOnResume, 500);
     
-    // 再開時のstartTime設定（ブックマーク保存のため）
-    if (!startTime) {
+    // 再開時のstartTime設定（読書が開始されている場合のみ）
+    if (!startTime && isReadingStarted) {
       setStartTime(Date.now());
       console.log('🔄 再開時startTime設定:', Date.now());
     }
@@ -2337,7 +2407,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       }}
     >
       {/* 報酬獲得演出 */}
-      <RewardEarnedFlash />
       <RewardFlashManager />
       {/* ページタイトル */}
       <div className="mb-6">
@@ -2571,10 +2640,8 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                       const currentSessionTime = startTime && endTime ? (endTime - startTime) : 0;
                       const newTotalTime = totalReadingTime + currentSessionTime;
                       
-                      // 新しい合計時間をlocalStorageに保存
-                      if (currentSessionTime > 0) {
-                        localStorage.setItem('totalReadingTime', newTotalTime.toString());
-                      }
+                      // 読書完了時に一度だけ保存（レンダリングのたびに保存しない）
+                      // handleCompleteReading内で保存済みなので、ここでは表示のみ
                       
                       const hours = Math.floor(newTotalTime / 3600000);
                       const minutes = Math.floor((newTotalTime % 3600000) / 60000);
@@ -2794,12 +2861,17 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         </div>
       )}
 
-      {/* スタンプフラッシュ表示 */}
-      <StampFlash 
+      {/* スタンプフラッシュ表示（無効化） */}
+      {/* <StampFlash 
         show={showStampFlash} 
         stampsEarned={earnedStampsCount}
-        onComplete={() => setShowStampFlash(false)} 
-      />
+        onComplete={() => {
+          console.log('🎊 StampFlash演出完了、状態リセット');
+          setShowStampFlash(false);
+          // 演出完了後の状態の安定化
+          setEarnedStampsCount(1);
+        }}
+      /> */}
 
 
 

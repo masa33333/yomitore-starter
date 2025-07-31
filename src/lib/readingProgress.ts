@@ -356,21 +356,19 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   if (newStampsEarned > 0) {
     console.log(`🌟 ${newStampsEarned}個のスタンプを獲得！（${data.wordCount}語読了）`);
     
-    // 20個目のスタンプ（カード完成）の場合はスタンプ演出をスキップ
-    if (newCardsCompleted === 0) {
-      // 通常のスタンプ演出のみ（カード完成時以外）
-      console.log('📮 通常スタンプ演出を表示');
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('stampEarned', { 
-          detail: { 
-            stampsEarned: newStampsEarned,
-            showAnimation: true
-          } 
-        }));
-      }, 50);
-    } else {
-      console.log('🎊 カード完成時のため、スタンプ演出をスキップしてコイン演出のみ表示');
-    }
+    // StampFlash演出を完全に無効化（豪華演出のみ使用）
+    console.log(`🎊 スタンプ獲得: ${newStampsEarned}個（StampFlash演出は無効化済み）`);
+    console.log('📮 豪華なRewardFlash演出のみを使用');
+    
+    // stampEarnedイベントの発火を停止（ちゃちい演出削除）
+    // setTimeout(() => {
+    //   window.dispatchEvent(new CustomEvent('stampEarned', { 
+    //     detail: { 
+    //       stampsEarned: newStampsEarned,
+    //       showAnimation: true
+    //     } 
+    //   }));
+    // }, 50);
   }
   
   // 8. 履歴保存（既存システム）
@@ -432,10 +430,9 @@ function updateAchievements(progress: UserProgress): void {
     
     // 大きな全画面コイン演出を表示
     setTimeout(() => {
-      console.log('🪙 Dispatching showRewardFlash event for coins:', { 
+      console.log('🪙 コイン演出を表示:', { 
         newCoins: newCoinsEarned, 
-        totalCoins: progress.bronzeCoins,
-        rewardType: 'coin'
+        totalCoins: progress.bronzeCoins
       });
       
       // 全画面RewardFlash用のイベント
