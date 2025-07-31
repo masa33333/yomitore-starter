@@ -12,7 +12,6 @@ export default function MessageNotification() {
 
   // キューをチェックしてヘッダーバッジのみを更新（自動表示しない）
   const checkAndUpdateBadge = () => {
-    console.log('🔍 キューをチェックしてヘッダーバッジを更新');
     updateHeaderNotificationBadge();
   };
 
@@ -81,7 +80,7 @@ export default function MessageNotification() {
       detail: { count: unreadCount }
     }));
     
-    console.log(`📧 ヘッダー通知更新: ${unreadCount}件`);
+    // ヘッダー通知更新 (logging removed)
   };
 
   // メッセージを閉じる

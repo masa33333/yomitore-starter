@@ -48,11 +48,7 @@ export function getUserProgress(): UserProgress {
     const stored = localStorage.getItem(STORAGE_KEYS.USER_PROGRESS);
     if (stored) {
       const parsed = JSON.parse(stored) as UserProgress;
-      console.log('🔍 getUserProgress: Loaded from storage:', {
-        totalWords: parsed.totalWords,
-        totalStamps: parsed.totalStamps,
-        currentCardStamps: parsed.currentCardStamps
-      });
+      // getUserProgress: Loaded from storage (logging removed)
       
       // マイグレーション処理を削除（重複更新の原因）
       // 既存データは初回時のmigrateFromLegacySystem()のみで処理
@@ -60,16 +56,10 @@ export function getUserProgress(): UserProgress {
       // データ整合性チェック - 語数とスタンプ数の論理的チェック
       const expectedStamps = Math.floor(parsed.totalWords / 100);
       if (parsed.totalStamps !== expectedStamps) {
-        console.warn(`⚠️ Stamp count mismatch detected! Expected: ${expectedStamps}, Got: ${parsed.totalStamps}`);
-        console.warn(`⚠️ Correcting stamp count based on word count: ${parsed.totalWords} words`);
-        const oldData = { ...parsed };
+        // Stamp count mismatch detected - correcting silently
         parsed.totalStamps = expectedStamps;
         parsed.currentCardStamps = expectedStamps % 20;
         parsed.completedCards = Math.floor(expectedStamps / 20);
-        console.log('🔧 Data corrected:', {
-          before: oldData,
-          after: parsed
-        });
         // 修正したデータを保存
         saveUserProgress(parsed);
       }
@@ -145,8 +135,6 @@ export function saveUserProgress(progress: UserProgress): void {
     // 🔧 修正: 既存システムとの互換性を維持
     localStorage.setItem(STORAGE_KEYS.TOTAL_WORDS_READ, progress.totalWords.toString());
     localStorage.setItem(STORAGE_KEYS.COMPLETED_READINGS, progress.totalStamps.toString());
-    
-    // Debug logging removed - problem resolved
   } catch (error) {
     console.error('❌ Failed to save user progress:', error);
   }
@@ -406,11 +394,7 @@ function updateAchievements(progress: UserProgress): void {
   // 以前のコイン数を記録
   const previousCoins = progress.bronzeCoins;
   
-  console.log('🪙 updateAchievements: コイン計算開始', {
-    previousCoins: previousCoins,
-    totalStamps: progress.totalStamps,
-    expectedCoins: Math.floor(progress.totalStamps / 10)
-  });
+  // updateAchievements: コイン計算開始 (logging removed)
   
   // ブロンズコイン（10スタンプごと）
   progress.bronzeCoins = Math.floor(progress.totalStamps / 10);
@@ -418,22 +402,14 @@ function updateAchievements(progress: UserProgress): void {
   // 新しいコインが獲得された場合
   const newCoinsEarned = progress.bronzeCoins - previousCoins;
   
-  console.log('🪙 updateAchievements: コイン計算結果', {
-    previousCoins,
-    newCoins: progress.bronzeCoins,
-    newCoinsEarned,
-    totalStamps: progress.totalStamps
-  });
+  // updateAchievements: コイン計算結果 (logging removed)
   
   if (newCoinsEarned > 0) {
     console.log(`🪙 ${newCoinsEarned}個のブロンズコインを獲得！合計: ${progress.bronzeCoins}コイン`);
     
     // 大きな全画面コイン演出を表示
     setTimeout(() => {
-      console.log('🪙 コイン演出を表示:', { 
-        newCoins: newCoinsEarned, 
-        totalCoins: progress.bronzeCoins
-      });
+      // コイン演出を表示 (logging removed)
       
       // 全画面RewardFlash用のイベント
       window.dispatchEvent(new CustomEvent('showRewardFlash', { 

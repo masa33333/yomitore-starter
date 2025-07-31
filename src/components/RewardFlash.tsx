@@ -68,12 +68,10 @@ const RewardFlash: React.FC<RewardFlashProps> = ({ show, rewardType, count, onCo
     if (show) {
       const config = REWARD_CONFIG[rewardType];
       
-      console.log(`🎨 RewardFlash表示開始: ${rewardType}, duration=${config.duration}ms`);
-      
       // 表示開始
       setVisible(true);
       
-      // キラキラエフェクト用の座標生成（報酬グレードに応じて数を調整）
+      // キラキラエフェクト用の座標生成
       const newSparkles = Array.from({ length: config.sparkleCount }, (_, i) => ({
         id: i,
         x: Math.random() * 600 - 300,
@@ -84,43 +82,26 @@ const RewardFlash: React.FC<RewardFlashProps> = ({ show, rewardType, count, onCo
       
       // スケールアニメーション開始
       const scaleTimer = setTimeout(() => {
-        console.log(`🎨 ${rewardType}: スケールアニメーション開始`);
         setScale(1);
       }, 10);
 
-      // 報酬グレードに応じて表示時間を調整
+      // 表示時間後にフェードアウト
       const hideTimer = setTimeout(() => {
-        console.log(`🎨 ${rewardType}: フェードアウト開始 (${config.duration}ms経過)`);
         setScale(0);
       }, config.duration);
 
-      // 完了タイマー - 確実に終了させる
+      // 完了タイマー
       const completeTimer = setTimeout(() => {
-        console.log(`🎨 ${rewardType}: 演出完了 - onComplete実行 (${config.duration + 500}ms経過)`);
         setVisible(false);
-        setScale(0);
-        
-        // onCompleteを安全に呼び出し
-        try {
-          if (onComplete && typeof onComplete === 'function') {
-            onComplete();
-          } else {
-            console.warn(`⚠️ onComplete is not a function:`, onComplete);
-          }
-        } catch (error) {
-          console.error(`❌ onComplete実行エラー:`, error);
-        }
+        onComplete();
       }, config.duration + 500);
 
       return () => {
-        console.log(`🎨 ${rewardType}: useEffectクリーンアップ実行`);
         clearTimeout(scaleTimer);
         clearTimeout(hideTimer);
         clearTimeout(completeTimer);
       };
     } else {
-      // showがfalseの場合は即座にリセット
-      console.log(`🎨 ${rewardType}: show=false, 状態リセット`);
       setVisible(false);
       setScale(0);
       setSparkles([]);
@@ -129,7 +110,6 @@ const RewardFlash: React.FC<RewardFlashProps> = ({ show, rewardType, count, onCo
 
   // 緊急脱出機能
   const handleEmergencyExit = () => {
-    console.warn(`🚨 ${rewardType}報酬: ユーザーによる緊急脱出`);
     setVisible(false);
     setScale(0);
     onComplete();
@@ -144,8 +124,8 @@ const RewardFlash: React.FC<RewardFlashProps> = ({ show, rewardType, count, onCo
 
   return (
     <div 
-      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-60 cursor-pointer" 
-      style={{ zIndex: 9998 }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-60 cursor-pointer" 
+      style={{ zIndex: 9999 }}
       onClick={handleEmergencyExit}
       title="クリックして演出をスキップ"
     >
@@ -266,11 +246,10 @@ const RewardFlash: React.FC<RewardFlashProps> = ({ show, rewardType, count, onCo
               style={{ filter: config.filter }}
               priority
               onError={(e) => {
-                console.error(`❌ 画像読み込みエラー: ${config.image} (${rewardType})`, e);
-                console.error('エラー詳細:', e.currentTarget);
+                // Image load error - silent handling
               }}
               onLoad={() => {
-                console.log(`✅ 画像読み込み成功: ${config.image} (${rewardType})`);
+                // Image loaded successfully - silent handling
               }}
             />
           </div>
