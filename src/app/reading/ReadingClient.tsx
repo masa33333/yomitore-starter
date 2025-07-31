@@ -2573,7 +2573,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 // 読書完了後：日本語表示と音声再生ボタンを表示
                 <>
                   <button
-                    onClick={() => setShowJapanese(!showJapanese)}
+                    onClick={handleShowJapanese}
                     className="rounded-md bg-primary-active px-4 py-2 font-bold text-text-primary transition-colors hover:bg-[#e5a561]"
                   >
                     {showJapanese ? '日本語を隠す' : '日本語を表示'}
