@@ -331,6 +331,16 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   // 獲得したスタンプ数をログ出力と演出制御
   if (newStampsEarned > 0) {
+    // スタンプ獲得時もRewardFlash豪華演出を表示
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+        detail: { 
+          rewardType: 'bronze', // スタンプはブロンズトロフィー演出
+          count: newStampsEarned
+        } 
+      }));
+    }, 50);
+    
     // StampFlash演出を完全に無効化（豪華演出のみ使用）
     // stampEarnedイベントの発火を停止（ちゃちい演出削除）
     // setTimeout(() => {
