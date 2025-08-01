@@ -15,15 +15,27 @@ export default function RewardFlashManager({ className = '' }: RewardFlashManage
     count: number;
   } | null>(null);
 
+  // 緊急テスト: 強制的に演出を発動
+  const forceShowAnimation = () => {
+    setCurrentReward({
+      show: true,
+      type: 'coin',
+      count: 1
+    });
+  };
+
+  // グローバルにアクセス可能にする
+  if (typeof window !== 'undefined') {
+    (window as any).forceShowAnimation = forceShowAnimation;
+  }
+
 
   useEffect(() => {
     const handleShowRewardFlash = (event: CustomEvent) => {
       const { rewardType, count } = event.detail;
-      console.log('🎊 RECEIVED showRewardFlash EVENT:', { rewardType, count, currentReward });
       
       // 演出が既に表示中の場合はスキップ
       if (currentReward && currentReward.show) {
-        console.log('🚫 Skipping animation - already showing:', currentReward);
         return;
       }
       
@@ -42,7 +54,6 @@ export default function RewardFlashManager({ className = '' }: RewardFlashManage
         type: rewardType,
         count: count
       };
-      console.log('🎊 Setting currentReward to:', newReward);
       setCurrentReward(newReward);
     };
 

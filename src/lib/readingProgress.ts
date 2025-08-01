@@ -67,7 +67,7 @@ export function getUserProgress(): UserProgress {
       return parsed;
     }
   } catch (error) {
-    console.error('❌ Failed to parse user progress:', error);
+    // Failed to parse user progress - silent handling
   }
   
   // 初回または破損時は既存データからマイグレーション
@@ -136,7 +136,7 @@ export function saveUserProgress(progress: UserProgress): void {
     localStorage.setItem(STORAGE_KEYS.TOTAL_WORDS_READ, progress.totalWords.toString());
     localStorage.setItem(STORAGE_KEYS.COMPLETED_READINGS, progress.totalStamps.toString());
   } catch (error) {
-    console.error('❌ Failed to save user progress:', error);
+    // Failed to save user progress - silent handling
   }
 }
 
@@ -148,7 +148,7 @@ export function getStampCardData(): StampData[] {
     const stored = localStorage.getItem(STORAGE_KEYS.STAMP_CARD);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('❌ Failed to parse stamp card data:', error);
+    // Failed to parse stamp card data (logging removed)
     return [];
   }
 }
@@ -159,9 +159,9 @@ export function getStampCardData(): StampData[] {
 export function saveStampCardData(stamps: StampData[]): void {
   try {
     localStorage.setItem(STORAGE_KEYS.STAMP_CARD, JSON.stringify(stamps));
-    console.log('💾 Stamp card data saved:', stamps.length, 'stamps');
+    // Stamp card data saved (logging removed)
   } catch (error) {
-    console.error('❌ Failed to save stamp card data:', error);
+    // Failed to save stamp card data (logging removed)
   }
 }
 
@@ -247,15 +247,11 @@ export function checkAndResetDailyData(testDate?: string): UserProgress {
  * 読書完了時の統一処理（メイン関数）
  */
 export function completeReading(data: ReadingCompletionData): UserProgress {
-  console.log('📖 Starting reading completion process:', data);
+  // Starting reading completion process (logging removed)
   
   // 1. 既存進捗データを取得（日付チェックは行わない）
   let progress = getUserProgress();
-  console.log('🔍 Current progress before reading:', {
-    totalWords: progress.totalWords,
-    totalStamps: progress.totalStamps,
-    currentCardStamps: progress.currentCardStamps
-  });
+  // Current progress before reading (logging removed)
   
   // 2. 読書前の累計語数を記録
   const previousTotalWords = progress.totalWords;
@@ -270,14 +266,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   const newStampCount = Math.floor(progress.totalWords / 100);
   const newStampsEarned = newStampCount - previousStampCount;
   
-  console.log('📊 Stamp calculation:', {
-    previousWords: previousTotalWords,
-    newWords: progress.totalWords,
-    addedWords: data.wordCount,
-    previousStamps: previousStampCount,
-    newStampTotal: newStampCount,
-    stampsEarned: newStampsEarned
-  });
+  // Stamp calculation (logging removed)
   
   // 5. スタンプ数更新とカード完成チェック
   const previousCardStamps = progress.currentCardStamps;
@@ -292,7 +281,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   if (newCardsCompleted > 0) {
     progress.completedCards += newCardsCompleted;
-    console.log('🎊 Card completed! New cards:', newCardsCompleted, 'Total cards:', progress.completedCards);
+    // Card completed (logging removed)
     
     // カード完成通知をUIに送信
     setTimeout(() => {
@@ -342,12 +331,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   // 獲得したスタンプ数をログ出力と演出制御
   if (newStampsEarned > 0) {
-    console.log(`🌟 ${newStampsEarned}個のスタンプを獲得！（${data.wordCount}語読了）`);
-    
     // StampFlash演出を完全に無効化（豪華演出のみ使用）
-    console.log(`🎊 スタンプ獲得: ${newStampsEarned}個（StampFlash演出は無効化済み）`);
-    console.log('📮 豪華なRewardFlash演出のみを使用');
-    
     // stampEarnedイベントの発火を停止（ちゃちい演出削除）
     // setTimeout(() => {
     //   window.dispatchEvent(new CustomEvent('stampEarned', { 
@@ -374,15 +358,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   // 9. 進捗データ保存
   saveUserProgress(progress);
   
-  console.log('✅ Reading completion process finished:', {
-    totalStamps: progress.totalStamps,
-    currentCardStamps: progress.currentCardStamps,
-    completedCards: progress.completedCards,
-    bronzeCoins: progress.bronzeCoins,
-    totalWords: progress.totalWords,
-    newStampsEarned,
-    newCardsCompleted
-  });
+  // Reading completion process finished (logging removed)
   
   return progress;
 }
@@ -405,12 +381,8 @@ function updateAchievements(progress: UserProgress): void {
   // updateAchievements: コイン計算結果 (logging removed)
   
   if (newCoinsEarned > 0) {
-    console.log(`🪙 ${newCoinsEarned}個のブロンズコインを獲得！合計: ${progress.bronzeCoins}コイン`);
-    
     // 大きな全画面コイン演出を表示
     setTimeout(() => {
-      console.log('🎊 FIRING showRewardFlash EVENT:', { rewardType: 'coin', count: newCoinsEarned });
-      
       // 全画面RewardFlash用のイベント
       window.dispatchEvent(new CustomEvent('showRewardFlash', { 
         detail: { 
@@ -419,8 +391,6 @@ function updateAchievements(progress: UserProgress): void {
         } 
       }));
     }, 100);
-  } else {
-    console.log('🪙 コイン獲得なし（新しいコイン数が以前と同じかそれより少ない）');
   }
   
   // ブロンズトロフィー（5カード完成）
