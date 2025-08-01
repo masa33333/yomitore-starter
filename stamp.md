@@ -22,7 +22,7 @@
 ├── カード（中期目標）
 │   └── 50スタンプで1枚完成
 ├── コイン（進捗の可視化）
-│   └── 10スタンプごとに1枚
+│   └── 20スタンプごとに1枚
 └── トロフィー（長期目標）
     ├── ブロンズ：5枚のカード完成（約50,000語）
     ├── シルバー：5個のブロンズ（約250,000語）
@@ -284,3 +284,125 @@ localStorage → Supabase の二段保存で既存ユーザーを切らさずに
 ## コード例のフォーマット
 - すべて **```tsx** ```** 内に収める（日本語コメント可）
 - 余計な解説文はコード外に一行で簡潔に書く
+
+
+## バグ発生
+現在スタンプの累計が133個、で、33/20とな
+  ってる。つまり20で次のスタンプカードに行
+  くべきところが、切り替わらずにずっと数字
+  が増えている状態。修正して。
+
+⏺ 問題を確認しました。スタンプカードの表示
+  が「33/20」となっているのは、20個でカー
+  ド完成するはずなのに正しく切り替わってい
+  ない状態ですね。
+
+  まず現在の問題を詳しく調べます：
+
+⏺ Update Todos
+  ⎿ ☐ スタンプカード表示の修正 -          
+      20個でカード切り替わりが動作しない
+      問題を解決
+    ☐ カード完成ロジックが正しく動作する
+      ことを確認
+
+⏺ Search(pattern: "currentCardStamps.*20",
+         glob: "**/*.tsx", output_mode:
+        "content")
+  ⎿  Found 0 lines 
+
+⏺ Search(pattern: "currentCardStamps",
+        glob: "**/*.ts*", output_mode:
+        "content")
+  ⎿  Found 146 lines (ctrl+r to expand)
+
+⏺ 問題が見つかりました！コードを見ると、st
+  amp.mdの仕様とコードが混在しています：
+
+  1. stamp.md仕様: 20個でカード完成
+  2. 現在のコード: 50個でカード完成（% 
+  50、Math.floor(totalStamps / 50)）
+
+  この不整合を修正する必要があります。NewS
+  tampCardコンポーネントも20個想定で作られ
+  ているので、全体を20個仕様に統一します：
+
+⏺ Update(src/lib/readingProgress.ts)
+  ⎿ Updated src/lib/readingProgress.ts    
+    with 2 additions and 2 removals
+      58          if (parsed.totalStamps 
+           !== expectedStamps) {
+      59            // Stamp count 
+           mismatch detected - correcting 
+           silently
+      60            parsed.totalStamps = 
+           expectedStamps;
+      61 -          
+    parsed.currentCardStamps =
+    expectedStamps % 50;
+         - parsed.currentCardStamps = 
+         - expectedStamps % 50;
+      62 -          parsed.completedCards 
+    = Math.floor(expectedStamps / 50);
+         - = Math.floor(expectedStamps / 
+         - 50);
+      61 +          
+    parsed.currentCardStamps =
+    expectedStamps % 20; // 
+    20個でカード完成
+         + parsed.currentCardStamps = 
+         + expectedStamps % 20; // 
+         + 20個でカード完成
+      62 +          parsed.completedCards 
+    = Math.floor(expectedStamps / 20);
+         + = Math.floor(expectedStamps / 
+         + 20);
+      63            // 
+           修正したデータを保存
+      64            
+           saveUserProgress(parsed);
+      65          }
+
+⏺ Update(src/lib/readingProgress.ts)
+  ⎿ Updated src/lib/readingProgress.ts    
+    with 2 additions and 2 removals
+      102        // 
+    レガシーデータは既存の
+            completedReadings値を使用
+      103        const legacyReadings = 
+            
+    parseInt(localStorage.getItem(
+            'completedReadings') || '0', 
+            10);
+      104        progress.totalStamps = 
+            legacyReadings;
+      105 -      
+    progress.currentCardStamps =
+    progress.totalStamps % 50;
+          - progress.currentCardStamps = 
+          - progress.totalStamps % 50;
+      106 -      progress.completedCards 
+    = Math.floor(progress.totalStamps /
+    50);
+          -  
+    Math.floor(progress.totalStam
+          - ps / 50);
+      105 +      
+    progress.currentCardStamps =
+    progress.totalStamps % 20; // 
+    20個でカード完成
+          + progress.currentCardStamps = 
+          + progress.totalStamps % 20; // 
+          + 20個でカード完成
+      106 +      progress.completedCards 
+    = Math.floor(progress.totalStamps /
+    20);
+          +  
+    Math.floor(progress.totalStam
+          + ps / 20);
+      107      }
+      108      
+      109      // データ整合性チェック - 
+            
+    語数とスタンプ数の論理的チェッ
+            ク

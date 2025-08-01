@@ -12,6 +12,15 @@ interface RewardFlashProps {
 }
 
 const REWARD_CONFIG = {
+  stamp: {
+    image: '/images/stamp.png',
+    title: 'スタンプGET！',
+    bgColor: 'from-blue-300 to-blue-500',
+    filter: '',
+    sparkleCount: 15,
+    imageSize: 180,
+    duration: 2500
+  },
   coin: {
     image: '/images/coin.png',
     title: 'コイン獲得！',
@@ -118,7 +127,7 @@ const RewardFlash: React.FC<RewardFlashProps> = ({ show, rewardType, count, onCo
   if (!visible) return null;
 
   const config = REWARD_CONFIG[rewardType];
-  const isTrophy = rewardType !== 'coin';
+  const isTrophy = !['coin', 'stamp'].includes(rewardType);
   const backgroundSize = config.imageSize + 200;
   const mainBgSize = config.imageSize + 150;
 

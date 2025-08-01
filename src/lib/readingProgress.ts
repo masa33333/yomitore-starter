@@ -56,12 +56,10 @@ export function getUserProgress(): UserProgress {
       // データ整合性チェック - 語数とスタンプ数の論理的チェック
       const expectedStamps = Math.floor(parsed.totalWords / 100);
       if (parsed.totalStamps !== expectedStamps) {
-        // Stamp count mismatch detected - correcting silently
+        // Stamp count mismatch detected - correcting silently in memory
         parsed.totalStamps = expectedStamps;
-        parsed.currentCardStamps = expectedStamps % 50;
-        parsed.completedCards = Math.floor(expectedStamps / 50);
-        // 修正したデータを保存
-        saveUserProgress(parsed);
+        parsed.currentCardStamps = expectedStamps % 20; // 20個でカード完成
+        parsed.completedCards = Math.floor(expectedStamps / 20);
       }
       
       return parsed;
@@ -102,16 +100,16 @@ function migrateFromLegacySystem(): UserProgress {
     // レガシーデータは既存のcompletedReadings値を使用
     const legacyReadings = parseInt(localStorage.getItem('completedReadings') || '0', 10);
     progress.totalStamps = legacyReadings;
-    progress.currentCardStamps = progress.totalStamps % 50;
-    progress.completedCards = Math.floor(progress.totalStamps / 50);
+    progress.currentCardStamps = progress.totalStamps % 20; // 20個でカード完成
+    progress.completedCards = Math.floor(progress.totalStamps / 20);
   }
   
   // データ整合性チェック - 語数とスタンプ数の論理的チェック
   const expectedStamps = Math.floor(progress.totalWords / 100);
   if (progress.totalStamps !== expectedStamps) {
     progress.totalStamps = expectedStamps;
-    progress.currentCardStamps = expectedStamps % 50;
-    progress.completedCards = Math.floor(expectedStamps / 50);
+    progress.currentCardStamps = expectedStamps % 20;
+    progress.completedCards = Math.floor(expectedStamps / 20);
   }
   
   // コインとトロフィーを計算（新しいスタンプ数ベース）
@@ -176,6 +174,7 @@ function recordConsecutiveReadingMessage(progress: UserProgress): void {
   if (consecutiveDays > 0) {
     const message = `今日で${consecutiveDays}日連続読書達成！`;
     localStorage.setItem('consecutiveReadingMessage', message);
+    console.log(`📚 ${message}`);
   }
 }
 
@@ -195,27 +194,39 @@ export function checkAndResetDailyData(testDate?: string): UserProgress {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
     
+    console.log('🔍 Checking login continuity...');
+    console.log('  Current lastLoginDate:', progress.lastLoginDate);
+    console.log('  Expected yesterday:', yesterdayStr);
+    console.log('  Today:', today);
     
     if (progress.lastLoginDate === yesterdayStr) {
       // 連続ログイン継続
+      console.log('✅ Consecutive login continued!');
       progress.consecutiveLoginDays += 1;
     } else if (progress.lastLoginDate === '') {
       // 初回ログイン
+      console.log('🆕 First time login!');
       progress.consecutiveLoginDays = 1;
     } else {
       // 連続ログインが途切れた
+      console.log('💔 Consecutive login broken!');
       const lastLoginDate = new Date(progress.lastLoginDate);
       const currentDate = testDate ? new Date(testDate) : new Date();
       const daysDifference = Math.floor((currentDate.getTime() - lastLoginDate.getTime()) / (1000 * 60 * 60 * 24));
+      console.log('  Days difference:', daysDifference);
       
       if (daysDifference >= 3) {
         // 3日以上空いている場合は復帰メッセージ
         showWelcomeBackMessage(daysDifference);
+        console.log(`🤗 おかえりなさい！${daysDifference}日ぶりのログイン`);
       }
       
       progress.consecutiveLoginDays = 1;
     }
     
+    console.log('📅 Daily data reset for new day:', today);
+    console.log('📊 Previous lastLoginDate:', progress.lastLoginDate, 'yesterday should be:', yesterdayStr);
+    console.log('🔥 Consecutive login days updated to:', progress.consecutiveLoginDays);
     
     // デイリーデータリセット
     progress.dailyStoriesRead = 0;
@@ -236,121 +247,98 @@ export function checkAndResetDailyData(testDate?: string): UserProgress {
  * 読書完了時の統一処理（メイン関数）
  */
 export function completeReading(data: ReadingCompletionData): UserProgress {
-  // Starting reading completion process (logging removed)
-  
-  // 1. 既存進捗データを取得（日付チェックは行わない）
+  // 1. 既存進捗データを取得
   let progress = getUserProgress();
-  // Current progress before reading (logging removed)
-  
-  // 2. 読書前の累計語数を記録
-  const previousTotalWords = progress.totalWords;
-  
-  // 3. 基本進捗更新
-  // Debug logging removed - problem resolved
+  const previousTotalStamps = progress.totalStamps;
+
+  // 2. 主要な進捗を先に計算
+  const newStampsEarned = 1;
+  progress.totalStamps += newStampsEarned;
   progress.totalWords += data.wordCount;
   progress.dailyStoriesRead += 1;
-  
-  // 4. 1話読了毎のスタンプ計算（stamp.md仕様通り）
-  const newStampsEarned = 1; // 1話読了 = 1スタンプ（語数関係なし）
-  progress.totalStamps += newStampsEarned;
-  
-  // Stamp calculation (logging removed)
-  
-  // 5. スタンプ数更新とカード完成チェック（stamp.md仕様：50個で1枚）
-  const previousTotalStamps = progress.totalStamps - newStampsEarned;
-  const newCardStamps = progress.totalStamps % 50;
-  
-  // カード完成チェック（50個に到達したかどうか）
-  const cardsBeforeReading = Math.floor(previousTotalStamps / 50);
-  const cardsAfterReading = Math.floor(progress.totalStamps / 50);
+
+  // 3. カード完成チェック
+  const cardsBeforeReading = Math.floor(previousTotalStamps / 20);
+  const cardsAfterReading = Math.floor(progress.totalStamps / 20);
   const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
-  
+
+  // 4. 演出を即時実行
   if (newCardsCompleted > 0) {
-    progress.completedCards += newCardsCompleted;
-    // Card completed (logging removed)
-    
-    // カード完成通知をUIに送信
-    setTimeout(() => {
+    // カード完成演出
+    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+      detail: { rewardType: 'gold', count: newCardsCompleted } 
+    }));
+  } else if (progress.totalStamps % 20 === 0) {
+    // 20スタンプごとのコイン獲得演出
+    const newCoinsEarned = Math.floor(progress.totalStamps / 20) - Math.floor(previousTotalStamps / 20);
+    if (newCoinsEarned > 0) {
+      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+        detail: { rewardType: 'coin', count: newCoinsEarned } 
+      }));
+    }
+  } else {
+    // 通常のスタンプ獲得演出
+    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+      detail: { rewardType: 'stamp', count: 1 } 
+    }));
+  }
+
+  // 5. 残りの重い処理を非同期で実行
+  setTimeout(() => {
+    // a. カード進捗を更新
+    progress.currentCardStamps = progress.totalStamps % 20;
+    if (newCardsCompleted > 0) {
+      progress.completedCards += newCardsCompleted;
+      // カード完成通知（UI更新用）
       window.dispatchEvent(new CustomEvent('cardCompleted', { 
         detail: { newCards: newCardsCompleted, totalCards: progress.completedCards } 
       }));
-    }, 100);
-  }
-  
-  progress.currentCardStamps = newCardStamps;
-  
-  // 4. コイン・トロフィー更新
-  updateAchievements(progress);
-  
-  // 5. デイリーボーナス処理
-  processeDailyBonuses(progress);
-  
-  // 6. 連続読書達成メッセージの記録（読書完了時）
-  recordConsecutiveReadingMessage(progress);
-  
-  // 7. スタンプデータ作成・保存（獲得した数だけ作成）
-  const stamps = getStampCardData();
-  
-  // 獲得したスタンプ数分だけスタンプデータを作成
-  for (let i = 0; i < newStampsEarned; i++) {
+    }
+
+    // b. コイン・トロフィー更新
+    updateAchievements(progress);
+
+    // c. デイリーボーナス処理
+    processeDailyBonuses(progress);
+
+    // d. 連続読書メッセージ記録
+    recordConsecutiveReadingMessage(progress);
+
+    // e. スタンプデータ作成・保存
+    const stamps = getStampCardData();
     const stamp: StampData = {
       id: generateStampId(),
       completionDate: data.completionDate || new Date().toISOString(),
-      wordCount: data.wordCount, // 今回読了した語数
+      wordCount: data.wordCount,
       level: data.level,
       sessionDuration: data.duration,
       wpm: data.wpm,
       title: data.title,
       contentType: data.contentType,
     };
-    
-    // ボーナススタンプかチェック
     if (shouldAwardBonusStamp(progress)) {
       stamp.isBonusStamp = true;
       stamp.bonusType = getBonusType(progress);
     }
-    
     stamps.push(stamp);
-  }
-  
-  saveStampCardData(stamps);
-  
-  // stamp.md仕様に基づく正しい演出システム（即座に実行）
-  // カード完成時（50話毎）の特別演出
-  if (newCardsCompleted > 0) {
-    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
-      detail: { 
-        rewardType: 'gold', // カード完成は金色演出
-        count: newCardsCompleted
-      } 
-    }));
-  } else {
-    // 毎回の基本スタンプ演出（軽い演出）
-    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
-      detail: { 
-        rewardType: 'coin', // スタンプ獲得は軽いコイン演出
-        count: 1
-      } 
-    }));
-  }
-  
-  // 8. 履歴保存（既存システム）
-  saveToHistory({
-    type: data.contentType,
-    title: data.title,
-    contentJP: '', // 必要に応じて後で追加
-    contentEN: '', // 必要に応じて後で追加
-    level: data.level,
-    wordCount: data.wordCount,
-    duration: data.duration,
-    wpm: data.wpm
-  });
-  
-  // 9. 進捗データ保存
-  saveUserProgress(progress);
-  
-  // Reading completion process finished (logging removed)
-  
+    saveStampCardData(stamps);
+
+    // f. 履歴保存
+    saveToHistory({
+      type: data.contentType,
+      title: data.title,
+      contentJP: '',
+      contentEN: '',
+      level: data.level,
+      wordCount: data.wordCount,
+      duration: data.duration,
+      wpm: data.wpm
+    });
+
+    // g. 最終的な進捗データを保存
+    saveUserProgress(progress);
+  }, 10); // 10ms後に実行
+
   return progress;
 }
 
@@ -366,21 +354,20 @@ function updateAchievements(progress: UserProgress): void {
   // ブロンズコイン（20スタンプごと）
   progress.bronzeCoins = Math.floor(progress.totalStamps / 20);
   
-  // 新しいコインが獲得された場合
+  // 新しいコインが獲得された場合（20個に到達した時のみ）
   const newCoinsEarned = progress.bronzeCoins - previousCoins;
   
   // updateAchievements: コイン計算結果 (logging removed)
   
+  // 20の倍数に到達した場合のみコイン演出を表示
   if (newCoinsEarned > 0) {
-    // 20スタンプ達成時のコイン演出（基本演出の後に表示）
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
-        detail: { 
-          rewardType: 'gold', // 20スタンプ達成は金色演出
-          count: newCoinsEarned
-        } 
-      }));
-    }, 2000); // 基本演出の後に表示
+    // 20スタンプ達成時のコイン演出（即座に表示）
+    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+      detail: { 
+        rewardType: 'coin', // 20スタンプ達成はコイン演出
+        count: newCoinsEarned
+      } 
+    }));
   }
   
   // ブロンズトロフィー（5カード完成）
@@ -390,14 +377,12 @@ function updateAchievements(progress: UserProgress): void {
   
   if (newBronzeTrophies > 0) {
     // ブロンズトロフィー獲得演出（250話達成！）
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
-        detail: { 
-          rewardType: 'bronze',
-          count: newBronzeTrophies
-        } 
-      }));
-    }, 4000); // 他の演出の後に表示
+    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+      detail: { 
+        rewardType: 'bronze',
+        count: newBronzeTrophies
+      } 
+    }));
   }
   
   // シルバートロフィー（5ブロンズ）
@@ -427,11 +412,13 @@ function processeDailyBonuses(progress: UserProgress): void {
   // 今日の最初の1話の記録
   if (progress.dailyStoriesRead === 1 && !progress.dailyFirstStoryBonus) {
     progress.dailyFirstStoryBonus = true;
+    console.log('🌟 今日の最初の1話達成！');
   }
   
   // デイリー目標達成（3話）の記録
   if (progress.dailyStoriesRead >= 3 && !progress.dailyGoalAchieved) {
     progress.dailyGoalAchieved = true;
+    console.log('🎯 デイリー目標3話達成！');
   }
 }
 
@@ -479,6 +466,7 @@ export function getAndClearWelcomeBackMessage(): { daysDifference: number; messa
     try {
       return JSON.parse(stored);
     } catch (error) {
+      console.error('Failed to parse welcome back message:', error);
       return null;
     }
   }
@@ -533,7 +521,7 @@ export function getStampCardDisplay(): StampCardDisplay {
   
   // 次のマイルストーン計算
   const nextCoin = (Math.floor(progress.totalStamps / 20) + 1) * 20;
-  const nextCard = (Math.floor(progress.totalStamps / 50) + 1) * 50;
+  const nextCard = (Math.floor(progress.totalStamps / 20) + 1) * 20;
   const stampsToNextCoin = nextCoin - progress.totalStamps;
   const stampsToNextCard = nextCard - progress.totalStamps;
   
@@ -556,8 +544,8 @@ export function getStampCardDisplay(): StampCardDisplay {
     currentStamps: currentCardStamps,
     progress: {
       current: progress.currentCardStamps,
-      total: 50,
-      percentage: (progress.currentCardStamps / 50) * 100
+      total: 20,
+      percentage: (progress.currentCardStamps / 20) * 100
     },
     nextMilestone
   };
@@ -570,27 +558,41 @@ export function resetProgress(): void {
   localStorage.removeItem(STORAGE_KEYS.USER_PROGRESS);
   localStorage.removeItem(STORAGE_KEYS.STAMP_CARD);
   localStorage.removeItem(STORAGE_KEYS.DAILY_DATA);
+  console.log('🗑️ All progress data reset');
 }
 
 // 緊急デバッグ機能を追加
 export function emergencyDebugProgress(): void {
   const progress = getUserProgress();
+  console.log('🚨 Emergency Debug - Current Progress:', progress);
   
   const actualTotalWords = 162 + 142; // 実際に読んだ語数
   const expectedStamps = Math.floor(actualTotalWords / 100);
+  
+  console.log('🧮 Manual calculation:', {
+    actualWordsRead: actualTotalWords,
+    expectedStamps: expectedStamps,
+    currentStamps: progress.totalStamps,
+    currentWords: progress.totalWords,
+    difference: progress.totalWords - actualTotalWords
+  });
 }
 
 export function emergencyFixProgress(): void {
   const actualTotalWords = 162 + 142; // 実際に読んだ語数
   const progress = getUserProgress();
   
+  console.log('🔧 Emergency Fix - Before:', progress);
+  
   progress.totalWords = actualTotalWords;
   progress.totalStamps = Math.floor(actualTotalWords / 100);
-  progress.currentCardStamps = progress.totalStamps % 50;
-  progress.completedCards = Math.floor(progress.totalStamps / 50);
+  progress.currentCardStamps = progress.totalStamps % 20;
+  progress.completedCards = Math.floor(progress.totalStamps / 20);
   progress.bronzeCoins = Math.floor(progress.totalStamps / 20);
   
   saveUserProgress(progress);
+  
+  console.log('🔧 Emergency Fix - After:', progress);
 }
 
 // 開発者コンソール用
