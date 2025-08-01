@@ -19,9 +19,11 @@ export default function RewardFlashManager({ className = '' }: RewardFlashManage
   useEffect(() => {
     const handleShowRewardFlash = (event: CustomEvent) => {
       const { rewardType, count } = event.detail;
+      console.log('🎊 RECEIVED showRewardFlash EVENT:', { rewardType, count, currentReward });
       
       // 演出が既に表示中の場合はスキップ
       if (currentReward && currentReward.show) {
+        console.log('🚫 Skipping animation - already showing:', currentReward);
         return;
       }
       
@@ -40,6 +42,7 @@ export default function RewardFlashManager({ className = '' }: RewardFlashManage
         type: rewardType,
         count: count
       };
+      console.log('🎊 Setting currentReward to:', newReward);
       setCurrentReward(newReward);
     };
 

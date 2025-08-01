@@ -409,7 +409,7 @@ function updateAchievements(progress: UserProgress): void {
     
     // 大きな全画面コイン演出を表示
     setTimeout(() => {
-      // コイン演出を表示 (logging removed)
+      console.log('🎊 FIRING showRewardFlash EVENT:', { rewardType: 'coin', count: newCoinsEarned });
       
       // 全画面RewardFlash用のイベント
       window.dispatchEvent(new CustomEvent('showRewardFlash', { 
