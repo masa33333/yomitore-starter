@@ -261,20 +261,17 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   progress.totalWords += data.wordCount;
   progress.dailyStoriesRead += 1;
   
-  // 4. 100語毎のスタンプ計算
-  const previousStampCount = Math.floor(previousTotalWords / 100);
-  const newStampCount = Math.floor(progress.totalWords / 100);
-  const newStampsEarned = newStampCount - previousStampCount;
+  // 4. 1話読了毎のスタンプ計算（stamp.md仕様通り）
+  const newStampsEarned = 1; // 1話読了 = 1スタンプ（語数関係なし）
+  progress.totalStamps += newStampsEarned;
   
   // Stamp calculation (logging removed)
   
-  // 5. スタンプ数更新とカード完成チェック
-  const previousCardStamps = progress.currentCardStamps;
-  progress.totalStamps = newStampCount;
+  // 5. スタンプ数更新とカード完成チェック（stamp.md仕様：20個で1枚）
+  const previousTotalStamps = progress.totalStamps - newStampsEarned;
   const newCardStamps = progress.totalStamps % 20;
   
   // カード完成チェック（20個に到達したかどうか）
-  const previousTotalStamps = previousStampCount;
   const cardsBeforeReading = Math.floor(previousTotalStamps / 20);
   const cardsAfterReading = Math.floor(progress.totalStamps / 20);
   const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
@@ -329,29 +326,15 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   saveStampCardData(stamps);
   
-  // 獲得したスタンプ数をログ出力と演出制御
-  if (newStampsEarned > 0) {
-    // スタンプ獲得時もRewardFlash豪華演出を表示
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
-        detail: { 
-          rewardType: 'bronze', // スタンプはブロンズトロフィー演出
-          count: newStampsEarned
-        } 
-      }));
-    }, 50);
-    
-    // StampFlash演出を完全に無効化（豪華演出のみ使用）
-    // stampEarnedイベントの発火を停止（ちゃちい演出削除）
-    // setTimeout(() => {
-    //   window.dispatchEvent(new CustomEvent('stampEarned', { 
-    //     detail: { 
-    //       stampsEarned: newStampsEarned,
-    //       showAnimation: true
-    //     } 
-    //   }));
-    // }, 50);
-  }
+  // 毎回スタンプ演出を表示（stamp.md仕様通り）
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+      detail: { 
+        rewardType: 'bronze', // 毎回ブロンズトロフィー演出（スタンプ獲得）
+        count: 1
+      } 
+    }));
+  }, 50);
   
   // 8. 履歴保存（既存システム）
   saveToHistory({
