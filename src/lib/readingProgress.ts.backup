@@ -176,6 +176,7 @@ function recordConsecutiveReadingMessage(progress: UserProgress): void {
   if (consecutiveDays > 0) {
     const message = `今日で${consecutiveDays}日連続読書達成！`;
     localStorage.setItem('consecutiveReadingMessage', message);
+    console.log(`📚 ${message}`);
   }
 }
 
@@ -195,27 +196,39 @@ export function checkAndResetDailyData(testDate?: string): UserProgress {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
     
+    console.log('🔍 Checking login continuity...');
+    console.log('  Current lastLoginDate:', progress.lastLoginDate);
+    console.log('  Expected yesterday:', yesterdayStr);
+    console.log('  Today:', today);
     
     if (progress.lastLoginDate === yesterdayStr) {
       // 連続ログイン継続
+      console.log('✅ Consecutive login continued!');
       progress.consecutiveLoginDays += 1;
     } else if (progress.lastLoginDate === '') {
       // 初回ログイン
+      console.log('🆕 First time login!');
       progress.consecutiveLoginDays = 1;
     } else {
       // 連続ログインが途切れた
+      console.log('💔 Consecutive login broken!');
       const lastLoginDate = new Date(progress.lastLoginDate);
       const currentDate = testDate ? new Date(testDate) : new Date();
       const daysDifference = Math.floor((currentDate.getTime() - lastLoginDate.getTime()) / (1000 * 60 * 60 * 24));
+      console.log('  Days difference:', daysDifference);
       
       if (daysDifference >= 3) {
         // 3日以上空いている場合は復帰メッセージ
         showWelcomeBackMessage(daysDifference);
+        console.log(`🤗 おかえりなさい！${daysDifference}日ぶりのログイン`);
       }
       
       progress.consecutiveLoginDays = 1;
     }
     
+    console.log('📅 Daily data reset for new day:', today);
+    console.log('📊 Previous lastLoginDate:', progress.lastLoginDate, 'yesterday should be:', yesterdayStr);
+    console.log('🔥 Consecutive login days updated to:', progress.consecutiveLoginDays);
     
     // デイリーデータリセット
     progress.dailyStoriesRead = 0;
@@ -427,11 +440,13 @@ function processeDailyBonuses(progress: UserProgress): void {
   // 今日の最初の1話の記録
   if (progress.dailyStoriesRead === 1 && !progress.dailyFirstStoryBonus) {
     progress.dailyFirstStoryBonus = true;
+    console.log('🌟 今日の最初の1話達成！');
   }
   
   // デイリー目標達成（3話）の記録
   if (progress.dailyStoriesRead >= 3 && !progress.dailyGoalAchieved) {
     progress.dailyGoalAchieved = true;
+    console.log('🎯 デイリー目標3話達成！');
   }
 }
 
@@ -479,6 +494,7 @@ export function getAndClearWelcomeBackMessage(): { daysDifference: number; messa
     try {
       return JSON.parse(stored);
     } catch (error) {
+      console.error('Failed to parse welcome back message:', error);
       return null;
     }
   }
@@ -570,19 +586,31 @@ export function resetProgress(): void {
   localStorage.removeItem(STORAGE_KEYS.USER_PROGRESS);
   localStorage.removeItem(STORAGE_KEYS.STAMP_CARD);
   localStorage.removeItem(STORAGE_KEYS.DAILY_DATA);
+  console.log('🗑️ All progress data reset');
 }
 
 // 緊急デバッグ機能を追加
 export function emergencyDebugProgress(): void {
   const progress = getUserProgress();
+  console.log('🚨 Emergency Debug - Current Progress:', progress);
   
   const actualTotalWords = 162 + 142; // 実際に読んだ語数
   const expectedStamps = Math.floor(actualTotalWords / 100);
+  
+  console.log('🧮 Manual calculation:', {
+    actualWordsRead: actualTotalWords,
+    expectedStamps: expectedStamps,
+    currentStamps: progress.totalStamps,
+    currentWords: progress.totalWords,
+    difference: progress.totalWords - actualTotalWords
+  });
 }
 
 export function emergencyFixProgress(): void {
   const actualTotalWords = 162 + 142; // 実際に読んだ語数
   const progress = getUserProgress();
+  
+  console.log('🔧 Emergency Fix - Before:', progress);
   
   progress.totalWords = actualTotalWords;
   progress.totalStamps = Math.floor(actualTotalWords / 100);
@@ -591,6 +619,8 @@ export function emergencyFixProgress(): void {
   progress.bronzeCoins = Math.floor(progress.totalStamps / 20);
   
   saveUserProgress(progress);
+  
+  console.log('🔧 Emergency Fix - After:', progress);
 }
 
 // 開発者コンソール用

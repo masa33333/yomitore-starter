@@ -18,13 +18,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'テキストが指定されていません' }, { status: 400 });
     }
 
-    console.log('🔄 翻訳リクエスト:', { 
-      textLength: text.length, 
-      textPreview: text.substring(0, 100) + '...', 
-      targetLanguage, 
-      isStory 
-    });
-
     const userPrompt = `Translate the following English text to natural Japanese:
 
 "${text}"
@@ -38,13 +31,9 @@ Requirements:
 
 Output only the Japanese translation, nothing else.`;
 
-    console.log('📤 OpenAIに送信する翻訳プロンプト');
-
     // ストーリーモードの場合はより多くのトークンを許可
     const maxTokens = isStory ? 8000 : 1000;
     const model = isStory ? "gpt-4o-mini" : "gpt-3.5-turbo";
-    
-    console.log(`📤 OpenAI翻訳設定: model=${model}, maxTokens=${maxTokens}`);
 
     const completion = await openai.chat.completions.create({
       model: model,
@@ -60,37 +49,17 @@ Output only the Japanese translation, nothing else.`;
     });
 
     let translation = completion.choices[0].message.content?.trim() ?? "";
-    console.log('📥 OpenAIからの翻訳応答:', {
-      translationLength: translation.length,
-      translationPreview: translation.substring(0, 200) + '...',
-      finishReason: completion.choices[0].finish_reason,
-      usage: completion.usage
-    });
     
     // 引用符を除去（文頭・文末のみ）
     translation = translation.replace(/^["'「『]/, '').replace(/["'」』]$/, '').trim();
-    
-    console.log('📥 クリーニング後の翻訳:', {
-      cleanedLength: translation.length,
-      finishReason: completion.choices[0].finish_reason,
-      wasTruncated: completion.choices[0].finish_reason === 'length'
-    });
-    
-    // If translation was truncated due to token limit, log a warning
-    if (completion.choices[0].finish_reason === 'length') {
-      console.warn('⚠️ 翻訳が最大トークン数により途中で切れました。より多くのトークンが必要です。');
-    }
 
     if (translation && translation.length > 0) {
-      console.log('✅ 翻訳取得成功:', text, '->', translation);
       return NextResponse.json({ translation: translation });
     } else {
-      console.log('⚠️ 翻訳が空または無効:', translation);
       return NextResponse.json({ translation: text }); // 元のテキストを返す
     }
 
   } catch (err) {
-    console.error("translation error:", err);
     return NextResponse.json({ 
       error: "翻訳の取得に失敗しました",
       translation: text || "翻訳に失敗しました"

@@ -40,7 +40,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
     const newStamps = Math.floor(wordCount / 100);
     if (newStamps > 0) {
       currentReward.stamps += newStamps;
-      console.log(`📮 ${newStamps}個のスタンプ獲得`);
     }
     
     // コイン獲得チェック（スタンプ20個 = コイン1個）
@@ -49,7 +48,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
       currentReward.coin += newCoins;
       currentReward.stamps %= 20;
       
-      console.log(`🪙 ${newCoins}個のコイン獲得!`);
       
       // コイン5個でブロンズトロフィーに変換チェック
       if (currentReward.coin >= 5) {
@@ -57,7 +55,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
         currentReward.bronze += newBronze;
         currentReward.coin %= 5;
         
-        console.log(`🏆 ${newBronze}個のブロンズトロフィー獲得!`);
         
         // ブロンズ5個でシルバーに変換チェック
         if (currentReward.bronze >= 5) {
@@ -65,7 +62,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
           currentReward.silver += newSilver;
           currentReward.bronze %= 5;
           
-          console.log(`🥈 ${newSilver}個のシルバートロフィー獲得!`);
           
           // シルバー5個でゴールドに変換チェック
           if (currentReward.silver >= 5) {
@@ -73,7 +69,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
             currentReward.gold += newGold;
             currentReward.silver %= 5;
             
-            console.log(`🥇 ${newGold}個のゴールドトロフィー獲得!`);
             
             // ゴールド4個でプラチナに変換チェック
             if (currentReward.gold >= 4) {
@@ -81,7 +76,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
               currentReward.platinum += newPlatinum;
               currentReward.gold %= 4;
               
-              console.log(`🏆 ${newPlatinum}個のプラチナトロフィー獲得!`);
               
               // プラチナトロフィー演出を表示
               window.dispatchEvent(new CustomEvent('showRewardFlash', {
@@ -173,7 +167,6 @@ export function RewardProvider({ children }: { children: ReactNode }) {
       if (finalReward[type] > oldReward[type]) {
         const count = finalReward[type] - oldReward[type];
         
-        console.log(`🏆 ${type} ${count}個獲得!`);
         
         // トロフィー演出を表示
         window.dispatchEvent(new CustomEvent('showRewardFlash', {
