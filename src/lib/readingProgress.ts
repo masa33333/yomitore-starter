@@ -341,7 +341,7 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
     // 毎回の基本スタンプ演出（軽い演出）
     window.dispatchEvent(new CustomEvent('showRewardFlash', { 
       detail: { 
-        rewardType: 'bronze', // スタンプ獲得はブロンズ演出
+        rewardType: 'coin', // スタンプ獲得は軽いコイン演出
         count: 1
       } 
     }));
@@ -385,16 +385,15 @@ function updateAchievements(progress: UserProgress): void {
   // updateAchievements: コイン計算結果 (logging removed)
   
   if (newCoinsEarned > 0) {
-    // 大きな全画面コイン演出を表示
+    // 20スタンプ達成時のコイン演出（基本演出の後に表示）
     setTimeout(() => {
-      // 全画面RewardFlash用のイベント
       window.dispatchEvent(new CustomEvent('showRewardFlash', { 
         detail: { 
-          rewardType: 'coin',
+          rewardType: 'gold', // 20スタンプ達成は金色演出
           count: newCoinsEarned
         } 
       }));
-    }, 100);
+    }, 2000); // 基本演出の後に表示
   }
   
   // ブロンズトロフィー（5カード完成）
@@ -411,7 +410,7 @@ function updateAchievements(progress: UserProgress): void {
           count: newBronzeTrophies
         } 
       }));
-    }, 150);
+    }, 4000); // 他の演出の後に表示
   }
   
   // シルバートロフィー（5ブロンズ）

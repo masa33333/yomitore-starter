@@ -798,36 +798,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     // Debug logging removed - problem resolved
     setWpm(calculatedWpm);
     
-    console.log('✅ 読書完了:', {
-      totalWordCount: wordCount,
-      actualWordsRead: actualWordsRead,
-      readingStartIndex: readingStartTokenIndex,
-      timeInMinutes: timeInMinutes.toFixed(1),
-      wpm: calculatedWpm,
-      duration
-    });
+    // 読書完了処理（ログ削除）
     
-    // カード完成判定のための事前計算
-    const userProgressData = localStorage.getItem('userProgress');
-    const currentTotal = userProgressData ? JSON.parse(userProgressData).totalWords : 0;
-    const newTotal = currentTotal + wordCount;
-    const previousStampCount = Math.floor(currentTotal / 100);
-    const newStampCount = Math.floor(newTotal / 100);
-    const stampsEarned = newStampCount - previousStampCount;
-    
-    // カード完成チェック（20個に到達したかどうか）
-    const cardsBeforeReading = Math.floor(previousStampCount / 20);
-    const cardsAfterReading = Math.floor(newStampCount / 20);
-    const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
-    
-    // StampFlash演出を無効化（ちゃちい演出削除）
-    console.log('🎊 StampFlash演出は無効化されています（豪華演出のみ使用）');
-    console.log(`📮 スタンプ獲得: ${stampsEarned}個（演出なし）`, { 
-      stampsEarned, 
-      newCardsCompleted 
-    });
-    
-    // 演出はRewardFlashManagerで豪華版を表示
+    // 演出はRewardFlashManagerで豪華版を表示（completeReading関数内で処理）
     
     // スタンプカード統合システムで進捗更新
     const currentLevel = parseInt(localStorage.getItem('level') || localStorage.getItem('fixedLevel') || '3', 10);
@@ -848,7 +821,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       // Debug logging removed - problem resolved
       
       const updatedProgress = completeReading(completionData);
-      console.log('🎆 スタンプカード更新完了:', updatedProgress);
+      // スタンプカード更新完了（ログ削除）
       
       // 合計読書時間を更新（一度だけ）
       const totalReadingTime = parseInt(localStorage.getItem('totalReadingTime') || '0', 10);
