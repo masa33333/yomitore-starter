@@ -58,8 +58,8 @@ export function getUserProgress(): UserProgress {
       if (parsed.totalStamps !== expectedStamps) {
         // Stamp count mismatch detected - correcting silently
         parsed.totalStamps = expectedStamps;
-        parsed.currentCardStamps = expectedStamps % 20;
-        parsed.completedCards = Math.floor(expectedStamps / 20);
+        parsed.currentCardStamps = expectedStamps % 50;
+        parsed.completedCards = Math.floor(expectedStamps / 50);
         // 修正したデータを保存
         saveUserProgress(parsed);
       }
@@ -98,18 +98,20 @@ function migrateFromLegacySystem(): UserProgress {
     progress.completedCards = 0;
   } else {
     progress.totalWords = legacyWords;
-    // 100語毎にスタンプ1個の新システムに変更（語数ベースで計算）
-    progress.totalStamps = Math.floor(legacyWords / 100);
-    progress.currentCardStamps = progress.totalStamps % 20;
-    progress.completedCards = Math.floor(progress.totalStamps / 20);
+    // 1話毎にスタンプ1個の新システム（stamp.md仕様）
+    // レガシーデータは既存のcompletedReadings値を使用
+    const legacyReadings = parseInt(localStorage.getItem('completedReadings') || '0', 10);
+    progress.totalStamps = legacyReadings;
+    progress.currentCardStamps = progress.totalStamps % 50;
+    progress.completedCards = Math.floor(progress.totalStamps / 50);
   }
   
   // データ整合性チェック - 語数とスタンプ数の論理的チェック
   const expectedStamps = Math.floor(progress.totalWords / 100);
   if (progress.totalStamps !== expectedStamps) {
     progress.totalStamps = expectedStamps;
-    progress.currentCardStamps = expectedStamps % 20;
-    progress.completedCards = Math.floor(expectedStamps / 20);
+    progress.currentCardStamps = expectedStamps % 50;
+    progress.completedCards = Math.floor(expectedStamps / 50);
   }
   
   // コインとトロフィーを計算（新しいスタンプ数ベース）
@@ -267,13 +269,13 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   // Stamp calculation (logging removed)
   
-  // 5. スタンプ数更新とカード完成チェック（stamp.md仕様：20個で1枚）
+  // 5. スタンプ数更新とカード完成チェック（stamp.md仕様：50個で1枚）
   const previousTotalStamps = progress.totalStamps - newStampsEarned;
-  const newCardStamps = progress.totalStamps % 20;
+  const newCardStamps = progress.totalStamps % 50;
   
-  // カード完成チェック（20個に到達したかどうか）
-  const cardsBeforeReading = Math.floor(previousTotalStamps / 20);
-  const cardsAfterReading = Math.floor(progress.totalStamps / 20);
+  // カード完成チェック（50個に到達したかどうか）
+  const cardsBeforeReading = Math.floor(previousTotalStamps / 50);
+  const cardsAfterReading = Math.floor(progress.totalStamps / 50);
   const newCardsCompleted = cardsAfterReading - cardsBeforeReading;
   
   if (newCardsCompleted > 0) {
@@ -326,15 +328,26 @@ export function completeReading(data: ReadingCompletionData): UserProgress {
   
   saveStampCardData(stamps);
   
-  // 毎回スタンプ演出を表示（stamp.md仕様通り）
+  // stamp.md仕様に基づく正しい演出システム
   setTimeout(() => {
-    window.dispatchEvent(new CustomEvent('showRewardFlash', { 
-      detail: { 
-        rewardType: 'bronze', // 毎回ブロンズトロフィー演出（スタンプ獲得）
-        count: 1
-      } 
-    }));
-  }, 50);
+    // カード完成時（50話毎）の特別演出
+    if (newCardsCompleted > 0) {
+      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+        detail: { 
+          rewardType: 'gold', // カード完成は金色演出
+          count: newCardsCompleted
+        } 
+      }));
+    } else {
+      // 毎回の基本スタンプ演出（軽い演出）
+      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+        detail: { 
+          rewardType: 'coin', // スタンプ獲得は軽いコイン演出
+          count: 1
+        } 
+      }));
+    }
+  }, 10); // 演出タイミングを短縮
   
   // 8. 履歴保存（既存システム）
   saveToHistory({
@@ -387,7 +400,21 @@ function updateAchievements(progress: UserProgress): void {
   }
   
   // ブロンズトロフィー（5カード完成）
+  const previousBronzeTrophies = progress.bronzeTrophies;
   progress.bronzeTrophies = Math.floor(progress.completedCards / 5);
+  const newBronzeTrophies = progress.bronzeTrophies - previousBronzeTrophies;
+  
+  if (newBronzeTrophies > 0) {
+    // ブロンズトロフィー獲得演出（250話達成！）
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('showRewardFlash', { 
+        detail: { 
+          rewardType: 'bronze',
+          count: newBronzeTrophies
+        } 
+      }));
+    }, 150);
+  }
   
   // シルバートロフィー（5ブロンズ）
   progress.silverTrophies = Math.floor(progress.bronzeTrophies / 5);
@@ -525,7 +552,7 @@ export function getStampCardDisplay(): StampCardDisplay {
   
   // 次のマイルストーン計算
   const nextCoin = (Math.floor(progress.totalStamps / 10) + 1) * 10;
-  const nextCard = (Math.floor(progress.totalStamps / 20) + 1) * 20;
+  const nextCard = (Math.floor(progress.totalStamps / 50) + 1) * 50;
   const stampsToNextCoin = nextCoin - progress.totalStamps;
   const stampsToNextCard = nextCard - progress.totalStamps;
   
@@ -548,8 +575,8 @@ export function getStampCardDisplay(): StampCardDisplay {
     currentStamps: currentCardStamps,
     progress: {
       current: progress.currentCardStamps,
-      total: 20,
-      percentage: (progress.currentCardStamps / 20) * 100
+      total: 50,
+      percentage: (progress.currentCardStamps / 50) * 100
     },
     nextMilestone
   };
@@ -590,8 +617,8 @@ export function emergencyFixProgress(): void {
   
   progress.totalWords = actualTotalWords;
   progress.totalStamps = Math.floor(actualTotalWords / 100);
-  progress.currentCardStamps = progress.totalStamps % 20;
-  progress.completedCards = Math.floor(progress.totalStamps / 20);
+  progress.currentCardStamps = progress.totalStamps % 50;
+  progress.completedCards = Math.floor(progress.totalStamps / 50);
   progress.bronzeCoins = Math.floor(progress.totalStamps / 10);
   
   saveUserProgress(progress);
