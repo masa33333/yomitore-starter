@@ -156,7 +156,7 @@ export default function ReadingFormPage() {
         <button
           type="submit"
           disabled={!topic.trim()}
-          className="w-full bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-bold hover:bg-[#e5a561] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-[#FFB86C] text-[#1E1E1E] px-6 py-3 rounded-md font-bold hover:bg-[#e5a561] transition-colors disabled:cursor-not-allowed"
         >
           {text.generateButton[displayLang]}
         </button>
