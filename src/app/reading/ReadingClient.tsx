@@ -2515,30 +2515,6 @@ const renderSimpleText = (text: string, paragraphIndex: number) => {
         style={{ display: 'none' }}
       />
       
-      {/* 🎵 Audio Playing Indicator & Offset Control */}
-      {isAudioPlaying && (
-        <div className="fixed top-4 right-4 bg-white shadow-lg rounded-lg p-3 z-50 border">
-          <div className="text-sm text-gray-700 mb-2">
-            🔊 音声再生中 - ハイライト調整
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs">遅く</span>
-            <input
-              type="range"
-              min="-1.0"
-              max="1.0"
-              step="0.1"
-              value={offsetSec}
-              onChange={(e) => setOffsetSec(Number(e.target.value))}
-              className="w-20"
-            />
-            <span className="text-xs">速く</span>
-            <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-              {offsetSec >= 0 ? '+' : ''}{offsetSec.toFixed(1)}s
-            </span>
-          </div>
-        </div>
-      )}
       {/* 報酬獲得演出 */}
       <RewardFlashManager />
       {/* ページタイトル */}
@@ -2726,23 +2702,6 @@ const renderSimpleText = (text: string, paragraphIndex: number) => {
                     onPlayingChange={setIsAudioPlaying}
                     onGenerated={handleTTSGenerated}
                   />
-                  
-                  {/* ハイライトタイミング調整 */}
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-md">
-                    <span className="text-sm text-gray-600 whitespace-nowrap">同期調整:</span>
-                    <input
-                      type="range"
-                      min="-1"
-                      max="0.5"
-                      step="0.05"
-                      value={offsetSec}
-                      onChange={(e) => setOffsetSec(Number(e.target.value))}
-                      className="w-20 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                    />
-                    <span className="text-xs text-gray-500 whitespace-nowrap">
-                      {offsetSec >= 0 ? `+${offsetSec.toFixed(2)}s` : `${offsetSec.toFixed(2)}s`}
-                    </span>
-                  </div>
                 </>
               )}
             </div>
