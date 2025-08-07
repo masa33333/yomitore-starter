@@ -246,7 +246,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       effectiveTextStart: effectiveText.substring(0, 50) + '...'
     });
     
+    console.log('🎯 CALLING setCurrentTimings with data:', data.timings);
     setCurrentTimings(data.timings);
+    console.log('🎯 setCurrentTimings COMPLETED');
     
     // audioRefにsrcを設定
     if (audioRef.current) {
@@ -2381,6 +2383,15 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   // 🎯 段落構造保持ハイライトレンダリング（音声再生時も段落とピリオドを維持）
   const renderParagraphWithHighlight = (paragraph: string, paragraphIndex: number) => {
+    // デバッグ情報
+    console.log(`🎯 renderParagraphWithHighlight called:`, {
+      hasTimings: !!currentTimings?.items?.length,
+      timingsCount: currentTimings?.items?.length || 0,
+      isAudioPlaying,
+      currentTimingIndex,
+      paragraphIndex
+    });
+    
     if (!currentTimings?.items?.length || !isAudioPlaying) {
       // 音声再生していない場合は通常のレンダリング
       return renderSimpleText(paragraph, paragraphIndex);
