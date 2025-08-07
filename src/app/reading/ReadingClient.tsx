@@ -2580,10 +2580,12 @@ const renderSimpleText = (text: string, paragraphIndex: number) => {
             {english && english.trim() && (
               <TTSButton
                 text={english}
-                contentId="reading-title-audio"
+                contentId="reading-full-content"
                 variant="secondary"
                 className="text-sm px-3 py-1"
-                // タイトル音声はハイライト対象外にする
+                audioRef={audioRef}
+                onPlayingChange={setIsAudioPlaying}
+                onGenerated={handleTTSGenerated}
               />
             )}
             
