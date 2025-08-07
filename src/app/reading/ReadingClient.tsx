@@ -112,7 +112,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [offsetSec, setOffsetSec] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('reading-highlight-offset');
-      return saved ? Number(saved) : -0.6; // デフォルト: 600ms早くハイライト
+      // モバイルデバイスの判定
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const defaultOffset = isMobile ? -0.8 : -0.6; // モバイルはさらに早く
+      return saved ? Number(saved) : defaultOffset;
     }
     return -0.6;
   });
