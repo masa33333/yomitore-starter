@@ -1,21 +1,39 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { TimingsJSON } from '@/types/highlight';
 
 type PlaybackSpeed = 'slow' | 'normal' | 'fast';
+
+interface TTSGeneratedData {
+  audioUrl: string;
+  contentId: string;
+  textHash: string;
+  timings: TimingsJSON;
+}
 
 interface TTSButtonProps {
   text: string;
   contentId: string;
   className?: string;
   variant?: 'primary' | 'secondary';
+  // 新しいプロパティ：外部audioRef対応
+  audioRef?: React.RefObject<HTMLAudioElement>;
+  onPlayingChange?: (isPlaying: boolean) => void;
+  onAudioUrlChange?: (audioUrl: string | null) => void;
+  // 新しいプロパティ：timings付きの生成完了通知
+  onGenerated?: (data: TTSGeneratedData) => void;
 }
 
 export default function TTSButton({ 
   text, 
   contentId, 
   className = '', 
-  variant = 'primary' 
+  variant = 'primary',
+  audioRef: externalAudioRef,
+  onPlayingChange,
+  onAudioUrlChange,
+  onGenerated
 }: TTSButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -23,7 +41,10 @@ export default function TTSButton({
   const [error, setError] = useState<string | null>(null);
   const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>('normal');
   const [showSpeedSelector, setShowSpeedSelector] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // 外部audioRefが提供されていればそれを使用、なければ内部のrefを使用
+  const audioRef = externalAudioRef || internalAudioRef;
 
   // 再生速度の倍率マップ
   const speedRates = {
@@ -39,6 +60,125 @@ export default function TTSButton({
       setPlaybackSpeed(savedSpeed);
     }
   }, []);
+
+  // audioUrl変更を親に通知
+  useEffect(() => {
+    onAudioUrlChange?.(audioUrl);
+  }, [audioUrl, onAudioUrlChange]);
+
+  // 外部audioRefのイベントリスナーを設定
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !externalAudioRef) return;
+
+    const handlePlay = () => {
+      setIsPlaying(true);
+      onPlayingChange?.(true);
+    };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+      onPlayingChange?.(false);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      onPlayingChange?.(false);
+    };
+
+    const handleError = () => {
+      setError('音声の再生に失敗しました');
+      setIsPlaying(false);
+      onPlayingChange?.(false);
+    };
+
+    // イベントリスナー登録
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    return () => {
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+    };
+  }, [audioRef, externalAudioRef, onPlayingChange]);
+
+  // ブラウザ互換のハッシュ生成（MD5の代替）
+  const generateTextHash = (text: string): string => {
+    // 簡易ハッシュ関数（既存TTSシステムとの整合性のため）
+    let hash = 0;
+    const str = text.trim();
+    if (str.length === 0) return '0';
+    
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // 32bit整数に変換
+    }
+    
+    return Math.abs(hash).toString(16);
+  };
+
+  // Phase 8 Simple: Server-side Whisper API integration (secure)
+  const generateWhisperTimings = async (audioUrl: string, textHash: string, contentId: string): Promise<TimingsJSON | null> => {
+    try {
+      console.log('🎵 Phase 8 Simple: Calling server-side Whisper API');
+      console.log('🎵 Audio URL:', audioUrl.substring(0, 50) + '...');
+      
+      const response = await fetch('/api/whisper-timings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          audioUrl,
+          textHash,
+          contentId
+        }),
+      });
+      
+      if (!response.ok) {
+        console.warn('🟨 Whisper API endpoint failed:', response.status, response.statusText);
+        return null;
+      }
+      
+      const data = await response.json();
+      console.log('✅ Server-side Whisper success:', {
+        cached: data.cached,
+        source: data.timings?.source,
+        wordCount: data.timings?.items?.length
+      });
+      
+      return data.timings;
+      
+    } catch (error) {
+      console.error('❌ Server-side Whisper integration failed:', error);
+      return null;
+    }
+  };
+
+  // Fallback timing generation (Phase 7 compatible)
+  const createFallbackTimings = (text: string, estimatedDuration?: number): TimingsJSON => {
+    const words = text.split(/\s+/).filter(w => w.trim());
+    const duration = estimatedDuration || (words.length / 3.3); // 200 WPM ≈ 3.3 WPS
+    const timePerWord = duration / words.length;
+    
+    return {
+      granularity: 'word',
+      items: words.map((word, i) => ({
+        i,
+        text: word,
+        start: i * timePerWord,
+        end: (i + 1) * timePerWord,
+      })),
+      source: 'fallback',
+      model: 'uniform-estimate',
+      createdAt: new Date().toISOString(),
+    };
+  };
 
   useEffect(() => {
     localStorage.setItem('tts-playback-speed', playbackSpeed);
@@ -124,6 +264,80 @@ export default function TTSButton({
       const data = await response.json();
       setAudioUrl(data.audioUrl);
       
+      // Phase 8 Simple: Direct Whisper timing generation
+      if (onGenerated) {
+        const textHash = generateTextHash(text);
+        console.log('🟡 TTSButton: onGenerated callback provided, starting Phase 8...');
+        console.log('🎵 Phase 8 Simple: Starting timing generation...');
+        
+        let timings: TimingsJSON | null = null;
+        
+        try {
+          // Step 1: Try server-side Whisper API
+          console.log('🎵 Attempting server-side Whisper integration...');
+          timings = await generateWhisperTimings(data.audioUrl, textHash, contentId);
+          
+          if (timings) {
+            console.log('🎉 Whisper timings successful:', {
+              source: timings.source,
+              wordCount: timings.items.length,
+              duration: timings.items[timings.items.length - 1]?.end
+            });
+          } else {
+            console.log('🟨 Whisper failed, using Phase 7 fallback');
+          }
+          
+        } catch (whisperError) {
+          console.warn('🟨 Whisper error, falling back:', whisperError);
+        }
+        
+        // Step 2: If Whisper failed, create fallback timings
+        if (!timings) {
+          console.log('🔧 Generating fallback timings...');
+          timings = createFallbackTimings(text);
+          
+          // Wait for audio metadata to adjust fallback timing to actual duration
+          if (audioRef.current) {
+            const audio = audioRef.current;
+            audio.src = data.audioUrl;
+            
+            const adjustFallbackTiming = () => {
+              if (audio.duration && !isNaN(audio.duration)) {
+                console.log('🔧 Adjusting fallback timing to actual duration:', audio.duration);
+                const adjustedTimings = createFallbackTimings(text, audio.duration);
+                adjustedTimings.source = 'fallback-adjusted';
+                adjustedTimings.model = 'fallback-actual-duration';
+                
+                onGenerated({
+                  audioUrl: data.audioUrl,
+                  contentId,
+                  textHash,
+                  timings: adjustedTimings
+                });
+              }
+            };
+            
+            if (audio.readyState >= 1) {
+              adjustFallbackTiming();
+            } else {
+              audio.addEventListener('loadedmetadata', adjustFallbackTiming, { once: true });
+            }
+            return; // Exit early for fallback adjustment
+          }
+        }
+        
+        // Step 3: Call onGenerated with timings (Whisper or immediate fallback)
+        onGenerated({
+          audioUrl: data.audioUrl,
+          contentId,
+          textHash,
+          timings
+        });
+        
+      } else {
+        console.log('🟫 TTSButton: onGenerated callback NOT provided - no timing generation');
+      }
+      
       // 音声を自動再生（モバイル対応）
       if (audioRef.current) {
         audioRef.current.src = data.audioUrl;
@@ -134,6 +348,7 @@ export default function TTSButton({
           // モバイルでは自動再生が制限される場合があるため、ユーザーアクションが必要
           await audioRef.current.play();
           setIsPlaying(true);
+          onPlayingChange?.(true);
           console.log('✅ Audio autoplay successful at', speedRates[playbackSpeed] + 'x speed');
         } catch (playError) {
           console.warn('⚠️ Autoplay failed (expected on mobile):', playError);
@@ -157,12 +372,14 @@ export default function TTSButton({
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      onPlayingChange?.(false);
     } else {
       try {
         // 再生速度を設定してから再生
         audioRef.current.playbackRate = speedRates[playbackSpeed];
         await audioRef.current.play();
         setIsPlaying(true);
+        onPlayingChange?.(true);
       } catch (err) {
         console.error('Audio play error:', err);
         setError('音声の再生に失敗しました');
@@ -185,11 +402,13 @@ export default function TTSButton({
 
   const handleAudioEnded = () => {
     setIsPlaying(false);
+    onPlayingChange?.(false);
   };
 
   const handleAudioError = () => {
     setError('音声ファイルの読み込みに失敗しました');
     setIsPlaying(false);
+    onPlayingChange?.(false);
   };
 
   const baseClasses = "inline-flex items-center rounded-md font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
@@ -278,14 +497,16 @@ export default function TTSButton({
       )}
 
 
-      {/* Hidden Audio Element */}
-      <audio
-        ref={audioRef}
-        onEnded={handleAudioEnded}
-        onError={handleAudioError}
-        preload="none"
-        style={{ display: 'none' }}
-      />
+      {/* Hidden Audio Element (内部audioRefの場合のみ) */}
+      {!externalAudioRef && (
+        <audio
+          ref={audioRef}
+          onEnded={handleAudioEnded}
+          onError={handleAudioError}
+          preload="none"
+          style={{ display: 'none' }}
+        />
+      )}
     </div>
   );
 }

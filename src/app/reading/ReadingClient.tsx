@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useReward } from '@/context/RewardContext';
@@ -14,6 +14,11 @@ import RewardDisplay from '@/components/RewardDisplay';
 import RewardFlashManager from '@/components/RewardFlashManager';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
+import { useAudioHighlighter } from '@/hooks/useAudioHighlighter';
+import { tokenizeForReading } from '@/lib/tokenize';
+import { buildTimingToTokenMap } from '@/lib/align';
+import { textFromTimings } from '@/lib/textFromTimings';
+import type { TimingsJSON } from '@/types/highlight';
 // import StampFlash from '@/components/StampFlash'; // 無効化：ちゃちい演出を削除
 import { BookmarkDialog } from '@/components/BookmarkDialog';
 import { ResumeDialog } from '@/components/ResumeDialog';
@@ -96,6 +101,79 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     return urlParams.get('fromNotebook') === 'true' || urlParams.get('from') === 'notebook';
   };
 
+  // 🎵 音声ハイライト用の状態
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [currentTimings, setCurrentTimings] = useState<TimingsJSON | null>(null);
+  const [effectiveText, setEffectiveText] = useState<string>('');
+  const [highlightedTokenIndex, setHighlightedTokenIndex] = useState<number>(-1);
+  
+  // 🎯 ハイライト制御（オフセット調整機能付き + 永続化）
+  const [offsetSec, setOffsetSec] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('reading-highlight-offset');
+      return saved ? Number(saved) : 0;
+    }
+    return 0;
+  });
+  const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
+  
+  // オフセット値の永続化
+  useEffect(() => {
+    localStorage.setItem('reading-highlight-offset', String(offsetSec));
+  }, [offsetSec]);
+  
+  // トークン配列とマッピング（安定化）
+  const tokens = useMemo(() => tokenizeForReading(effectiveText), [effectiveText]);
+  const timingToTokenMap = useMemo(() => {
+    if (!currentTimings || !tokens.length) {
+      return new Map();
+    }
+    console.log('🔥🔥🔥 Building timing to token map...');
+    const map = buildTimingToTokenMap(currentTimings, tokens);
+    console.log('🔥🔥🔥 Map built, size:', map.size);
+    return map;
+  }, [currentTimings, tokens]);
+  
+  // デバッグ: トークンとタイミングの整合性チェック
+  useEffect(() => {
+    if (currentTimings && tokens.length > 0) {
+      console.log('🔥🔥🔥 TOKEN DEBUG:', {
+        effectiveTextLength: effectiveText.length,
+        tokensCount: tokens.length,
+        wordTokensCount: tokens.filter(t => t.isWord).length,
+        timingsItemsCount: currentTimings.items.length,
+        mappingSize: timingToTokenMap.size,
+        // 単語数の不一致をチェック
+        wordCountDifference: tokens.filter(t => t.isWord).length - currentTimings.items.length
+      });
+      
+      // より詳細な比較（最初の10単語）
+      const first10Words = tokens.filter(t => t.isWord).slice(0, 10).map(t => t.text);
+      const first10Timings = currentTimings.items.slice(0, 10).map(t => t.text);
+      console.log('🔥🔥🔥 First 10 words comparison:');
+      console.log('🔥🔥🔥 Tokens:', first10Words);
+      console.log('🔥🔥🔥 Timings:', first10Timings);
+      
+      // ミスマッチ箇所を特定
+      let firstMismatch = -1;
+      for (let i = 0; i < Math.min(first10Words.length, first10Timings.length); i++) {
+        if (first10Words[i] !== first10Timings[i]) {
+          firstMismatch = i;
+          break;
+        }
+      }
+      console.log('🔥🔥🔥 First mismatch at index:', firstMismatch);
+      if (firstMismatch >= 0) {
+        console.log('🔥🔥🔥 Token vs Timing:', {
+          index: firstMismatch,
+          token: first10Words[firstMismatch],
+          timing: first10Timings[firstMismatch]
+        });
+      }
+    }
+  }, [currentTimings, tokens.length, timingToTokenMap.size]);
+
   // 基本状態
   const [loading, setLoading] = useState(false);
   
@@ -117,6 +195,62 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   
   // クライアントサイドでの状態復元フラグ
   const [isClientRestored, setIsClientRestored] = useState(false);
+
+  // 🎯 effectiveText初期化（段落表示と一致させる）
+  useEffect(() => {
+    if (english && english.trim().length > 0) {
+      // 段落分割されたテキストを結合して effectiveText を作成
+      const paragraphs = english.split('\n').filter(p => p.trim());
+      const combinedText = paragraphs.join(' ');
+      console.log('🔥🔥🔥 EffectiveText set from paragraphs:', {
+        originalLength: english.length,
+        combinedLength: combinedText.length,
+        paragraphsCount: paragraphs.length,
+        firstParagraphStart: paragraphs[0]?.substring(0, 30) + '...'
+      });
+      setEffectiveText(combinedText);
+    } else if (currentTimings) {
+      const restoredText = textFromTimings(currentTimings);
+      if (restoredText) {
+        setEffectiveText(restoredText);
+        console.log('📄 Text restored from timings:', restoredText.substring(0, 100) + '...');
+      }
+    }
+  }, [english, currentTimings]);
+
+  // 🎯 ハイライト位置更新（直接タイミングインデックス使用）
+  useEffect(() => {
+    if (currentTimingIndex >= 0) {
+      // マッピングを使わず、タイミングインデックスを直接使用
+      setHighlightedTokenIndex(currentTimingIndex);
+      
+      const word = currentTimings?.items?.[currentTimingIndex]?.text;
+      console.log(`🎯 DIRECT HIGHLIGHT[${currentTimingIndex}]: "${word}"`);
+    } else {
+      setHighlightedTokenIndex(-1);
+    }
+  }, [currentTimingIndex]);
+
+  // 🎵 TTS生成完了時のハンドラー
+  const handleTTSGenerated = (data: { audioUrl: string; contentId: string; textHash: string; timings: TimingsJSON }) => {
+    console.log('🔥🔥🔥 READING TTS Generated with timings:', {
+      contentId: data.contentId,
+      textHash: data.textHash,
+      granularity: data.timings.granularity,
+      itemsCount: data.timings.items.length,
+      source: data.timings.source,
+      effectiveTextLength: effectiveText.length,
+      effectiveTextStart: effectiveText.substring(0, 50) + '...'
+    });
+    
+    setCurrentTimings(data.timings);
+    
+    // audioRefにsrcを設定
+    if (audioRef.current) {
+      audioRef.current.src = data.audioUrl;
+    }
+  };
+
   const [japanese, setJapanese] = useState<string>('');
   const [storyTitle, setStoryTitle] = useState<string>(() => {
     if (isFromNotebook() && typeof window !== 'undefined') {
@@ -2158,13 +2292,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
   };
 
-  // 英語テキストをクリック可能な単語に分割（マークダウン太字対応）
+  // 🎯 トークンベースのクリック可能テキスト生成（ハイライト対応）
   const renderClickableText = (text: string, paragraphIndex: number) => {
-    // renderClickableText logging removed to prevent infinite console output
-    
-    // 段落開始時にインデックスを初期化（最初の段落のみ）
+    // 全段落レンダリング開始時に一度だけリセット
     if (paragraphIndex === 0) {
       globalTokenIndexRef.current = 0;
+      console.log('🔥🔥🔥 RESET globalTokenIndex for paragraph rendering');
     }
     
     // マークダウンの太字(**text**)を最初に処理
@@ -2173,8 +2306,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     return parts.map((part, partIndex) => {
       // 太字部分の処理
       if (part.startsWith('**') && part.endsWith('**')) {
-        const boldText = part.slice(2, -2); // **を削除
-        console.log('📖 チャプタータイトル検出:', boldText);
+        const boldText = part.slice(2, -2);
         return (
           <strong key={partIndex} className="font-bold text-text-primary block mb-3 text-lg">
             {boldText}
@@ -2182,24 +2314,40 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         );
       }
       
-      // 通常テキストの単語分割とクリック可能処理
-      const words = part.split(/(\s+|[.!?;:,\-\u2013\u2014()"])/);
+      // 🎯 統一トークナイザで分割
+      const partTokens = tokenizeForReading(part);
       
-      let clickableWordCount = 0;
-      const result = words.map((word, wordIndex) => {
-        if (/^[a-zA-Z-]+$/.test(word) && word !== '-') {
-          clickableWordCount++;
-          const tokenIndex = globalTokenIndexRef.current++;
+      return partTokens.map((token) => {
+        if (token.isWord) {
+          const currentGlobalIndex = globalTokenIndexRef.current++;
+          const isCurrentToken = currentGlobalIndex === highlightedTokenIndex;
+          const isBookmarkToken = currentGlobalIndex === bookmarkTokenIndex;
+          
+          // ハイライト時のデバッグ
+          if (isCurrentToken) {
+            console.log('🔥🔥🔥 VISUAL HIGHLIGHT:', {
+              globalIndex: currentGlobalIndex,
+              tokenText: token.text,
+              paragraphIndex,
+              partIndex,
+              highlightedTokenIndex
+            });
+          }
+          
           return (
             <span
-              key={`${partIndex}-${wordIndex}`}
-              className={`clickable-word ${
-                highlightedWord === word ? 'bg-yellow-300' : ''
+              key={`${partIndex}-${token.i}`}
+              className={`clickable-word tap-target ${
+                highlightedWord === token.text ? 'bg-yellow-300' : ''
               } ${
-                bookmarkTokenIndex === tokenIndex ? 'bg-red-400 text-white font-bold' : ''
+                isCurrentToken ? 'audio-highlight' : ''
+              } ${
+                currentGlobalIndex === bookmarkTokenIndex ? 'bg-red-400 text-white font-bold' : ''
               }`}
-              data-word={word}
-              data-idx={tokenIndex}
+              data-word={token.text}
+              data-idx={currentGlobalIndex}
+              data-token-i={token.i}
+              onClick={() => !isAudioPlaying && handleWordClick(token.text)}
               style={{
                 outline: '0',
                 border: '0',
@@ -2208,33 +2356,109 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 WebkitTouchCallout: 'none',
                 WebkitUserSelect: 'none',
                 touchAction: 'manipulation',
-                // 最強レベルの紫色阻止
-                backgroundColor: highlightedWord === word ? '#fde047' : 
-                                bookmarkTokenIndex === tokenIndex ? '#f87171' : 'transparent',
-                borderStyle: 'none',
-                borderWidth: '0',
-                borderColor: 'transparent',
-                outlineStyle: 'none',
-                outlineWidth: '0',
-                outlineColor: 'transparent',
-                // ブラウザ固有の無効化
-                WebkitAppearance: 'none',
-                MozAppearance: 'none',
-                appearance: 'none'
+                cursor: isAudioPlaying ? 'not-allowed' : 'pointer'
               }}
+              onTouchStart={handleTextTouchStart}
+              onTouchEnd={handleTextTouch}
             >
-              {word}
+              {token.text}
             </span>
           );
         } else {
-          return <span key={`${partIndex}-${wordIndex}`}>{word}</span>;
+          // 非単語トークン（空白・句読点）はそのまま表示
+          return (
+            <span key={`${partIndex}-${token.i}`}>
+              {token.text}
+            </span>
+          );
         }
       });
-      
-      if (clickableWordCount > 0) {
-        console.log(`🎯 パート ${partIndex}: ${clickableWordCount}個の単語を検出`);
+    });
+  };
+
+  // 🎯 タイミングベースレンダリング（音声ハイライト専用）
+  const renderTimingBasedText = () => {
+    if (!currentTimings?.items?.length) {
+      return <span>Loading timing data...</span>;
+    }
+    
+    return (
+      <span>
+        {currentTimings.items.map((item, index) => {
+          const isHighlighted = index === highlightedTokenIndex;
+          
+          return (
+            <span
+              key={index}
+              className={`inline-block mr-1 ${
+                isHighlighted ? 'audio-highlight' : ''
+              } clickable-word tap-target`}
+              data-word={item.text}
+              onTouchStart={handleTextTouchStart}
+              onTouchEnd={handleTextTouch}
+            >
+              {item.text}
+            </span>
+          );
+        })}
+      </span>
+    );
+  };
+
+  // 🎯 シンプル化されたテキストレンダリング（全段落で共通インデックス）
+  
+const renderSimpleText = (text: string, paragraphIndex: number) => {
+    // 最初の段落でグローバルインデックスをリセット
+    if (paragraphIndex === 0) {
+      globalTokenIndexRef.current = 0;
+    }
+    
+    const allTokens = tokenizeForReading(text);
+    
+    return allTokens.map((token, tokenIndex) => {
+      if (token.isWord) {
+        const currentGlobalIndex = globalTokenIndexRef.current++;
+        const isCurrentToken = currentGlobalIndex === highlightedTokenIndex;
+        const isBookmarkToken = currentGlobalIndex === bookmarkTokenIndex;
+        
+        return (
+          <span
+            key={`word-${tokenIndex}`}
+            className={`clickable-word tap-target ${
+              highlightedWord === token.text ? 'bg-yellow-300' : ''
+            } ${
+              isCurrentToken ? 'audio-highlight' : ''
+            } ${
+              isBookmarkToken ? 'bg-red-400 text-white font-bold' : ''
+            }`}
+            data-word={token.text}
+            data-idx={currentGlobalIndex}
+            onClick={() => !isAudioPlaying && handleWordClick(token.text)}
+            style={{
+              cursor: isAudioPlaying ? 'not-allowed' : 'pointer'
+            }}
+            onTouchStart={(e) => {
+              if (!isAudioPlaying && token.isWord) {
+                handleTextTouchStart(e);
+              }
+            }}
+            onTouchEnd={(e) => {
+              if (!isAudioPlaying && token.isWord) {
+                handleTextTouch(e);
+              }
+            }}
+          >
+            {token.text}
+          </span>
+        );
+      } else {
+        // 非単語トークン（空白・句読点）
+        return (
+          <span key={`nonword-${tokenIndex}`}>
+            {token.text}
+          </span>
+        );
       }
-      return result;
     });
   };
 
@@ -2244,7 +2468,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
 
   return (
     <main 
-      className="min-h-screen bg-page-bg p-2 sm:p-4"
+      className={`min-h-screen bg-page-bg p-2 sm:p-4 ${isAudioPlaying ? 'audio-playing' : ''}`}
       style={{ 
         overflow: 'auto',
         pointerEvents: 'auto',
@@ -2252,6 +2476,37 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
         minHeight: '100vh'
       }}
     >
+      {/* 🎵 Hidden Audio Element */}
+      <audio
+        ref={audioRef}
+        preload="none"
+        style={{ display: 'none' }}
+      />
+      
+      {/* 🎵 Audio Playing Indicator & Offset Control */}
+      {isAudioPlaying && (
+        <div className="fixed top-4 right-4 bg-white shadow-lg rounded-lg p-3 z-50 border">
+          <div className="text-sm text-gray-700 mb-2">
+            🔊 音声再生中 - ハイライト調整
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs">遅く</span>
+            <input
+              type="range"
+              min="-1.0"
+              max="1.0"
+              step="0.1"
+              value={offsetSec}
+              onChange={(e) => setOffsetSec(Number(e.target.value))}
+              className="w-20"
+            />
+            <span className="text-xs">速く</span>
+            <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+              {offsetSec >= 0 ? '+' : ''}{offsetSec.toFixed(1)}s
+            </span>
+          </div>
+        </div>
+      )}
       {/* 報酬獲得演出 */}
       <RewardFlashManager />
       {/* ページタイトル */}
@@ -2302,13 +2557,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
               </div>
             </div>
             
-            {/* 音声再生ボタン */}
+            {/* 音声再生ボタン（タイトル部分のみ、ハイライト対象外） */}
             {english && english.trim() && (
               <TTSButton
                 text={english}
                 contentId="reading-title-audio"
                 variant="secondary"
                 className="text-sm px-3 py-1"
+                // タイトル音声はハイライト対象外にする
               />
             )}
             
@@ -2358,6 +2614,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                 contentId="reading-full-content"
                 variant="secondary"
                 className="px-4 py-2"
+                audioRef={audioRef}
+                onPlayingChange={setIsAudioPlaying}
+                onGenerated={handleTTSGenerated}
               />
             </div>
           </div>
@@ -2388,7 +2647,14 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                       touchAction: 'manipulation'
                     }}
                   >
-                    {renderClickableText(paragraph, index)}
+                    {/* 🎯 タイミングベースレンダリング（音声再生時、最初の段落のみ）またはテキストベースレンダリング */}
+                    {currentTimings?.items && isAudioPlaying && index === 0 ? 
+                      renderTimingBasedText() : 
+                      (currentTimings?.items && isAudioPlaying && index > 0 ? 
+                        null : 
+                        renderSimpleText(paragraph, index)
+                      )
+                    }
                   </p>
                   
                   {/* 対応する日本語段落 */}
@@ -2430,6 +2696,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
                     contentId="reading-full-content"
                     variant="secondary"
                     className="px-4 py-2"
+                    audioRef={audioRef}
+                    onPlayingChange={setIsAudioPlaying}
+                    onGenerated={handleTTSGenerated}
                   />
                 </>
               )}
