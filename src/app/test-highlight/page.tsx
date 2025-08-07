@@ -19,7 +19,7 @@ export default function TestHighlightPage() {
   const [logs, setLogs] = useState<string[]>([]);
   
   // 🎚️ オフセット調整機能
-  const [offsetSec, setOffsetSec] = useState<number>(-0.5);
+  const [offsetSec, setOffsetSec] = useState<number>(-0.6);
   const [debugStats, setDebugStats] = useState<any>(null);
 
   // 🎯 ハイライト制御（オフセット対応）

@@ -112,9 +112,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [offsetSec, setOffsetSec] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('reading-highlight-offset');
-      return saved ? Number(saved) : -0.5; // デフォルト: 500ms早くハイライト
+      return saved ? Number(saved) : -0.6; // デフォルト: 600ms早くハイライト
     }
-    return -0.5;
+    return -0.6;
   });
   const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
   
@@ -2731,13 +2731,13 @@ const renderSimpleText = (text: string, paragraphIndex: number) => {
                       type="range"
                       min="-1"
                       max="0.5"
-                      step="0.1"
+                      step="0.05"
                       value={offsetSec}
                       onChange={(e) => setOffsetSec(Number(e.target.value))}
-                      className="w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      className="w-20 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
                     />
                     <span className="text-xs text-gray-500 whitespace-nowrap">
-                      {offsetSec >= 0 ? `+${offsetSec.toFixed(1)}s` : `${offsetSec.toFixed(1)}s`}
+                      {offsetSec >= 0 ? `+${offsetSec.toFixed(2)}s` : `${offsetSec.toFixed(2)}s`}
                     </span>
                   </div>
                 </>
