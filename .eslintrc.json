@@ -1,3 +1,10 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "tailwindcss/classnames-order": "warn",
+    "tailwindcss/no-unnecessary-arbitrary-value": "warn",
+    "tailwindcss/enforces-shorthand": "warn",
+    "tailwindcss/migration-from-tailwind-2": "warn",
+    "@next/next/no-img-element": "warn"
+  }
 }
