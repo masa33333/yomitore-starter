@@ -113,9 +113,9 @@ span[data-idx].bookmark-highlight {
 }
 
 .audio-highlight {
-  background-color: #fcd34d !important;
-  color: #1f2937 !important;
-  font-weight: 500 !important;
+  background-color: rgba(252, 211, 77, 0.3) !important; /* より薄い黄色 */
+  color: inherit !important; /* 元の文字色を維持 */
+  font-weight: inherit !important; /* 元のfont-weightを維持（太字にしない） */
   padding: 1px 3px !important;
   border-radius: 3px !important;
   transition: all 0.2s ease !important;

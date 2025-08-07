@@ -37,13 +37,7 @@ export default function HighlightTestSimplePage() {
         return (
           <span
             key={index}
-            className={isHighlighted ? 'bg-red-500 text-white font-bold px-1' : ''}
-            style={{
-              backgroundColor: isHighlighted ? '#ef4444' : 'transparent',
-              color: isHighlighted ? 'white' : 'black',
-              padding: isHighlighted ? '2px 4px' : '0',
-              borderRadius: isHighlighted ? '3px' : '0'
-            }}
+            className={isHighlighted ? 'audio-highlight' : ''}
           >
             {token.text}
           </span>
