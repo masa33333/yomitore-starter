@@ -112,9 +112,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [offsetSec, setOffsetSec] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('reading-highlight-offset');
-      return saved ? Number(saved) : 0;
+      return saved ? Number(saved) : -0.3; // デフォルト: 300ms早くハイライト
     }
-    return 0;
+    return -0.3;
   });
   const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
   
@@ -2723,6 +2723,23 @@ const renderSimpleText = (text: string, paragraphIndex: number) => {
                     onPlayingChange={setIsAudioPlaying}
                     onGenerated={handleTTSGenerated}
                   />
+                  
+                  {/* ハイライトタイミング調整 */}
+                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-md">
+                    <span className="text-sm text-gray-600 whitespace-nowrap">同期調整:</span>
+                    <input
+                      type="range"
+                      min="-1"
+                      max="0.5"
+                      step="0.1"
+                      value={offsetSec}
+                      onChange={(e) => setOffsetSec(Number(e.target.value))}
+                      className="w-16 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                      {offsetSec >= 0 ? `+${offsetSec.toFixed(1)}s` : `${offsetSec.toFixed(1)}s`}
+                    </span>
+                  </div>
                 </>
               )}
             </div>
