@@ -112,9 +112,9 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [offsetSec, setOffsetSec] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('reading-highlight-offset');
-      return saved ? Number(saved) : -0.3; // デフォルト: 300ms早くハイライト
+      return saved ? Number(saved) : -0.5; // デフォルト: 500ms早くハイライト
     }
-    return -0.3;
+    return -0.5;
   });
   const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
   
