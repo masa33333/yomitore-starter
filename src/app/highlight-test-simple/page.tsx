@@ -27,15 +27,17 @@ export default function HighlightTestSimplePage() {
   };
 
   const renderText = () => {
-    // 🎯 FIXED: During audio playback, render directly from timing data
-    if (isAudioPlaying && currentTimings?.items?.length) {
-      return currentTimings.items.map((item, index) => {
-        const isHighlighted = index === highlightedTokenIndex;
+    const tokens = tokenizeForReading(testText);
+    
+    return tokens.map((token, index) => {
+      if (token.isWord) {
+        // 単語のみハイライト判定
+        const isHighlighted = isAudioPlaying && index === highlightedTokenIndex;
         
         return (
           <span
             key={index}
-            className={isHighlighted ? 'bg-red-500 text-white font-bold px-1 mr-1' : 'mr-1'}
+            className={isHighlighted ? 'bg-red-500 text-white font-bold px-1' : ''}
             style={{
               backgroundColor: isHighlighted ? '#ef4444' : 'transparent',
               color: isHighlighted ? 'white' : 'black',
@@ -43,20 +45,17 @@ export default function HighlightTestSimplePage() {
               borderRadius: isHighlighted ? '3px' : '0'
             }}
           >
-            {item.text}
+            {token.text}
           </span>
         );
-      });
-    }
-    
-    // 🎯 Fallback: Use tokenized text when not playing audio
-    const tokens = tokenizeForReading(testText);
-    return tokens.map((token, index) => {
-      return (
-        <span key={index} className="mr-1">
-          {token.text}
-        </span>
-      );
+      } else {
+        // スペースや句読点はそのまま表示
+        return (
+          <span key={index}>
+            {token.text}
+          </span>
+        );
+      }
     });
   };
 

@@ -2376,33 +2376,62 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     });
   };
 
-  // 🎯 タイミングベースレンダリング（音声ハイライト専用）
-  const renderTimingBasedText = () => {
-    if (!currentTimings?.items?.length) {
-      return <span>Loading timing data...</span>;
+  // 🎯 段落構造保持ハイライトレンダリング（音声再生時も段落とピリオドを維持）
+  const renderParagraphWithHighlight = (paragraph: string, paragraphIndex: number) => {
+    if (!currentTimings?.items?.length || !isAudioPlaying) {
+      // 音声再生していない場合は通常のレンダリング
+      return renderSimpleText(paragraph, paragraphIndex);
     }
     
-    return (
-      <span>
-        {currentTimings.items.map((item, index) => {
-          const isHighlighted = index === highlightedTokenIndex;
-          
-          return (
-            <span
-              key={index}
-              className={`inline-block mr-1 ${
-                isHighlighted ? 'audio-highlight' : ''
-              } clickable-word tap-target`}
-              data-word={item.text}
-              onTouchStart={handleTextTouchStart}
-              onTouchEnd={handleTextTouch}
-            >
-              {item.text}
-            </span>
-          );
-        })}
-      </span>
-    );
+    // 段落の最初でグローバルインデックスをリセット
+    if (paragraphIndex === 0) {
+      globalTokenIndexRef.current = 0;
+    }
+    
+    const allTokens = tokenizeForReading(paragraph);
+    
+    return allTokens.map((token, tokenIndex) => {
+      if (token.isWord) {
+        const currentGlobalIndex = globalTokenIndexRef.current++;
+        
+        // ハイライト判定（現在のタイミングインデックスと単語インデックスが一致）
+        const isHighlighted = currentTimingIndex >= 0 && 
+          currentGlobalIndex === currentTimingIndex;
+        
+        return (
+          <span
+            key={`${paragraphIndex}-${tokenIndex}`}
+            className={`clickable-word tap-target ${
+              isHighlighted ? 'audio-highlight' : ''
+            }`}
+            data-word={token.text}
+            onClick={() => !isAudioPlaying && handleWordClick(token.text)}
+            onTouchStart={(e) => {
+              if (!isAudioPlaying && token.isWord) {
+                handleTextTouchStart(e);
+              }
+            }}
+            onTouchEnd={(e) => {
+              if (!isAudioPlaying && token.isWord) {
+                handleTextTouch(e);
+              }
+            }}
+            style={{
+              cursor: isAudioPlaying ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {token.text}
+          </span>
+        );
+      } else {
+        // スペースや句読点はそのまま表示
+        return (
+          <span key={`${paragraphIndex}-${tokenIndex}`}>
+            {token.text}
+          </span>
+        );
+      }
+    });
   };
 
   // 🎯 シンプル化されたテキストレンダリング（全段落で共通インデックス）
@@ -2647,14 +2676,8 @@ const renderSimpleText = (text: string, paragraphIndex: number) => {
                       touchAction: 'manipulation'
                     }}
                   >
-                    {/* 🎯 タイミングベースレンダリング（音声再生時、最初の段落のみ）またはテキストベースレンダリング */}
-                    {currentTimings?.items && isAudioPlaying && index === 0 ? 
-                      renderTimingBasedText() : 
-                      (currentTimings?.items && isAudioPlaying && index > 0 ? 
-                        null : 
-                        renderSimpleText(paragraph, index)
-                      )
-                    }
+                    {/* 🎯 段落構造保持ハイライトレンダリング */}
+                    {renderParagraphWithHighlight(paragraph, index)}
                   </p>
                   
                   {/* 対応する日本語段落 */}
