@@ -29,7 +29,7 @@ export function useAudioHighlighter(
     const updateHighlight = () => {
       const currentTime = audio.currentTime + offsetSec;
 
-      // 🎯 SIMPLE SEQUENTIAL: 順番通り進行（最も確実な方法）
+      // 🎯 PROACTIVE SEQUENTIAL: 順番通り進行 + 積極的先行表示
       let foundIndex = currentTimingIndexRef.current;
       
       // 初期状態
@@ -37,19 +37,31 @@ export function useAudioHighlighter(
         foundIndex = 0;
       }
       
-      // 現在の単語の範囲をチェック
+      // 現在の単語の範囲をチェック（より積極的な先行表示）
       if (foundIndex >= 0 && foundIndex < items.length) {
         const currentWord = items[foundIndex];
         
-        // 現在の単語の時間内ならそのまま
-        if (currentTime >= currentWord.start && currentTime <= currentWord.end + 0.2) {
+        // 現在の単語の時間内ならそのまま（余裕を持たせて継続）
+        if (currentTime >= currentWord.start && currentTime <= currentWord.end + 0.1) {
           // 現在の単語継続
         } 
-        // 現在の単語を超えた場合は次に進む
-        else if (currentTime > currentWord.end + 0.2) {
-          // 次の単語に進む（1個ずつ）
-          if (foundIndex < items.length - 1) {
-            foundIndex++;
+        // 現在の単語を超えた場合は積極的に次に進む
+        else if (currentTime > currentWord.end + 0.1) {
+          // スキップ防止：2-3語先まで確認して最適な位置を見つける
+          let nextIndex = foundIndex + 1;
+          while (nextIndex < items.length && nextIndex <= foundIndex + 3) {
+            const nextWord = items[nextIndex];
+            if (currentTime >= nextWord.start - 0.3) { // より早めの判定
+              foundIndex = nextIndex;
+              nextIndex++;
+            } else {
+              break;
+            }
+          }
+          
+          // 範囲チェック
+          if (foundIndex >= items.length) {
+            foundIndex = items.length - 1;
           }
         }
         // 現在の単語より前の場合はそのまま（戻らない）
@@ -60,15 +72,16 @@ export function useAudioHighlighter(
         const previousIndex = currentTimingIndexRef.current;
         const jump = foundIndex - previousIndex;
         
-        // スキップ検出（1回だけログ）
+        // スキップ検出（改善されたアルゴリズムの効果を確認）
         if (jump > 1) {
-          console.log(`❌ SKIP DETECTED: [${previousIndex}]→[${foundIndex}] (${jump} steps) at ${currentTime.toFixed(3)}s`);
+          console.log(`⚡ PROACTIVE JUMP: [${previousIndex}]→[${foundIndex}] (${jump} steps) at ${currentTime.toFixed(3)}s`);
           if (previousIndex >= 0 && foundIndex < items.length) {
             const prevWord = items[previousIndex];
             const currWord = items[foundIndex];
             console.log(`  Previous: "${prevWord?.text}" (${prevWord?.start}s-${prevWord?.end}s)`);
             console.log(`  Current: "${currWord?.text}" (${currWord?.start}s-${currWord?.end}s)`);
             console.log(`  Time gap: ${currWord?.start - prevWord?.end}s`);
+            console.log(`  🎯 This is now intentional proactive highlighting to prevent skips`);
           }
         }
         

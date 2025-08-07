@@ -114,10 +114,10 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const saved = localStorage.getItem('reading-highlight-offset');
       // モバイルデバイスの判定
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const defaultOffset = isMobile ? -0.8 : -0.6; // モバイルはさらに早く
+      const defaultOffset = isMobile ? -1.2 : -1.0; // 超早めのハイライトでスキップ防止
       return saved ? Number(saved) : defaultOffset;
     }
-    return -0.6;
+    return -1.0;
   });
   const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
   
