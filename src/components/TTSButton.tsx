@@ -269,6 +269,7 @@ export default function TTSButton({
         const textHash = generateTextHash(text);
         console.log('🟡 TTSButton: onGenerated callback provided, starting Phase 8...');
         console.log('🎵 Phase 8 Simple: Starting timing generation...');
+        console.log('🟡 TTSButton: Callback function type:', typeof onGenerated);
         
         let timings: TimingsJSON | null = null;
         
@@ -327,12 +328,20 @@ export default function TTSButton({
         }
         
         // Step 3: Call onGenerated with timings (Whisper or immediate fallback)
+        console.log('🟡🟡🟡 TTSButton: CALLING onGenerated callback with data:', {
+          audioUrl: data.audioUrl,
+          contentId,
+          textHash,
+          timingsSource: timings?.source,
+          timingsItems: timings?.items?.length
+        });
         onGenerated({
           audioUrl: data.audioUrl,
           contentId,
           textHash,
           timings
         });
+        console.log('🟡🟡🟡 TTSButton: onGenerated callback COMPLETED');
         
       } else {
         console.log('🟫 TTSButton: onGenerated callback NOT provided - no timing generation');
