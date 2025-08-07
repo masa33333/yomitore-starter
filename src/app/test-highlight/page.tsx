@@ -23,7 +23,7 @@ export default function TestHighlightPage() {
   const [debugStats, setDebugStats] = useState<any>(null);
 
   // 🎯 ハイライト制御（オフセット対応）
-  const { currentTimingIndex, getStats } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
+  const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
   
   // デバッグ: currentTimingsの変更を監視
   useEffect(() => {
@@ -82,10 +82,13 @@ export default function TestHighlightPage() {
 
     const updateDebugStats = (now: number) => {
       if (now - lastRenderRef.current >= 100) { // 100ms間隔
-        const stats = getStats?.();
-        if (stats) {
-          setDebugStats(stats);
-        }
+        // Basic debug info without getStats
+        const stats = {
+          currentTime: audioRef.current?.currentTime || 0,
+          currentIndex: currentTimingIndex,
+          timestamp: Date.now()
+        };
+        setDebugStats(stats);
         lastRenderRef.current = now;
       }
       
@@ -96,7 +99,7 @@ export default function TestHighlightPage() {
 
     const rafId = requestAnimationFrame(updateDebugStats);
     return () => cancelAnimationFrame(rafId);
-  }, [isAudioPlaying, getStats]);
+  }, [isAudioPlaying, currentTimingIndex]);
 
   // 🎚️ オフセット制御
   const handleOffsetChange = (newOffset: number) => {

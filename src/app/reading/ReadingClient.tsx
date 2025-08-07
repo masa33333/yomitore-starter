@@ -1903,7 +1903,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const globalTokenIndexRef = useRef<number>(0);
 
   // タッチ開始ハンドラー（長押し対応）
-  const handleTextTouchStart = (e: React.TouchEvent<HTMLParagraphElement>) => {
+  const handleTextTouchStart = (e: React.TouchEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
     const touch = e.touches[0];
     
@@ -1934,7 +1934,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   };
 
   // タッチ終了ハンドラー（長押し対応）
-  const handleTextTouch = (e: React.TouchEvent<HTMLParagraphElement>) => {
+  const handleTextTouch = (e: React.TouchEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
     const touchEndTime = Date.now();
     const touchDuration = touchEndTime - touchStartTimeRef.current;
