@@ -36,20 +36,30 @@ export function useMobileHighlighter(
 
     const handlePlay = () => {
       console.log('📱 MOBILE: Audio play detected');
-      startTimeRef.current = Date.now();
       
-      // 音声の長さを取得（推定値も使用）
-      const audioDuration = audio.duration || estimateAudioDuration(text);
-      durationRef.current = audioDuration;
+      // 音声の長さを取得（推定値使用の遅延開始）
+      const waitForActualDuration = () => {
+        if (audio.duration && audio.duration > 0 && !isNaN(audio.duration)) {
+          // 実際の音声長さが取得できた場合
+          console.log(`📱 MOBILE: Actual duration available: ${audio.duration.toFixed(1)}s`);
+          durationRef.current = audio.duration;
+          startTimeRef.current = Date.now();
+          startHighlighting();
+        } else {
+          // まだ取得できない場合は100ms後に再試行
+          console.log('📱 MOBILE: Duration not ready, retrying in 100ms...');
+          setTimeout(waitForActualDuration, 100);
+        }
+      };
       
-      console.log(`📱 MOBILE: Duration=${audioDuration.toFixed(1)}s, Words=${wordCountRef.current}`);
-      
-      startHighlighting();
+      // 即座に試行、だめなら遅延試行
+      waitForActualDuration();
     };
 
     const handlePause = () => {
       console.log('📱 MOBILE: Audio paused');
       stopHighlighting();
+      // 一時停止時はwordIndexをリセットしない（再開時に復活させるため）
     };
 
     const handleEnded = () => {
@@ -74,7 +84,8 @@ export function useMobileHighlighter(
   useEffect(() => {
     if (!isAudioPlaying) {
       stopHighlighting();
-      setCurrentWordIndex(-1);
+      // 音声停止時はwordIndexをリセットしない（再開に備えて保持）
+      console.log('📱 MOBILE: Audio playing state changed to false, highlighting stopped');
     }
   }, [isAudioPlaying]);
 
@@ -82,6 +93,15 @@ export function useMobileHighlighter(
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+
+    console.log('📱 MOBILE: Starting highlighting with params:', {
+      duration: durationRef.current,
+      totalWords: wordCountRef.current,
+      startTime: startTimeRef.current
+    });
+
+    // 初期状態設定（-1から0にリセット）
+    setCurrentWordIndex(0);
 
     // 50ms間隔の高頻度更新（20fps）
     intervalRef.current = setInterval(() => {
@@ -95,8 +115,8 @@ export function useMobileHighlighter(
         const wordIndex = Math.floor(progress * totalWords);
         const clampedIndex = Math.max(0, Math.min(wordIndex, totalWords - 1));
 
-        // モバイル固有の先行調整（0.5秒早める）
-        const adjustedProgress = Math.min((elapsed + 0.5) / duration, 1.0);
+        // モバイル固有の先行調整（0.3秒早める - 調整値を減少）
+        const adjustedProgress = Math.min((elapsed + 0.3) / duration, 1.0);
         const adjustedIndex = Math.floor(adjustedProgress * totalWords);
         const finalIndex = Math.max(0, Math.min(adjustedIndex, totalWords - 1));
 
