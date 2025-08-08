@@ -87,6 +87,16 @@ export function useAudioHighlighter(
         setHighlightedIndex(foundIndex);
       }
 
+      // モバイル対応：より高頻度で更新
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '');
+      if (isMobile) {
+        // モバイルでは16ms (60fps) のタイマーでも並行実行
+        setTimeout(() => {
+          if (!audio.paused && !audio.ended) {
+            updateHighlight();
+          }
+        }, 16);
+      }
       rafRef.current = requestAnimationFrame(updateHighlight);
     };
 
