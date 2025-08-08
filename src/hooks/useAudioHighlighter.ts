@@ -40,9 +40,15 @@ export function useAudioHighlighter(
       // 🎯 SIMPLE SEQUENTIAL: 順番通り進行（最も確実な方法）
       let foundIndex = currentTimingIndexRef.current;
       
-      // 初期状態
+      // 初期状態 + モバイル強制進行
       if (foundIndex < 0 && items.length > 0) {
         foundIndex = 0;
+      }
+      
+      // モバイル専用: 音声開始後5秒経っても最初の単語にいる場合は強制進行
+      if (isMobile && foundIndex === 0 && currentTime > 5.0 && items.length > 10) {
+        foundIndex = Math.min(10, items.length - 1); // 10語目まで一気に進む
+        console.log('📱 MOBILE FORCE JUMP: 初期停止を検出、10語目まで強制進行');
       }
       
       // 現在の単語の範囲をチェック
@@ -55,13 +61,20 @@ export function useAudioHighlighter(
         } 
         // 現在の単語を超えた場合は積極的に次に進む（モバイル対応）
         else if (currentTime > currentWord.end + 0.05) {
-          // モバイルの場合は2-3語一気に進むことも許容（深刻な遅延対応）
-          const jumpSize = isMobile ? 2 : 1; // モバイルは2語ずつ進む
-          
-          if (foundIndex < items.length - jumpSize) {
-            foundIndex += jumpSize;
-          } else if (foundIndex < items.length - 1) {
-            foundIndex++;
+          if (isMobile) {
+            // モバイル: 遅延がひどい場合は大幅ジャンプ
+            let jumpSize = 2;
+            const timeLag = currentTime - currentWord.end;
+            if (timeLag > 3.0) jumpSize = 5; // 3秒以上遅れている場合は5語ジャンプ
+            else if (timeLag > 1.5) jumpSize = 3; // 1.5秒以上遅れている場合は3語ジャンプ
+            
+            foundIndex = Math.min(foundIndex + jumpSize, items.length - 1);
+            console.log(`📱 MOBILE JUMP: ${jumpSize}語ジャンプ (遅延: ${timeLag.toFixed(1)}s)`);
+          } else {
+            // Web版: 1語ずつ
+            if (foundIndex < items.length - 1) {
+              foundIndex++;
+            }
           }
         }
         // 現在の単語より前の場合はそのまま（戻らない）
@@ -88,9 +101,15 @@ export function useAudioHighlighter(
         setHighlightedIndex(foundIndex);
       }
 
-      // モバイル対応：より高頻度で更新
+      // モバイル対応：超高頻度で更新
       if (isMobile) {
-        // モバイルでは16ms (60fps) のタイマーでも並行実行
+        // モバイルでは8ms (125fps) の超高頻度タイマーで並行実行
+        setTimeout(() => {
+          if (!audio.paused && !audio.ended) {
+            updateHighlight();
+          }
+        }, 8);
+        // さらに16msタイマーも並行実行（ダブル監視）
         setTimeout(() => {
           if (!audio.paused && !audio.ended) {
             updateHighlight();

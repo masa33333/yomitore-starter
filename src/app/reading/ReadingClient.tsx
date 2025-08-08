@@ -114,7 +114,7 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
       const saved = localStorage.getItem('reading-highlight-offset');
       // モバイルデバイスの判定
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const defaultOffset = isMobile ? -6.0 : -1.5; // Web版も音声より1.5秒早く
+      const defaultOffset = isMobile ? -8.0 : -1.5; // モバイルは8秒早く（致命的遅延対応）
       return saved ? Number(saved) : defaultOffset;
     }
     return -1.5;
