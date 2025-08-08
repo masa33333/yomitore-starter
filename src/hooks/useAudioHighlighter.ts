@@ -29,8 +29,10 @@ export function useAudioHighlighter(
     const updateHighlight = () => {
       const currentTime = audio.currentTime + offsetSec;
       
-      // モバイル専用デバッグ（5回に1回だけ表示）
+      // モバイル判定（1回だけ）
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '');
+      
+      // モバイル専用デバッグ（5回に1回だけ表示）
       if (isMobile && Math.random() < 0.2) {
         console.log(`📱 MOBILE DEBUG: audioTime=${audio.currentTime.toFixed(2)}s, offset=${offsetSec}s, adjustedTime=${currentTime.toFixed(2)}s`);
       }
@@ -54,7 +56,6 @@ export function useAudioHighlighter(
         // 現在の単語を超えた場合は積極的に次に進む（モバイル対応）
         else if (currentTime > currentWord.end + 0.05) {
           // モバイルの場合は2-3語一気に進むことも許容（深刻な遅延対応）
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '');
           const jumpSize = isMobile ? 2 : 1; // モバイルは2語ずつ進む
           
           if (foundIndex < items.length - jumpSize) {
@@ -88,7 +89,6 @@ export function useAudioHighlighter(
       }
 
       // モバイル対応：より高頻度で更新
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '');
       if (isMobile) {
         // モバイルでは16ms (60fps) のタイマーでも並行実行
         setTimeout(() => {
