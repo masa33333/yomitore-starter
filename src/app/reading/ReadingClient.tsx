@@ -15,10 +15,12 @@ import RewardFlashManager from '@/components/RewardFlashManager';
 import TTSButton from '@/components/TTSButton';
 import CatLoader from '@/components/CatLoader';
 import { useAudioHighlighter } from '@/hooks/useAudioHighlighter';
+import { useMobileHighlighter } from '@/hooks/useMobileHighlighter';
 import { tokenizeForReading } from '@/lib/tokenize';
 import { buildTimingToTokenMap } from '@/lib/align';
 import { textFromTimings } from '@/lib/textFromTimings';
 import type { TimingsJSON } from '@/types/highlight';
+import MobileHighlightedText from '@/components/MobileHighlightedText';
 // import StampFlash from '@/components/StampFlash'; // 無効化：ちゃちい演出を削除
 import { BookmarkDialog } from '@/components/BookmarkDialog';
 import { ResumeDialog } from '@/components/ResumeDialog';
@@ -109,17 +111,29 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   const [highlightedTokenIndex, setHighlightedTokenIndex] = useState<number>(-1);
   
   // 🎯 ハイライト制御（オフセット調整機能付き + 永続化）
+  // モバイル判定（一度だけ実行）
+  const isMobile = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }, []);
+
   const [offsetSec, setOffsetSec] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('reading-highlight-offset');
-      // モバイルデバイスの判定
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       const defaultOffset = isMobile ? -8.0 : -1.5; // モバイルは8秒早く（致命的遅延対応）
       return saved ? Number(saved) : defaultOffset;
     }
     return -1.5;
   });
+
+  // Web版ハイライトフック
   const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
+  
+  // モバイル版ハイライトフック  
+  const mobileHighlighter = useMobileHighlighter(audioRef.current, english, isAudioPlaying);
+  
+  // プラットフォームに応じてハイライトインデックスを選択
+  const activeHighlightIndex = isMobile ? mobileHighlighter.currentWordIndex : currentTimingIndex;
   
   // オフセット値の永続化
   useEffect(() => {
@@ -2381,10 +2395,57 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     });
   };
 
-  // 🎯 段落構造保持ハイライトレンダリング（音声再生時も段落とピリオドを維持）
+  // モバイル用：段落ごとのワードオフセット計算
+  const calculateParagraphWordOffset = (paragraphIndex: number): number => {
+    const paragraphs = english.split('\n\n');
+    let offset = 0;
+    
+    for (let i = 0; i < paragraphIndex && i < paragraphs.length; i++) {
+      const tokens = tokenizeForReading(paragraphs[i]);
+      offset += tokens.filter(token => token.isWord).length;
+    }
+    
+    return offset;
+  };
+
+  // 🎯 段落構造保持ハイライトレンダリング（モバイル・Web分離対応）
   const renderParagraphWithHighlight = (paragraph: string, paragraphIndex: number) => {
-    // デバッグ情報
-    console.log(`🎯 renderParagraphWithHighlight called:`, {
+    // モバイル専用レンダリング（完全独立システム）
+    if (isMobile) {
+      const wordOffset = calculateParagraphWordOffset(paragraphIndex);
+      const currentParagraphTokens = tokenizeForReading(paragraph);
+      const paragraphWordCount = currentParagraphTokens.filter(token => token.isWord).length;
+      
+      // この段落内でハイライトされる単語のインデックス（-1は該当なし）
+      const globalCurrentWord = mobileHighlighter.currentWordIndex;
+      let paragraphHighlightIndex = -1;
+      
+      if (globalCurrentWord >= wordOffset && globalCurrentWord < wordOffset + paragraphWordCount) {
+        paragraphHighlightIndex = globalCurrentWord - wordOffset;
+      }
+      
+      console.log(`📱 MOBILE renderParagraph:`, {
+        paragraphIndex,
+        wordOffset,
+        paragraphWordCount,
+        globalCurrentWord,
+        paragraphHighlightIndex,
+        isAudioPlaying
+      });
+      
+      return (
+        <MobileHighlightedText
+          text={paragraph}
+          currentWordIndex={paragraphHighlightIndex}
+          isAudioPlaying={isAudioPlaying}
+          onWordClick={handleWordClick}
+          className={getTextSizeClass()}
+        />
+      );
+    }
+    
+    // Web版レンダリング（従来システム）
+    console.log(`💻 WEB renderParagraph:`, {
       hasTimings: !!currentTimings?.items?.length,
       timingsCount: currentTimings?.items?.length || 0,
       isAudioPlaying,
