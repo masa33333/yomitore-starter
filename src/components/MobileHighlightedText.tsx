@@ -25,6 +25,15 @@ export default function MobileHighlightedText({
   
   const tokens = tokenizeForReading(text);
   let wordIndex = 0;
+  
+  // デバッグログ追加
+  console.log('📱 MobileHighlightedText render:', {
+    textLength: text.length,
+    tokensCount: tokens.length,
+    currentWordIndex,
+    isAudioPlaying,
+    className
+  });
 
   const handleWordClick = (word: string) => {
     if (!isAudioPlaying && onWordClick) {
@@ -38,6 +47,17 @@ export default function MobileHighlightedText({
         if (token.isWord) {
           const isCurrentWord = wordIndex === currentWordIndex;
           const currentWordIdx = wordIndex;
+          
+          // デバッグ: ハイライト適用チェック
+          if (isCurrentWord && isAudioPlaying) {
+            console.log('📱 HIGHLIGHTING WORD:', {
+              word: token.text,
+              wordIndex,
+              currentWordIndex,
+              isAudioPlaying
+            });
+          }
+          
           wordIndex++;
 
           return (

@@ -27,8 +27,9 @@ export function useMobileHighlighter(
   
   useEffect(() => {
     wordCountRef.current = words.length;
-    console.log(`📱 MOBILE: ${words.length} words detected`);
-  }, [words.length]);
+    console.log(`📱 MOBILE HOOK: ${words.length} words detected from text length ${text.length}`);
+    console.log(`📱 MOBILE HOOK: Current state - audio:${!!audio}, isPlaying:${isAudioPlaying}, wordIndex:${currentWordIndex}`);
+  }, [words.length, audio, isAudioPlaying, currentWordIndex]);
 
   // 音声再生開始/停止の監視
   useEffect(() => {

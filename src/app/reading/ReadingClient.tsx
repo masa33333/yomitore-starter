@@ -210,6 +210,19 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // プラットフォームに応じてハイライトインデックスを選択
   const activeHighlightIndex = isMobile ? mobileHighlighter.currentWordIndex : currentTimingIndex;
   
+  // デバッグ: モバイル判定とハイライト状態の確認
+  useEffect(() => {
+    console.log('🔍 MOBILE DEBUG:', {
+      isMobile,
+      userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'N/A',
+      mobileCurrentWordIndex: mobileHighlighter.currentWordIndex,
+      webCurrentTimingIndex: currentTimingIndex,
+      activeHighlightIndex,
+      isAudioPlaying,
+      englishLength: english.length
+    });
+  }, [isMobile, mobileHighlighter.currentWordIndex, currentTimingIndex, activeHighlightIndex, isAudioPlaying, english.length]);
+  
   // クライアントサイドでの状態復元フラグ
   const [isClientRestored, setIsClientRestored] = useState(false);
 
