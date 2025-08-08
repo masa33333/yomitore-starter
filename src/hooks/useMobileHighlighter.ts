@@ -176,7 +176,6 @@ export function useMobileHighlighter(
           elapsed
         });
       }
-      }
     }, 50);
   };
 
