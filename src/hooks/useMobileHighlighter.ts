@@ -37,7 +37,10 @@ export function useMobileHighlighter(
     const handlePlay = () => {
       console.log('📱 MOBILE: Audio play detected');
       
-      // 音声の長さを取得（推定値使用の遅延開始）
+      let retryCount = 0;
+      const maxRetries = 20; // 最大2秒待機（100ms × 20回）
+      
+      // 音声の長さを取得（推定値フォールバック付き）
       const waitForActualDuration = () => {
         if (audio.duration && audio.duration > 0 && !isNaN(audio.duration)) {
           // 実際の音声長さが取得できた場合
@@ -45,14 +48,22 @@ export function useMobileHighlighter(
           durationRef.current = audio.duration;
           startTimeRef.current = Date.now();
           startHighlighting();
-        } else {
+        } else if (retryCount < maxRetries) {
           // まだ取得できない場合は100ms後に再試行
-          console.log('📱 MOBILE: Duration not ready, retrying in 100ms...');
+          retryCount++;
+          console.log(`📱 MOBILE: Duration not ready, retry ${retryCount}/${maxRetries}...`);
           setTimeout(waitForActualDuration, 100);
+        } else {
+          // 最大試行回数に達した場合は推定値を使用
+          const estimatedDuration = estimateAudioDuration(text);
+          console.log(`📱 MOBILE: Fallback to estimated duration: ${estimatedDuration.toFixed(1)}s`);
+          durationRef.current = estimatedDuration;
+          startTimeRef.current = Date.now();
+          startHighlighting();
         }
       };
       
-      // 即座に試行、だめなら遅延試行
+      // 即座に試行開始
       waitForActualDuration();
     };
 
@@ -100,8 +111,18 @@ export function useMobileHighlighter(
       startTime: startTimeRef.current
     });
 
+    // パラメータ検証
+    if (durationRef.current <= 0 || wordCountRef.current <= 0) {
+      console.error('📱 MOBILE: Invalid parameters for highlighting:', {
+        duration: durationRef.current,
+        totalWords: wordCountRef.current
+      });
+      return;
+    }
+
     // 初期状態設定（-1から0にリセット）
     setCurrentWordIndex(0);
+    console.log('📱 MOBILE: Initial word index set to 0');
 
     // 50ms間隔の高頻度更新（20fps）
     intervalRef.current = setInterval(() => {
@@ -110,31 +131,51 @@ export function useMobileHighlighter(
       const totalWords = wordCountRef.current;
 
       if (duration > 0 && totalWords > 0) {
-        // 均等割りでの進行計算
-        const progress = Math.min(elapsed / duration, 1.0);
-        const wordIndex = Math.floor(progress * totalWords);
-        const clampedIndex = Math.max(0, Math.min(wordIndex, totalWords - 1));
-
-        // モバイル固有の先行調整（0.3秒早める - 調整値を減少）
-        const adjustedProgress = Math.min((elapsed + 0.3) / duration, 1.0);
-        const adjustedIndex = Math.floor(adjustedProgress * totalWords);
-        const finalIndex = Math.max(0, Math.min(adjustedIndex, totalWords - 1));
-
+        // モバイル特化：シンプルな進行計算
+        let rawProgress = elapsed / duration;
+        
+        // モバイル固有の先行調整（0.5秒早める）
+        rawProgress = (elapsed + 0.5) / duration;
+        
+        // 進行度を0-1の範囲に制限
+        const progress = Math.max(0, Math.min(rawProgress, 1.0));
+        
+        // 単語インデックス計算（確実に進行するよう調整）
+        let wordIndex = Math.floor(progress * totalWords);
+        
+        // 初期段階（最初の5%）では強制的に進行
+        if (elapsed > 1.0 && wordIndex === 0 && totalWords > 5) {
+          wordIndex = Math.min(2, totalWords - 1); // 最低2語目まで進める
+          console.log('📱 MOBILE: Force progress - moving to word 2');
+        }
+        
+        // 最終インデックス
+        const finalIndex = Math.max(0, Math.min(wordIndex, totalWords - 1));
+        
         setCurrentWordIndex(finalIndex);
 
-        // 診断情報更新（5回に1回）
-        if (Math.random() < 0.2) {
-          setDiagnostics({
-            elapsed: elapsed.toFixed(1),
-            duration: duration.toFixed(1),
-            progress: (progress * 100).toFixed(1),
-            wordIndex: finalIndex,
-            totalWords,
-            method: 'uniform-mobile'
-          });
+        // 診断情報更新（毎回更新に変更してデバッグ強化）
+        setDiagnostics({
+          elapsed: elapsed.toFixed(1),
+          duration: duration.toFixed(1),
+          progress: (progress * 100).toFixed(1),
+          wordIndex: finalIndex,
+          totalWords,
+          method: 'mobile-simple'
+        });
 
-          console.log(`📱 MOBILE: ${elapsed.toFixed(1)}s/${duration.toFixed(1)}s → word ${finalIndex}/${totalWords}`);
+        // デバッグログ（頻度を上げる）
+        if (Math.random() < 0.3) {
+          console.log(`📱 MOBILE PROGRESS: ${elapsed.toFixed(1)}s/${duration.toFixed(1)}s → progress:${(progress*100).toFixed(1)}% → word ${finalIndex}/${totalWords}`);
         }
+      } else {
+        // duration/totalWordsが無効な場合のエラーログ
+        console.error('📱 MOBILE ERROR: Invalid parameters:', {
+          duration,
+          totalWords,
+          elapsed
+        });
+      }
       }
     }, 50);
   };
