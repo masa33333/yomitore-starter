@@ -129,12 +129,6 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
   // Web版ハイライトフック
   const { currentTimingIndex } = useAudioHighlighter(audioRef.current, currentTimings, offsetSec);
   
-  // モバイル版ハイライトフック  
-  const mobileHighlighter = useMobileHighlighter(audioRef.current, english, isAudioPlaying);
-  
-  // プラットフォームに応じてハイライトインデックスを選択
-  const activeHighlightIndex = isMobile ? mobileHighlighter.currentWordIndex : currentTimingIndex;
-  
   // オフセット値の永続化
   useEffect(() => {
     localStorage.setItem('reading-highlight-offset', String(offsetSec));
@@ -209,6 +203,12 @@ export default function ReadingClient({ searchParams, initialData, mode }: Readi
     }
     return initialData?.story || '';
   });
+  
+  // モバイル版ハイライトフック（englishが定義された後に配置）
+  const mobileHighlighter = useMobileHighlighter(audioRef.current, english, isAudioPlaying);
+  
+  // プラットフォームに応じてハイライトインデックスを選択
+  const activeHighlightIndex = isMobile ? mobileHighlighter.currentWordIndex : currentTimingIndex;
   
   // クライアントサイドでの状態復元フラグ
   const [isClientRestored, setIsClientRestored] = useState(false);
