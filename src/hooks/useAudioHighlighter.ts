@@ -41,12 +41,12 @@ export function useAudioHighlighter(
       if (foundIndex >= 0 && foundIndex < items.length) {
         const currentWord = items[foundIndex];
         
-        // 現在の単語の時間内ならそのまま
-        if (currentTime >= currentWord.start && currentTime <= currentWord.end + 0.2) {
+        // 現在の単語の時間内ならそのまま（モバイル対応で短縮）
+        if (currentTime >= currentWord.start && currentTime <= currentWord.end + 0.05) {
           // 現在の単語継続
         } 
-        // 現在の単語を超えた場合は次に進む
-        else if (currentTime > currentWord.end + 0.2) {
+        // 現在の単語を超えた場合は積極的に次に進む（モバイル対応）
+        else if (currentTime > currentWord.end + 0.05) {
           // 次の単語に進む（1個ずつ）
           if (foundIndex < items.length - 1) {
             foundIndex++;
