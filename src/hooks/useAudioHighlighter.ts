@@ -28,6 +28,12 @@ export function useAudioHighlighter(
 
     const updateHighlight = () => {
       const currentTime = audio.currentTime + offsetSec;
+      
+      // モバイル専用デバッグ（5回に1回だけ表示）
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '');
+      if (isMobile && Math.random() < 0.2) {
+        console.log(`📱 MOBILE DEBUG: audioTime=${audio.currentTime.toFixed(2)}s, offset=${offsetSec}s, adjustedTime=${currentTime.toFixed(2)}s`);
+      }
 
       // 🎯 SIMPLE SEQUENTIAL: 順番通り進行（最も確実な方法）
       let foundIndex = currentTimingIndexRef.current;
@@ -47,8 +53,13 @@ export function useAudioHighlighter(
         } 
         // 現在の単語を超えた場合は積極的に次に進む（モバイル対応）
         else if (currentTime > currentWord.end + 0.05) {
-          // 次の単語に進む（1個ずつ）
-          if (foundIndex < items.length - 1) {
+          // モバイルの場合は2-3語一気に進むことも許容（深刻な遅延対応）
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent || '');
+          const jumpSize = isMobile ? 2 : 1; // モバイルは2語ずつ進む
+          
+          if (foundIndex < items.length - jumpSize) {
+            foundIndex += jumpSize;
+          } else if (foundIndex < items.length - 1) {
             foundIndex++;
           }
         }
