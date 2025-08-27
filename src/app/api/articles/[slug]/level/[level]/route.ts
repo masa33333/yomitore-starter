@@ -3,9 +3,9 @@ import { createSafeSupabaseClient, createServiceSupabaseClient } from '@/lib/sup
 
 export async function GET(
   req: Request,
-  context: { params: Record<string, string | string[]> }
+  context: { params: Promise<Record<string, string | string[] | undefined>> }
 ) {
-  const { slug, level } = context.params as { slug: string; level: string }
+  const { slug, level } = (await context.params) as { slug: string; level: string }
   const anon = createSafeSupabaseClient()
   const supabase = anon ?? createServiceSupabaseClient()
   if (!supabase) {
