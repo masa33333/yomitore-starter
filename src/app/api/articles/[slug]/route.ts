@@ -3,8 +3,9 @@ import { createSafeSupabaseClient, createServiceSupabaseClient } from '@/lib/sup
 
 export async function GET(
   req: Request,
-  { params }: { params: { slug: string } }
+  context: { params: Record<string, string | string[]> }
 ) {
+  const { slug } = context.params as { slug: string }
   const anon = createSafeSupabaseClient()
   const supabase = anon ?? createServiceSupabaseClient()
   if (!supabase) {
@@ -25,7 +26,7 @@ export async function GET(
   const { data: articles, error } = await supabase
     .from('articles')
     .select('*, article_levels(level, word_count, id)')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .limit(1)
 
   if (error) {
