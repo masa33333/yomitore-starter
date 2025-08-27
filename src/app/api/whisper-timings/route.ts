@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createServiceSupabaseClient } from '@/lib/supabase';
+
+export const dynamic = 'force-dynamic';
 import { TimingsJSON } from '@/types/highlight';
 
-// OpenAI クライアントの初期化
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+}
 
 // Whisper APIレスポンスの型定義
 type WhisperWord = {
@@ -274,6 +277,10 @@ export async function POST(request: NextRequest) {
       type: 'audio/mpeg' 
     });
     
+    const openai = getOpenAI();
+    if (!openai) {
+      return NextResponse.json({ error: 'OpenAI API key is not configured' }, { status: 500 });
+    }
     const whisperResponse = await openai.audio.transcriptions.create({
       model: 'whisper-1',
       file: audioFile,

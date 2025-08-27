@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { generateStoryPrompt, STORY_SYSTEM_MESSAGE, parseStoryResponse, validateStoryParameters } from '@/lib/storyPrompt';
 
-// OpenAI client initialization
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export const dynamic = 'force-dynamic';
+
+function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+}
 
 interface StoryRequest {
   genre: string;
@@ -63,6 +66,11 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('🎭 Generating story with OpenAI:', { genre, mood, tone, vocabLevel });
+
+    const openai = getOpenAI();
+    if (!openai) {
+      return NextResponse.json({ error: 'OpenAI API key is not configured' }, { status: 500 });
+    }
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({

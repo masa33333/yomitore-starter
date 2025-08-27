@@ -1,7 +1,13 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+export const dynamic = 'force-dynamic';
+
+function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+}
 
 export async function POST(req: Request) {
   let word = 'word';
@@ -45,6 +51,10 @@ ${detailedPos ? `Grammar hint: ${detailedPos}` : ''}`;
 
     console.log('📤 OpenAIに送信するプロンプト:', userPrompt.substring(0, 200) + '...');
 
+    const openai = getOpenAI();
+    if (!openai) {
+      return NextResponse.json({ error: 'OpenAI API key is not configured' }, { status: 500 });
+    }
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [

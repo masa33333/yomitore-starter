@@ -1,7 +1,13 @@
 import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+export const dynamic = 'force-dynamic';
+
+function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+}
 
 export async function POST(req: Request) {
   let text = '';
@@ -35,6 +41,10 @@ Output only the Japanese translation, nothing else.`;
     const maxTokens = isStory ? 8000 : 1000;
     const model = isStory ? "gpt-4o-mini" : "gpt-3.5-turbo";
 
+    const openai = getOpenAI();
+    if (!openai) {
+      return NextResponse.json({ error: 'OpenAI API key is not configured' }, { status: 500 });
+    }
     const completion = await openai.chat.completions.create({
       model: model,
       messages: [
