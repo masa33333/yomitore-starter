@@ -161,7 +161,7 @@ export default async function ReadingPage({ searchParams }: PageProps) {
   // Daily Reading mode: load Daily article level and adapt to reading client
   if (mode === 'daily' && slug) {
     // Build absolute base URL for server-side fetch
-    const hdrs = headers();
+    const hdrs = await headers();
     const host = hdrs.get('x-forwarded-host') || hdrs.get('host') || 'localhost:3000';
     const proto = hdrs.get('x-forwarded-proto') || 'http';
     const base = `${proto}://${host}`;
