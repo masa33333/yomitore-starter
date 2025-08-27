@@ -1,13 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import Image from 'next/image';
 import { getMessageQueue } from '@/utils/messageLoader';
 
 export default function Header() {
-  const router = useRouter();
   const { displayLang, setDisplayLang } = useLanguage();
   const [hasNewLetter, setHasNewLetter] = useState(false);
   const [showMailNotification, setShowMailNotification] = useState(false);
@@ -99,15 +98,16 @@ export default function Header() {
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         {/* 左側: ロゴ + 言語トグル + 手紙通知 */}
         <div className="flex items-center gap-4">
-          <a href="/" onClick={(e) => { e.preventDefault(); router.push('/'); }} className="hover:opacity-70">
-            <Image 
-              src="/images/logo.png" 
-              alt="読みトレ" 
-              width={120} 
+          <Link href="/" className="hover:opacity-70 inline-block">
+            <Image
+              src="/images/logo.png"
+              alt="読みトレ"
+              width={120}
               height={40}
               className="object-contain"
+              priority
             />
-          </a>
+          </Link>
           
           {/* Language Toggle */}
           <select

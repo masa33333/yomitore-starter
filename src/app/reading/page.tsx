@@ -3,6 +3,8 @@ import { Suspense } from 'react';
 import ReadingClient from './ReadingClient';
 import CatLoader from '@/components/CatLoader';
 import { createClient } from '@supabase/supabase-js';
+import { markdownToPlainText } from '@/lib/markdown';
+import { headers } from 'next/headers';
 import { getNotingHillStory as getStaticStory } from '@/data/nottingHillStories';
 import { getStoryBySlugAndLevel } from '@/data/stories';
 import { loadStoryFromFileServer } from '@/lib/serverStoryLoader';
@@ -156,6 +158,45 @@ export default async function ReadingPage({ searchParams }: PageProps) {
   // サーバーサイドでデータを取得
   let initialData: StoryData | null = null;
 
+  // Daily Reading mode: load Daily article level and adapt to reading client
+  if (mode === 'daily' && slug) {
+    // Build absolute base URL for server-side fetch
+    const hdrs = headers();
+    const host = hdrs.get('x-forwarded-host') || hdrs.get('host') || 'localhost:3000';
+    const proto = hdrs.get('x-forwarded-proto') || 'http';
+    const base = `${proto}://${host}`;
+    const userLevel = parseInt(params.level || '1');
+    try {
+      const metaRes = await fetch(`${base}/api/articles/${slug}`, { cache: 'no-store' }).catch(() => null)
+      const levelRes = await fetch(`${base}/api/articles/${slug}/level/${userLevel}`, { cache: 'no-store' })
+      const levelJson = await levelRes.json()
+      const bodyMd: string | undefined = levelJson?.level?.body_md
+      // Prefer title from the first markdown heading, and remove it from body
+      let resolvedTitle = `Daily: ${slug}`
+      let bodyForReading = bodyMd || ''
+      if (bodyMd) {
+        const lines = bodyMd.split('\n')
+        const idx = lines.findIndex(l => /^(#{1,3})\s+/.test(l.trim()))
+        if (idx !== -1) {
+          const m = lines[idx].trim().match(/^#{1,3}\s+(.+)$/)
+          if (m && m[1]) {
+            resolvedTitle = m[1].replace(/\s*\(L\d\)\s*$/,'').trim()
+          }
+          bodyForReading = lines.slice(idx + 1).join('\n').trim()
+        }
+      }
+      // Fallback to meta title only if no heading was found
+      if ((!bodyMd || resolvedTitle.startsWith('Daily:')) && metaRes && metaRes.ok) {
+        const metaJson = await metaRes.json().catch(() => null)
+        if (metaJson?.article?.title) resolvedTitle = metaJson.article.title
+      }
+      const story = bodyForReading ? markdownToPlainText(bodyForReading) : ''
+      initialData = { title: resolvedTitle, story, themes: [`Daily`, `L${userLevel}`, slug] }
+    } catch (e) {
+      console.warn('Daily load failed, falling back:', e)
+      initialData = { title: `Daily: ${slug} (L${userLevel})`, story: 'Failed to load daily content.', themes: ['Daily'] }
+    }
+  }
   // Generated story mode - delegate to client-side to load from localStorage
   if (isGeneratedStoryMode) {
     console.log(`📖 Generated story mode: ${id}`);
@@ -164,7 +205,7 @@ export default async function ReadingPage({ searchParams }: PageProps) {
     initialData = null;
   }
   // プリセットストーリーの場合
-  else if (isPresetMode && slug) {
+  else if (isPresetMode && slug && mode !== 'daily') {
     // ユーザーのレベルを取得（デフォルト: 1）
     const userLevel = parseInt(params.level || '1');
     

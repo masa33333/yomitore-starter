@@ -4,6 +4,9 @@
       "maxDuration": 30
     }
   },
+  "crons": [
+    { "path": "/api/admin/publish-daily", "schedule": "0 7 * * *" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

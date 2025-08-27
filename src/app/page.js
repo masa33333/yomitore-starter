@@ -46,6 +46,10 @@ export default function Home() {
       ja: '読み込み中...',
       en: 'Loading...',
     },
+    daily: {
+      ja: '今日の1本を読む',
+      en: "Read Today's Article",
+    },
   };
 
   // 表示言語に応じたテキスト取得関数
@@ -100,6 +104,10 @@ export default function Home() {
     router.push('/start');
   };
 
+  const handleOpenDaily = () => {
+    router.push('/daily');
+  };
+
   const handleChooseReading = () => {
     console.log('🔽 「今日の読み物を決める」ボタンがクリックされました');
     // 語彙レベルがない場合は先にquizに誘導
@@ -123,8 +131,16 @@ export default function Home() {
         <h1 className="text-xl text-text-primary/70 mb-8 font-bold">
           {getText('subtitle')}
         </h1>
+        {/* Daily CTA */}
+        <button
+          onClick={handleOpenDaily}
+          className="w-full mb-4 bg-black text-white font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg cursor-pointer"
+          style={{ pointerEvents: 'auto' }}
+        >
+          {getText('daily')}
+        </button>
         
-        {/* メインボタン: 今日の読み物を決める */}
+        {/* 既存: メインボタン: 今日の読み物を決める */}
         <button
           onClick={handleChooseReading}
           className="w-full mb-4 bg-primary-active text-text-primary font-semibold rounded-full px-6 py-3 text-xl hover:opacity-90 transition-colors shadow-lg cursor-pointer"
